@@ -1,6 +1,6 @@
 # eprase
 
-> A Vue.js project
+> The Vue version of the eprase client.
 
 ## Build Setup
 
