@@ -14,8 +14,8 @@
           <form id="ep-system-form">
             <div class="form-group">
               <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? </label>
-              <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service" required placeholder="Please select...">
-                <option selected disabled >Select System...</option>
+              <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service" required>
+                <option :value="null">Select System...</option>
                 <option value="Cerner"> Cerner </option>
                 <option value="All script"> All script </option>
                 <option value="Meditech"> Meditech </option>
@@ -44,7 +44,7 @@
             <div class="question form-group" id="question-1">
               <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?</label>
               <select name="ep-usage" id="usage-selector" class="form-control" v-model="results.ep_usage" required>
-                <option selected disabled hidden>Select Percentage...</option>
+                <option :value="null">Select Percentage...</option>
                 <option value="76-100">76-100%</option>
                 <option value="51-75">51-75%</option>
                 <option value="26-50">26-50%</option>
@@ -55,7 +55,7 @@
             <div class="question form-group" id="question-2">
               <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
               <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" required>
-                <option selected disabled hidden>Select an Option...</option>
+                <option :value="null">Select an Option...</option>
                 <option value="Adults">Adults</option>
                 <option value="Pediatrics">Pediatrics</option>
                 <option value="Both">Both</option>
@@ -94,7 +94,7 @@
         </div>
       </div>
 
-    </div>git add .*
+    </div>
   </div>
 </template>
 
@@ -115,10 +115,10 @@
         data() {
             return {
                 results: {
-                    ep_service: '',
+                    ep_service: null,
                     ep_version: '',
-                    ep_usage: '',
-                    patient_type: '',
+                    ep_usage: null,
+                    patient_type: null,
                     lab_results: '',
                     med_history: ''
                 },
@@ -146,7 +146,6 @@
     padding-top: 20px;
   }
   label {
-    text-align: left;
     max-width: 600px;
   }
 
@@ -156,7 +155,7 @@
 
   .lab-results-label, .med-history-label {
     font-weight: 700;
-    max-width: 600px;
+    max-width: 550px;
     display: inline-block;
   }
 
@@ -169,7 +168,7 @@
   }
 
   .radio-buttons {
-    margin-left: 100px;
+    margin-left: 140px;
   }
 
   #ep-system-form {
@@ -188,6 +187,7 @@
 
   .form-group {
     margin-bottom : 25px;
+    text-align: left;
   }
 
   .form-control {
@@ -249,6 +249,7 @@
 
   .footer {
     margin-top: 40px;
+    text-align: center;
   }
 
   .footer p {
