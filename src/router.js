@@ -6,6 +6,8 @@ import Home from './components/Home.vue';
 import About from './components/About.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
+import Instructions from "./components/Instructions";
+import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentPart1 from './components/AssessmentPart1.vue';
 
 Vue.use(Router);
@@ -38,6 +40,14 @@ export const router = new Router({
       path: '/',
       name: 'welcome',
       component: Welcome
+    },
+    {
+      path: '/instructions',
+      component: Instructions
+    },
+    {
+      path: '/assessmentintro',
+      component: AssessmentIntro
     },
     {
       path: '/assessmentpart1',

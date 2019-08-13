@@ -6,6 +6,7 @@
       <div class="header-bar-buttons">
         <button @click=home()><span class="glyphicon glyphicon-home"></span><p>Home</p></button>
         <button @click=assessments()><span class="glyphicon glyphicon-list"></span><p>Assessments</p></button>
+        <button @click=instructions()><span class="glyphicon glyphicon-list-alt"></span><p>Instructions</p></button>
         <button @click=reports()><span class="glyphicon glyphicon-stats"></span><p>Reports</p></button>
         <button><span class="glyphicon glyphicon-question-sign"></span><p><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></p></button>
         <button><span class="glyphicon glyphicon-log-out"></span><p class="headerLink"><router-link to="/login">Logout</router-link></p></button>
@@ -28,7 +29,11 @@
           },
           reports() {
             window.location.href = './home'
-          }
+          },
+          instructions() {
+              window.location.href = './instructions'
+          },
+
         }
     }
 </script>

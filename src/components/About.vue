@@ -1,6 +1,6 @@
 <template>
 
-  <div class="page">
+  <div id="page">
     <Header />
     <div class="content" >
       <h1>About ePRaSE</h1>
@@ -43,14 +43,16 @@
     height: 50px;
   }
 
-
   #logo-bar {
     padding-top: 40px;
     width: 100%;
   }
 
-  .logos {
+  .content {
+    padding: 40px;
+  }
 
+  .logos {
     padding-right: 70px;
   }
 

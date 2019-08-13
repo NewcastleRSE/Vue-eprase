@@ -11,12 +11,15 @@
         <div><button @click="assessments()"><span class="glyphicon glyphicon-list" style="font-size:12px;"></span><p>Assessments</p></button></div>
         <div class="home-buttons-text">Click here to begin the assessment questions.</div>
         <div><button><span class="glyphicon glyphicon-stats" style="font-size:12px;"></span><p>Reports</p></button></div>
-        <div id="results" class="home-buttons-text">Click here to view the assessment results.</div>
+        <div class="home-buttons-text">Click here to view the assessment results.</div>
 
       </div>
-      <hr>
+
       <div id="help-section">
-        <h3>Help Buttons</h3>
+
+        <p>For more detailed instructions, <router-link to="/instructions">click here</router-link>.</p>
+        <p>For futther information about the project, <router-link to="/about">click here</router-link>.</p>
+     <!--   <h3>Help Buttons</h3>
         <p>For more <strong>information</strong> about the ePRaSE system or to read user <strong>instructions</strong>, please click the buttons below.</p>
       </div>
       <div id="help-buttons">
@@ -25,7 +28,7 @@
         <button class="modal-btn btn btn-primary" id="show-about-modal" @click="showAboutModal = true">About</button>
 
         <InstructionsModal v-if="showModal" :modalData='customData' @close="showModal = false" />
-        <button class="modal-btn btn btn-primary" id="show-modal" @click="showModal = true">Instructions</button>
+        <button class="modal-btn btn btn-primary" id="show-modal" @click="showModal = true">Instructions</button> -->
       </div>
 
     </div>
@@ -62,7 +65,7 @@
         },
         methods: {
             assessments() {
-                window.location.href = './assessmentpart1'
+                window.location.href = './assessmentintro'
             }
         },
         computed: {
@@ -90,15 +93,7 @@
     margin:0;
   }
 
-
-  button.modal-btn {
-    height: 40px;
-    width: 120px;
-    font-size: 1.2em;
-  }
-
   #home-buttons {
-    margin: 0 auto;
     padding: 20px;
     display: grid;
     grid-template-columns: 100px 300px;
@@ -110,8 +105,15 @@
     padding-top: 25px;
   }
 
-  #results {
-    margin-left: -20px;
+  #help-section {
+    padding-top: 30px;
+  }
+
+   /*
+  button.modal-btn {
+    height: 40px;
+    width: 120px;
+    font-size: 1.2em;
   }
 
   #help-buttons {
@@ -120,14 +122,11 @@
 
   #show-modal {
     margin-left: 50px;
-  }
+  } */
 
-  .content, #help-section {
-    margin-top: 40px;
-  }
-
-  hr {
-    width: 650px;
+  .content{
+    padding: 40px;
+    text-align: left;
   }
 
 </style>
