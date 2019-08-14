@@ -4,12 +4,12 @@
     <div class="header-content">
       <img src="../assets/logo.png" alt="ePRaSE" class="eprase-logo-header">
       <div class="header-bar-buttons">
-        <button @click=home()><span class="glyphicon glyphicon-home"></span><p>Home</p></button>
-        <button @click=assessments()><span class="glyphicon glyphicon-list"></span><p>Assessments</p></button>
-        <button @click=instructions()><span class="glyphicon glyphicon-list-alt"></span><p>Instructions</p></button>
-        <button @click=reports()><span class="glyphicon glyphicon-stats"></span><p>Reports</p></button>
-        <button><span class="glyphicon glyphicon-question-sign"></span><p><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></p></button>
-        <button><span class="glyphicon glyphicon-log-out"></span><p class="headerLink"><router-link to="/login">Logout</router-link></p></button>
+        <button @click=home()><font-awesome-icon icon="home"></font-awesome-icon><p>Home</p></button>
+        <button @click=assessments()><font-awesome-icon icon="list"></font-awesome-icon><p>Assessments</p></button>
+        <button @click=instructions()><font-awesome-icon icon="clipboard"></font-awesome-icon><p>Instructions</p></button>
+        <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><p>Reports</p></button>
+        <button><font-awesome-icon icon="question-circle"></font-awesome-icon><p><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></p></button>
+        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><p class="headerLink"><router-link to="/login">Logout</router-link></p></button>
       </div>
     </div>
   </div>
@@ -65,7 +65,7 @@
   }
 
   .header-bar-buttons button {
-    margin: 5px 5px 5px 0px;
+    margin: 7px 5px 3px 0px;
     height: 70px;
     width: 95px;
     padding: 0;

@@ -8,6 +8,7 @@ import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 import Instructions from "./components/Instructions";
 import AssessmentIntro from "./components/AssessmentIntro";
+import AssessmentHome from "./components/AssessmentHome";
 import AssessmentPart1 from './components/AssessmentPart1.vue';
 
 Vue.use(Router);
@@ -48,6 +49,10 @@ export const router = new Router({
     {
       path: '/assessmentintro',
       component: AssessmentIntro
+    },
+    {
+      path: '/assessmenthome',
+      component: AssessmentHome
     },
     {
       path: '/assessmentpart1',

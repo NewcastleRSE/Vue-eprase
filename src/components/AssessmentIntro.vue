@@ -1,14 +1,14 @@
 <template>
   <div id="page">
     <Header />
-    <div class="content" v-if="assessmentComplete == false">
+    <div class="content" v-if="assessmentComplete === false">
       <h1>ePRaSE Assessment</h1>
       <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of indicators.</p>
       <p>The ePRaSE assessment will be repeated annually.</p>
       <h3>2019 ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
       <div class="buttons">
-        <button class="btn btn-primary" v-if="assessment.currentPart==1" @click="onStartAssessmentClick()">Begin 2019 Assessment</button>
+        <button class="btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin 2019 Assessment</button>
         <button class="btn btn-primary" v-if="assessment.currentPart>1" @click="onStartAssessmentClick()">Continue 2019 Assessment</button>
       </div>
       <div id="section">
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div class="content" v-if="assessmentComplete == true">
+    <div class="content" v-if="assessmentComplete === true">
       <h1>Assessment Complete</h1>
       <p>Thank you for taking part in the 2019 ePRaSE Assessment.</p>
       <p>To view the results of this assessment, click the 'View Results' button below.</p>

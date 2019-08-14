@@ -1,7 +1,11 @@
+let numPatients = 10;
+let numTests = 20;
 
 export const dataService = {
   getAssessmentPart,
-  setAssessmentPart
+  setAssessmentPart,
+  numPatients,
+  numTests
 };
 
 function getAssessmentPart() {

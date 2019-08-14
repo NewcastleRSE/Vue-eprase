@@ -1,0 +1,485 @@
+[
+  { "id": "P001",   "first_name": "Simon",  "surname": "zzzTam", "age": 54,   "gender": "male",
+    "height": 1.68,  "weight": 51,    "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "Penicillin" ],
+    "diagnosis": [
+      "Presents with Cholecystitis",
+      "Acute Liver Disease",
+      "Malnutrition",
+      "Alcohol Excess",
+      "Peptic Ulcer Disease"
+    ],
+    "medication_history": [
+      { "name": "Thiamine",       "dose": 100, "units": "mg", "route": "oral", "form": "", "frequency": "tds"},
+      { "name": "Spironolactone", "dose": 200, "units": "mg", "route": "oral", "form": "", "frequency": "od"},
+      { "name": "Multivitamins",  "dose": 1,   "units": "",   "route": "oral", "form": "", "frequency": "od"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",             "value": 132},
+      { "investigation": "Potassium",          "value": 3.5},
+      { "investigation": "Urea",               "value": 6.9},
+      { "investigation": "Creatinine",         "value": 87},
+      { "investigation": "C-Reactive Protein", "value": 21},
+      { "investigation": "Albumin",            "value": 37},
+      { "investigation": "Phosphate",          "value": 0.79},
+      { "investigation": "Magnesium",          "value": 0.68},
+      { "investigation": "Bilirubin",          "value": 27},
+      { "investigation": "ALP",                "value": 200},
+      { "investigation": "ALT",                "value": 50},
+      { "investigation": "Hb",                 "value": 12.1},
+      { "investigation": "Platelets",          "value": 132},
+      { "investigation": "WCC",                "value": 12.1},
+      { "investigation": "PT",                 "value": 19}
+    ]
+  },
+  { "id": "P002",   "first_name": "Karin",  "surname": "zzzChakwas", "age": 59,   "gender": "female",
+    "height": 1.57,  "weight": 150,    "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ ],
+    "diagnosis": [
+      "Presents with cellulitis",
+      "Chronic Kidney Disease stage 3",
+      "Depression",
+      "High BMI"
+    ],
+    "medication_history": [
+      { "name": "Duloxetine",       "dose": 60,   "units": "mg",  "route": "po", "form": "", "frequency": "bd"},
+      { "name": "Paracetamol",      "dose": 1,    "units": "g",   "route": "po", "form": "", "frequency": "qds"},
+      { "name": "Omeprazole",       "dose": 20,   "units": "mg",  "route": "po", "form": "", "frequency": "od"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",             "value": 138},
+      { "investigation": "Potassium",          "value": 4.2},
+      { "investigation": "Urea",               "value": 2.5},
+      { "investigation": "Creatinine",         "value": 64},
+      { "investigation": "C-Reactive Protein", "value": 12},
+      { "investigation": "Total Protein",      "value": 74},
+      { "investigation": "Albumin",            "value": 35},
+      { "investigation": "Bilirubin",          "value": 6},
+      { "investigation": "ALP",                "value": 71},
+      { "investigation": "ALT",                "value": 17},
+      { "investigation": "Hb",                 "value": 127},
+      { "investigation": "Platelets",          "value": 44.7},
+      { "investigation": "WCC",                "value": 15.03},
+      { "investigation": "Neutrophils",        "value": 9.46}
+    ]
+  },
+  { "id": "P003",   "first_name": "Chloe",  "surname": "zzzMichel", "age": 66,   "gender": "female",
+    "height": 1.72,  "weight": 60,    "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ ],
+    "diagnosis": [
+      "Hypertension",
+      "Type 2 Diabetes",
+      "AKI",
+      "Cholecystitis",
+      "Peptic Ulcer Disease & Ischemic Heart Disease"
+    ],
+    "medication_history": [
+      { "name": "Metformin MR",     "dose": 1,    "units": "g",   "route": "po",    "form": "",        "frequency": "bd"},
+      { "name": "Simvastatin",      "dose": 40,   "units": "mg",  "route": "po",    "form": "",        "frequency": "on"},
+      { "name": "Perindopril",      "dose": 4,    "units": "mg",  "route": "po",    "form": "",        "frequency": "od"},
+      { "name": "Gliclazide",       "dose": 80,   "units": "mg",  "route": "po",    "form": "",        "frequency": "bd"},
+      { "name": "Aspirin",          "dose": 75,   "units": "mg",  "route": "po",    "form": "",        "frequency": "od"},
+      { "name": "GTN ",             "dose": 0,    "units": "",    "route": "",      "form": "Spray",   "frequency": "prn"}
+    ],
+    "clinical_data": [
+      { "investigation": "e Glomerular Filtration Rate",  "value": 25}
+    ]
+  },
+  { "id": "P004",   "first_name": "Janet",  "surname": "zzzFraiser", "age": 3,   "gender": "female",
+    "height": 0.96,  "weight": 15,    "dob": "01/01/1971", "is_adult": false,
+    "allergies": [ "Penicillin" ],
+    "diagnosis": [
+      "Presents with Chest Infection",
+      "Epilepsy"
+    ],
+    "medication_history": [
+      { "name": "Sodium Valproate",       "dose": 225, "units": "mg", "route": "oral", "form": "", "frequency": "bd"},
+      { "name": "Levetiracetam", "dose": 150, "units": "mg", "route": "oral", "form": "", "frequency": "bd"},
+      { "name": "Midazolam",   "dose": 5,   "units": "mg",   "route": "buccal", "form": "", "frequency": "prn for seizures"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",             "value": 140},
+      { "investigation": "Potassium",          "value": 3.6},
+      { "investigation": "Sodium",             "value": 140},
+      { "investigation": "Urea",               "value": 5.4},
+      { "investigation": "Creatinine",         "value": 26},
+      { "investigation": "C-Reactive Protein", "value": 40},
+      { "investigation": "Albumin",            "value": 40},
+      { "investigation": "Magnesium",          "value": 0.8},
+      { "investigation": "Bilirubin",          "value": 8},
+      { "investigation": "ALP",                "value": 200},
+      { "investigation": "ALT",                "value": 15},
+      { "investigation": "WCC",                "value": 15},
+      { "investigation": "Neutrophils",        "value": 11},
+      { "investigation": "MCV",                "value": 90}
+    ]
+  },
+  { "id": "P005",   "first_name": "Claire",  "surname": "zzzTemple", "age": 6,   "gender": "female",
+    "height": 1.15,  "weight": 21,   "dob": "01/01/1971", "is_adult": false,
+    "allergies": [ "No Known Drug allergies" ],
+    "diagnosis": [
+      "Appendicitis"
+    ],
+    "medication_history": [
+    ],
+    "clinical_data": [
+
+    ]
+  },
+  { "id": "P006",   "first_name": "Kellye",  "surname": "zzzYamato", "age": 6,   "gender": "female",
+    "height": 1.1,  "weight": 20,   "dob": "01/01/1971", "is_adult": false,
+    "allergies": [ "No Known Drug allergies" ],
+    "diagnosis": [
+      "Paediatric Congenital Heart Disease",
+      "Admitted for Cardiac Catheter Procedure"
+    ],
+    "medication_history": [
+      { "name": "Spironolactone", "dose": 10,  "units": "mg", "route": "PO", "form": "", "frequency": "Bd"},
+      { "name": "Frusemide",      "dose": 10,  "units": "mg", "route": "PO", "form": "", "frequency": "Bd"},
+      { "name": "Sytron",         "dose": 2.5, "units": "ml", "route": "PO", "form": "", "frequency": "tds"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",             "value": 143},
+      { "investigation": "Potassium",          "value": 6},
+      { "investigation": "Urea",               "value": 9}
+    ]
+  },
+  { "id": "P007",   "first_name": "Beverley",  "surname": "zzzCrusher", "age": 79,   "gender": "female",
+    "height": 1.64,  "weight": 56,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "Penicillin" ],
+    "diagnosis": [
+      "Community-acquired pneumonia",
+      "Previous breast cancer",
+      "Hypothyroid",
+      "TIA"
+    ],
+    "medication_history": [
+      { "name": "Clopidogrel", "dose": 75, "units": "mg", "route": "PO", "form": "Tablet", "frequency": "MANE"},
+      { "name": "Paracetamol",   "dose": 1,   "units": "g",   "route": "PO", "form": "Tablet", "frequency": "QDS PRN"},
+      { "name": "Simvastatin", "dose": 40, "units": "mg", "route": "PO", "form": "Tablet", "frequency": "NOCTE"}
+    ],
+    "clinical_data": [
+      { "investigation": "C-Reactive Protein", "value": 243},
+      { "investigation": "WCC",                "value": 14.2},
+      { "investigation": "Neutrophils",        "value": 10.4}
+    ]
+  },
+  { "id": "P008",   "first_name": "Leonard",  "surname": "zzzMcCoy", "age": 74,   "gender": "male",
+    "height": 1.69,  "weight": 0, "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "NSAids" ],
+    "diagnosis": [
+      "Presents with Pulmonary Embolism",
+      "Heart Failure",
+      "Chronic Kidney Disease"
+    ],
+    "medication_history": [
+      { "name": "Certirizine",  "dose": 10, "units": "mg", "route": "Oral", "form": "Tablet", "frequency": "Once Daily"},
+      { "name": "Ramipiril",   "dose": 10,   "units": "mg",   "route": "Oral", "form": "Capsule", "frequency": "Once Daily"}
+    ],
+    "clinical_data": [
+      { "investigation": "Potassium",     "value": 5.5},
+      { "investigation": "Urea",          "value": 17.8},
+      { "investigation": "Creatinine",    "value": 297},
+      { "investigation": "Platelets",     "value": 48}
+    ]
+  },
+  { "id": "P009",   "first_name": "Julius",  "surname": "zzzHibbert", "age": 70,   "gender": "male",
+    "height": 1.69,  "weight": 0, "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ ],
+    "diagnosis": [
+      "Presents with Pulmonary Embolism",
+      "Chronic Kidney Disease"
+    ],
+    "medication_history": [
+      { "name": "Certirizine",  "dose": 10, "units": "mg", "route": "Oral", "form": "Tablet", "frequency": "Once Daily"},
+      { "name": "Ramipiril",   "dose": 10,   "units": "mg",   "route": "Oral", "form": "Capsule", "frequency": "Once Daily"}
+    ],
+    "clinical_data": [
+      { "investigation": "Potassium",     "value": 5.5},
+      { "investigation": "Urea",          "value": 17.8},
+      { "investigation": "Creatinine",    "value": 297},
+      { "investigation": "Platelets",     "value": 48}
+    ]
+  },
+  { "id": "P010",   "first_name": "Margaret",  "surname": "zzzHoulihan", "age": 65,   "gender": "female",
+    "height": 1.6,  "weight": 79, "dob": "01/01/1971", "is_adult": true,
+    "allergies": [  ],
+    "diagnosis": [
+      "New diagnosis of Atrial Fibrillation",
+      "Depression",
+      "Hypertension",
+      "Osteoarthritis"
+    ],
+    "medication_history": [
+      { "name": "Asprin",       "dose": 75,   "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "MANE"},
+      { "name": "Domperidone",  "dose": 10,   "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "Three times daily"},
+      { "name": "Ibuprofen",    "dose": 400,  "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "Three times daily"},
+      { "name": "Quinine",      "dose": 200,  "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "NOCTE"},
+      { "name": "Verapamil",    "dose": 80,   "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "Three times daily"}
+    ],
+    "clinical_data": [
+
+    ]
+  },
+  { "id": "P011",   "first_name": "Julian",  "surname": "zzzBashir", "age": 72,   "gender": "male",
+    "height": 1.72,  "weight": 65,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [  ],
+    "diagnosis": [
+      "Sepsis ? chest",
+      "Renal Transplant",
+      "Glaucoma",
+      "Von Willebrand\"s Disease",
+      "Previous Duodenal Ulcer"
+    ],
+    "medication_history": [
+      { "name": "Prednisolone",  "dose": 10,   "units": "mg",   "route": "Oral", "form": "Tablet",   "frequency": "Daily"}
+    ],
+    "clinical_data": [
+
+    ]
+  },
+  { "id": "P012",   "first_name": "Laurel",  "surname": "zzzWeaver", "age": 34,   "gender": "female",
+    "height": 1.57,  "weight": 45,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [  ],
+    "diagnosis": [
+      "Meningitis",
+      "Epilepsy",
+      "Psoriasis"
+    ],
+    "medication_history": [
+      { "name": "Meropenem",  "dose": 2,   "units": "g",   "route": "IV", "form": "Injection",   "frequency": "Three Times Daily"}
+    ],
+    "clinical_data": [
+
+    ]
+  },
+  { "id": "P019",   "first_name": "Laurel",  "surname": "zzzWeaver", "age": 83,   "gender": "male",
+    "height": 0,  "weight": 60.2,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "NKDA" ],
+    "diagnosis": [
+      "Presents with shortness of breath",
+      "Pleural Effusion  & PE",
+      "Parkinson’s Disease"
+    ],
+    "medication_history": [
+      { "name": "Amlodipine",   "dose": 10,     "units": "mg",      "route": "Oral",    "form": "Tablet",      "frequency": "Once Daily"},
+      { "name": "Astrovastin",  "dose": 20,     "units": "mg",      "route": "Oral",    "form": "Tablet",      "frequency": "Once Daily"},
+      { "name": "Omeprazole",   "dose": 20,     "units": "mg",      "route": "Oral",    "form": "Capsule",     "frequency": "Once Daily"},
+      { "name": "Tinzaparin",   "dose": 12500,  "units": "units",   "route": "sc",      "form": "Injection",   "frequency": "Once Daily"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",        "value": 144},
+      { "investigation": "Potassium",     "value": 4},
+      { "investigation": "Urea",          "value": 5.9},
+      { "investigation": "Creatinine",    "value": 86},
+      { "investigation": "e Glomerular Filtration Rate",     "value": 48},
+      { "investigation": "Hb",            "value": 144},
+      { "investigation": "Platelets",     "value": 280},
+      { "investigation": "WCC",           "value": 8.4},
+      { "investigation": "Neutrophils",   "value": 5.35}
+    ]
+  },
+  { "id": "P020",   "first_name": "Robert",  "surname": "zzzKelso", "age": 81,   "gender": "male",
+    "height": 0,  "weight": 61,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "NKDA" ],
+    "diagnosis": [
+      "Presents with shortness of breath",
+      "Pleural Effusion  & PE",
+      "Parkinson’s Disease"
+    ],
+    "medication_history": [
+      { "name": "Amlodipine",   "dose": 10,    "units": "mg",    "route": "Oral", "form": "Tablet",    "frequency": "Once Daily"},
+      { "name": "Astrovastin",  "dose": 20,    "units": "mg",    "route": "Oral", "form": "Tablet",    "frequency": "Once Daily"},
+      { "name": "Omeprazole",   "dose": 20,    "units": "mg",    "route": "Oral", "form": "Capsule",   "frequency": "Once Daily"},
+      { "name": "Tinzaparin",   "dose": 12500, "units": "units", "route": "sc",   "form": "Injection", "frequency": "Once Daily"},
+      { "name": "Co-beneldopa", "dose": 1,  "units": "cap",   "route": "Oral", "form": "Capsule",   "frequency": "three times a day 10am, 2pm & 6pm"},
+      { "name": "Amoxicillin",  "dose": 500,   "units": "mg",    "route": "Oral", "form": "Capsule",   "frequency": "Three times a day (t.d.s)"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",        "value": 143},
+      { "investigation": "Potassium",     "value": 4.1},
+      { "investigation": "Urea",          "value": 6},
+      { "investigation": "Creatinine",    "value": 86},
+      { "investigation": "Hb",            "value": 144},
+      { "investigation": "Platelets",     "value": 280},
+      { "investigation": "WCC",           "value": 8.4},
+      { "investigation": "Neutrophils",   "value": 5.35}
+    ]
+  },
+  { "id": "P021",   "first_name": "Perry",  "surname": "zzzCox", "age": 68,   "gender": "male",
+    "height": 0,  "weight": 71,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "NKDA" ],
+    "diagnosis": [
+      "Presents with a chest infection",
+      "Atrial Fibrillation",
+      "Type 2 diabetes"
+    ],
+    "medication_history": [
+      { "name": "Amlodipine",   "dose": 5,     "units": "mg",      "route": "Oral",    "form": "Tablet",      "frequency": "Once Daily"},
+      { "name": "Rivaroxaban ", "dose": 30,    "units": "mg",      "route": "Oral",    "form": "Tablet",      "frequency": "Once Daily with Food"},
+      { "name": "Metformin",    "dose": 500,   "units": "mg",      "route": "Oral",    "form": "Tablet",      "frequency": "Twice Daily"},
+      { "name": "Digoxin",      "dose": 125,   "units": "mcg",     "route": "Oral",    "form": "Tablet",      "frequency": "Once Daily"},
+      { "name": "Amoxicillin",  "dose": 500,   "units": "mg",      "route": "Oral",    "form": "Capsule",     "frequency": "Three times a day"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",                        "value": 140},
+      { "investigation": "Potassium",                     "value": 3.9},
+      { "investigation": "Urea",                          "value": 4.5},
+      { "investigation": "Creatinine",                    "value": 51},
+      { "investigation": "e Glomerular Filtration Rate",  "value": 90}
+    ]
+  },
+  { "id": "P022",   "first_name": "Carla",  "surname": "zzzEspinosa", "age": 48,   "gender": "male",
+    "height": 0,  "weight": 60,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "Co-trimoxazole" ],
+    "diagnosis": [
+      "Presents with worsening foot ulcer, nausea & vomiting and pain",
+      "Type 1 Diabetic",
+      "Gastroparesis"
+    ],
+    "medication_history": [
+      { "name": "Lantus",         "dose": 22,  "units": "unit", "route": "Subcutaneous",  "form": "Injection",   "frequency": "Once Daily at night"},
+      { "name": "Nortriptyline",  "dose": 10,  "units": "mg",   "route": "Oral",          "form": "Tablet",      "frequency": "Once Daily with night"},
+      { "name": "Paracetamol",    "dose": 1,   "units": "g",    "route": "Oral",          "form": "Tablet",      "frequency": "Four times a day (qds)"},
+      { "name": "Gabapentin",     "dose": 300, "units": "mg",   "route": "Oral",          "form": "Capsules",    "frequency": "When required (prn)"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",                        "value": 140},
+      { "investigation": "Potassium",                     "value": 4.9},
+      { "investigation": "Urea",                          "value": 4.6},
+      { "investigation": "Creatinine",                    "value": 68},
+      { "investigation": "e Glomerular Filtration Rate",  "value": 90},
+      { "investigation": "C-Reactive Protein",            "value": 43},
+      { "investigation": "WCC",                           "value": 5.6},
+      { "investigation": "Neutrophils",                   "value": 3.6}
+    ]
+  },
+  { "id": "P023",   "first_name": "Drake",  "surname": "zzzRamoray", "age": 54,   "gender": "male",
+    "height": 0,  "weight": 41,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [ "Penicillin" ],
+    "diagnosis": [
+      "Presents with cholecystitis",
+      "Acute Liver Disease",
+      "Malnutrition",
+      "Alcohol excess",
+      "Peptic Ulcer Disease",
+      "Malnutrition"
+    ],
+    "medication_history": [
+      { "name": "Thiamine",           "dose": 100,    "units": "mg",    "route": "Oral",      "form": "",       "frequency": "tds"},
+      { "name": "Spironolactone",     "dose": 200,    "units": "mg",    "route": "Oral",      "form": "",       "frequency": "od"},
+      { "name": "Multivitamins",      "dose": 1,      "units": "",      "route": "Oral",      "form": "",       "frequency": "od"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",                        "value": 132},
+      { "investigation": "Potassium",                     "value": 5.5},
+      { "investigation": "Urea",                          "value": 6.9},
+      { "investigation": "Creatinine",                    "value": 87},
+      { "investigation": "C-Reactive Protein",            "value": 21},
+      { "investigation": "Albumin",                       "value": 37},
+      { "investigation": "Phosphate",                     "value": 0.79},
+      { "investigation": "Magnesium",                     "value": 0.68},
+      { "investigation": "Bilirubin",                     "value": 27},
+      { "investigation": "ALP",                           "value": 200},
+      { "investigation": "ALT",                           "value": 50},
+      { "investigation": "Hb",                            "value": 12.1},
+      { "investigation": "Platelets",                     "value": 170},
+      { "investigation": "WCC",                           "value": 12.1}
+    ]
+  },
+  { "id": "P024",   "first_name": "Benjamin",  "surname": "zzzPierce", "age": 77,   "gender": "male",
+    "height": 1.72,  "weight": 70,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [  ],
+    "diagnosis": [
+      "Presents with Non-severe Community Acquired Pneumonia"
+    ],
+    "medication_history": [
+      { "name": "Warfarin",       "dose": 3,   "units": "mg",   "route": "oral", "form": "tablets",   "frequency": "OD (2mg on a Sunday)"},
+      { "name": "Carbocisteine",  "dose": 750, "units": "mg",   "route": "oral", "form": "capsules",  "frequency": "TDS"},
+      { "name": "Bumetanide ",    "dose": 1,   "units": "mg",   "route": "oral", "form": "tablets",   "frequency": "OM"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",      "value": 145},
+      { "investigation": "Urea",        "value": 5.9},
+      { "investigation": "Total Ca.",   "value": 2.35},
+      { "investigation": "INR",         "value": 2.7}
+    ]
+  },
+  { "id": "P025",   "first_name": "Christine",  "surname": "zzzChapel", "age": 71,   "gender": "female",
+    "height": 1.60,  "weight": 58,  "dob": "01/01/1971", "is_adult": true,
+    "allergies": [  ],
+    "diagnosis": [
+      "Presents with exacerbation of COPD",
+      "Dementia"
+    ],
+    "medication_history": [
+      { "name": "Salbutamol",       "dose": 200,  "units": "mcg",  "route": "inhaled",  "form": "inhaler",   "frequency": "2 puffs QDS PRN"},
+      { "name": "Ranitidine",       "dose": 150,  "units": "mg",   "route": "oral",     "form": "capsules",  "frequency": "BD"},
+      { "name": "Prednisolone ",    "dose": 5,    "units": "mg",   "route": "oral",     "form": "tablets",   "frequency": "OD"}
+    ],
+    "clinical_data": [
+      { "investigation": "Sodium",      "value": 131},
+      { "investigation": "Potassium",   "value": 3.9},
+      { "investigation": "Total Ca.",   "value": 2.27}
+    ]
+  },
+  {
+    "id": "P026",
+    "first_name": "Henry",
+    "surname": "zzzBlake",
+    "age": 79,
+    "gender": "male",
+    "height": 1.70,
+    "weight": 62,
+    "dob": "01/01/1971",
+    "is_adult": true,
+    "allergies": [],
+    "diagnosis": [
+      "Presents with SOB (Shortness of breath)"
+    ],
+    "medication_history": [
+      {
+        "name": "Colecalciferol",
+        "dose": 800,
+        "units": "units",
+        "route": "oral",
+        "form": "capsules",
+        "frequency": "OD"
+      },
+      {
+        "name": "Folic acid",
+        "dose": 5,
+        "units": "mg",
+        "route": "oral",
+        "form": "tablets",
+        "frequency": "OD"
+      },
+      {
+        "name": "Tamsulosin ",
+        "dose": 400,
+        "units": "mcg",
+        "route": "oral",
+        "form": "capsules",
+        "frequency": "OD"
+      }
+    ],
+    "clinical_data": [
+      {
+        "investigation": "Sodium",
+        "value": 139
+      },
+      {
+        "investigation": "Potassium",
+        "value": 5.8
+      },
+      {
+        "investigation": "Creatinine",
+        "value": 259
+      },
+      {
+        "investigation": "C-Reactive Protein",
+        "value": 4
+      }
+    ]
+  }
+]

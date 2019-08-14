@@ -8,9 +8,9 @@
       </div>
       <div id="home-buttons">
 
-        <div><button @click="assessments()"><span class="glyphicon glyphicon-list" style="font-size:12px;"></span><p>Assessments</p></button></div>
+        <div><button @click="assessments()"><font-awesome-icon icon="list"></font-awesome-icon><p>Assessments</p></button></div>
         <div class="home-buttons-text">Click here to begin the assessment questions.</div>
-        <div><button><span class="glyphicon glyphicon-stats" style="font-size:12px;"></span><p>Reports</p></button></div>
+        <div><button><font-awesome-icon icon="chart-bar"></font-awesome-icon><p>Reports</p></button></div>
         <div class="home-buttons-text">Click here to view the assessment results.</div>
 
       </div>
@@ -96,9 +96,9 @@
   #home-buttons {
     padding: 20px;
     display: grid;
-    grid-template-columns: 100px 300px;
+    grid-template-columns: 100px 500px;
     grid-gap: 20px;
-    width: 400px;
+    width: 600px;
   }
 
   .home-buttons-text {
