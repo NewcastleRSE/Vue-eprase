@@ -9,7 +9,8 @@ import Register from './components/Register.vue';
 import Instructions from "./components/Instructions";
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
-import AssessmentPart1 from './components/AssessmentPart1.vue';
+import AssessmentPart1 from './components/AssessmentPart1';
+import AssessmentPart2 from './components/AssessmentPart2';
 
 Vue.use(Router);
 
@@ -57,6 +58,10 @@ export const router = new Router({
     {
       path: '/assessmentpart1',
       component: AssessmentPart1
+    },
+    {
+      path: '/assessmentpart2',
+      component: AssessmentPart2
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }

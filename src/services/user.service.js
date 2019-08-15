@@ -1,4 +1,3 @@
-import { authHeader } from '../auth-header';
 
 let baseURL = 'http://localhost:6001/api';
 
@@ -20,7 +19,8 @@ function login(username, password) {
       // login successful if there's a jwt token in the response
       if (user.accessToken) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        localStorage.setItem('user', user.accessToken);
+        localStorage.setItem('token', user.accessToken);
+        localStorage.setItem('user', 'fvines');
       }
       return user;
     });
@@ -29,6 +29,7 @@ function login(username, password) {
 function logout() {
   // remove user from local storage to log user out
   localStorage.removeItem('user');
+  localStorage.removeItem('token');
 }
 
 function handleResponse(response) {

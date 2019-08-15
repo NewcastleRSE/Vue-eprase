@@ -98,11 +98,8 @@
         },
         methods: {
             onContinueClick() {
-                window.location.href = './assessmentpart' + this.currentPart;
+                window.location.href = './assessmentpart' + this.assessment.currentPart;
             }
-        },
-        created : function() {
-
         }
     }
 </script>

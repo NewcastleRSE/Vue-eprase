@@ -18,7 +18,7 @@
       <div id="help-section">
 
         <p>For more detailed instructions, <router-link to="/instructions">click here</router-link>.</p>
-        <p>For futther information about the project, <router-link to="/about">click here</router-link>.</p>
+        <p>For further information about the project, <router-link to="/about">click here</router-link>.</p>
      <!--   <h3>Help Buttons</h3>
         <p>For more <strong>information</strong> about the ePRaSE system or to read user <strong>instructions</strong>, please click the buttons below.</p>
       </div>

@@ -160,9 +160,9 @@
     width: 370px;
   }
 
-  .is-valid {
+  /*.is-valid {
     border-left: 5px solid #42A948;
-  }
+  } */
 
   #email-link {
     padding-bottom: 20px;
