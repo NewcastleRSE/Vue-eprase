@@ -30,10 +30,14 @@ export const authentication = {
       userService.logout();
       commit('logout');
     } ,
-    saveData({ dispatch, commit }, { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
-      dataService.saveAssessmentData(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
-      commit('saveAssessmentData');
-    }
+    savePart1Data({ dispatch, commit }, { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
+      dataService.savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
+      commit('savePart1Data');
+    },
+    savePart2Data({ dispatch, commit }, { qualitative_data, time_taken }){
+      dataService.savePart2Data( qualitative_data, time_taken);
+      commit('savePart2Data');
+    },
   },
   mutations: {
     loginRequest(state, user) {
@@ -52,7 +56,11 @@ export const authentication = {
       state.status = {};
       state.user = null;
     } ,
-    saveAssessmentData(state) {
+    savePart1Data(state) {
+      state.status = {};
+      state.user = user;
+    },
+    savePart2Data(state) {
       state.status = {};
       state.user = user;
     }

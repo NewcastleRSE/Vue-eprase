@@ -40,32 +40,52 @@
         data() {
             return {
                 patients : json,
-                patientList : []
+                numPatients : 0,
+                patientList : [],
+                patientIds : []
             }
         },
         methods: {
             setPatients: function() {
 
-               let i = 0;
-               for(i = 0; i < this.patients.length; i++){
-                  this.patientList.push(this.patients[i]);
-               }
+               this.numPatients = this.patients.length;
+
+                // create a list of 10 patients randomly
+                for(let i = 0; i < this.numPatients; i++){
+                    let index = Math.floor(Math.random() * this.numPatients);
+
+                    if(!this.patientIds.includes(index)){
+                        this.patientIds.push(index);
+                        if(this.patientIds.length <= 10){
+                            this.patientList.push(this.patients[index]);
+                        }
+                    }
+                }
+
+                // set patient DOBs
+                for(let i = 0; i < this.patientList.length; i++) {
+                    this.patientList[i].dob = this.getDOB(this.patientList[i]);
+                }
             },
             getPatients: function () {
                 return this.patientList;
             },
             getDOB(patient)
             {
-                var today = new Date();                   // get today's date
+                // get today's date
+                var today = new Date();
 
-                var days = Math.random() * 360;           //randomise the date within the last 12 months
+                //randomise the date within the last 12 months
+                var days = Math.random() * 360;
                 today.setDate(today.getDate()-days);
 
-                var d = today.getDate();                 // get date string info
+                // get date string info
+                var d = today.getDate();
                 var m = today.getMonth() + 1;
                 var yyyy = today.getFullYear();
 
-                yyyy = yyyy - patient.age;                // subtract patient's age
+                // subtract patient's age
+                yyyy = yyyy - patient.age;
 
                 var dd = d.toString();
                 var mm = m.toString();
