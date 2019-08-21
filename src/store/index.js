@@ -9,6 +9,30 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   modules: {
     alert,
-    authentication
+    authentication,
+  },
+  state : {
+  },
+  actions : {
+    setPatientList({ commit }, { patientList, patientIds } ) {
+      commit('setPatientList', { patientList }),
+      commit('setPatientIds', { patientIds })
+    }
+  },
+  mutations: {
+    setPatientList(state, patientList ){
+      state.patientList = patientList;
+    },
+    setPatientIds(state, patientIds ){
+      state.patientIds = patientIds;
+    }
+  },
+  getters: {
+    getPatientListById: (state) => (id) => {
+      return state.patientList.find(id => patientList.id === id)
+    },
+    getPatientList : state => {
+      return state.patientList
+    }
   }
 });

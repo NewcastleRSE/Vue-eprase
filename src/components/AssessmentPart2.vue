@@ -31,7 +31,7 @@
       <div class="buttons">
         <p>When all of the patients have been admitted to your ePrescription System, click <strong>Next</strong>.</p>
         <button type="button" class="btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
-        <button type="button" class="btn btn-primary"  id="next-button" @click="onNextClick()">Next</button>
+        <button type="button" class="btn btn-primary"  id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
       </div>
     </div>
 
@@ -58,14 +58,6 @@
         },
         data() {
             return {
-                patient: {
-                    first_name: '',
-                    suranme: '',
-                    dob: null,
-                    gender: null,
-
-                    time_taken: ''
-                },
                 submitted: false,
                 assessment: {
                     currentPart: dataService.getAssessmentPart(),
@@ -77,7 +69,7 @@
         },
         methods: {
             resetForm: function () {
-                this.$data.results = {};
+                this.$data.assessment = {};
                 this.errors.clear();
             },
             onExitClick() {
@@ -91,7 +83,7 @@
 
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
-                        this.assesment.time_taken = elapsedTime/1000;
+                        this.assessment.time_taken = elapsedTime/1000;
 
                         const qualitative_data = this.assessment.qualitative_data;
                         const time_taken = this.assessment.time_taken;

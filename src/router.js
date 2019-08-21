@@ -11,6 +11,7 @@ import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
 import AssessmentPart1 from './components/AssessmentPart1';
 import AssessmentPart2 from './components/AssessmentPart2';
+import AssessmentPart3 from './components/AssessmentPart3';
 
 Vue.use(Router);
 
@@ -62,6 +63,10 @@ export const router = new Router({
     {
       path: '/assessmentpart2',
       component: AssessmentPart2
+    },
+    {
+      path: '/assessmentpart3',
+      component: AssessmentPart3
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }

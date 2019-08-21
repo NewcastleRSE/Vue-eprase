@@ -30,12 +30,10 @@
 
 <script>
     import json from '../json/patients.json'
-    import Patient from './Patient'
 
     export default {
         name: "Patients",
         components: {
-          Patient
         },
         data() {
             return {
@@ -49,26 +47,35 @@
             setPatients: function() {
 
                this.numPatients = this.patients.length;
+               let patientIndex = [];
 
-                // create a list of 10 patients randomly
+                // create a list of 10 patient indexes randomly from all patients
                 for(let i = 0; i < this.numPatients; i++){
                     let index = Math.floor(Math.random() * this.numPatients);
-
-                    if(!this.patientIds.includes(index)){
-                        this.patientIds.push(index);
-                        if(this.patientIds.length <= 10){
-                            this.patientList.push(this.patients[index]);
+                    if(patientIndex.length < 10){
+                        // don't want the same patient twice
+                        if (!(patientIndex.includes(index))) {
+                            patientIndex.push(index);
                         }
                     }
                 }
 
-                // set patient DOBs
+                // loop through indexes and set the patient list and patient id list
+                for(let i = 0; i < patientIndex.length; i++) {
+                    this.patientList.push(this.patients[patientIndex[i]]);
+                    let patient = this.patients[patientIndex[i]];
+                    this.patientIds.push(patient.id);
+                }
+
+                // set the data in the central store
+                const patientList = this.patientList;
+                const patientIds = this.patientIds;
+                this.$store.dispatch('setPatientList', { patientList, patientIds });
+
+                // fix patient DOBs
                 for(let i = 0; i < this.patientList.length; i++) {
                     this.patientList[i].dob = this.getDOB(this.patientList[i]);
                 }
-            },
-            getPatients: function () {
-                return this.patientList;
             },
             getDOB(patient)
             {
@@ -93,11 +100,9 @@
                 if (d < 10) {
                     dd = '0' + d;
                 }
-
                 if (m < 10) {
                     mm = '0' + m;
                 }
-
                 return dd + '/' + mm + '/' + yyyy;
             }
         },

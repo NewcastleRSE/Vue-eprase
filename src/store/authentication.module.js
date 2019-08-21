@@ -38,6 +38,10 @@ export const authentication = {
       dataService.savePart2Data( qualitative_data, time_taken);
       commit('savePart2Data');
     },
+    savePart3Data({ dispatch, commit }, { qualitative_data, time_taken }){
+      dataService.savePart3Data( qualitative_data, time_taken);
+      commit('savePart3Data');
+    },
   },
   mutations: {
     loginRequest(state, user) {
@@ -61,6 +65,10 @@ export const authentication = {
       state.user = user;
     },
     savePart2Data(state) {
+      state.status = {};
+      state.user = user;
+    },
+    savePart3Data(state) {
       state.status = {};
       state.user = user;
     }
