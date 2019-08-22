@@ -30,15 +30,15 @@ export const authentication = {
       userService.logout();
       commit('logout');
     } ,
-    savePart1Data({ dispatch, commit }, { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
+    savePart1Data({ commit }, { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
       dataService.savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
       commit('savePart1Data');
     },
-    savePart2Data({ dispatch, commit }, { qualitative_data, time_taken }){
+    savePart2Data({ commit }, { qualitative_data, time_taken }){
       dataService.savePart2Data( qualitative_data, time_taken);
       commit('savePart2Data');
     },
-    savePart3Data({ dispatch, commit }, { qualitative_data, time_taken }){
+    savePart3Data({ commit }, { qualitative_data, time_taken }){
       dataService.savePart3Data( qualitative_data, time_taken);
       commit('savePart3Data');
     },
@@ -61,15 +61,15 @@ export const authentication = {
       state.user = null;
     } ,
     savePart1Data(state) {
-      state.status = {};
+      state.status = { loggedIn: true};
       state.user = user;
     },
     savePart2Data(state) {
-      state.status = {};
+      state.status = { loggedIn: true};
       state.user = user;
     },
     savePart3Data(state) {
-      state.status = {};
+      state.status = { loggedIn: true};
       state.user = user;
     }
   }

@@ -12,6 +12,8 @@ export const store = new Vuex.Store({
     authentication,
   },
   state : {
+    patientList : null,
+    patientIds: null
   },
   actions : {
     setPatientList({ commit }, { patientList, patientIds } ) {
@@ -32,7 +34,9 @@ export const store = new Vuex.Store({
       return state.patientList.find(id => patientList.id === id)
     },
     getPatientList : state => {
-      return state.patientList
+      if (state.patientList) {
+        return state.patientList;
+      }
     }
   }
 });

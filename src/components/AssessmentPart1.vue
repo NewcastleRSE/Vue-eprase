@@ -28,7 +28,7 @@
                 <option value="Sunrise"> Sunrise </option>
                 <option value="MedChart">MedChart </option>
                 <option value="Lorenzo">Lorenzo </option>
-                <option value="Other"> Other (Please Specify) </option>
+              <!--  <option value="Other"> Other (Please Specify) </option> -->
               </select>
             </div>
 

@@ -9,9 +9,97 @@
       <p>When you are done, click <strong>Next</strong> to continue.</p>
       <br/>
 
-      <h4>patient profile</h4>
+      <div v-for="patient in myPatientList">
 
-      {{ myPatientList}}
+        <div align="center">
+          <h4>{{patient[0].first_name}} {{patient[0].surname}}</h4>
+        <!--  <p class="subtitle">(Patient {{assessment.getCurrentPatientIndex()+1}} of {{assessment.getNumPatients()}})</p>-->
+
+          <div id="patient-card">
+            <div class="patient-image" v-if="patient[0].gender == 'male'">
+              <img src="../assets/anon-male.png" height="160px" />
+            </div>
+
+            <div class="patient-image" v-if="patient[0].gender == 'female'">
+              <img src="../assets/anon-female.png" height="160px" />
+            </div>
+            <div class="patient-demographics">
+              <p><strong>Demographics:</strong></p>
+              <table>
+                <tr>
+                  <td><strong>Height (m):</strong> {{patient[0].height}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Weight (kg):</strong> {{patient[0].weight}}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="patient-info">
+
+              <div align="left" v-if="patient[0].allergies.length !== 0">
+                <p><strong>Allergies:</strong></p>
+                <table>
+                  <tr v-for="allergy in patient[0].allergies">
+                    <td>{{allergy}}</td>
+                  </tr>
+                </table>
+              </div>
+
+                <div align="left" v-if="patient[0].allergies.length == 0">
+                  <p><strong>Allergies:</strong></p>
+                  <table>
+                    <tr>
+                      <td>No Known Drug Allergies</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left" v-if="patient[0].diagnosis.length != 0">
+                  <p><strong>Diagnosis:</strong></p>
+                  <table>
+                    <tr v-for="diagnosis in patient[0].diagnosis">
+                      <td>{{diagnosis}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left"  v-if="patient[0].medication_history.length != 0">
+                  <p><strong>Current Medication:</strong></p>
+                  <table>
+                    <tr>
+                      <td><strong>Name</strong></td>
+                      <td><strong>Dose</strong></td>
+                      <td><strong>Route</strong></td>
+                      <td><strong>Form</strong></td>
+                      <td><strong>Frequency</strong></td>
+                    </tr>
+                    <tr v-for="history in patient[0].medication_history">
+                      <td>{{history.name}}</td>
+                      <td>{{history.dose}} {{history.units}}</td>
+                      <td>{{history.route}}</td>
+                      <td>{{history.form}}</td>
+                      <td>{{history.frequency}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left"  v-if="patient[0].clinical_data.length != 0">
+                  <p><strong>Clinical Data:</strong></p>
+                  <table>
+                    <tr>
+                      <td><strong>Investigation</strong></td>
+                      <td><strong>Value</strong></td>
+                    </tr>
+                    <tr v-for="clinical in patient[0].clinical_data">
+                      <td>{{clinical.investigation}}</td>
+                      <td>{{clinical.value}}</td>
+                    </tr>
+                  </table>
+                </div>
+            </div>
+          </div>
+        </div>
 
       <div class="assessment">
         <p>Note any intervention from the system using the box below.</p>
@@ -31,6 +119,7 @@
         </div>
       </div>
     </div>
+    </div>
 
  </div>
 </template>
@@ -39,6 +128,7 @@
 
     import Header from './Header';
     import { dataService } from '../services/data.service';
+    import { mapState } from 'vuex';
 
     export default {
         name: "AssessmentPart3",
@@ -49,15 +139,18 @@
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
             },
-            myPatientList() {
-              //return this.$store.state.patientList;
-                return this.$store.state.patientIds;
+           myPatientList() {
+              return this.$store.state.patientList;
+              //  return this.$store.getters.getPatientList;
+            },
+            myPatientIds() {
+                // return this.$store.state.patientIds;
             }
+          // ... mapState(['patientList','patientIds']),
         },
         data() {
             return {
                 submitted: false,
-                patientList : null,
                 assessment: {
                     currentPart: dataService.getAssessmentPart(),
                     qualitative_data : '',
@@ -99,6 +192,10 @@
         },
         created : function() {
             this.startTime = new Date();
+        },
+        mounted() {
+            this.$store.watch(
+                (state, getters) => getters.patientList )
         }
     }
 </script>

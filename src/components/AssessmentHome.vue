@@ -98,7 +98,8 @@
         },
         methods: {
             onContinueClick() {
-                window.location.href = './assessmentpart' + this.assessment.currentPart;
+                let location = './assessmentpart' + this.assessment.currentPart;
+                this.$router.push({ path: location });
             }
         }
     }

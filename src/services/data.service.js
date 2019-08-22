@@ -1,13 +1,15 @@
 let numPatients = 10;
 let numTests = 20;
-
 let baseURL = 'http://localhost:6001/api';
+
+import { router } from '../router';
 
 export const dataService = {
   getAssessmentPart,
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
+  savePart3Data,
   numPatients,
   numTests
 };
@@ -31,20 +33,15 @@ function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_resul
 
   return fetch(baseURL + '/users/' + user + '/' + path, requestOptions)
     .then(response => {
-      window.location.href = './' + newassessment;
-      dataService.setAssessmentPart(newpart);
+      dataService.setAssessmentPart(2);
+      router.push({ path: './assessmentpart2' });
     })
-    .catch(error => this.errors = error.response.data)
-
 }
 
 function savePart2Data(qualitative_data, time_taken){
 
   let token = getToken();
   let part = getAssessmentPart();
-  let newpart = part + 1;
-
-  let newassessment = 'assessmentpart' + newpart;
 
   const requestOptions = {
     method: 'POST',
@@ -54,13 +51,17 @@ function savePart2Data(qualitative_data, time_taken){
 
   // api/part1/{assessmentId}/part2
 
-  return fetch(baseURL + '/part1/1/part2', requestOptions)
+  return fetch(baseURL + '/part1/42/part2', requestOptions)
     .then(response => {
-      window.location.href = './' + newassessment;
-      dataService.setAssessmentPart(newpart);
+      dataService.setAssessmentPart(3);
+      router.push({ path: './assessmentpart3' });
     })
-    .catch(error => this.errors = error.response.data)
 
+}
+
+function savePart3Data(qualitative_data, time_taken){
+
+  console.log('saving part 3 data');
 }
 
 

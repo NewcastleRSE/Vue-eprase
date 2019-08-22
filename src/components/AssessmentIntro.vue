@@ -57,10 +57,10 @@
                return this.assessmentComplete;
             },
             onResultsClick() {
-                window.location.href = './resultshome'
+                this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-                window.location.href = './assessmenthome'
+                this.$router.push({ path: './assessmenthome' });
             }
         },
         created : function() {

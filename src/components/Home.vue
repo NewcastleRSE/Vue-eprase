@@ -65,7 +65,7 @@
         },
         methods: {
             assessments() {
-                window.location.href = './assessmentintro'
+                this.$router.push({ path: './assessmentintro' });
             }
         },
         computed: {
