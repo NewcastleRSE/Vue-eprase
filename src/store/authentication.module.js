@@ -38,9 +38,10 @@ export const authentication = {
       dataService.savePart2Data( qualitative_data, time_taken);
       commit('savePart2Data');
     },
-    savePart3Data({ commit }, { qualitative_data, time_taken }){
+    savePart3Data({ commit }, { qualitative_data, time_taken, index }){
       dataService.savePart3Data( qualitative_data, time_taken);
       commit('savePart3Data');
+      commit('updatePatientIndex', index, { root: true });
     },
   },
   mutations: {

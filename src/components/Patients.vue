@@ -80,22 +80,22 @@
             getDOB(patient)
             {
                 // get today's date
-                var today = new Date();
+                let today = new Date();
 
                 //randomise the date within the last 12 months
-                var days = Math.random() * 360;
+                let days = Math.random() * 360;
                 today.setDate(today.getDate()-days);
 
                 // get date string info
-                var d = today.getDate();
-                var m = today.getMonth() + 1;
-                var yyyy = today.getFullYear();
+                let d = today.getDate();
+                let m = today.getMonth() + 1;
+                let yyyy = today.getFullYear();
 
                 // subtract patient's age
                 yyyy = yyyy - patient.age;
 
-                var dd = d.toString();
-                var mm = m.toString();
+                let dd = d.toString();
+                let mm = m.toString();
 
                 if (d < 10) {
                     dd = '0' + d;

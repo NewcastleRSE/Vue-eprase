@@ -12,32 +12,32 @@
       <div v-for="patient in myPatientList">
 
         <div align="center">
-          <h4>{{patient[0].first_name}} {{patient[0].surname}}</h4>
-        <!--  <p class="subtitle">(Patient {{assessment.getCurrentPatientIndex()+1}} of {{assessment.getNumPatients()}})</p>-->
+          <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
+          <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{getNumPatients}})</p>
 
           <div id="patient-card">
-            <div class="patient-image" v-if="patient[0].gender == 'male'">
+            <div class="patient-image" v-if="patient[getCurrentPatient].gender == 'male'">
               <img src="../assets/anon-male.png" height="160px" />
             </div>
 
-            <div class="patient-image" v-if="patient[0].gender == 'female'">
+            <div class="patient-image" v-if="patient[getCurrentPatient].gender == 'female'">
               <img src="../assets/anon-female.png" height="160px" />
             </div>
             <div class="patient-demographics">
               <p><strong>Demographics:</strong></p>
               <table>
                 <tr>
-                  <td><strong>Height (m):</strong> {{patient[0].height}}</td>
+                  <td><strong>Height (m):</strong> {{patient[getCurrentPatient].height}}</td>
                 </tr>
                 <tr>
-                  <td><strong>Weight (kg):</strong> {{patient[0].weight}}</td>
+                  <td><strong>Weight (kg):</strong> {{patient[getCurrentPatient].weight}}</td>
                 </tr>
               </table>
             </div>
 
             <div class="patient-info">
 
-              <div align="left" v-if="patient[0].allergies.length !== 0">
+              <div align="left" v-if="patient[getCurrentPatient].allergies.length !== 0">
                 <p><strong>Allergies:</strong></p>
                 <table>
                   <tr v-for="allergy in patient[0].allergies">
@@ -46,57 +46,57 @@
                 </table>
               </div>
 
-                <div align="left" v-if="patient[0].allergies.length == 0">
-                  <p><strong>Allergies:</strong></p>
-                  <table>
-                    <tr>
-                      <td>No Known Drug Allergies</td>
-                    </tr>
-                  </table>
-                </div>
+              <div align="left" v-if="patient[getCurrentPatient].allergies.length == 0">
+                <p><strong>Allergies:</strong></p>
+                <table>
+                  <tr>
+                    <td>No Known Drug Allergies</td>
+                  </tr>
+                </table>
+              </div>
 
-                <div align="left" v-if="patient[0].diagnosis.length != 0">
-                  <p><strong>Diagnosis:</strong></p>
-                  <table>
-                    <tr v-for="diagnosis in patient[0].diagnosis">
-                      <td>{{diagnosis}}</td>
-                    </tr>
-                  </table>
-                </div>
+              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+                <p><strong>Diagnosis:</strong></p>
+                <table>
+                  <tr v-for="diagnosis in patient[0].diagnosis">
+                    <td>{{diagnosis}}</td>
+                  </tr>
+                </table>
+              </div>
 
-                <div align="left"  v-if="patient[0].medication_history.length != 0">
-                  <p><strong>Current Medication:</strong></p>
-                  <table>
-                    <tr>
-                      <td><strong>Name</strong></td>
-                      <td><strong>Dose</strong></td>
-                      <td><strong>Route</strong></td>
-                      <td><strong>Form</strong></td>
-                      <td><strong>Frequency</strong></td>
-                    </tr>
-                    <tr v-for="history in patient[0].medication_history">
-                      <td>{{history.name}}</td>
-                      <td>{{history.dose}} {{history.units}}</td>
-                      <td>{{history.route}}</td>
-                      <td>{{history.form}}</td>
-                      <td>{{history.frequency}}</td>
-                    </tr>
-                  </table>
-                </div>
+              <div align="left"  v-if="patient[getCurrentPatient].medication_history.length != 0">
+                <p><strong>Current Medication:</strong></p>
+                <table>
+                  <tr>
+                    <td><strong>Name</strong></td>
+                    <td><strong>Dose</strong></td>
+                    <td><strong>Route</strong></td>
+                    <td><strong>Form</strong></td>
+                    <td><strong>Frequency</strong></td>
+                  </tr>
+                  <tr v-for="history in patient[getCurrentPatient].medication_history">
+                    <td>{{history.name}}</td>
+                    <td>{{history.dose}} {{history.units}}</td>
+                    <td>{{history.route}}</td>
+                    <td>{{history.form}}</td>
+                    <td>{{history.frequency}}</td>
+                  </tr>
+                </table>
+              </div>
 
-                <div align="left"  v-if="patient[0].clinical_data.length != 0">
-                  <p><strong>Clinical Data:</strong></p>
-                  <table>
-                    <tr>
-                      <td><strong>Investigation</strong></td>
-                      <td><strong>Value</strong></td>
-                    </tr>
-                    <tr v-for="clinical in patient[0].clinical_data">
-                      <td>{{clinical.investigation}}</td>
-                      <td>{{clinical.value}}</td>
-                    </tr>
-                  </table>
-                </div>
+              <div align="left"  v-if="patient[getCurrentPatient].clinical_data.length != 0">
+                <p><strong>Clinical Data:</strong></p>
+                <table>
+                  <tr>
+                    <td><strong>Investigation</strong></td>
+                    <td><strong>Value</strong></td>
+                  </tr>
+                  <tr v-for="clinical in patient[getCurrentPatient].clinical_data">
+                    <td>{{clinical.investigation}}</td>
+                    <td>{{clinical.value}}</td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -114,7 +114,7 @@
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
           <button id="exit-button" type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
-          <button id="next-button" type="button" class="btn btn-primary visible" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+          <button id="next-button" type="button" class="btn btn-primary visible" @click="onNextClick()">Next</button>
           <button id="done-button" type="button" class="btn btn-primary invisible" @click="onDoneClick()">Done</button>
         </div>
       </div>
@@ -128,7 +128,6 @@
 
     import Header from './Header';
     import { dataService } from '../services/data.service';
-    import { mapState } from 'vuex';
 
     export default {
         name: "AssessmentPart3",
@@ -136,17 +135,20 @@
             Header
         },
         computed: {
-            isFormInvalid() {
-                return Object.keys(this.fields).some(key => this.fields[key].invalid);
-            },
-           myPatientList() {
+            myPatientList() {
               return this.$store.state.patientList;
-              //  return this.$store.getters.getPatientList;
+            },
+            getCurrentPatient() {
+                return this.$store.state.patientIndex;
+            },
+            getNumPatients() {
+                let patients = this.$store.state.patientIds;
+                this.numPatients = patients.patientIds.length;
+                return this.numPatients;
             },
             myPatientIds() {
                 // return this.$store.state.patientIds;
             }
-          // ... mapState(['patientList','patientIds']),
         },
         data() {
             return {
@@ -156,7 +158,9 @@
                     qualitative_data : '',
                     time_taken: ''
                 },
-                startTime: ''
+                startTime: '',
+                index: null,
+                numPatients: null
             }
         },
         methods: {
@@ -179,9 +183,10 @@
 
                         const qualitative_data = this.assessment.qualitative_data;
                         const time_taken = this.assessment.time_taken;
+                        const index = this.index;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePart3Data', { qualitative_data, time_taken });
+                            dispatch('authentication/savePart3Data', { qualitative_data, time_taken, index });
                         }
                     }
                 });
@@ -194,8 +199,8 @@
             this.startTime = new Date();
         },
         mounted() {
-            this.$store.watch(
-                (state, getters) => getters.patientList )
+            this.index = this.$store.state.patientIndex;
+            console.log('Index ' + this.index);
         }
     }
 </script>

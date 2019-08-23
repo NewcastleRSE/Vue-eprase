@@ -1,5 +1,4 @@
-let numPatients = 10;
-let numTests = 20;
+
 let baseURL = 'http://localhost:6001/api';
 
 import { router } from '../router';
@@ -9,21 +8,13 @@ export const dataService = {
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
-  savePart3Data,
-  numPatients,
-  numTests
+  savePart3Data
 };
 
 function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
 
   let token = getToken();
   let user =  getUser();
-  let part = getAssessmentPart();
-  let newpart = part + 1;
-
-  // type conversions
-  let path = 'part' + part;
-  let newassessment = 'assessmentpart' + newpart;
 
   const requestOptions = {
     method: 'POST',
@@ -31,7 +22,15 @@ function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_resul
     body: JSON.stringify({ ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
   };
 
-  return fetch(baseURL + '/users/' + user + '/' + path, requestOptions)
+  return fetch(baseURL + '/users/' + user + '/part1', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      let assessmentId = JSON.stringify(response);
+      if (assessmentId) {
+       // store assessment id
+       localStorage.setItem('assessmentId', assessmentId);
+     }
+    })
     .then(response => {
       dataService.setAssessmentPart(2);
       router.push({ path: './assessmentpart2' });
@@ -41,7 +40,7 @@ function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_resul
 function savePart2Data(qualitative_data, time_taken){
 
   let token = getToken();
-  let part = getAssessmentPart();
+  let assessmentId = getAssessmentId();
 
   const requestOptions = {
     method: 'POST',
@@ -49,21 +48,45 @@ function savePart2Data(qualitative_data, time_taken){
     body: JSON.stringify({ qualitative_data, time_taken })
   };
 
-  // api/part1/{assessmentId}/part2
-
-  return fetch(baseURL + '/part1/42/part2', requestOptions)
+  return fetch(baseURL + '/part1/' + assessmentId + '/part2', requestOptions)
     .then(response => {
       dataService.setAssessmentPart(3);
       router.push({ path: './assessmentpart3' });
     })
-
 }
 
 function savePart3Data(qualitative_data, time_taken){
 
-  console.log('saving part 3 data');
+  let token = getToken();
+  let assessmentId = getAssessmentId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ qualitative_data, time_taken })
+  };
+
+  return fetch(baseURL + '/part1/' + assessmentId + '/part2', requestOptions)
+    .then(response => {
+      router.push({ path: './assessmentpart3' });
+    })
 }
 
+function handleResponse(response) {
+  return response.text().then(text => {
+    const data = text && JSON.parse(text);
+    if (!response.ok) {
+      if (response.status === 401) {
+        // auto logout if 401 response returned from api
+        logout();
+        location.reload(true);
+      }
+      const error = (data && data.message) || response.statusText;
+      return Promise.reject(error);
+    }
+    return data;
+  });
+}
 
 function getAssessmentPart() {
 
@@ -81,11 +104,15 @@ function setAssessmentPart(value) {
 }
 
 function getToken(){
-  let token = localStorage.getItem('token');
-  return token;
+  return localStorage.getItem('token');
 }
 
 function getUser() {
-  let user = localStorage.getItem('user');
-  return user;
+  return localStorage.getItem('user');
 }
+
+function getAssessmentId() {
+  return localStorage.getItem('assessmentId');
+}
+
+
