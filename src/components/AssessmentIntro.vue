@@ -33,6 +33,7 @@
 <script>
 
     import { dataService } from '../services/data.service';
+    import { patientService } from '../services/patient.service';
     import Header from './Header';
 
     export default {
@@ -60,6 +61,7 @@
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
+                patientService.setPatients();
                 this.$router.push({ path: './assessmenthome' });
             }
         },

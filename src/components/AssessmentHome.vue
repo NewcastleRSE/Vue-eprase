@@ -77,6 +77,7 @@
 <script>
 
     import { dataService } from '../services/data.service';
+    import { patientService } from '../services/patient.service';
     import Header from './Header';
 
     export default {
@@ -91,8 +92,8 @@
                     currentPart : dataService.getAssessmentPart(),
                     currentPatientIndex : 0,
                     currentTestIndex: 0,
-                    numPatients: dataService.numPatients,
-                    numTests : dataService.numTests
+                    numPatients: patientService.numPatients,
+                    numTests : patientService.numTests
                 }
             }
         },

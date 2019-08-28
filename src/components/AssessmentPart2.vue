@@ -11,8 +11,7 @@
         <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
         <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click <strong>Next</strong> to continue.</p>
 
-      <Patients />
-
+       <Patients />
       </div>
     </div>
 
