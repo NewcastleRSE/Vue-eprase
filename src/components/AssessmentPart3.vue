@@ -13,7 +13,7 @@
 
         <div align="center">
           <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
-          <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{getNumPatients}})</p>
+          <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
 
           <div id="patient-card">
             <div class="patient-image" v-if="patient[getCurrentPatient].gender == 'male'">
@@ -97,6 +97,7 @@
                   </tr>
                 </table>
               </div>
+              <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].id" />
             </div>
           </div>
         </div>
@@ -114,8 +115,8 @@
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
           <button id="exit-button" type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
-          <button id="next-button" type="button" class="btn btn-primary visible" @click="onNextClick()">Next</button>
-          <button id="done-button" type="button" class="btn btn-primary invisible" @click="onDoneClick()">Done</button>
+          <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()">Next</button>
+          <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
         </div>
       </div>
     </div>
@@ -128,6 +129,7 @@
 
     import Header from './Header';
     import { dataService } from '../services/data.service';
+    import { patientService } from '../services/patient.service';
 
     export default {
         name: "AssessmentPart3",
@@ -140,14 +142,6 @@
             },
             getCurrentPatient() {
                 return this.$store.state.patientIndex;
-            },
-            getNumPatients() {
-                let patients = this.$store.state.patientIds;
-                this.numPatients = patients.patientIds.length;
-                return this.numPatients;
-            },
-            myPatientIds() {
-                // return this.$store.state.patientIds;
             }
         },
         data() {
@@ -155,12 +149,14 @@
                 submitted: false,
                 assessment: {
                     currentPart: dataService.getAssessmentPart(),
+                    patient_id : '',
                     qualitative_data : '',
                     time_taken: ''
                 },
                 startTime: '',
-                index: null,
-                numPatients: null
+                nextEnabled: true,
+                doneEnabled: false,
+                numPatients: patientService.numPatients
             }
         },
         methods: {
@@ -174,33 +170,42 @@
             onNextClick()  {
                 this.submitted = true;
 
+                let index = this.$store.state.patientIndex;
+
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
-
                         const qualitative_data = this.assessment.qualitative_data;
+                        const patient_id = this.assessment.patient_id;
                         const time_taken = this.assessment.time_taken;
-                        const index = this.index;
+;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePart3Data', { qualitative_data, time_taken, index });
+                            dispatch('authentication/savePart3Data', { qualitative_data, patient_id, time_taken, index });
                         }
+                        this.assessment.qualitative_data = '';
                     }
                 });
+
+                // if last patient, change button from 'next' to 'done'
+                if (index === (this.numPatients - 1)) {
+                    this.nextEnabled = false;
+                    this.doneEnabled = true;
+                }
             },
             onDoneClick() {
-                window.location.href = './logout'
+
+                const unlockTime = new Date();
+                unlockTime.setHours(unlockTime.getHours() + 1);
+                localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
+                this.$router.push('/lockout-screen');
             }
         },
         created : function() {
             this.startTime = new Date();
-        },
-        mounted() {
-            this.index = this.$store.state.patientIndex;
-            console.log('Index ' + this.index);
         }
     }
 </script>
@@ -264,6 +269,10 @@
     padding: 40px;
   }
 
+  .patient-image img {
+    border: 1px solid grey;
+  }
+
   .patient-demographics {
     text-align: left;
   }
@@ -310,6 +319,8 @@
     border:  1px solid #6b9bc7;
     border-radius: 25px;
     margin-bottom: 20px;
+    -webkit-box-shadow: 1px 3px 8px -1px #000000;
+    box-shadow: 1px 3px 8px -1px #000000;
   }
 
   button {
@@ -320,11 +331,14 @@
     margin: 0 50px;
   }
 
-  .visible {
-    visibility: visible;
+  #done-button {
+    margin-left: 120px;
+    background-color: #07abb8;
+    border-color: #07818e;
   }
-  .invisible {
-    visibility: hidden;
+
+  #done-button :hover {
+    background-color: #07818e;
   }
 
   .footer {

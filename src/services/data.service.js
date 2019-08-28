@@ -55,7 +55,7 @@ function savePart2Data(qualitative_data, time_taken){
     })
 }
 
-function savePart3Data(qualitative_data, time_taken){
+function savePart3Data(qualitative_data, patient_id, time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -63,10 +63,10 @@ function savePart3Data(qualitative_data, time_taken){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ qualitative_data, time_taken })
+    body: JSON.stringify({ qualitative_data, patient_id, time_taken })
   };
 
-  return fetch(baseURL + '/part1/' + assessmentId + '/part2', requestOptions)
+  return fetch(baseURL + '/part1/' + assessmentId + '/part3', requestOptions)
     .then(response => {
       router.push({ path: './assessmentpart3' });
     })
