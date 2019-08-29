@@ -198,8 +198,9 @@
     max-width: 600px;
   }
 
-  .is-valid {
-    border-left: 5px solid #42A948;
+  .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
+    background: none;
+    background-color: #fff;
   }
 
 </style>

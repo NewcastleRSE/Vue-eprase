@@ -18,7 +18,7 @@
           </div>
           <div class="form-group">
             <label>Password: </label>
-            <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" class="form-control" name="password" maxlength="50" :class="{ 'is-invalid': submitted & errors.has('password') }"/>
+            <input type="text" v-model="user.password" v-validate="{ required: true, min: 6 }" class="form-control" name="password" maxlength="50" :class="{ 'is-invalid': submitted & errors.has('password') }"/>
             <div v-show="submitted & errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
           </div>
         </form>
@@ -160,16 +160,15 @@
     width: 370px;
   }
 
-  /*.is-valid {
-    border-left: 5px solid #42A948;
-  } */
-
   #email-link {
     padding-bottom: 20px;
     font-size: 0.9em;
   }
 
-
+  .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
+    background: none;
+    background-color: #fff;
+  }
 
 
 </style>

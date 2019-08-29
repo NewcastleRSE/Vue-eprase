@@ -201,7 +201,7 @@
                 const unlockTime = new Date();
                 unlockTime.setHours(unlockTime.getHours() + 1);
                 localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
-                this.$router.push('/lockout-screen');
+                this.$router.push('/lockoutscreen');
             }
         },
         created : function() {

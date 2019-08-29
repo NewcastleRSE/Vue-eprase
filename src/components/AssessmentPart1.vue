@@ -15,7 +15,7 @@
           <form id="ep-system-form" @submit.prevent="handleSubmit">
             <div class="form-group">
               <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? </label>
-              <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service">
+              <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select System...</option>
                 <option value="Cerner"> Cerner </option>
                 <option value="All script"> All script </option>
@@ -45,7 +45,7 @@
 
             <div class="question form-group" id="question-1">
               <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?</label>
-              <select name="ep-usage" id="usage-selector" class="form-control" v-model="results.ep_usage">
+              <select name="ep-usage" id="usage-selector" class="form-control" v-model="results.ep_usage" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select Percentage...</option>
                 <option value="76-100">76-100%</option>
                 <option value="51-75">51-75%</option>
@@ -56,7 +56,7 @@
 
             <div class="question form-group" id="question-2">
               <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
-              <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type">
+              <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select an Option...</option>
                 <option value="Adults">Adults</option>
                 <option value="Pediatrics">Pediatrics</option>
@@ -68,10 +68,10 @@
               <p class="lab-results-label"> Is your hospital laboratory results system fully integrated with your e-prescribing system?</p>
               <span class="radio-buttons">
                 <label for="lab-results-yes">Yes</label>
-                <input type="radio" value=true class="radio-yes" name="lab-results-yes" id="lab-results-yes"  v-model="results.lab_results">
+                <input type="radio" value=true class="radio-yes" name="lab-results" id="lab-results-yes"  v-model="results.lab_results" v-validate="'required'">
 
                 <label for="lab-results-no">No</label>
-                <input type="radio" value=false class="radio-no" name="lab-results-no" id="lab-results-no"  v-model="results.lab_results">
+                <input type="radio" value=false class="radio-no" name="lab-results" id="lab-results-no"  v-model="results.lab_results">
               </span>
             </div>
 
@@ -79,9 +79,9 @@
               <p class="med-history-label">Are you able to manually enter diagnosis and medical history into your test system?</p>
               <span class="radio-buttons">
                   <label for="med-history-yes">Yes</label>
-                    <input type="radio" value=true class="radio-yes" name="med-history-yes" id="med-history-yes" v-model="results.med_history">
+                    <input type="radio" value=true class="radio-yes" name="med-history" id="med-history-yes" v-model="results.med_history" v-validate="'required'">
                   <label for="med-history-no">No</label>
-                    <input type="radio" value=false class="radio-no" name="med-history-no" id="med-history-no" v-model="results.med_history">
+                    <input type="radio" value=false class="radio-no" name="med-history" id="med-history-no" v-model="results.med_history">
             </span>
             </div>
 
@@ -214,11 +214,7 @@
     display: inline-block;
   }
 
-  .radio-yes {
-    width: 25px;
-  }
-
-  .radio-no {
+  .radio-yes, .radio-no {
     width: 25px;
   }
 
@@ -297,6 +293,10 @@
     padding-bottom: 10px;
   }
 
+  .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
+    background: none;
+    background-color: #fff;
+  }
 
 
 </style>
