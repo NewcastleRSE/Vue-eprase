@@ -1,7 +1,7 @@
 <template>
-  <div id="page">
 
-    <Header />
+  <div >
+
 
     <div id="test-scenario">
 
@@ -143,10 +143,6 @@
 </script>
 
 <style scoped>
-
-  #page {
-    text-align: left;
-  }
 
   .subtitle {
     text-align: center;
