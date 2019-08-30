@@ -90,10 +90,10 @@
                 assessmentComplete : false,
                 assessment : {
                     currentPart : dataService.getAssessmentPart(),
-                    currentPatientIndex : 0,
-                    currentTestIndex: 0,
-                    numPatients: patientService.numPatients,
-                    numTests : patientService.numTests
+                    currentPatientIndex : patientService.getPatientIndex(),
+                    currentTestIndex: patientService.getTestIndex(),
+                    numPatients: patientService.getNumPatients(),
+                    numTests : patientService.numPrescriptions
                 }
             }
         },

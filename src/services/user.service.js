@@ -32,6 +32,7 @@ function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('assessmentPart');
   localStorage.removeItem('assessmentId');
+  localStorage.removeItem('assessmentUnlockTime');
 }
 
 function handleResponse(response) {

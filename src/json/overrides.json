@@ -1,0 +1,5 @@
+[
+  { "assessmentResponseId" : 2,   "display" : "Unable to Override",                         "score_value" : -3},
+  { "assessmentResponseId" : 3,   "display" : "Override with Change to Order",              "score_value" : -1},
+  { "assessmentResponseId" : 4,   "display" : "Override with reason, No Change to Order",   "score_value" : -1}
+]

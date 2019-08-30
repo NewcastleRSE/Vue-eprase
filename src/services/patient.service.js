@@ -1,50 +1,67 @@
-import json from '../json/patients.json'
+import jsonpatients from '../json/patients.json'
+import jsontests from '../json/prescriptions.json'
+import jsonerrors from '../json/configerror.json'
 import { store } from '../store/index';
 
-let numPatients = 10;
-let numTests = 20;
+let numPrescriptions = 19;
 
 export const patientService = {
   setPatients,
   getPatients,
   getDOB,
-  numPatients,
-  numTests
+  getNumPatients,
+  getPatientIndex,
+  getTestIndex,
+  numPrescriptions
 };
 
 function setPatients() {
 
-  const patients = json;
+  const patients = jsonpatients;
+  const tests = jsontests;
+  const errors = jsonerrors;
   const patientList = [];
   const patientIds = [];
-  const patientIndex = [];
+  const testList = [];
+  const testIndex = [];
+  const allTests = tests.length;
 
-  const numPatients = patients.length;
+  // loop through the tests at random and assign them to testList
+  for(let i = 0; i < allTests; i++){
+    let index = Math.floor(Math.random() * allTests);
 
-  // create a list of 10 patient indexes randomly from all patients
-  for(let i = 0; i < numPatients; i++){
-    let index = Math.floor(Math.random() * numPatients);
-    if(patientIndex.length < 10){
-      // don't want the same patient twice
-      if (!(patientIndex.includes(index))) {
-        patientIndex.push(index);
+    // don't want the same test twice
+    if (testIndex.indexOf(index) === -1) {
+      // keep a note of the index
+      testIndex.push(index);
+     // console.log('Added to testIndex ' + index);
+
+      if (testList.length <= numPrescriptions) {
+        testList.push(tests[index]);
+        patientIds.push(tests[index].patient_id);
       }
     }
   }
 
-  // loop through indexes and set the patient list and patient id list
-  for(let i = 0; i < patientIndex.length; i++) {
-    patientList.push(patients[patientIndex[i]]);
-    let patient = patients[patientIndex[i]];
-    patientIds.push(patient.id);
+  // loop through patients and set the patient list
+  for(let index in patients)
+  {
+    let id = patients[index].id;
+    if (patientIds.includes(id)){
+      patientList.push(patients[index]);
+    }
   }
 
-  store.dispatch('setPatientList', { patientList, patientIds });
+  console.log(patientList);
 
-  // fix patient DOBs
+   // fix patient DOBs
   for(let i = 0; i < patientList.length; i++) {
     patientList[i].dob = patientService.getDOB(patientList[i]);
   }
+
+  localStorage.setItem('numPatients', patientList.length);
+  store.dispatch('setPatientList', { patientList, patientIds, testList });
+
 }
 
 function getDOB(patient) {
@@ -79,3 +96,16 @@ function getDOB(patient) {
 function getPatients() {
   return store.state.patientList;
 }
+
+function getPatientIndex() {
+  return store.state.patientIndex;
+}
+
+function getTestIndex() {
+  return store.state.testIndex;
+}
+
+function getNumPatients() {
+  return localStorage.getItem('numPatients');
+}
+

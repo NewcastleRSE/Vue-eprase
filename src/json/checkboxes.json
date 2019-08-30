@@ -1,0 +1,38 @@
+[
+  {
+    "id" : 2, "name" : "Advice on Contraindication" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 3, "name" : "Advice on Dose" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 4, "name" : "Advice on Interaction" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 5, "name" : "Advice on Therapeutic Duplication" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 6, "name" : "Advice on Lab Results/TDM", "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 7, "name" : "Advice on Route" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 9, "name" : "Advice on Age" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 10, "name" : "Advice on Frequency" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 12, "name" : "Advice on Formulary" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 13, "name" : "Alternative Order Suggested" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 14, "name" : "Advice on Allergy" , "selected"  : false, "score_value" : -1
+  },
+  {
+    "id" : 0, "name" : "Other Please Specify" , "selected"  : false, "score_value" : -1
+  }
+]

@@ -13,24 +13,28 @@ export const store = new Vuex.Store({
   },
   state : {
     patientList : null,
-    patientIds: null,
-    patientIndex : 0
+    testList: null,
+    patientIndex : 0,
+    testIndex: 0
   },
   actions : {
-    setPatientList({ commit }, { patientList, patientIds } ) {
+    setPatientList({ commit }, { patientList, testList } ) {
       commit('setPatientList', { patientList });
-      commit('setPatientIds', { patientIds });
+      commit('setTestList', { testList });
     }
   },
   mutations: {
     setPatientList(state, patientList ){
       state.patientList = patientList;
     },
-    setPatientIds(state, patientIds ){
-      state.patientIds = patientIds;
+    setTestList(state, testList ){
+      state.testList = testList;
     },
     updatePatientIndex(state, index){
       state.patientIndex = index + 1;
+    },
+    updateTestIndex(state, index){
+      state.testIndex = index + 1;
     }
   },
   getters: {

@@ -142,6 +142,9 @@
             },
             getCurrentPatient() {
                 return this.$store.state.patientIndex;
+            },
+            getCurrentTest() {
+                return this.$store.state.testIndex;
             }
         },
         data() {
@@ -156,7 +159,7 @@
                 startTime: '',
                 nextEnabled: true,
                 doneEnabled: false,
-                numPatients: patientService.numPatients
+                numPatients: patientService.getNumPatients()
             }
         },
         methods: {
