@@ -142,9 +142,6 @@
             },
             getCurrentPatient() {
                 return this.$store.state.patientIndex;
-            },
-            getCurrentTest() {
-                return this.$store.state.testIndex;
             }
         },
         data() {

@@ -1,15 +1,14 @@
 <template>
 
   <div >
-
-
     <div id="test-scenario">
 
       <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_score}}></p>
 
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
-        <p><strong>Patient:</strong> {{ getCurrentPatient.first_name}} {{ getCurrentPatient.surname}}</p>
+        <p><strong>Patient:</strong> {{ getCurrentPatient }} </p>
+
         <table id="test-patient">
           <tr>
             <td><strong>Drug</strong></td>
@@ -32,19 +31,20 @@
           <h4>Questions</h4>
           <div class="question" id="question-1">
             <label for="selector-1">What of the following best describes the response from the system when you attempted to prescribe the specified drug?</label>
-            <select name="singleSelect" id="selector-1" class="form-control" @change="onSelect1()" v-model="response.response1">
-              <option :value="undefined" selected disabled hidden>Select a Response...</option>
+            <select name="singleSelect" id="selector-1" class="form-control" v-model="response.outcomes">
+              <option :value="null" >Select an Response...</option>
               <option v-for="response in outcomeResponses" :value="response.display">{{response.display}}</option>
             </select>
 
           </div>
-          <div class="question" id="question-2" hidden>
+          <div v-show="response.outcomes === 'Intervention'" class="question" id="question-2">
             <p>What was the stated reason(s) for the intervention? Please choose any that apply.</p>
 
             <div class="intervention bottom-border" v-for="check in checkBoxList">
               <label>{{check.name}}</label>
               <input type="checkbox" :value="check.name" v-model="check.selected">
-              <div id="response-other" v-if="check.name=='Other Please Specify' && check.selected">
+
+              <div v-show="check.name === 'Other Please Specify' && check.selected" id="response-other">
                 <label id="other"> Other: </label>
                 <input type="text" id="advice-other" class="form-control" v-model="response.other" minlength="3" maxlength="50">
                 <div v-if="other.invalid && other.touched" class="alert alert-danger">
@@ -56,8 +56,8 @@
           </div>
           <div class="question" id="question-3" hidden>
             <label for="selector-2">Were you given any option to override and complete the prescription?</label>
-            <select name="singleSelect" id="selector-2" class="form-control" @change="onSelect3()" v-model="response.response3">
-              <option :value="undefined" selected disabled hidden>Select a Response...</option>
+            <select name="singleSelect" id="selector-2" class="form-control" @change="onSelect3()" v-model="response.overrides">
+              <option :value="null">Select an Response...</option>
               <option v-for="response in interventionOverrides" :value="response.display">{{response.display}}</option>
             </select>
           </div>
@@ -94,8 +94,8 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
+    import jsontests from '../json/prescriptions.json';
 
-    import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
     import Header from './Header';
 
@@ -105,40 +105,42 @@
             Header
         },
         computed : {
-            getCurrentPatient() {
-                return this.$store.state.patientIndex;
-            },
             getResultScore() {
                 return 0;
+            },
+            prescription() {
+                return this.prescriptionTests[this.assessment.testIndex];
+            },
+            getCurrentPatient() {
+                let test = this.prescriptionTests[this.assessment.testIndex];
+                let testPatientId = test.patient_id;
+                let patient = localStorage.getItem(testPatientId);
+                return patient;
             }
         },
         data() {
+
             return {
                 assessment: {
                     debugMode: true,
-                    isConfigErrorTest: false
-                },
-                prescription: {
-                    id : null,
-                    risk_score : null,
-                    drug_name : null,
-                    drug_dose: null,
-                    route: null,
-                    drug_frequency : null,
-                    duration : null
+                    isConfigErrorTest: false,
+                    currentPatientIndex : 0,
+                    patients : patientService.getPatients(),
+                    testIndex : patientService.getTestIndex()
                 },
                 response: {
-                    response1 : '',
-                    response2 : '',
-                    response3 : ''
+                    outcomes : '',
+                    overrides : ''
                 },
                 outcomeResponses : jsonoutcomes,
                 interventionDetails : jsoninterventions,
                 interventionOverrides : jsonoverrides,
                 checkBoxList : jsoncheckboxes,
+                prescriptionTests : jsontests,
+                showInterventions : false,
                 startTime: ''
             }
-        },
+        }
     }
 </script>
 

@@ -46,6 +46,9 @@
                 startTime: ''
             }
         },
+        created : function() {
+            this.startTime = new Date();
+        }
     }
 </script>
 

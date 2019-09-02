@@ -36,17 +36,5 @@ export const store = new Vuex.Store({
     updateTestIndex(state, index){
       state.testIndex = index + 1;
     }
-  },
-  getters: {
-    getPatientList : state => {
-      if (state.patientList) {
-        return state.patientList;
-      }
-    },
-    getPatientIndex : state => {
-      if (state.patientIndex) {
-        return state.patientIndex;
-      }
-    }
   }
 });

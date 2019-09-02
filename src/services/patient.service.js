@@ -52,11 +52,14 @@ function setPatients() {
     }
   }
 
-  console.log(patientList);
-
-   // fix patient DOBs
   for(let i = 0; i < patientList.length; i++) {
+    // fix patient DOBs
     patientList[i].dob = patientService.getDOB(patientList[i]);
+
+    // assign id and name to local storage
+    let myid = patientList[i].id
+    let myname = patientList[i].first_name + ' ' + patientList[i].surname;
+    localStorage.setItem(myid, myname);
   }
 
   localStorage.setItem('numPatients', patientList.length);
