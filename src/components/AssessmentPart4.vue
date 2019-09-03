@@ -42,12 +42,8 @@
                     isPrescriptionTest: true,
                     isConfigErrorTest: false
                 },
-                numPrescriptions: patientService.numPrescriptions,
-                startTime: ''
+                numPrescriptions: patientService.numPrescriptions
             }
-        },
-        created : function() {
-            this.startTime = new Date();
         }
     }
 </script>

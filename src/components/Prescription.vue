@@ -31,7 +31,7 @@
           <h4>Questions</h4>
           <div class="question" id="question-1">
             <label for="selector-1">What of the following best describes the response from the system when you attempted to prescribe the specified drug?</label>
-            <select name="singleSelect" id="selector-1" class="form-control" v-model="response.outcomes">
+            <select name="singleSelect" id="selector-1" class="form-control" v-model="response.outcomes" v-validate="{required: true, min: 1 }" >
               <option value="" >Select an Response...</option>
               <option v-for="response in outcomeResponses" :value="response.display">{{response.display}}</option>
             </select>
@@ -70,6 +70,11 @@
               <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
             </div>
           </div>
+
+          <input type="hidden" id="test_id" v-model="response.test_id=prescription.id" />
+          <input type="hidden" id="result_score" v-model="response.result_score=getResultScore" />
+          <input type="hidden" id="risk_score" v-model="response.risk_score=prescription.risk_score" />
+
           <p class="subtitle" v-if="assessment.debugMode">< Results Score: {{ getResultScore }} ></p>
         </div>
       </div>
@@ -79,7 +84,7 @@
     <div class="form-group footer" align="center">
       <div class="buttons">
         <button type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
-        <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()">Next</button>
+        <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
         <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
       </div>
     </div>
@@ -116,29 +121,73 @@
                 // vue allows the use of 'this' with computed....
                 let testPatientId = this.prescription.patient_id;
                 return localStorage.getItem(testPatientId);
+            },
+            isFormInvalid() {
+                return Object.keys(this.fields).some(key => this.fields[key].invalid);
             }
         },
         data() {
-
             return {
                 assessment: {
                     debugMode: true,
                     isConfigErrorTest: false,
-                    testIndex : patientService.getTestIndex()
+                    testIndex: patientService.getTestIndex(),
                 },
                 response: {
-                    outcomes : '',
-                    other : '',
-                    overrides : ''
+                    outcomes: '',
+                    other: '',
+                    overrides: '',
+                    time_taken: '',
+                    test_id : '',
+                    result_score : '',
+                    risk_score : '',
+                    interventions : [],
+                    qualitative_data : ''
                 },
-                outcomeResponses : jsonoutcomes,
-                interventionDetails : jsoninterventions,
-                interventionOverrides : jsonoverrides,
-                checkBoxList : jsoncheckboxes,
-                showInterventions : false,
+                outcomeResponses: jsonoutcomes,
+                interventionDetails: jsoninterventions,
+                interventionOverrides: jsonoverrides,
+                checkBoxList: jsoncheckboxes,
+                showInterventions: false,
                 nextEnabled: true,
-                doneEnabled: false
+                doneEnabled: false,
+                startTime: ''
             }
+        },
+        methods : {
+            onExitClick() {
+                window.location.href = './logout'
+            },
+            onNextClick()  {
+                this.submitted = true;
+                this.$validator.validate().then(valid => {
+                    if (valid) {
+
+                        let endTime = new Date();
+                        let elapsedTime = endTime.getTime() - this.startTime.getTime();
+                        this.response.time_taken = elapsedTime/1000;
+
+                        const test_id = this.response.test_id;
+                        const outcomes = this.response.outcomes;
+                        const other = this.response.other;
+                        const overrides = this.response.overrides;
+                        const risk_score = this.response.risk_score;
+                        const result_score = this.response.result_score;
+                        const time_taken = this.response.time_taken;
+                        const qualitative_data = this.response.qualitative_data;
+                        const interventions = this.response.interventions;
+
+                        const { dispatch } = this.$store;
+                        if (time_taken){
+                            dispatch('authentication/savePrescriptionData', {test_id, outcomes, other, overrides, risk_score, result_score, time_taken, qualitative_data, interventions });
+                        }
+                        this.assessment.qualitative_data = '';
+                    }
+                });
+            }
+        },
+        created : function() {
+            this.startTime = new Date();
         }
     }
 </script>
@@ -168,11 +217,6 @@
 
   .prescription-info p {
     text-align: left;
-  }
-
-  .prescription {
-    margin-top: 30px;
-    margin-bottom: 30px;
   }
 
   .questionnaire {
@@ -343,5 +387,11 @@
     margin-bottom: 20px;
     width: 100%;
   }
+
+  .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
+    background: none;
+    background-color: #fff;
+  }
+
 
 </style>
