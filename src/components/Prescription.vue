@@ -32,7 +32,7 @@
           <div class="question" id="question-1">
             <label for="selector-1">What of the following best describes the response from the system when you attempted to prescribe the specified drug?</label>
             <select name="singleSelect" id="selector-1" class="form-control" v-model="response.outcomes">
-              <option :value="null" >Select an Response...</option>
+              <option value="" >Select an Response...</option>
               <option v-for="response in outcomeResponses" :value="response.display">{{response.display}}</option>
             </select>
 
@@ -47,17 +47,17 @@
               <div v-show="check.name === 'Other Please Specify' && check.selected" id="response-other">
                 <label id="other"> Other: </label>
                 <input type="text" id="advice-other" class="form-control" v-model="response.other" minlength="3" maxlength="50">
-                <div v-if="other.invalid && other.touched" class="alert alert-danger">
+                <div v-if="response.other.invalid && response.other.touched" class="alert alert-danger">
                   Other is required with a minimum of 3 characters
                 </div>
               </div>
             </div>
 
           </div>
-          <div class="question" id="question-3" hidden>
+          <div v-show="response.outcomes === 'Intervention'" class="question" id="question-3">
             <label for="selector-2">Were you given any option to override and complete the prescription?</label>
-            <select name="singleSelect" id="selector-2" class="form-control" @change="onSelect3()" v-model="response.overrides">
-              <option :value="null">Select an Response...</option>
+            <select name="singleSelect" id="selector-2" class="form-control" v-model="response.overrides">
+              <option value="">Select an Response...</option>
               <option v-for="response in interventionOverrides" :value="response.display">{{response.display}}</option>
             </select>
           </div>
@@ -79,8 +79,8 @@
     <div class="form-group footer" align="center">
       <div class="buttons">
         <button type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
-        <button type="button" id="next-button" class="btn btn-primary visible" @click="onNextClick()" disabled>Next</button>
-        <button type="button" id="done-button" class="btn btn-primary invisible" @click="onDoneClick()" disabled>Done</button>
+        <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()">Next</button>
+        <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
       </div>
     </div>
 
@@ -94,7 +94,6 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
-    import jsontests from '../json/prescriptions.json';
 
     import { patientService } from '../services/patient.service';
     import Header from './Header';
@@ -109,13 +108,14 @@
                 return 0;
             },
             prescription() {
-                return this.prescriptionTests[this.assessment.testIndex];
+                // this needs to return the first test from testList in store
+                let prescription = this.$store.state.testList;
+                return prescription.testList[this.assessment.testIndex];
             },
             getCurrentPatient() {
-                let test = this.prescriptionTests[this.assessment.testIndex];
-                let testPatientId = test.patient_id;
-                let patient = localStorage.getItem(testPatientId);
-                return patient;
+                // vue allows the use of 'this' with computed....
+                let testPatientId = this.prescription.patient_id;
+                return localStorage.getItem(testPatientId);
             }
         },
         data() {
@@ -124,21 +124,20 @@
                 assessment: {
                     debugMode: true,
                     isConfigErrorTest: false,
-                    currentPatientIndex : 0,
-                    patients : patientService.getPatients(),
                     testIndex : patientService.getTestIndex()
                 },
                 response: {
                     outcomes : '',
+                    other : '',
                     overrides : ''
                 },
                 outcomeResponses : jsonoutcomes,
                 interventionDetails : jsoninterventions,
                 interventionOverrides : jsonoverrides,
                 checkBoxList : jsoncheckboxes,
-                prescriptionTests : jsontests,
                 showInterventions : false,
-                startTime: ''
+                nextEnabled: true,
+                doneEnabled: false
             }
         }
     }

@@ -105,6 +105,7 @@ function getPatientIndex() {
 }
 
 function getTestIndex() {
+  console.log(store.state.testIndex);
   return store.state.testIndex;
 }
 
