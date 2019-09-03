@@ -169,19 +169,17 @@
             },
             onNextClick()  {
                 this.submitted = true;
-
-                let index = this.$store.state.patientIndex;
-
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
+                        let index = this.$store.state.patientIndex;
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
                         const qualitative_data = this.assessment.qualitative_data;
                         const patient_id = this.assessment.patient_id;
                         const time_taken = this.assessment.time_taken;
-;
+
                         const { dispatch } = this.$store;
                         if (time_taken){
                             dispatch('authentication/savePart3Data', { qualitative_data, patient_id, time_taken, index });
@@ -189,12 +187,6 @@
                         this.assessment.qualitative_data = '';
                     }
                 });
-
-                // if last patient, change button from 'next' to 'done'
-                if (index === (this.numPatients - 1)) {
-                    this.nextEnabled = false;
-                    this.doneEnabled = true;
-                }
             },
             onDoneClick() {
 
@@ -206,6 +198,13 @@
         },
         created : function() {
             this.startTime = new Date();
+        },
+        beforeUpdate: function() {
+            let index = this.$store.state.patientIndex;
+            if (index === (this.numPatients - 1)) {
+                this.nextEnabled = false;
+                this.doneEnabled = true;
+            }
         }
     }
 </script>
