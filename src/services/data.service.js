@@ -72,6 +72,24 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     })
 }
 
+function savePrescriptionData(test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions){
+
+  let token = getToken();
+  let assessmentId = getAssessmentId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions })
+  };
+
+  return fetch(baseURL + '/part1/' + assessmentId + '/prescription', requestOptions)
+    .then(response => {
+      router.push({ path: './assessmentresults' });
+    })
+}
+
+
 function handleResponse(response) {
   return response.text().then(text => {
     const data = text && JSON.parse(text);

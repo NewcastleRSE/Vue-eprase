@@ -43,6 +43,11 @@ export const authentication = {
       commit('savePart3Data');
       commit('updatePatientIndex', index, { root: true });
     },
+    savePrescriptionData({ commit }, { test_id, outcomes, other, overrides, risk_score, result_score, time_taken, qualitative_data, interventions, index }){
+      dataService.savePrescriptionData( test_id, outcomes, other, overrides, risk_score, result_score, time_taken, qualitative_data, interventions );
+      commit('savePart4Data');
+      commit('updateTestIndex', index, { root: true });
+    },
   },
   mutations: {
     loginRequest(state, user) {
@@ -62,16 +67,16 @@ export const authentication = {
       state.user = null;
     } ,
     savePart1Data(state) {
-      state.status = { loggedIn: true};
-      state.user = user;
+      state.part1complete = true;
     },
     savePart2Data(state) {
-      state.status = { loggedIn: true};
-      state.user = user;
+      state.part2complete = true;
     },
     savePart3Data(state) {
-      state.status = { loggedIn: true};
-      state.user = user;
+      state.part3complete = 'In progress';
+    },
+    savePart4Data(state) {
+      state.part4complete = 'In progress';
     }
   }
 }

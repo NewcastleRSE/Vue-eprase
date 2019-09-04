@@ -14,6 +14,7 @@ import AssessmentPart2 from './components/AssessmentPart2';
 import AssessmentPart3 from './components/AssessmentPart3';
 import AssessmentPart4 from './components/AssessmentPart4';
 import LockoutScreen from './components/LockoutScreen';
+import AssessmentResults from './components/AssessmentResults';
 
 Vue.use(Router);
 
@@ -77,6 +78,10 @@ export const router = new Router({
     {
       path: '/lockoutscreen',
       component: LockoutScreen
+    },
+    {
+      path: '/assessmentresults',
+      component: AssessmentResults
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }

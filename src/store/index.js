@@ -15,7 +15,11 @@ export const store = new Vuex.Store({
     patientList : null,
     testList: null,
     patientIndex : 0,
-    testIndex: 0
+    testIndex: 0,
+    part1complete: null,
+    part2complete: null,
+    part3complete: null,
+    part4complete: null
   },
   actions : {
     setPatientList({ commit }, { patientList, testList } ) {

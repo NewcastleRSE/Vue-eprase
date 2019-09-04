@@ -168,20 +168,21 @@
                         this.response.time_taken = elapsedTime/1000;
 
                         const test_id = this.response.test_id;
-                        const outcomes = this.response.outcomes;
+                        const response1 = this.response.outcomes;
                         const other = this.response.other;
-                        const overrides = this.response.overrides;
+                        const response3 = this.response.overrides;
                         const risk_score = this.response.risk_score;
                         const result_score = this.response.result_score;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
                         const interventions = this.response.interventions;
+                        const index = this.assessment.testIndex;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePrescriptionData', {test_id, outcomes, other, overrides, risk_score, result_score, time_taken, qualitative_data, interventions });
+                            dispatch('authentication/savePrescriptionData', {test_id, response1, other, response1, risk_score, result_score, time_taken, qualitative_data, interventions, index });
                         }
-                        this.assessment.qualitative_data = '';
+                        this.response.qualitative_data = '';
                     }
                 });
             }
