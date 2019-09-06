@@ -1,5 +1,5 @@
 
-let baseURL = 'http://localhost:6001/api';
+let baseURL = 'http://localhost:6001/';
 
 import { router } from '../router';
 
@@ -8,7 +8,8 @@ export const dataService = {
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
-  savePart3Data
+  savePart3Data,
+  savePrescriptionData
 };
 
 function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
@@ -85,7 +86,7 @@ function savePrescriptionData(test_id, response1, other, response3, risk_score, 
 
   return fetch(baseURL + '/part1/' + assessmentId + '/prescription', requestOptions)
     .then(response => {
-      router.push({ path: './assessmentresults' });
+      router.push({ path: './assessmentpart4' });
     })
 }
 

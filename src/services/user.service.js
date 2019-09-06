@@ -1,5 +1,5 @@
 
-let baseURL = 'http://localhost:6001/api';
+let baseURL = 'http://localhost:6001';
 
 export const userService = {
   login,
@@ -15,14 +15,14 @@ function login(username, password) {
 
   return fetch(baseURL + '/auth/signin', requestOptions)
     .then(handleResponse)
-    .then(user => {
+    .then(response => {
       // login successful if there's a jwt token in the response
-      if (user.accessToken) {
+      if (response.jwt.accessToken) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        localStorage.setItem('token', user.accessToken);
-        localStorage.setItem('user', 'fvines');
+        localStorage.setItem('token', response.jwt.accessToken);
+        localStorage.setItem('user', username);
       }
-      return user;
+      return response;
     });
 }
 

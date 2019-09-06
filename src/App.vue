@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
+   <!-- <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div> -->
     <router-view></router-view>
   </div>
 </template>
@@ -14,9 +14,9 @@ export default {
   components: {
   },
   computed: {
-      alert () {
+      /*alert () {
           return this.$store.state.alert
-      }
+      } */
   },
   watch:{
       $route (to, from){
