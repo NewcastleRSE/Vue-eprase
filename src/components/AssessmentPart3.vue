@@ -182,7 +182,7 @@
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePart3Data', { qualitative_data, patient_id, time_taken, index });
+                            dispatch('savePart3Data', { qualitative_data, patient_id, time_taken, index});
                         }
                         this.assessment.qualitative_data = '';
                     }
@@ -193,6 +193,10 @@
                 const unlockTime = new Date();
                 unlockTime.setHours(unlockTime.getHours() + 1);
                 localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
+
+                const { dispatch } = this.$store;
+                dispatch('completePart3');
+
                 this.$router.push('/lockoutscreen');
             }
         },

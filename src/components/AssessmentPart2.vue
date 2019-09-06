@@ -89,7 +89,7 @@
                         const time_taken = this.assessment.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePart2Data', { qualitative_data, time_taken });
+                            dispatch('savePart2Data', { qualitative_data, time_taken });
                         }
                     }
                 });

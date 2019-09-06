@@ -15,7 +15,6 @@ export const dataService = {
 function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
 
   let token = getToken();
-  let user =  getUser();
 
   const requestOptions = {
     method: 'POST',
@@ -23,7 +22,7 @@ function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_resul
     body: JSON.stringify({ ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
   };
 
-  return fetch(baseURL + '/users/' + user + '/part1', requestOptions)
+  return fetch(baseURL + 'part1', requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
@@ -49,7 +48,7 @@ function savePart2Data(qualitative_data, time_taken){
     body: JSON.stringify({ qualitative_data, time_taken })
   };
 
-  return fetch(baseURL + '/part1/' + assessmentId + '/part2', requestOptions)
+  return fetch(baseURL + 'part2?ID=' + assessmentId, requestOptions)
     .then(response => {
       dataService.setAssessmentPart(3);
       router.push({ path: './assessmentpart3' });
@@ -67,7 +66,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     body: JSON.stringify({ qualitative_data, patient_id, time_taken })
   };
 
-  return fetch(baseURL + '/part1/' + assessmentId + '/part3', requestOptions)
+  return fetch(baseURL + 'part3?ID=' + assessmentId, requestOptions)
     .then(response => {
       router.push({ path: './assessmentpart3' });
     })
@@ -84,7 +83,7 @@ function savePrescriptionData(test_id, response1, other, response3, risk_score, 
     body: JSON.stringify({ test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions })
   };
 
-  return fetch(baseURL + '/part1/' + assessmentId + '/prescription', requestOptions)
+  return fetch(baseURL + 'prescription?ID=' + assessmentId, requestOptions)
     .then(response => {
       router.push({ path: './assessmentpart4' });
     })

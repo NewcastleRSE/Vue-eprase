@@ -160,7 +160,7 @@
                         const time_taken = this.results.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePart1Data', { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
+                            dispatch('savePart1Data', { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
                         }
                     }
                 });

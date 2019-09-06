@@ -151,10 +151,14 @@
                 showInterventions: false,
                 nextEnabled: true,
                 doneEnabled: false,
+                completed: false,
                 startTime: ''
             }
         },
         methods : {
+            getInterventions() {
+                let results = [];
+            },
             onExitClick() {
                 window.location.href = './logout'
             },
@@ -162,6 +166,8 @@
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
                     if (valid) {
+
+                        console.log(this.response.interventions);
 
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
@@ -177,10 +183,11 @@
                         const qualitative_data = this.response.qualitative_data;
                         const interventions = this.response.interventions;
                         const index = this.assessment.testIndex;
+                        const completed = this.completed;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('authentication/savePrescriptionData', {test_id, response1, other, response1, risk_score, result_score, time_taken, qualitative_data, interventions, index });
+                            dispatch('savePrescriptionData', {test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions, index, completed });
                         }
                         this.response.qualitative_data = '';
                     }
