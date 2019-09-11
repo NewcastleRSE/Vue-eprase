@@ -1,5 +1,5 @@
 [
-  { "assessmentResponseId" : 1, "display" : "No Intervention", "score_value" : 0 },
-  { "assessmentResponseId" : 2,  "display" : "Intervention",  "score_value ": -4 },
-  { "assessmentResponseId" : 3,  "display" : "Unable to Initiate Order", "score_value" : -10}
+  { "display" : "No Intervention", "score_value" : 0 },
+  { "display" : "Intervention",  "score_value ": -4 },
+  { "display" : "Unable to Initiate Order", "score_value" : -10}
 ]

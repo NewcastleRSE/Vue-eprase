@@ -11,7 +11,6 @@ export const patientService = {
   getDOB,
   getNumPatients,
   getPatientIndex,
-  getTestIndex,
   numPrescriptions
 };
 
@@ -46,9 +45,11 @@ function setPatients() {
   // loop through patients and set the patient list
   for(let index in patients)
   {
-    let id = patients[index].id;
-    if (patientIds.includes(id)){
-      patientList.push(patients[index]);
+    if(patients.hasOwnProperty(index)){
+      let id = patients[index].id;
+      if (patientIds.includes(id)){
+        patientList.push(patients[index]);
+      }
     }
   }
 
@@ -57,7 +58,7 @@ function setPatients() {
     patientList[i].dob = patientService.getDOB(patientList[i]);
 
     // assign id and name to local storage
-    let myid = patientList[i].id
+    let myid = patientList[i].id;
     let myname = patientList[i].first_name + ' ' + patientList[i].surname;
     localStorage.setItem(myid, myname);
   }
@@ -102,10 +103,6 @@ function getPatients() {
 
 function getPatientIndex() {
   return store.state.patientIndex;
-}
-
-function getTestIndex() {
-  return store.state.testIndex;
 }
 
 function getNumPatients() {

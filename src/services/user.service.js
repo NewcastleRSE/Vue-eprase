@@ -27,12 +27,8 @@ function login(username, password) {
 }
 
 function logout() {
-  // remove user from local storage to log user out
-  localStorage.removeItem('user');
-  localStorage.removeItem('token');
-  localStorage.removeItem('assessmentPart');
-  localStorage.removeItem('assessmentId');
-  localStorage.removeItem('assessmentUnlockTime');
+  // remove all items from local storage
+  localStorage.clear();
 }
 
 function handleResponse(response) {

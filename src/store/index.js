@@ -72,10 +72,13 @@ export const store = new Vuex.Store({
       state.part3complete = 'In progress';
     },
     savePart4Data(state, completed) {
-      state.part4complete = completed;
+      state.part4complete ='In progress';
     },
     completePart3(state){
       state.part3complete = true;
+    },
+    completePart4(state){
+      state.part4complete = true;
     }
   }
 });

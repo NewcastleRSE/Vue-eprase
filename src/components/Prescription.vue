@@ -75,7 +75,6 @@
           <input type="hidden" id="result_score" v-model="response.result_score=getResultScore" />
           <input type="hidden" id="risk_score" v-model="response.risk_score=prescription.risk_score" />
 
-          <p class="subtitle" v-if="assessment.debugMode">< Results Score: {{ getResultScore }} ></p>
         </div>
       </div>
     </div>  <!-- end box -->
@@ -99,8 +98,6 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
-
-    import { patientService } from '../services/patient.service';
     import Header from './Header';
 
     export default {
@@ -109,13 +106,10 @@
             Header
         },
         computed : {
-            getResultScore() {
-                return 0;
-            },
             prescription() {
                 // this needs to return the first test from testList in store
                 let prescription = this.$store.state.testList;
-                return prescription.testList[this.assessment.testIndex];
+                return prescription.testList[this.getPresTestIndex];
             },
             getCurrentPatient() {
                 // vue allows the use of 'this' with computed....
@@ -124,6 +118,9 @@
             },
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
+            },
+            getPresTestIndex() {
+                return this.$store.state.testIndex;
             }
         },
         data() {
@@ -131,7 +128,6 @@
                 assessment: {
                     debugMode: true,
                     isConfigErrorTest: false,
-                    testIndex: patientService.getTestIndex(),
                 },
                 response: {
                     outcomes: '',
@@ -139,7 +135,6 @@
                     overrides: '',
                     time_taken: '',
                     test_id : '',
-                    result_score : '',
                     risk_score : '',
                     interventions : [],
                     qualitative_data : ''
@@ -148,6 +143,7 @@
                 interventionDetails: jsoninterventions,
                 interventionOverrides: jsonoverrides,
                 checkBoxList: jsoncheckboxes,
+                result_score : null,
                 showInterventions: false,
                 nextEnabled: true,
                 doneEnabled: false,
@@ -157,7 +153,51 @@
         },
         methods : {
             getInterventions() {
-                let results = [];
+
+                this.result_score = this.prescription.risk_score;
+                console.log('Result score ' + this.result_score);
+
+                for (let index in this.checkBoxList) {
+                    if(this.checkBoxList.hasOwnProperty(index)){
+                        if (this.checkBoxList[index].selected === true) {
+                            this.response.interventions.push({
+                                display: this.checkBoxList[index].name,
+                                score_value: this.checkBoxList[index].score_value
+                            });
+                            // add to interventionTotal
+                            this.result_score += parseInt(this.checkBoxList[index].score_value);
+                        }
+                    }
+                }
+                console.log('Result score after interventions ' + this.result_score);
+                return this.response.interventions;
+
+            },
+            getResultScore() {
+
+                // get outcomes scoring
+                if (this.response.outcomes === 'Intervention') {
+                    this.result_score += -4;
+                }
+                else if (this.response.outcomes === 'Unable to Initiate Order'){
+                    this.result_score += -10;
+                }
+                else {
+                    this.result_score += 0;
+                }
+                console.log('Result score after outcome ' + this.result_score);
+                // get overrides scoring
+                if(this.response.overrides === 'Unable to Override'){
+                    this.result_score += -3;
+                }
+                else if (this.response.overrides !== ''){
+                    this.result_score += -1;
+                }
+                else {
+                    this.result_score += 0;
+                }
+                console.log('Result score after overrride ' + this.result_score);
+                return this.result_score;
             },
             onExitClick() {
                 window.location.href = './logout'
@@ -167,8 +207,6 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
-                        console.log(this.response.interventions);
-
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.response.time_taken = elapsedTime/1000;
@@ -177,21 +215,41 @@
                         const response1 = this.response.outcomes;
                         const other = this.response.other;
                         const response3 = this.response.overrides;
-                        const risk_score = this.response.risk_score;
                         const result_score = this.response.result_score;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
-                        const interventions = this.response.interventions;
-                        const index = this.assessment.testIndex;
+                        const interventions = this.getInterventions();
+                        const risk_score = this.getResultScore();
+                        const index = this.getPresTestIndex;
                         const completed = this.completed;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
                             dispatch('savePrescriptionData', {test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions, index, completed });
                         }
-                        this.response.qualitative_data = '';
+                        // reset data fields
+                        this.resetDataFields();
+                        this.clearCheckBoxes();
                     }
                 });
+            },
+            clearCheckBoxes() {
+
+                for (let index in this.checkBoxList) {
+                    if(this.checkBoxList.hasOwnProperty(index)){
+                        if (this.checkBoxList[index].selected === true) {
+                            this.checkBoxList[index].selected = false;
+                        }
+                    }
+                }
+            },
+            resetDataFields() {
+                this.response.outcomes = '';
+                this.response.overrides = '';
+                this.response.qualitative_data = '';
+                this.response.interventions = [];
+                this.response.other = '';
+                this.result_score = null;
             }
         },
         created : function() {
@@ -317,7 +375,6 @@
   button {
     height: 40px;
     width: 100px;
-    margin: 10px 0px;
     font-size: 1.2em;
     margin: 0 50px;
   }
