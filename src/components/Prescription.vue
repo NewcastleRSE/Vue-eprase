@@ -98,6 +98,7 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
+    import { patientService } from '../services/patient.service';
     import Header from './Header';
 
     export default {
@@ -106,13 +107,13 @@
             Header
         },
         computed : {
+            // vue allows the use of 'this' with computed....
             prescription() {
                 // this needs to return the first test from testList in store
                 let prescription = this.$store.state.testList;
                 return prescription.testList[this.getPresTestIndex];
             },
             getCurrentPatient() {
-                // vue allows the use of 'this' with computed....
                 let testPatientId = this.prescription.patient_id;
                 return localStorage.getItem(testPatientId);
             },
@@ -145,17 +146,18 @@
                 checkBoxList: jsoncheckboxes,
                 result_score : null,
                 showInterventions: false,
+                completed: false,
                 nextEnabled: true,
                 doneEnabled: false,
-                completed: false,
-                startTime: ''
+                startTime: '',
+                numTests : patientService.numPrescriptions
             }
         },
         methods : {
             getInterventions() {
 
                 this.result_score = this.prescription.risk_score;
-                console.log('Result score ' + this.result_score);
+                console.log('Risk score ' + this.result_score);
 
                 for (let index in this.checkBoxList) {
                     if(this.checkBoxList.hasOwnProperty(index)){
@@ -196,7 +198,7 @@
                 else {
                     this.result_score += 0;
                 }
-                console.log('Result score after overrride ' + this.result_score);
+                console.log('Result score after override ' + this.result_score);
                 return this.result_score;
             },
             onExitClick() {
@@ -215,11 +217,11 @@
                         const response1 = this.response.outcomes;
                         const other = this.response.other;
                         const response3 = this.response.overrides;
-                        const result_score = this.response.result_score;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
+                        const risk_score = this.response.risk_score;
                         const interventions = this.getInterventions();
-                        const risk_score = this.getResultScore();
+                        const result_score = this.getResultScore();
                         const index = this.getPresTestIndex;
                         const completed = this.completed;
 
@@ -233,8 +235,12 @@
                     }
                 });
             },
+            onDoneClick() {
+                const { dispatch } = this.$store;
+                dispatch('completePart4');
+                this.$router.push('/assessmentresults');
+            },
             clearCheckBoxes() {
-
                 for (let index in this.checkBoxList) {
                     if(this.checkBoxList.hasOwnProperty(index)){
                         if (this.checkBoxList[index].selected === true) {
@@ -254,6 +260,13 @@
         },
         created : function() {
             this.startTime = new Date();
+        },
+        beforeUpdate: function() {
+            let index = this.$store.state.testIndex;
+            if (index === (this.numTests)) {
+                this.nextEnabled = false;
+                this.doneEnabled = true;
+            }
         }
     }
 </script>

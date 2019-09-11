@@ -11,6 +11,7 @@ export const patientService = {
   getDOB,
   getNumPatients,
   getPatientIndex,
+  getTestIndex,
   numPrescriptions
 };
 
@@ -107,5 +108,9 @@ function getPatientIndex() {
 
 function getNumPatients() {
   return localStorage.getItem('numPatients');
+}
+
+function getTestIndex() {
+  return store.state.testIndex;
 }
 

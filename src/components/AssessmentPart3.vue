@@ -329,7 +329,6 @@
   button {
     height: 40px;
     width: 100px;
-    margin: 10px 0px;
     font-size: 1.2em;
     margin: 0 50px;
   }

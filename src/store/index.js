@@ -47,6 +47,9 @@ export const store = new Vuex.Store({
     },
     completePart3({commit}){
       commit('completePart3');
+    },
+    completePart4({commit}){
+      commit('completePart4');
     }
   },
   mutations: {
