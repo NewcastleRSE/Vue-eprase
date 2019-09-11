@@ -214,9 +214,9 @@
                         this.response.time_taken = elapsedTime/1000;
 
                         const test_id = this.response.test_id;
-                        const response1 = this.response.outcomes;
+                        const outcome = this.response.outcomes;
                         const other = this.response.other;
-                        const response3 = this.response.overrides;
+                        const override = this.response.overrides;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
                         const risk_score = this.response.risk_score;
@@ -227,7 +227,7 @@
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {test_id, response1, other, response3, risk_score, result_score, time_taken, qualitative_data, interventions, index, completed });
+                            dispatch('savePrescriptionData', {test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
