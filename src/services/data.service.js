@@ -85,7 +85,7 @@ function savePrescriptionData(test_id, outcome, other, override, risk_score, res
 
   return fetch(baseURL + 'prescription?ID=' + assessmentId, requestOptions)
     .then(response => {
-      router.push({ path: './assessmentpart4' });
+      // router.push({ path: './assessmentpart4' });
     })
 }
 

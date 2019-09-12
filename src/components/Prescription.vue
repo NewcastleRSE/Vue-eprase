@@ -99,6 +99,7 @@
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
     import { patientService } from '../services/patient.service';
+    import { settings } from '../settings'
     import Header from './Header';
 
     export default {
@@ -179,10 +180,10 @@
 
                 // get outcomes scoring
                 if (this.response.outcomes === 'Intervention') {
-                    this.result_score += -4;
+                    this.result_score += settings.outcomeIntervention;
                 }
                 else if (this.response.outcomes === 'Unable to Initiate Order'){
-                    this.result_score += -10;
+                    this.result_score += settings.outcomeUnableToInitiate;
                 }
                 else {
                     this.result_score += 0;
@@ -190,10 +191,10 @@
                 console.log('Result score after outcome ' + this.result_score);
                 // get overrides scoring
                 if(this.response.overrides === 'Unable to Override'){
-                    this.result_score += -3;
+                    this.result_score += settings.unableToOverride;
                 }
                 else if (this.response.overrides !== ''){
-                    this.result_score += -1;
+                    this.result_score += settings.defaultOverride;
                 }
                 else {
                     this.result_score += 0;
@@ -205,6 +206,10 @@
                 window.location.href = './logout'
             },
             onNextClick()  {
+               this.saveData();
+                this.$router.push('/assessmentpart4');
+            },
+            saveData() {
                 this.submitted = true;
                 this.$validator.validate().then(valid => {
                     if (valid) {
@@ -236,6 +241,9 @@
                 });
             },
             onDoneClick() {
+                // save the last test data
+                this.saveData();
+
                 const { dispatch } = this.$store;
                 dispatch('completePart4');
                 this.$router.push('/assessmentresults');
