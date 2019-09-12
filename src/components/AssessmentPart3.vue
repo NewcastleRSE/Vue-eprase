@@ -168,7 +168,24 @@
                 window.location.href = './logout'
             },
             onNextClick()  {
-                this.submitted = true;
+                this.saveData();
+                this.$router.push('/assessmentpart3');
+            },
+            onDoneClick() {
+
+                const unlockTime = new Date();
+                unlockTime.setHours(unlockTime.getHours() + 1);
+                localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
+
+                // save the last patient data
+                this.saveData();
+
+                const { dispatch } = this.$store;
+                dispatch('completePart3');
+
+                this.$router.push('/lockoutscreen');
+            },
+            saveData() {
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
@@ -184,20 +201,10 @@
                         if (time_taken){
                             dispatch('savePart3Data', { qualitative_data, patient_id, time_taken, index});
                         }
+                        this.submitted = true;
                         this.assessment.qualitative_data = '';
                     }
                 });
-            },
-            onDoneClick() {
-
-                const unlockTime = new Date();
-                unlockTime.setHours(unlockTime.getHours() + 1);
-                localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
-
-                const { dispatch } = this.$store;
-                dispatch('completePart3');
-
-                this.$router.push('/lockoutscreen');
             }
         },
         created : function() {

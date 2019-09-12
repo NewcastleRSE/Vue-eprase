@@ -471,5 +471,9 @@
     background-color: #fff;
   }
 
+  .form-control.is-invalid {
+      border-color: #ced4da;
+  }
+
 
 </style>

@@ -68,7 +68,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
 
   return fetch(baseURL + 'part3?ID=' + assessmentId, requestOptions)
     .then(response => {
-      router.push({ path: './assessmentpart3' });
+      // router.push({ path: './assessmentpart3' });
     })
 }
 
