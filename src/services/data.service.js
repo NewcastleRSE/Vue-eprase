@@ -4,6 +4,7 @@ let baseURL = 'http://localhost:6001/';
 import { router } from '../router';
 
 export const dataService = {
+  getAssessment,
   getAssessmentPart,
   setAssessmentPart,
   savePart1Data,
@@ -106,6 +107,24 @@ function handleResponse(response) {
   });
 }
 
+function getAssessment() {
+
+  let token = getToken();
+  let assessmentId = getAssessmentId();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(baseURL + 'result?ID=' + assessmentId, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+     console.log(response.part1);
+      return response.part1;
+    });
+}
+
 function getAssessmentPart() {
 
   let part = localStorage.getItem('assessmentPart');
@@ -132,5 +151,7 @@ function getUser() {
 function getAssessmentId() {
   return localStorage.getItem('assessmentId');
 }
+
+
 
 
