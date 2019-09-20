@@ -6,8 +6,7 @@
       <h1>ePRaSE 2019 Assessment Results</h1>
       <p>Below are the results from the 2019 ePRaSE assessment. </p>
 
-      {{ assessment }}
-      <div class="assessment-results" v-if="assessment">
+      <div class="assessment-results" v-if="getAssessment">
 
         <h3>eP Usage Results</h3>
         <p>The following results are based on your answers to the questions in part 1 of the assessment.</p>
@@ -15,12 +14,12 @@
 
           <table>
             <tr>
-              <td><strong>eP Usage</strong></td><td>{{assessment.ep_usage}}%</td>
+              <td><strong>eP Usage</strong></td><td>{{ getAssessment.ep_usage }}%</td>
               <td>
-                <img v-if="assessment.ep_usage==100" src="../assets/smiley1.jpg" title="great" class="smiley">
-                <img v-if="assessment.ep_usage==75"  src="../assets/smiley2.jpg" title="good"  class="smiley">
-                <img v-if="assessment.ep_usage==50"  src="../assets/smiley3.jpg" title="ok"    class="smiley">
-                <img v-if="assessment.ep_usage==25"  src="../assets/smiley4.jpg" title="poor"  class="smiley">
+                <img v-if="getAssessment.ep_usage==='76-100'" src="../assets/smiley1.jpg" title="great" class="smiley">
+                <img v-if="getAssessment.ep_usage==='51-75'"  src="../assets/smiley2.jpg" title="good"  class="smiley">
+                <img v-if="getAssessment.ep_usage==='26-50'"  src="../assets/smiley3.jpg" title="ok"    class="smiley">
+                <img v-if="getAssessment.ep_usage==='0-25'"  src="../assets/smiley4.jpg" title="poor"  class="smiley">
               </td>
             </tr>
           </table>
@@ -29,10 +28,10 @@
         <div class="results-data">
           <table>
             <tr>
-              <td><strong>Lab Results</strong></td><td>{{assessment.lab_results}}</td>
+              <td><strong>Lab Results</strong></td><td>{{ getAssessment.lab_results }}</td>
               <td>
-                <img v-if="assessment.lab_results==true"  src="../assets/smiley2.jpg" title="good" class="smiley">
-                <img v-if="assessment.lab_results==false" src="../assets/smiley4.jpg" title="bad"   class="smiley">
+                <img v-if="getAssessment.lab_results==='true'"  src="../assets/smiley2.jpg" title="good" class="smiley">
+                <img v-if="getAssessment.lab_results==='false'" src="../assets/smiley4.jpg" title="bad"   class="smiley">
               </td>
             </tr>
           </table>
@@ -90,7 +89,6 @@
             return {
                 subcategories : [],
                 indicators : jsonindicators,
-                assessment : dataService.getAssessment(),
                 score : {
                     category : '',
                     resultAverage : ''
@@ -99,7 +97,19 @@
                 sub : null
             }
         },
+        computed: {
+            getAssessment() {
+                return this.$store.state.ep_usage;
+            }
+        },
         methods : {
+            calcSpearmans() {
+                const mitigations = _.map(this.assessment.prescriptionList, 'rankedMitigation');
+                const risks = _.map(this.assessment.prescriptionList, 'rankedRisk');
+
+                const totalCorrelation = (jStat.spearmancoeff(mitigations, risks)).toFixed(2);
+                return totalCorrelation;
+            },
             rankAverage(value, array, order) {
                 if (order > 0) {
                     array.sort();
@@ -139,6 +149,50 @@
 
   #content {
     padding: 40px;
+  }
+
+  img {
+    border: 1px solid black;
+  }
+
+  .assessment-results {
+    padding-bottom: 20px;
+  }
+
+  td {
+    width: 180px;
+    font-size: 14px;
+    #text-align: center;
+  }
+
+  table {
+    margin-left: 10px;
+  }
+
+  .results-data p {
+    margin-left: 10px;
+  }
+
+  .results-data td {
+    text-transform: capitalize;
+  }
+
+  .smiley {
+    width: 40px;
+    border: none;
+    float: left;
+    margin-right: 10px;
+  }
+
+  p {
+    line-height: 40px;
+  }
+
+  button {
+    height: 40px;
+    width: 100px;
+    margin: 10px 0px;
+    font-size: 1.2em;
   }
 
 </style>
