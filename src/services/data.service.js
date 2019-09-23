@@ -120,7 +120,7 @@ function getAssessment() {
   return fetch(baseURL + 'result?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
-     console.log(response.part1);
+     //console.log(response.part1);
       return response.part1;
     });
 }

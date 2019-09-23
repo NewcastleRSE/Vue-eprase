@@ -151,7 +151,7 @@
                 nextEnabled: true,
                 doneEnabled: false,
                 startTime: '',
-                numTests : patientService.numPrescriptions
+                numTests : settings.numPrescriptions
             }
         },
         methods : {

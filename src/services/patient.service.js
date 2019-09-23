@@ -2,8 +2,9 @@ import jsonpatients from '../json/patients.json'
 import jsontests from '../json/prescriptions.json'
 import jsonerrors from '../json/configerror.json'
 import { store } from '../store/index';
+import { settings } from '../settings';
 
-let numPrescriptions = 19;
+let numPrescriptions = settings.numPrescriptions;
 
 export const patientService = {
   setPatients,
@@ -36,7 +37,7 @@ function setPatients() {
       testIndex.push(index);
      // console.log('Added to testIndex ' + index);
 
-      if (testList.length <= numPrescriptions) {
+      if (testList.length < numPrescriptions) {
         testList.push(tests[index]);
         patientIds.push(tests[index].patient_id);
       }
