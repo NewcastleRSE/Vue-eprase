@@ -45,7 +45,7 @@
               <input type="checkbox" :value="check.name" v-model="check.selected">
 
               <div v-show="check.name === 'Other Please Specify' && check.selected" id="response-other">
-                <label id="other"> Other: </label>
+                <label for="advice-other"> Other: </label>
                 <input type="text" id="advice-other" class="form-control" v-model="response.other" minlength="3" maxlength="50">
                 <div v-if="response.other.invalid && response.other.touched" class="alert alert-danger">
                   Other is required with a minimum of 3 characters
@@ -82,7 +82,6 @@
 
     <div class="form-group footer" align="center">
       <div class="buttons">
-        <button type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
         <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
         <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
       </div>
@@ -98,7 +97,6 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
-    import { patientService } from '../services/patient.service';
     import { settings } from '../settings'
     import Header from './Header';
 
@@ -202,9 +200,6 @@
                 console.log('Result score after override ' + this.result_score);
                 return this.result_score;
             },
-            onExitClick() {
-                window.location.href = './logout'
-            },
             onNextClick()  {
                this.saveData();
                 this.$router.push('/assessmentpart4');
@@ -225,14 +220,14 @@
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
                         const risk_score = this.response.risk_score;
-                        const interventions = this.getInterventions();
+                        const assessmentResponses = this.getInterventions();
                         const result_score = this.getResultScore();
                         const index = this.getPresTestIndex;
                         const completed = this.completed;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions, index, completed });
+                            dispatch('savePrescriptionData', {test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
@@ -241,11 +236,10 @@
                 });
             },
             onDoneClick() {
+                // this is now true
+                this.completed = true;
                 // save the last test data
                 this.saveData();
-
-                const { dispatch } = this.$store;
-                dispatch('completePart4');
                 this.$router.push('/assessmentresults');
             },
             clearCheckBoxes() {
@@ -271,7 +265,7 @@
         },
         beforeUpdate: function() {
             let index = this.$store.state.testIndex;
-            if (index === (this.numTests)) {
+            if (index === (this.numTests - 1)) {
                 this.nextEnabled = false;
                 this.doneEnabled = true;
             }

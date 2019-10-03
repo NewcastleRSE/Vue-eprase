@@ -4,7 +4,7 @@ import jsonerrors from '../json/configerror.json'
 import { store } from '../store/index';
 import { settings } from '../settings';
 
-let numPrescriptions = settings.numPrescriptions;
+let numPrescriptions = settings.numPrescriptions + settings.numConfigError;
 
 export const patientService = {
   setPatients,
@@ -35,14 +35,18 @@ function setPatients() {
     if (testIndex.indexOf(index) === -1) {
       // keep a note of the index
       testIndex.push(index);
-     // console.log('Added to testIndex ' + index);
-
       if (testList.length < numPrescriptions) {
         testList.push(tests[index]);
         patientIds.push(tests[index].patient_id);
       }
     }
   }
+
+  // create a random point to insert a config error between 2 and 5
+  let configInsert = Math.floor(Math.random() * 4) + 2;
+
+  // add it into the array without deleting anything
+  testList.splice(configInsert, 0, errors);
 
   // loop through patients and set the patient list
   for(let index in patients)

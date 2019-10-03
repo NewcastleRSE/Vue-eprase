@@ -10,17 +10,18 @@ export const dataService = {
   savePart1Data,
   savePart2Data,
   savePart3Data,
-  savePrescriptionData
+  savePrescriptionData,
+  saveConfigError
 };
 
-function savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
+function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
 
   let token = getToken();
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
+    body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
   };
 
   return fetch(baseURL + 'part1', requestOptions)
@@ -73,7 +74,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     })
 }
 
-function savePrescriptionData(test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions){
+function savePrescriptionData(test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -81,10 +82,27 @@ function savePrescriptionData(test_id, outcome, other, override, risk_score, res
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions })
+    body: JSON.stringify({ test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses })
   };
 
   return fetch(baseURL + 'prescription?ID=' + assessmentId, requestOptions)
+    .then(response => {
+      // router.push({ path: './assessmentpart4' });
+    })
+}
+
+function saveConfigError(  test_id, risk_score, result_score, result, time_taken, qualitative_data ) {
+
+  let token = getToken();
+  let assessmentId = getAssessmentId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ test_id, risk_score, result_score, result, time_taken, qualitative_data })
+  };
+
+  return fetch(baseURL + 'configError?ID=' + assessmentId, requestOptions)
     .then(response => {
       // router.push({ path: './assessmentpart4' });
     })
@@ -131,13 +149,11 @@ function getAssessmentPart() {
   if(part == null){
     part = 1
   }
-  console.log('Getting part ' + part);
   return part;
 }
 
 function setAssessmentPart(value) {
   localStorage.setItem('assessmentPart', value);
-  console.log('Setting part ' + value);
 }
 
 function getToken(){

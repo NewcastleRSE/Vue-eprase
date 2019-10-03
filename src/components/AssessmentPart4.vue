@@ -9,7 +9,7 @@
        <h4>Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</h4>
 
        <Prescription v-if="assessment.isPrescriptionTest"></Prescription>
-      <!-- <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError> -->
+       <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError>
      </div>
    </div>
 
@@ -43,6 +43,16 @@
                     isConfigErrorTest: false
                 },
                 numPrescriptions: patientService.numPrescriptions
+            }
+        },
+        beforeUpdate: function() {
+            let index = this.$store.state.testIndex;
+            let tests = this.$store.state.testList;
+            let currentTest = tests.testList[index];
+
+            if (currentTest.category === 'config-error') {
+                this.assessment.isPrescriptionTest = false;
+                this.assessment.isConfigErrorTest = true;
             }
         }
     }

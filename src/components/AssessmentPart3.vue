@@ -156,6 +156,7 @@
                 startTime: '',
                 nextEnabled: true,
                 doneEnabled: false,
+                completed : false,
                 numPatients: patientService.getNumPatients()
             }
         },
@@ -172,17 +173,15 @@
                 this.$router.push('/assessmentpart3');
             },
             onDoneClick() {
-
                 const unlockTime = new Date();
                 unlockTime.setHours(unlockTime.getHours() + 1);
                 localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
 
+                // this is now true
+                this.completed = true;
+
                 // save the last patient data
                 this.saveData();
-
-                const { dispatch } = this.$store;
-                dispatch('completePart3');
-
                 this.$router.push('/lockoutscreen');
             },
             saveData() {
@@ -196,10 +195,11 @@
                         const qualitative_data = this.assessment.qualitative_data;
                         const patient_id = this.assessment.patient_id;
                         const time_taken = this.assessment.time_taken;
+                        const completed = this.completed;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePart3Data', { qualitative_data, patient_id, time_taken, index});
+                            dispatch('savePart3Data', { qualitative_data, patient_id, time_taken, index, completed});
                         }
                         this.submitted = true;
                         this.assessment.qualitative_data = '';
@@ -277,10 +277,6 @@
   .patient-image {
     float: right;
     padding: 40px;
-  }
-
-  .patient-image img {
-    border: 1px solid grey;
   }
 
   .patient-demographics {

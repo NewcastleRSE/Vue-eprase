@@ -143,7 +143,7 @@
 
   #regForm label {
     margin-bottom : 0px;
-    margin-left: -500px;
+    margin-left: -520px;
   }
 
   #regForm p {

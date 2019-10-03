@@ -28,18 +28,19 @@
                 <option value="Sunrise"> Sunrise </option>
                 <option value="MedChart">MedChart </option>
                 <option value="Lorenzo">Lorenzo </option>
-              <!--  <option value="Other"> Other (Please Specify) </option> -->
+                <option value="Other"> Other (Please Specify) </option>
               </select>
             </div>
 
-            <div id="other" class="form-group" hidden>
-              <ul style="list-style-type:circle">
-                <li><input type="text" ></li>
-              </ul>
+            <div v-show="results.ep_service === 'Other'" class="form-group">
+              <label for="other-service"> Other eP service?</label>
+              <input type="text" name="other" id="other-service" class="form-control" v-model="results.other_service" minlength="3" maxlength="50" placeholder="Enter service...">
+              <div v-if="submitted && errors.has('other_service')" class="invalid-feedback alert alert-danger">{{ errors.first('other_service') }}</div>
             </div>
+
             <div class="form-group">
               <label for="ep-version">What version of the service are you currently using?</label>
-              <span id="version"><input id="ep-version" name="ep-version" type="text" class="form-control" v-model="results.ep_version" v-validate="{required: true, min: 1, max: 50}" ></span>
+              <span id="version"><input id="ep-version" name="ep-version" type="text" class="form-control" v-model="results.ep_version" v-validate="{required: true, min: 1, max: 50}" placeholder="Enter version..."></span>
               <div v-if="submitted && errors.has('ep-version')" class="invalid-feedback alert alert-danger">{{ errors.first('ep-version') }}</div>
             </div>
 
@@ -120,6 +121,7 @@
                 results: {
                     ep_service: null,
                     ep_version: '',
+                    other_service : '',
                     ep_usage: null,
                     patient_type: null,
                     lab_results: '',
@@ -153,6 +155,7 @@
 
                         const ep_service  = this.results.ep_service;
                         const ep_version = this.results.ep_version;
+                        const other_service = this.results.other_service;
                         const ep_usage = this.results.ep_usage;
                         const patient_type = this.results.patient_type;
                         const lab_results = this.results.lab_results;
@@ -160,7 +163,7 @@
                         const time_taken = this.results.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePart1Data', { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
+                            dispatch('savePart1Data', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
                         }
                     }
                 });
@@ -191,7 +194,7 @@
     max-width: 950px;
   }
 
-  #version {
+  #version, #other-service {
     float: right;
   }
 

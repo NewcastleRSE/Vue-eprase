@@ -4,6 +4,6 @@ export const settings = {
   outcomeUnableToInitiate : -10,
   unableToOverride : -3,
   defaultOverride : -1,
-  numPrescriptions: 18,
+  numPrescriptions: 19,
   numConfigError : 1
 }

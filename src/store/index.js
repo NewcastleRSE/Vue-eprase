@@ -21,6 +21,7 @@ export const store = new Vuex.Store({
     part2complete: null,
     part3complete: null,
     part4complete: null,
+    configErrorComplete: null,
     ep_usage: null,
     lab_results : null
   },
@@ -29,29 +30,27 @@ export const store = new Vuex.Store({
       commit('setPatientList', { patientList });
       commit('setTestList', { testList });
     },
-    savePart1Data({ commit }, { ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
-      dataService.savePart1Data(ep_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
+    savePart1Data({ commit }, { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
+      dataService.savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
       commit('savePart1Data', { ep_usage, lab_results } );
     },
     savePart2Data({ commit }, { qualitative_data, time_taken }){
       dataService.savePart2Data( qualitative_data, time_taken);
       commit('savePart2Data');
     },
-    savePart3Data({ commit }, { qualitative_data, patient_id, time_taken, index }){
+    savePart3Data({ commit }, { qualitative_data, patient_id, time_taken, index, completed }){
       dataService.savePart3Data( qualitative_data, patient_id, time_taken);
-      commit('savePart3Data');
+      commit('savePart3Data', completed);
       commit('updatePatientIndex', index);
     },
-    savePrescriptionData({ commit }, { test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions, index}){
-      dataService.savePrescriptionData( test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, interventions );
-      commit('savePart4Data');
+    savePrescriptionData({ commit }, { test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses, index, completed}){
+      dataService.savePrescriptionData( test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses );
+      commit('savePart4Data', completed);
       commit('updateTestIndex', index);
     },
-    completePart3({commit}){
-      commit('completePart3');
-    },
-    completePart4({commit}){
-      commit('completePart4');
+    saveConfigError({ commit }, { test_id, risk_score, result_score, result, time_taken, qualitative_data }){
+      dataService.saveConfigError( test_id, risk_score, result_score, result, time_taken, qualitative_data );
+      commit('saveConfigError');
     }
   },
   mutations: {
@@ -75,17 +74,14 @@ export const store = new Vuex.Store({
     savePart2Data(state) {
       state.part2complete = true;
     },
-    savePart3Data(state) {
-      state.part3complete = 'In progress';
+    savePart3Data(state, completed) {
+      state.part3complete = completed;
     },
     savePart4Data(state, completed) {
-      state.part4complete ='In progress';
+      state.part4complete = completed;
     },
-    completePart3(state){
-      state.part3complete = true;
-    },
-    completePart4(state){
-      state.part4complete = true;
+    saveConfigError(state){
+      state.configErrorComplete = true;
     }
   }
 });
