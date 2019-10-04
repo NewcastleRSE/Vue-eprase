@@ -102,7 +102,7 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
     body: JSON.stringify({ test_id, risk_score, result_score, result, time_taken, qualitative_data })
   };
 
-  return fetch(baseURL + 'configError?ID=' + assessmentId, requestOptions)
+  return fetch(baseURL + 'config?ID=' + assessmentId, requestOptions)
     .then(response => {
       // router.push({ path: './assessmentpart4' });
     })

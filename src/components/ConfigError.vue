@@ -59,13 +59,15 @@
         },
         computed: {
             getPreviousPatient() {
-                let patients = this.$store.state.patientList;
-                let previousPatientId = patients.patientList[0].id;
-                let previousPatient = localStorage.getItem(previousPatientId);
-                return previousPatient;
+                let tests = this.$store.state.testList;
+                let previousPatientId = tests.testList[0].patient_id;
+                return localStorage.getItem(previousPatientId);
             },
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
+            },
+            getPresTestIndex() {
+                return this.$store.state.testIndex;
             }
         },
         data() {
@@ -99,10 +101,11 @@
                         const result = this.response.result;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
+                        const index = this.getPresTestIndex;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveConfigError', {test_id, risk_score, result_score, result, time_taken, qualitative_data });
+                            dispatch('saveConfigError', {test_id, risk_score, result_score, result, time_taken, qualitative_data, index });
                         }
                     }
                 });

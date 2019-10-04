@@ -50,9 +50,14 @@
             let tests = this.$store.state.testList;
             let currentTest = tests.testList[index];
 
+            // make sure we get the right type of test
             if (currentTest.category === 'config-error') {
                 this.assessment.isPrescriptionTest = false;
                 this.assessment.isConfigErrorTest = true;
+            }
+            else {
+                this.assessment.isPrescriptionTest = true;
+                this.assessment.isConfigErrorTest = false;
             }
         }
     }
