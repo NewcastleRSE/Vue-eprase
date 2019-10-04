@@ -20,9 +20,9 @@
 <script>
 
     import Header from './Header';
+    import { settings } from '../settings';
     import Prescription from "./Prescription";
     import ConfigError from "./ConfigError";
-    import { patientService } from '../services/patient.service';
 
     export default {
         name: "AssessmentPart4",
@@ -42,7 +42,7 @@
                     isPrescriptionTest: true,
                     isConfigErrorTest: false
                 },
-                numPrescriptions: patientService.numPrescriptions
+                numPrescriptions: settings.numPrescriptions + settings.numConfigError
             }
         },
         beforeUpdate: function() {

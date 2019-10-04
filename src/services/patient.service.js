@@ -4,16 +4,13 @@ import jsonerrors from '../json/configerror.json'
 import { store } from '../store/index';
 import { settings } from '../settings';
 
-let numPrescriptions = settings.numPrescriptions + settings.numConfigError;
-
 export const patientService = {
   setPatients,
   getPatients,
   getDOB,
   getNumPatients,
   getPatientIndex,
-  getTestIndex,
-  numPrescriptions
+  getTestIndex
 };
 
 function setPatients() {
@@ -35,7 +32,7 @@ function setPatients() {
     if (testIndex.indexOf(index) === -1) {
       // keep a note of the index
       testIndex.push(index);
-      if (testList.length < numPrescriptions) {
+      if (testList.length < settings.numPrescriptions) {
         testList.push(tests[index]);
         patientIds.push(tests[index].patient_id);
       }

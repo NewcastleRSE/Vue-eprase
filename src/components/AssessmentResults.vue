@@ -6,7 +6,7 @@
       <h1>ePRaSE 2019 Assessment Results</h1>
       <p>Below are the results from the 2019 ePRaSE assessment. </p>
 
-      <div class="assessment-results" v-if="getAssessment">
+      <div class="assessment-results" v-if="assessment">
 
         <h3>eP Usage Results</h3>
         <p>The following results are based on your answers to the questions in part 1 of the assessment.</p>
@@ -14,12 +14,12 @@
 
           <table>
             <tr>
-              <td><strong>eP Usage</strong></td><td>{{ getAssessment.ep_usage }}%</td>
+              <td><strong>eP Usage</strong></td><td>{{ getEpUsage }}%</td>
               <td>
-                <img v-if="getAssessment.ep_usage==='76-100'" src="../assets/smiley1.jpg" title="great" class="smiley">
-                <img v-if="getAssessment.ep_usage==='51-75'"  src="../assets/smiley2.jpg" title="good"  class="smiley">
-                <img v-if="getAssessment.ep_usage==='26-50'"  src="../assets/smiley3.jpg" title="ok"    class="smiley">
-                <img v-if="getAssessment.ep_usage==='0-25'"  src="../assets/smiley4.jpg" title="poor"  class="smiley">
+                <img v-if="getEpUsage === '76-100'" src="../assets/smiley1.jpg" title="great" class="smiley">
+                <img v-if="getEpUsage === '51-75'"  src="../assets/smiley2.jpg" title="good"  class="smiley">
+                <img v-if="getEpUsage === '26-50'"  src="../assets/smiley3.jpg" title="ok"    class="smiley">
+                <img v-if="getEpUsage === '0-25'"  src="../assets/smiley4.jpg" title="poor"  class="smiley">
               </td>
             </tr>
           </table>
@@ -28,10 +28,10 @@
         <div class="results-data">
           <table>
             <tr>
-              <td><strong>Lab Results</strong></td><td>{{ getAssessment.lab_results }}</td>
+              <td><strong>Lab Results</strong></td><td>{{ getLabResults }}</td>
               <td>
-                <img v-if="getAssessment.lab_results==='true'"  src="../assets/smiley2.jpg" title="good" class="smiley">
-                <img v-if="getAssessment.lab_results==='false'" src="../assets/smiley4.jpg" title="bad"   class="smiley">
+                <img v-if="getLabResults === 'true'"  src="../assets/smiley2.jpg" title="good" class="smiley">
+                <img v-if="getLabResults === 'false'" src="../assets/smiley4.jpg" title="bad"   class="smiley">
               </td>
             </tr>
           </table>
@@ -72,12 +72,18 @@
 
 <script>
 
-
+    import { settings } from '../settings';
     import jsonindicators from '../json/indicators.json';
     import { dataService } from '../services/data.service';
     import _ from 'lodash';
     import jStat from 'jStat';
     import Header from './Header';
+
+    import axios from 'axios'
+    import VueAxios from 'vue-axios'
+    import Vue from 'vue'
+
+    Vue.use(VueAxios, axios);
 
     export default {
         name: "AssessmentResults",
@@ -87,6 +93,8 @@
         },
         data() {
             return {
+                assessment : [],
+                prescriptionList : '',
                 subcategories : [],
                 indicators : jsonindicators,
                 score : {
@@ -98,17 +106,90 @@
             }
         },
         computed: {
-            getAssessment() {
-                return this.$store.state.ep_usage;
+            getEpUsage() {
+                return this.$store.state.ep_usage.ep_usage;
+            },
+            getLabResults() {
+                return this.$store.state.ep_usage.lab_results;
             }
         },
         methods : {
+
+            createResults(assessment) {
+
+                console.log('Class assessment in create results ' + this.assessment);
+                console.log('Param assessment in create results ' + assessment);
+
+                this.subcategories = _.uniq(_.map(this.indicators, 'subcategory'));
+                //console.log(this.subcategories);
+
+                if(this.assessment !== undefined) {
+
+                    console.log('Unfiltered List ' + this.assessment.prescriptionList);
+                    // exclude tests with low risk scores
+                    this.prescriptionList = _.reject(this.assessment.prescriptionList, { risk_score: 2 });
+                    console.log('List ' + this.prescriptionList);
+
+                    /** Spearman Correlation */
+
+                   /* for (let i = 0; i <  this.prescriptionList.length; i++) {
+                        this.prescriptionList[i].mitigation_score = 10 - this.prescriptionList[i].result_score;
+                        this.prescriptionList[i].subCategory = this.getSubcategory(this.prescriptionList[i].test_id);
+                    }
+
+                    for (let i = 0; i < this.assessment.prescriptionList.length; i++) {
+                        this.assessment.prescriptionList[i].rankedMitigation = this.rankAverage(
+                            this.assessment.prescriptionList[i].mitigation_score,
+                            _.map(this.assessment.prescriptionList, 'mitigation_score'),
+                            1
+                        );
+                        this.assessment.prescriptionList[i].rankedRisk = this.rankAverage(
+                            this.assessment.prescriptionList[i].risk_score,
+                            _.map(this.assessment.prescriptionList, 'risk_score'),
+                            1
+                        );
+                    } */
+
+                    const mitigations = _.map(this.assessment.prescriptionList, 'rankedMitigation');
+                    const risks = _.map(this.assessment.prescriptionList, 'rankedRisk');
+
+                    const totalCorrelation = (jStat.spearmancoeff(mitigations, risks)).toFixed(2);
+
+                    this.scores = [{
+                        category: 'Total',
+                        correlation: Number.isNaN(totalCorrelation) ? null : totalCorrelation,
+                        resultAverage: _.meanBy(this.assessment.prescriptionList, 'result_score')
+                    }];
+
+                }
+
+
+
+                /*this.subcategories.forEach((subCategory) => {
+
+                    const questions = _.filter(this.assessment.prescriptionList, { subCategory });
+
+                    if (questions.length > 0) {
+
+                        const correlation = jStat.spearmancoeff(_.map(questions, 'rankedMitigation'),
+                            _.map(questions, 'rankedRisk'));
+
+                        this.scores.push({
+                            category: subCategory.replace('Drug - ', ''),
+                            correlation: Number.isNaN(correlation) ? null : correlation.toFixed(2),
+                            resultAverage: _.meanBy(questions, 'result_score')
+                        });
+                    }
+                }); */
+
+                console.log(this.scores);
+
+            },
             calcSpearmans() {
                 const mitigations = _.map(this.assessment.prescriptionList, 'rankedMitigation');
                 const risks = _.map(this.assessment.prescriptionList, 'rankedRisk');
 
-                const totalCorrelation = (jStat.spearmancoeff(mitigations, risks)).toFixed(2);
-                return totalCorrelation;
+                return (jStat.spearmancoeff(mitigations, risks)).toFixed(2);
             },
             rankAverage(value, array, order) {
                 if (order > 0) {
@@ -131,12 +212,63 @@
                     return _.sum(keys) / keys.length;
                 }
             },
+            getSubcategory(testID) {
+                let category = '';
+
+                /*for (let i = 0; i < PRESCRIPTION_TESTS.length; i++) {
+                    const test = PRESCRIPTION_TESTS[i];
+                    if (test.id === testID) {
+                        const category_id = test.indicator_id;
+
+                        if (category_id === 'CEXXX') {
+                            return 'No Category';
+                        }
+
+                        for (let x = 0; x < INDICATORS.length; x++) {
+                            const cat = INDICATORS[x];
+
+                            if (category_id === cat.id) {
+                                category = cat.subcategory;
+                            }
+                        }
+                    }
+                } */
+                return category;
+            },
             onBackClick() {
                 this.$router.push('/results-home');
             },
             onHomeClick() {
                 this.$router.push('/home');
-            }
+            },
+        },
+        created() {
+
+            let baseURL = settings.baseUrl;
+            let token = localStorage.getItem('token');
+            let assessmentId =  localStorage.getItem('assessmentId');
+            let temp = [];
+
+            const requestOptions = {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+            };
+
+            axios.get(baseURL + 'result?ID=' + assessmentId, requestOptions)
+            .then(function (response) {
+
+                console.log(response.data.prescriptionList);
+                //this.assessment = response.data;
+                temp = response.data;
+                console.log('here is ' +  temp);
+
+                this.createResults(temp);
+            })
+            .catch(function (error) {
+                console.log('error ' + error);
+            });
+
+
         }
     }
 </script>

@@ -5,5 +5,6 @@ export const settings = {
   unableToOverride : -3,
   defaultOverride : -1,
   numPrescriptions: 19,
-  numConfigError : 1
-}
+  numConfigError : 1,
+  baseUrl : 'http://localhost:6001/'
+};

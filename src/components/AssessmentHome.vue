@@ -17,10 +17,10 @@
               <td>
                 Part 1 - Initial Questions
               </td>
-              <td v-if="assessment.currentPart===1" class="td-right">
+              <td v-if="getServiceData === null" class="td-right">
                 Incomplete
               </td>
-              <td v-if="assessment.currentPart>1" class="td-right">
+              <td v-if="getServiceData === 'completed'" class="td-right">
                 Complete
               </td>
             </tr>
@@ -28,10 +28,10 @@
               <td>
                 Part 2 - Admit Patients
               </td>
-              <td v-if="assessment.currentPart<=2" class="td-right">
+              <td v-if="getPatientData === null" class="td-right">
                 Incomplete
               </td>
-              <td v-if="assessment.currentPart>2" class="td-right">
+              <td v-if="getPatientData === 'completed'" class="td-right">
                 Complete
               </td>
             </tr>
@@ -76,6 +76,7 @@
 
 <script>
 
+    import { settings } from '../settings';
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
     import Header from './Header';
@@ -85,6 +86,14 @@
         components: {
             Header
         },
+        computed : {
+            getServiceData() {
+                return this.$store.state.part1complete;
+            },
+            getPatientData() {
+                return this.$store.state.part2complete;
+            }
+        },
         data() {
             return {
                 assessmentComplete : false,
@@ -93,7 +102,7 @@
                     currentPatientIndex : patientService.getPatientIndex(),
                     currentTestIndex: patientService.getTestIndex(),
                     numPatients: patientService.getNumPatients(),
-                    numTests : patientService.numPrescriptions
+                    numTests : settings.numPrescriptions + settings.numConfigError
                 }
             }
         },
