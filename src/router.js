@@ -14,6 +14,7 @@ import AssessmentPart2 from './components/AssessmentPart2';
 import AssessmentPart3 from './components/AssessmentPart3';
 import AssessmentPart4 from './components/AssessmentPart4';
 import LockoutScreen from './components/LockoutScreen';
+import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
 
 Vue.use(Router);
@@ -80,8 +81,13 @@ export const router = new Router({
       component: LockoutScreen
     },
     {
-      path: '/assessmentresults',
+      path: '/assessmentresults/:ID',
+      name: 'assessmentresults',
       component: AssessmentResults
+    },
+    {
+      path: '/resultshome',
+      component: ResultsHome
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }

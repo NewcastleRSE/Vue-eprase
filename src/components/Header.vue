@@ -28,7 +28,7 @@
             window.location.href = './about'
           },
           reports() {
-            window.location.href = './home'
+            window.location.href = './resultshome'
           },
           instructions() {
               window.location.href = './instructions'
