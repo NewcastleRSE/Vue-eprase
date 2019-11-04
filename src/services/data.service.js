@@ -1,6 +1,5 @@
 
-let baseURL = 'http://localhost:6001/';
-
+import { settings } from '../settings';
 import { router } from '../router';
 
 export const dataService = {
@@ -24,7 +23,7 @@ function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_
     body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
   };
 
-  return fetch(baseURL + 'part1', requestOptions)
+  return fetch(settings.baseUrl + 'part1', requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
@@ -50,7 +49,7 @@ function savePart2Data(qualitative_data, time_taken){
     body: JSON.stringify({ qualitative_data, time_taken })
   };
 
-  return fetch(baseURL + 'part2?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'part2?ID=' + assessmentId, requestOptions)
     .then(response => {
       dataService.setAssessmentPart(3);
       router.push({ path: './assessmentpart3' });
@@ -68,7 +67,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     body: JSON.stringify({ qualitative_data, patient_id, time_taken })
   };
 
-  return fetch(baseURL + 'part3?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'part3?ID=' + assessmentId, requestOptions)
     .then(response => {
       // router.push({ path: './assessmentpart3' });
     })
@@ -85,7 +84,7 @@ function savePrescriptionData(test_id, outcome, other, override, risk_score, res
     body: JSON.stringify({ test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses })
   };
 
-  return fetch(baseURL + 'prescription?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId, requestOptions)
     .then(response => {
       // router.push({ path: './assessmentpart4' });
     })
@@ -102,7 +101,7 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
     body: JSON.stringify({ test_id, risk_score, result_score, result, time_taken, qualitative_data })
   };
 
-  return fetch(baseURL + 'config?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'config?ID=' + assessmentId, requestOptions)
     .then(response => {
       // router.push({ path: './assessmentpart4' });
     })
@@ -125,22 +124,22 @@ function handleResponse(response) {
   });
 }
 
-function getAssessment() {
+function getAssessment(id) {
 
   let token = getToken();
-  let assessmentId = getAssessmentId();
+  let assessmentId = id;
 
   const requestOptions = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(baseURL + 'result?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'result?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
-     //console.log(response);
       return response;
-    });
+    })
+
 }
 
 function getAssessmentPart() {

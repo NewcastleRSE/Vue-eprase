@@ -67,6 +67,7 @@
     </div>
   </div>
 
+
 </template>
 
 <script>
@@ -93,8 +94,6 @@
         },
         data() {
             return {
-                assessments : [],
-                prescriptionList : '',
                 subcategories : [],
                 indicators : jsonindicators,
                 tests : jsontests,
@@ -103,15 +102,20 @@
                     resultAverage : ''
                 },
                 scores: null,
-                sub : null
+                sub : null,
+                part1 : {
+                     ep_usage : '',
+                     lab_results: ''
+                },
+                prescriptionList : []
             }
         },
         computed: {
             getEpUsage() {
-                return this.$store.state.ep_usage.ep_usage;
+                return this.part1.ep_usage;
             },
             getLabResults() {
-                return this.$store.state.ep_usage.lab_results;
+                return this.part1.lab_results;
             }
         },
         methods : {
@@ -119,22 +123,22 @@
             createResults() {
                 this.subcategories = _.uniq(_.map(this.indicators, 'subcategory'));
 
-                if(this.assessment !== undefined) {
+                if(this.prescriptionList !== undefined) {
 
                     // exclude tests with low risk scores
-                    this.prescriptionList = _.reject(this.assessment.prescriptionList, { risk_score: 2 });
+                    this.prescriptionList = _.reject(this.prescriptionList, { risk_score: 2 });
                     const totalCorrelation = this.calcSpearmans();
 
                     this.scores = [{
                         category: 'Total',
                         correlation: Number.isNaN(totalCorrelation) ? null : totalCorrelation,
-                        resultAverage: _.meanBy(this.assessment.prescriptionList, 'result_score')
+                        resultAverage: _.meanBy(this.prescriptionList, 'result_score')
                     }];
                 }
 
                 this.subcategories.forEach((subCategory) => {
 
-                    const questions = _.filter(this.assessment.prescriptionList, { subCategory });
+                    const questions = _.filter(this.prescriptionList, { subCategory });
 
                     if (questions.length > 0) {
 
@@ -157,20 +161,20 @@
                     this.prescriptionList[i].subCategory = this.getSubcategory(this.prescriptionList[i].test_id);
                 }
 
-                for (let i = 0; i < this.assessment.prescriptionList.length; i++) {
-                    this.assessment.prescriptionList[i].rankedMitigation = this.rankAverage(
-                        this.assessment.prescriptionList[i].mitigation_score,
-                        _.map(this.assessment.prescriptionList, 'mitigation_score'),
+                for (let i = 0; i < this.prescriptionList.length; i++) {
+                    this.prescriptionList[i].rankedMitigation = this.rankAverage(
+                        this.prescriptionList[i].mitigation_score,
+                        _.map(this.prescriptionList, 'mitigation_score'),
                         1
                     );
-                    this.assessment.prescriptionList[i].rankedRisk = this.rankAverage(
-                        this.assessment.prescriptionList[i].risk_score,
-                        _.map(this.assessment.prescriptionList, 'risk_score'),
+                    this.prescriptionList[i].rankedRisk = this.rankAverage(
+                        this.prescriptionList[i].risk_score,
+                        _.map(this.prescriptionList, 'risk_score'),
                         1
                     );
                 }
-                const mitigations = _.map(this.assessment.prescriptionList, 'rankedMitigation');
-                const risks = _.map(this.assessment.prescriptionList, 'rankedRisk');
+                const mitigations = _.map(this.prescriptionList, 'rankedMitigation');
+                const risks = _.map(this.prescriptionList, 'rankedRisk');
                 return jStat.spearmancoeff(mitigations, risks).toFixed(2);
             },
             rankAverage(value, array, order) {
@@ -222,38 +226,17 @@
             },
             onHomeClick() {
                 this.$router.push('/home');
-            },
+            }
         },
         created() {
-            let baseURL = settings.baseUrl;
-            let token = localStorage.getItem('token');
-            let assessmentId = 0;
-
-            let queryId = this.$router.params.ID;
-            console.log(queryId);
-            console.log('Scream');
-
-            if(queryId !== null){
-                assessmentId = queryId;
-            }
-            else {
-                assessmentId  =  localStorage.getItem('assessmentId');
-            }
-
-            console.log(assessmentId);
-
-            const requestOptions = {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
-            };
-            axios.get(baseURL + 'result?ID=' + assessmentId, requestOptions)
-                .then(response => {
-                    this.assessment = response.data;
-                   // this.createResults();
-                })
-                .catch(function (error) {
-                    console.log('error ' + error);
-                });
+            // get the assessment id from the url
+            let id = this.$route.params.ID;
+            dataService.getAssessment(id).then(data => {
+                this.prescriptionList = data.prescriptionList;
+                this.part1.ep_usage = data.part1.ep_usage;
+                this.part1.lab_results = data.part1.lab_results.toString();
+                this.createResults();
+            });
         }
     }
 </script>
@@ -277,12 +260,11 @@
   }
 
   table, th, td {
-    border: 1px solid #7f7d81;
+    border: 1px solid #eeeeee;
     border-collapse: collapse;
   }
 
   th, td {
-    background-color: #dddddd;
     padding: 10px;
   }
 
@@ -297,8 +279,6 @@
     font-size: 14px;
 
   }
-
-
 
   .results-data p {
     margin-left: 10px;
