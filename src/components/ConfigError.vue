@@ -13,25 +13,27 @@
       <div align="center">
         <div class="questionnaire">
           <h4>Questions</h4>
-          <div class="question form-group" id="question-1">
-            <p class="recordlabel">Was the patient record still open?</p>
-            <span class="radio-buttons">
+          <form>
+            <div class="question form-group" id="question-1">
+              <p class="recordlabel">Was the patient record still open?</p>
+              <span class="radio-buttons">
           <label for="radio-yes" class="radio-label">Yes</label>
             <input type="radio" value=1 id="radio-yes" name="patientrecord" v-model="response.result" v-validate="'required'">
 
           <label for="radio-no" class="radio-label">No </label>
-            <input type="radio" value=0 id="radio-no" name="patientrecord">
+            <input type="radio" value=0 id="radio-no" name="patientrecord" v-model="response.result">
         </span>
-          </div>
-          <div class="assessment">
-            <p>Note any intervention from the system using the box below.</p>
-            <div align="center">
-              <div class="alert alert-warning" role="alert">
-                To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
-              </div>
-              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
             </div>
-          </div>
+            <div class="assessment">
+              <p>Note any intervention from the system using the box below.</p>
+              <div align="center">
+                <div class="alert alert-warning" role="alert">
+                  To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
+                </div>
+                <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
+              </div>
+            </div>
+          </form>
 
         </div>
       </div>
@@ -64,7 +66,9 @@
                 return localStorage.getItem(previousPatientId);
             },
             isFormInvalid() {
-                return Object.keys(this.fields).some(key => this.fields[key].invalid);
+                if(!this.response.result){
+                    return true;
+                }
             },
             getPresTestIndex() {
                 return this.$store.state.testIndex;
