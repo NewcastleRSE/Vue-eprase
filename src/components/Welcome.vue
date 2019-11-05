@@ -1,23 +1,29 @@
 <template>
-  <div class="welcome">
-    <div align="center">
-      <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
-    </div>
-    <div class="welcome-text">
-      <h1>Welcome to ePRaSE 2019</h1>
-      <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
-        in order to determine their effectiveness and to encourage the correct use of these systems
-        and deliver improved patient outcomes. </p>
-      <p id="infoLink" @click=about()><a href="#">Click here for more information</a></p><br/>
-      <p>To complete the assessment and view the results,<br/>please log in using the button below.</p>
-      <br/>
+  <div id="page">
+    <div class="welcome">
       <div align="center">
-        <div class="buttons" >
-          <button type="button" class="btn btn-primary" @click=login()>Continue</button>
+        <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+      </div>
+      <div class="welcome-text">
+        <h1>Welcome to ePRaSE 2019</h1>
+        <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
+          in order to determine their effectiveness and to encourage the correct use of these systems
+          and deliver improved patient outcomes. </p>
+        <p>To complete the assessment and view the results,<br/>please log in using the button below.</p>
+        <br/>
+        <div align="center">
+          <div class="buttons" >
+            <button type="button" class="btn btn-primary" @click=login()>Begin</button>
+          </div>
         </div>
       </div>
     </div>
-
+    <div>
+      <p id="logo-bar">
+        <span class="logos"><img id="di-logo" src="../assets/Digital_Institute.jpg" alt="Digital Institute" ></span>
+        <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
+        <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span></p>
+    </div>
   </div>
 
 </template>
@@ -51,8 +57,10 @@
     font-size: 1.2em;
   }
 
-  #infoLink {
-    padding-top: 10px;
+  #page {
+    border: 1px solid #c4c4c4;
+    border-radius: 25px;
+    margin: 50px;
   }
 
   .welcome {
@@ -68,6 +76,25 @@
     #justify-content:center;
     #align-items:center;
     max-width: 600px;
+  }
+
+
+  #di-logo, #pharm-logo {
+    height: 50px;
+    max-width: 200px;
+  }
+
+  #nuth-logo {
+    height: 50px;
+  }
+
+  #logo-bar {
+    padding: 40px 0;
+    width: 100%;
+  }
+
+  .logos {
+    padding-right: 70px;
   }
 
 

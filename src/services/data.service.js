@@ -30,12 +30,13 @@ function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_
       if (assessmentId) {
        // store assessment id
        localStorage.setItem('assessmentId', assessmentId);
+       dataService.setAssessmentPart(2);
+       router.push({ path: './assessmentpart2' });
      }
     })
-    .then(response => {
-      dataService.setAssessmentPart(2);
-      router.push({ path: './assessmentpart2' });
-    })
+    .catch(function() {
+       console.log('Error returning from savePart1Data');
+    });
 }
 
 function savePart2Data(qualitative_data, time_taken){
@@ -50,10 +51,15 @@ function savePart2Data(qualitative_data, time_taken){
   };
 
   return fetch(settings.baseUrl + 'part2?ID=' + assessmentId, requestOptions)
+    .then(handleResponse)
     .then(response => {
       dataService.setAssessmentPart(3);
       router.push({ path: './assessmentpart3' });
     })
+    .catch(function() {
+      console.log('Error returning from savePart2Data');
+    });
+
 }
 
 function savePart3Data(qualitative_data, patient_id, time_taken){
@@ -68,9 +74,13 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
   };
 
   return fetch(settings.baseUrl + 'part3?ID=' + assessmentId, requestOptions)
+    .then(handleResponse)
     .then(response => {
-      // router.push({ path: './assessmentpart3' });
+      return response;
     })
+    .catch(function() {
+      console.log('Error returning from savePart3Data');
+    });
 }
 
 function savePrescriptionData(test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses){
@@ -85,9 +95,11 @@ function savePrescriptionData(test_id, outcome, other, override, risk_score, res
   };
 
   return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId, requestOptions)
+    .then(handleResponse)
     .then(response => {
-      // router.push({ path: './assessmentpart4' });
+      return response;
     })
+
 }
 
 function saveConfigError(  test_id, risk_score, result_score, result, time_taken, qualitative_data ) {
@@ -102,9 +114,13 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
   };
 
   return fetch(settings.baseUrl + 'config?ID=' + assessmentId, requestOptions)
+    .then(handleResponse)
     .then(response => {
-      // router.push({ path: './assessmentpart4' });
+      return response;
     })
+    .catch(function() {
+      console.log('Error returning from savePrescriptionData');
+    });
 }
 
 
@@ -139,6 +155,9 @@ function getAssessment(id) {
     .then(response => {
       return response;
     })
+    .catch(function() {
+      console.log('Error returning from getAssessment');
+    });
 
 }
 

@@ -17,6 +17,7 @@
         <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
         <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span></p>
     </div>
+
   </div>
 </template>
 
@@ -28,7 +29,7 @@
         name: "About",
         components: {
           Header
-        },
+        }
     }
 </script>
 

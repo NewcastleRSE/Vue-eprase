@@ -238,9 +238,10 @@
             onDoneClick() {
                 // this is now true
                 this.completed = true;
+                let id = localStorage.getItem('assessmentId');
                 // save the last test data
                 this.saveData();
-                this.$router.push('/assessmentresults');
+                this.$router.push('/assessmentresults/'+ id);
             },
             clearCheckBoxes() {
                 for (let index in this.checkBoxList) {

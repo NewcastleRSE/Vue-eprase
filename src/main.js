@@ -18,7 +18,14 @@ Vue.use(VeeValidate, {
   }
 });
 
+// hides default console message
 Vue.config.productionTip = false;
+// control inspection of code using vue devtools - set to false for production
+Vue.config.devtools = true;
+
+Vue.config.errorHandler = function(err, vm, info) {
+  console.log(`Error: ${err.toString()}\nInfo: ${info}`);
+}
 
 new Vue({
   router,
