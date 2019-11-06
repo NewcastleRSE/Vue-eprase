@@ -60,7 +60,7 @@
 </template>
 
 <script>
-    import Header from './Header';
+    import Header from './AppHeader';
     import {HTTP} from '../http-constants';
     import json from '../json/institutions.json'
 

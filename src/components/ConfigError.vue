@@ -52,7 +52,7 @@
 
 <script>
 
-    import Header from './Header';
+    import Header from './AppHeader';
 
     export default {
         name: "ConfigError",

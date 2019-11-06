@@ -98,7 +98,7 @@
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
     import { settings } from '../settings'
-    import Header from './Header';
+    import Header from './AppHeader';
 
     export default {
         name: "Prescription",

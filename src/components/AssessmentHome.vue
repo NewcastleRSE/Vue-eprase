@@ -79,7 +79,7 @@
     import { settings } from '../settings';
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
-    import Header from './Header';
+    import Header from './AppHeader';
 
     export default {
         name: "AssessmentHome",

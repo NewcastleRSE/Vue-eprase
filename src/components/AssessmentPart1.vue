@@ -1,6 +1,5 @@
 <template>
   <div id="page">
-    <Header />
     <div id="content">
 
       <h1>ePRaSE Assessment</h1>
@@ -103,13 +102,13 @@
 
 <script>
 
-    import Header from './Header';
+    import Header from './AppHeader';
     import { dataService } from '../services/data.service';
 
     export default {
         name: "AssessmentPart1",
         components: {
-            Header
+
         },
         computed: {
             isFormInvalid() {

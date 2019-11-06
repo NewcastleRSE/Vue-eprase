@@ -26,7 +26,7 @@
 
 <script>
 
-    import Header from './Header';
+    import Header from './AppHeader';
     import { settings } from '../settings';
     import axios from 'axios'
     import VueAxios from 'vue-axios'

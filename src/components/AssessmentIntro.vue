@@ -1,6 +1,5 @@
 <template>
   <div id="page">
-    <Header />
     <div class="content" v-if="assessmentComplete === false">
       <h1>ePRaSE Assessment</h1>
       <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of indicators.</p>
@@ -34,7 +33,7 @@
 
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
-    import Header from './Header';
+    import Header from './AppHeader';
 
     export default {
         name: "AssessmentIntro",

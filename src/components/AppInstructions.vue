@@ -22,7 +22,7 @@
 </template>
 
 <script>
-    import Header from "./Header";
+    import Header from "./AppHeader";
     export default {
         name: "Instructions",
         components: {Header}

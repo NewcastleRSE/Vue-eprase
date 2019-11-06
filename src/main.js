@@ -6,6 +6,10 @@ import VeeValidate from 'vee-validate'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faHome, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import VueFormWizard from 'vue-form-wizard'
+import 'vue-form-wizard/dist/vue-form-wizard.min.css'
+
+Vue.use(VueFormWizard);
 
 library.add(faHome, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt);
 Vue.component('font-awesome-icon', FontAwesomeIcon);

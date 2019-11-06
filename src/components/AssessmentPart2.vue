@@ -1,6 +1,6 @@
 <template>
 <div id="page">
-  <Header />
+
   <div id="content">
     <h3>ePRaSE Assessment</h3>
     <h4>Part 2 - Assessment Preparation</h4>
@@ -41,14 +41,13 @@
 
 <script>
 
-    import Header from './Header';
     import { dataService } from '../services/data.service';
-    import  Patients from './Patients';
+    import  Patients from './AppPatients';
 
     export default {
         name: "AssessmentPart2",
         components: {
-            Header,
+
             Patients
         },
         computed: {

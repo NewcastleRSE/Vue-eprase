@@ -9,11 +9,11 @@
         <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
           in order to determine their effectiveness and to encourage the correct use of these systems
           and deliver improved patient outcomes. </p>
-        <p>To complete the assessment and view the results,<br/>please log in using the button below.</p>
+
         <br/>
         <div align="center">
           <div class="buttons" >
-            <button type="button" class="btn btn-primary" @click=login()>Begin</button>
+            <button type="button" class="btn btn-primary" @click=login()>Start</button>
           </div>
         </div>
       </div>

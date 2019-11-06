@@ -1,6 +1,6 @@
 <template>
  <div id="page">
-   <Header />
+
     <div id="content">
       <h1>ePRaSE Assessment</h1>
       <h3>Part 3 - Patient Information</h3>
@@ -127,14 +127,13 @@
 
 <script>
 
-    import Header from './Header';
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
 
     export default {
         name: "AssessmentPart3",
         components: {
-            Header
+
         },
         computed: {
             myPatientList() {

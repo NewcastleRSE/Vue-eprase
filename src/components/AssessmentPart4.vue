@@ -1,6 +1,6 @@
 <template>
  <div id="page">
-   <Header />
+
    <div id="content">
      <h1>ePRaSE Assessment</h1>
      <h3>Part 4 - Assessment Scenarios</h3>
@@ -19,15 +19,13 @@
 
 <script>
 
-    import Header from './Header';
     import { settings } from '../settings';
-    import Prescription from "./Prescription";
+    import Prescription from "./Part4Prescription";
     import ConfigError from "./ConfigError";
 
     export default {
         name: "AssessmentPart4",
         components: {
-            Header,
             Prescription,
             ConfigError
         },

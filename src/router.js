@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router';
 
-import Welcome from './components/Welcome.vue';
-import Home from './components/Home.vue';
-import About from './components/About.vue';
-import Login from './components/Login.vue';
-import Register from './components/Register.vue';
-import Instructions from "./components/Instructions";
+import Welcome from './components/AppWelcome.vue';
+import Home from './components/AppHome.vue';
+import About from './components/AppAbout.vue';
+import Login from './components/AppLogin.vue';
+import Register from './components/AppRegister.vue';
+import Instructions from "./components/AppInstructions";
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
 import AssessmentPart1 from './components/AssessmentPart1';
@@ -16,6 +16,7 @@ import AssessmentPart4 from './components/AssessmentPart4';
 import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
+import ContentHolder from './components/ContentHolder';
 
 Vue.use(Router);
 
@@ -89,6 +90,10 @@ export const router = new Router({
       path: '/resultshome',
       component: ResultsHome
     },
+    {
+      path: '/contentholder',
+      component: ContentHolder
+    },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
   ]
@@ -100,7 +105,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // list public pages
-  const publicPages = ['/login','/register','/instructions'];
+  const publicPages = ['/login','/register','/instructions', '/contentholder'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 

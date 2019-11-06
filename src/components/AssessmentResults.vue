@@ -78,7 +78,7 @@
     import { dataService } from '../services/data.service';
     import _ from 'lodash';
     import jStat from 'jStat';
-    import Header from './Header';
+    import Header from './AppHeader';
 
     import axios from 'axios'
     import VueAxios from 'vue-axios'
