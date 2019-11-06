@@ -1,6 +1,6 @@
 <template>
   <div id="page">
-    <Header />
+    <AppHeader />
     <div id="content">
       <h1>ePRaSE Assessment Instructions</h1>
       <div class="section"> <p>The ePRaSE assessment involves 10 test patient scenarios. For each patient, you will be asked to complete two sets of tasks.</p>
@@ -22,10 +22,10 @@
 </template>
 
 <script>
-    import Header from "./AppHeader";
+    import AppHeader from "./AppHeader";
     export default {
-        name: "Instructions",
-        components: {Header}
+        name: "AppInstructions",
+        components: {AppHeader}
     }
 </script>
 

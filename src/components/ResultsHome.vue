@@ -1,6 +1,6 @@
 <template>
   <div id="page">
-    <Header />
+    <AppHeader />
     <div id="content">
       <div class="welcome-text">
         <div>
@@ -26,7 +26,7 @@
 
 <script>
 
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
     import { settings } from '../settings';
     import axios from 'axios'
     import VueAxios from 'vue-axios'
@@ -37,7 +37,7 @@
     export default {
         name: "ResultsHome",
         components: {
-            Header
+           AppHeader
         },
         data() {
             return {

@@ -33,12 +33,12 @@
 
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     export default {
         name: "AssessmentIntro",
         components: {
-            Header
+           AppHeader
         },
         data() {
             return {

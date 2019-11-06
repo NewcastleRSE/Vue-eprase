@@ -57,12 +57,6 @@
     font-size: 1.2em;
   }
 
-  #page {
-    border: 1px solid #c4c4c4;
-    border-radius: 25px;
-    margin: 50px;
-  }
-
   .welcome {
     margin: auto;
     margin-top: 7%;

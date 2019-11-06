@@ -102,7 +102,7 @@
 
 <script>
 
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
     import { dataService } from '../services/data.service';
 
     export default {

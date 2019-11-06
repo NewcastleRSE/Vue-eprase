@@ -36,6 +36,17 @@ export default {
   color: #2c3e50;
 }
 
+body {
+  background-color: #eeeeee;
+}
+
+#page {
+  border: 1px solid #c4c4c4;
+  border-radius: 25px;
+  margin: 50px;
+  background-color: #fff;
+}
+
 h1, h2 {
   font-weight: normal;
 }

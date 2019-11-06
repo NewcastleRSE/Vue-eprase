@@ -1,6 +1,6 @@
 <template>
   <div id="page">
-    <Header />
+    <AppHeader />
 
     <div id="content">
       <h1>ePRaSE 2019 Assessment Results</h1>
@@ -78,7 +78,7 @@
     import { dataService } from '../services/data.service';
     import _ from 'lodash';
     import jStat from 'jStat';
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     import axios from 'axios'
     import VueAxios from 'vue-axios'
@@ -89,7 +89,7 @@
     export default {
         name: "AssessmentResults",
         components: {
-            Header,
+           AppHeader,
             jStat
         },
         data() {

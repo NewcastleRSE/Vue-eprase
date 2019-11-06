@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <Header />
+    <AppHeader />
     <div class="content">
       <div>
         <h1>ePRaSE Home</h1>
@@ -38,14 +38,14 @@
 
 <script>
 
-  import Header from './AppHeader';
+  import AppHeader from './AppHeader';
   import InstructionsModal from './InstructionsModal';
   import AboutModal from './AboutModal';
 
     export default {
         name: "Home",
         components: {
-          Header,
+         AppHeader,
           InstructionsModal,
           AboutModal
         },

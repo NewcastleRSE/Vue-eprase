@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <Header />
+  <div id="page">
+
     <div class="loginpage">
 
       <div align="center">
@@ -40,12 +40,12 @@
 </template>
 
 <script>
-  import Header from './AppHeader';
+
 
     export default {
-      name: "Login",
+      name: "AppLogin",
       components: {
-        Header
+
       },
       computed: {
           isFormInvalid() {
@@ -147,6 +147,12 @@
     padding-top: 30px;
     max-width: 700px;
     padding-bottom :20px;
+  }
+
+  #page {
+    border: 1px solid #c4c4c4;
+    border-radius: 25px;
+    margin: 50px;
   }
 
   .alert {

@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router';
 
-import Welcome from './components/AppWelcome.vue';
-import Home from './components/AppHome.vue';
-import About from './components/AppAbout.vue';
-import Login from './components/AppLogin.vue';
-import Register from './components/AppRegister.vue';
-import Instructions from "./components/AppInstructions";
+import AppWelcome from './components/AppWelcome.vue';
+import AppHome from './components/AppHome.vue';
+import AppAbout from './components/AppAbout.vue';
+import AppLogin from './components/AppLogin.vue';
+import AppRegister from './components/AppRegister.vue';
+import AppInstructions from "./components/AppInstructions";
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
 import AssessmentPart1 from './components/AssessmentPart1';
@@ -27,31 +27,31 @@ export const router = new Router({
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: AppLogin
     },
     {
       path: '/register',
       name: 'register',
-      component: Register
+      component: AppRegister
     },
     {
       path: '/home',
       name: 'home',
-      component: Home
+      component: AppHome
     },
     {
       path: '/about',
       name: 'about',
-      component: About
+      component: AppAbout
     },
     {
       path: '/',
       name: 'welcome',
-      component: Welcome
+      component: AppWelcome
     },
     {
       path: '/instructions',
-      component: Instructions
+      component: AppInstructions
     },
     {
       path: '/assessmentintro',
@@ -105,7 +105,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // list public pages
-  const publicPages = ['/login','/register','/instructions', '/contentholder'];
+  const publicPages = ['/','/login','/register','/instructions', '/contentholder'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 

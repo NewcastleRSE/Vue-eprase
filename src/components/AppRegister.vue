@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <Header />
+  <div id="page">
+
     <div class="register">
 
       <div align="center">
@@ -48,9 +48,10 @@
             <div v-show="submitted && errors.has('confirmPassword')" class="invalid-feedback alert alert-danger">{{ errors.first('confirmPassword') }}</div>
           </div>
 
-          <div class="form-group" align="center">
-            <button class="btn btn-primary" :disabled="isFormInvalid">Register</button>
+          <div id="buttons" class="form-group" align="center">
+            <button type="button" class="btn btn-primary" :disabled="isFormInvalid">Register</button>
             <button type="button" class="btn btn-primary" @click.prevent="resetForm">Cancel</button>
+            <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
           </div>
         </form>
 
@@ -60,14 +61,14 @@
 </template>
 
 <script>
-    import Header from './AppHeader';
+
     import {HTTP} from '../http-constants';
     import json from '../json/institutions.json'
 
     export default {
       name: "Register",
       components: {
-        Header
+
       },
       computed: {
         isFormInvalid() {
@@ -90,6 +91,9 @@
         }
       },
       methods: {
+        onLoginClick: function() {
+            this.$router.push({ path: './login' });
+        },
         resetForm: function() {
           this.$data.user = {};
           this.errors.clear();
@@ -151,6 +155,15 @@
     padding-left: 120px;
   }
 
+  #buttons {
+    margin-left: 60px;
+  }
+
+  #loginBtn {
+    background-color: #07abb8;
+    border-color: #07818e;
+  }
+
   .form-group {
     margin-bottom : 25px;
   }
@@ -180,7 +193,7 @@
     width: 120px;
     height: 40px;
     font-size: 1.2em;
-    margin-left: 100px;
+    margin-left: 50px;
   }
 
   .register {

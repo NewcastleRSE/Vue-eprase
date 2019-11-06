@@ -98,12 +98,12 @@
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
     import { settings } from '../settings'
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     export default {
         name: "Prescription",
         components: {
-            Header
+           AppHeader
         },
         computed : {
             // vue allows the use of 'this' with computed....

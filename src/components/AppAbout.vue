@@ -1,7 +1,8 @@
 <template>
 
   <div id="page">
-    <Header />
+    <AppHeader />
+
     <div class="content" >
       <h1>About ePRaSE</h1>
       <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
@@ -23,12 +24,12 @@
 
 <script>
 
-  import Header from './AppHeader';
+  import AppHeader from './AppHeader';
 
     export default {
-        name: "About",
+        name: "AppAbout",
         components: {
-          Header
+          AppHeader
         }
     }
 </script>

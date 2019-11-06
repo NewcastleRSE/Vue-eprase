@@ -52,12 +52,12 @@
 
 <script>
 
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     export default {
         name: "ConfigError",
         components: {
-            Header
+           AppHeader
         },
         computed: {
             getPreviousPatient() {

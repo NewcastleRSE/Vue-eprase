@@ -1,6 +1,6 @@
 <template>
   <div id="page">
-    <Header />
+    <AppHeader />
       <div id="content">
       <h1>ePRaSE Assessment</h1>
       <h3>Thank You</h3>
@@ -20,12 +20,12 @@
 <script>
 
     import { settings } from '../settings'
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     export default {
         name: "LockoutScreen",
         components: {
-            Header
+           AppHeader
         },
         data() {
             return {

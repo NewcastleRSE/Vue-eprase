@@ -1,6 +1,6 @@
 <template>
   <div id="page">
-    <Header />
+    <AppHeader />
     <div id="content">
       <h1>Assessment Home</h1>
       <p>Welcome to the ePRaSE assessment.</p>
@@ -79,12 +79,12 @@
     import { settings } from '../settings';
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
-    import Header from './AppHeader';
+    import AppHeader from './AppHeader';
 
     export default {
         name: "AssessmentHome",
         components: {
-            Header
+           AppHeader
         },
         computed : {
             getServiceData() {
