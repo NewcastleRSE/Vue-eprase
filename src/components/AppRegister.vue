@@ -10,7 +10,7 @@
         <h1>Register</h1>
         <p>To register with the ePRaSE system, please provide the following information.</p>
 
-        <form id="regForm" @submit.prevent="handleSubmit">
+        <form id="regForm" @submit.prevent="handleSubmit()">
           <div class="form-group">
             <label for="name">Name:</label>
             <input type="text" v-model="user.name" v-validate="{required: true, min: 3, max: 50}" id="name" name="name" class="form-control" :class="{ 'is-invalid': errors.has('name') }"  />
@@ -49,9 +49,9 @@
           </div>
 
           <div id="buttons" class="form-group" align="center">
-            <button type="button" class="btn btn-primary" :disabled="isFormInvalid">Register</button>
+            <button type="submit" class="btn btn-primary" :disabled="isFormInvalid">Register</button>
             <button type="button" class="btn btn-primary" @click.prevent="resetForm">Cancel</button>
-            <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
+           <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
           </div>
         </form>
 
@@ -66,7 +66,7 @@
     import json from '../json/institutions.json'
 
     export default {
-      name: "Register",
+      name: "AppRegister",
       components: {
 
       },
@@ -92,15 +92,14 @@
       },
       methods: {
         onLoginClick: function() {
-            this.$router.push({ path: './login' });
+           this.$router.push({ path: './login' });
         },
         resetForm: function() {
           this.$data.user = {};
           this.errors.clear();
         },
-        handleSubmit(e) {
+        handleSubmit() {
           this.submitted = true;
-
           this.$validator.validate().then(valid => {
             if (valid) {
 

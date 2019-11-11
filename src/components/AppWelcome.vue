@@ -31,7 +31,7 @@
 <script>
 
     export default {
-        name: "Welcome",
+        name: "AppWelcome",
         methods: {
           login() {
             window.location.href = './login'

@@ -1,6 +1,8 @@
 <template>
 <div id="page">
 
+  <TabHeader />
+
   <div id="content">
     <h3>ePRaSE Assessment</h3>
     <h4>Part 2 - Assessment Preparation</h4>
@@ -11,7 +13,7 @@
         <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
         <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click <strong>Next</strong> to continue.</p>
 
-       <Patients />
+       <AppPatients />
       </div>
     </div>
 
@@ -42,13 +44,14 @@
 <script>
 
     import { dataService } from '../services/data.service';
-    import  Patients from './AppPatients';
+    import  AppPatients from './AppPatients';
+    import  TabHeader from './TabHeader';
 
     export default {
         name: "AssessmentPart2",
         components: {
-
-            Patients
+            TabHeader,
+            AppPatients
         },
         computed: {
             isFormInvalid() {

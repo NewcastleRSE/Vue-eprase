@@ -101,7 +101,7 @@
     import AppHeader from './AppHeader';
 
     export default {
-        name: "Prescription",
+        name: "Part4Prescription",
         components: {
            AppHeader
         },

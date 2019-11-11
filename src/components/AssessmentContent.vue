@@ -1,19 +1,8 @@
-<template >
-  <form-wizard shape="tab" color="#005EB8" title="" subtitle="">
-    <tab-content title="System">
-      <assessment-part1></assessment-part1>
-    </tab-content>
-    <tab-content title="Patients" >
-      <assessment-part2></assessment-part2>
-    </tab-content>
-    <tab-content title="Scenarios">
-      <assessment-part3></assessment-part3>
-    </tab-content>
+<template>
 
-    <tab-content title="Report">
-      <assessment-part4></assessment-part4>
-    </tab-content>
-  </form-wizard>
+  <div>
+    Containing template
+  </div>
 
 </template>
 

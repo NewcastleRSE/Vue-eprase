@@ -16,7 +16,7 @@ import AssessmentPart4 from './components/AssessmentPart4';
 import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
-import ContentHolder from './components/AssessmnentContent';
+import AssessmentContent from './components/AssessmentContent';
 
 Vue.use(Router);
 
@@ -31,22 +31,18 @@ export const router = new Router({
     },
     {
       path: '/register',
-      name: 'register',
       component: AppRegister
     },
     {
       path: '/home',
-      name: 'home',
       component: AppHome
     },
     {
       path: '/about',
-      name: 'about',
       component: AppAbout
     },
     {
       path: '/',
-      name: 'welcome',
       component: AppWelcome
     },
     {

@@ -43,7 +43,7 @@
   import AboutModal from './AboutModal';
 
     export default {
-        name: "Home",
+        name: "AppHome",
         components: {
          AppHeader,
           InstructionsModal,

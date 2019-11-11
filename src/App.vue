@@ -37,7 +37,6 @@ export default {
 }
 
 body {
-  background-color: #eeeeee;
 }
 
 #page {

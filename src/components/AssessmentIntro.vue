@@ -1,19 +1,28 @@
 <template>
   <div id="page">
+
+    <TabHeader />
     <div class="content" v-if="assessmentComplete === false">
-      <h1>ePRaSE Assessment</h1>
+      <h1>Welcome to the ePRaSE Assessment</h1>
+
       <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of indicators.</p>
       <p>The ePRaSE assessment will be repeated annually.</p>
-      <h3>2019 ePRaSE Assessment</h3>
+
+      <p></p>
+      <h4>Instructions</h4>
+      <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions system and then
+        to prescribe a series medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
+
+      <h3>2020 ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
+
       <div class="buttons">
-        <button class="btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin 2019 Assessment</button>
+        <button class="btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin 2020 Assessment</button>
         <button class="btn btn-primary" v-if="assessment.currentPart>1" @click="onStartAssessmentClick()">Continue 2019 Assessment</button>
       </div>
-      <div id="section">
-        <p>For more detailed instructions, <router-link to="/instructions">click here</router-link>.</p>
-      </div>
     </div>
+
+
 
     <div class="content" v-if="assessmentComplete === true">
       <h1>Assessment Complete</h1>
@@ -33,12 +42,12 @@
 
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
-    import AppHeader from './AppHeader';
+    import TabHeader from './TabHeader';
 
     export default {
         name: "AssessmentIntro",
         components: {
-           AppHeader
+           TabHeader
         },
         data() {
             return {
@@ -61,7 +70,7 @@
             },
             onStartAssessmentClick() {
                 patientService.setPatients();
-                this.$router.push({ path: './assessmenthome' });
+                this.$router.push({ path: './assessmentpart1' });
             }
         },
         created : function() {
@@ -87,8 +96,8 @@
     padding: 40px;
   }
 
-  #section {
-    padding-top: 20px;
+  .btn-primary {
+    background-color: #07818e;
   }
 
 </style>

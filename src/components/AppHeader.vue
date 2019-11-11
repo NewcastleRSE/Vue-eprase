@@ -19,7 +19,7 @@
 
 <script>
     export default {
-        name: "Header",
+        name: "AppHeader",
         methods: {
           home() {
             window.location.href = './home'

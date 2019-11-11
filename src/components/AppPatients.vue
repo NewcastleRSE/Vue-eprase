@@ -35,7 +35,7 @@
   import { patientService } from '../services/patient.service';
 
     export default {
-        name: "Patients",
+        name: "AppPatients",
         components: {
         },
         data() {

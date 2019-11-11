@@ -1,15 +1,10 @@
 <template>
-  <div id="page">
-    <div id="content">
 
-      <h1>ePRaSE Assessment</h1>
+    <div id="content">
       <h4>Part 1 - EP System Information</h4>
-      <p>Before we begin the assessment, please provide the following information.</p>
+      <p>Please answer the following questions about your ePrescribing system:</p>
 
       <div class="assessment-part1">
-        <h4>About your system</h4>
-        <p>Please answer the following questions about your ePrescribing system:</p>
-
         <div>
           <form id="ep-system-form" @submit.prevent="handleSubmit">
             <div class="form-group">
@@ -97,18 +92,18 @@
       </div>
 
     </div>
-  </div>
+
 </template>
 
 <script>
 
-    import AppHeader from './AppHeader';
+    import AssessmentHome from './AssessmentHome';
     import { dataService } from '../services/data.service';
 
     export default {
         name: "AssessmentPart1",
         components: {
-
+          AssessmentHome
         },
         computed: {
             isFormInvalid() {
@@ -176,7 +171,7 @@
 
 <style scoped>
 
-  #page {
+  #content p {
     text-align: left;
   }
 
