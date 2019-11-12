@@ -74,9 +74,9 @@
   #test-patients td {
     width: 150px;
     font-size: 16px;
-    background-color: #cdf8ff;
+    background-color: #f5f5f5;
     padding: 5px;
-    border:  1px solid #6b9bc7;
+    border:  1px solid #7f7d81;
   }
 
 

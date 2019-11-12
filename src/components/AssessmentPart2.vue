@@ -4,8 +4,7 @@
   <TabHeader />
 
   <div id="content">
-    <h3>ePRaSE Assessment</h3>
-    <h4>Part 2 - Assessment Preparation</h4>
+    <h3>Part 2 - Assessment Preparation</h3>
     <p>In preparation for the assessment, please complete the following tasks:</p>
     <div align="center">
       <div class="patient-info">
@@ -33,7 +32,7 @@
       <div class="buttons">
         <p>When all of the patients have been admitted to your ePrescription System, click <strong>Next</strong>.</p>
         <button type="button" class="btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
-        <button type="button" class="btn btn-primary"  id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+        <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
       </div>
     </div>
 
@@ -155,6 +154,10 @@
     margin: 10px 0px;
     font-size: 1.2em;
     margin: 0 50px;
+  }
+
+  .next-btn {
+    background-color: #029a99;
   }
 
   .footer {

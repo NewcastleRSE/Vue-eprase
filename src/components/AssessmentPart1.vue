@@ -1,6 +1,9 @@
 <template>
 
-    <div id="content">
+  <div id="page">
+
+    <TabHeader />
+    <div class="content">
       <h4>Part 1 - EP System Information</h4>
       <p>Please answer the following questions about your ePrescribing system:</p>
 
@@ -84,7 +87,7 @@
               <div class="buttons">
                 <p>When you have answered all of the questions, click <strong>Next</strong>.</p>
                 <button type="button" class="btn btn-primary" id="exit-button" @click="onExitClick()">Exit</button>
-                <button type="button" class="btn btn-primary" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+                <button type="button" class="next-btn btn btn-primary" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
               </div>
             </div>
           </form>
@@ -93,17 +96,21 @@
 
     </div>
 
+  </div>
+
 </template>
 
 <script>
 
     import AssessmentHome from './AssessmentHome';
+    import TabHeader from './TabHeader';
     import { dataService } from '../services/data.service';
 
     export default {
         name: "AssessmentPart1",
         components: {
-          AssessmentHome
+            AssessmentHome,
+            TabHeader
         },
         computed: {
             isFormInvalid() {
@@ -171,18 +178,20 @@
 
 <style scoped>
 
-  #content p {
+  .content p {
     text-align: left;
   }
 
-  #content {
+  #page {
+
+    }
+
+  .content {
     padding: 40px;
   }
 
   #ep-system-form {
     margin-top: 40px;
-    background-color: #cdf8ff;
-    border: 1px solid #6b9bc7;
     padding: 20px;
     border-radius: 25px;
     max-width: 950px;
@@ -279,6 +288,10 @@
     width: 100px;
     font-size: 1.2em;
     margin: 0 50px;
+  }
+
+  .next-btn {
+    background-color: #07818e;
   }
 
   .footer {
