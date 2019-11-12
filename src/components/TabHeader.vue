@@ -28,47 +28,38 @@
 
   #tabbedHeader {
     height: 80px;
-    width: 100%;
+    width: 98%;
+    margin: 10px;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
   }
 
   #system {
     background-color: #07818e;
   /*  background-image: url("assets/tick.png"); */
-    position: fixed;
-    left: 0px;
-    top: 0px;
   }
   #patients {
     background-color: #029a99;
-    position: fixed;
-    left: 220px;
-    top: 0px;
   }
   #scenarios {
     background-color: #02b9b8;
-    position: fixed;
-    left: 450px;
-    top: 0px;
   }
   #report {
     background-color: #02dddc;
-    position: fixed;
-    left: 670px;
-    top: 0px;
   }
 
   .tab {
-    margin: 100px;
-    position:relative;
+    margin: 10px;
     color: #fff;
-    width: 25%;
     -moz-border-radius-topleft: 15px;
     -moz-border-radius-topright: 0px;
     -moz-border-radius-bottomright: 15px;
     -moz-border-radius-bottomleft: 0px;
     -webkit-border-radius: 15px 0px 15px 0px;
     border-radius: 15px 0px 15px 0px;
-    padding: 15px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
   }
 
 </style>

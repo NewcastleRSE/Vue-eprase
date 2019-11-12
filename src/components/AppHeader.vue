@@ -1,18 +1,18 @@
 <template>
   <nav>
-  <div class="header-bar">
-    <div class="header-content">
-      <img src="../assets/logo.png" alt="ePRaSE" class="eprase-logo-header">
-      <div class="header-bar-buttons">
-        <button @click=home()><font-awesome-icon icon="home"></font-awesome-icon><p>Home</p></button>
-        <button @click=assessments()><font-awesome-icon icon="list"></font-awesome-icon><p>Assessments</p></button>
-        <button @click=instructions()><font-awesome-icon icon="clipboard"></font-awesome-icon><p>Instructions</p></button>
-        <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><p>Reports</p></button>
-        <button><font-awesome-icon icon="question-circle"></font-awesome-icon><p><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></p></button>
-        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><p class="headerLink"><router-link to="/login">Logout</router-link></p></button>
+    <div class="header-bar">
+      <div class="header-content">
+        <img src="../assets/logo.png" alt="ePRaSE" class="eprase-logo-header">
+        <div class="header-bar-buttons">
+          <button @click=home()><font-awesome-icon icon="home"></font-awesome-icon><p>Home</p></button>
+          <button @click=contact()><font-awesome-icon icon="clipboard"></font-awesome-icon><p>Contact</p></button>
+          <button @click=instructions()><font-awesome-icon icon="clipboard"></font-awesome-icon><p>Instructions</p></button>
+          <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><p>History</p></button>
+          <button><font-awesome-icon icon="question-circle"></font-awesome-icon><p><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></p></button>
+          <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><p class="headerLink"><router-link to="/login">Logout</router-link></p></button>
+        </div>
       </div>
     </div>
-  </div>
   </nav>
 
 </template>

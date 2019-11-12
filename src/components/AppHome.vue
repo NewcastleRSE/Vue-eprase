@@ -1,35 +1,27 @@
 <template>
-  <div class="page">
-    <AppHeader />
+  <div id="page">
+    <TabHeader />
     <div class="content">
+
       <div>
+
+        <img src="../assets/logo.png" alt="ePRaSE" class="eprase-logo-header">
         <h1>ePRaSE Home</h1>
-        <p>Welcome to ePRaSE 2019 To complete the assessment or view the results, use the buttons below.</p>
-      </div>
-      <div id="home-buttons">
+        <p>Welcome to ePRaSE 2020!</p>
 
-        <div><button @click="assessments()"><font-awesome-icon icon="list"></font-awesome-icon><p>Assessments</p></button></div>
-        <div class="home-buttons-text">Click here to begin the assessment questions.</div>
-        <div><button><font-awesome-icon icon="chart-bar"></font-awesome-icon><p>Reports</p></button></div>
-        <div class="home-buttons-text">Click here to view the assessment results.</div>
-
+        <button class="modal-btn btn" @click="assessments()">Start</button>
       </div>
+
 
       <div id="help-section">
 
-        <p>For more detailed instructions, <router-link to="/instructions">click here</router-link>.</p>
-        <p>For further information about the project, <router-link to="/about">click here</router-link>.</p>
-     <!--   <h3>Help Buttons</h3>
+        <h3>Help Buttons</h3>
         <p>For more <strong>information</strong> about the ePRaSE system or to read user <strong>instructions</strong>, please click the buttons below.</p>
       </div>
-      <div id="help-buttons">
 
-        <AboutModal v-if="showAboutModal" :aboutModalData='aboutCustomData' @close="showAboutModal = false" />
-        <button class="modal-btn btn btn-primary" id="show-about-modal" @click="showAboutModal = true">About</button>
+      <AboutModal v-if="showAboutModal" :aboutModalData='aboutCustomData' @close="showAboutModal = false" />
+      <InstructionsModal v-if="showModal" :modalData='customData' @close="showModal = false" />
 
-        <InstructionsModal v-if="showModal" :modalData='customData' @close="showModal = false" />
-        <button class="modal-btn btn btn-primary" id="show-modal" @click="showModal = true">Instructions</button> -->
-      </div>
 
     </div>
 
@@ -38,16 +30,16 @@
 
 <script>
 
-  import AppHeader from './AppHeader';
   import InstructionsModal from './InstructionsModal';
   import AboutModal from './AboutModal';
+  import TabHeader from './TabHeader';
 
     export default {
         name: "AppHome",
         components: {
-         AppHeader,
           InstructionsModal,
-          AboutModal
+          AboutModal,
+          TabHeader
         },
         data() {
             return {
@@ -93,40 +85,69 @@
     margin:0;
   }
 
-  #home-buttons {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: 100px 500px;
-    grid-gap: 20px;
-    width: 600px;
-  }
-
-  .home-buttons-text {
-    padding-top: 25px;
-  }
 
   #help-section {
     padding-top: 30px;
   }
 
-   /*
+
   button.modal-btn {
     height: 40px;
     width: 120px;
     font-size: 1.2em;
+    background-color: #07818e;
+    color: #fff;
   }
-
-  #help-buttons {
-    padding: 25px;
-  }
-
-  #show-modal {
-    margin-left: 50px;
-  } */
 
   .content{
     padding: 40px;
     text-align: left;
   }
+
+  .header-bar {
+    height: 84px;
+  }
+
+  .header-content {
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .eprase-logo-header {
+    height: 50px;
+    float: right;
+    margin-top: 17px;
+    margin-left: 30px;
+  }
+
+
+
+  .header-bar-buttons button {
+    margin: 7px 5px 3px 0px;
+    height: 70px;
+    width: 95px;
+    padding: 0;
+    border-radius: 5px;
+  }
+
+  .header-bar button p {
+    text-align: center;
+    margin:0;
+    padding-top:2px;
+    padding-bottom:2px;
+    font-size: 12px;
+  }
+
+  #downloadPDF {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+
+  .headerLink {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+
+
 
 </style>

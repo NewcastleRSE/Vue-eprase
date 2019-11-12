@@ -29,7 +29,7 @@
 
         <div align="center">
           <div class="buttons">
-            <button type="button" id="login" class="btn btn-primary" @click="onLoginClick()">Login</button>
+            <button type=" button" id="login" class="login-btn btn btn-primary" @click="onLoginClick()">Login</button>
             <button type="button" id="register" class="btn btn-primary" @click="onRegisterClick()">Register</button>
           </div>
         </div>
@@ -126,6 +126,9 @@
     width: 120px;
     height: 40px;
     font-size: 1.2em;
+  }
+  .login-btn {
+    background-color: #07818e;
   }
 
   #login {

@@ -49,7 +49,7 @@
           </div>
 
           <div id="buttons" class="form-group" align="center">
-            <button type="submit" class="btn btn-primary" :disabled="isFormInvalid">Register</button>
+            <button type="submit" class="reg-btn btn btn-primary" :disabled="isFormInvalid">Register</button>
             <button type="button" class="btn btn-primary" @click.prevent="resetForm">Cancel</button>
            <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
           </div>
@@ -161,6 +161,10 @@
   #loginBtn {
     background-color: #07abb8;
     border-color: #07818e;
+  }
+
+  .reg-btn {
+    background-color: #07818e;
   }
 
   .form-group {

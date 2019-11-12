@@ -13,7 +13,7 @@
         <br/>
         <div align="center">
           <div class="buttons" >
-            <button type="button" class="btn btn-primary" @click=login()>Start</button>
+            <button type="button" class="start-btn btn btn-primary" @click=login()>Start</button>
           </div>
         </div>
       </div>
@@ -55,6 +55,10 @@
     width: 120px;
     height: 40px;
     font-size: 1.2em;
+  }
+
+  .start-btn {
+    background-color: #07818e;
   }
 
   .welcome {

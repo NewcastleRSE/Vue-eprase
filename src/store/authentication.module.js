@@ -18,7 +18,7 @@ export const authentication = {
         .then(
           user => {
             commit('loginSuccess', user);
-            router.push('/home');
+            router.push('/assessmentintro');
           },
           error => {
             commit('loginFailure', error);
