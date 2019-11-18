@@ -1,9 +1,8 @@
 <template>
  <div id="page">
-
+   <TabHeader system-opacity="1.0" patient-opacity="1.0" scenario-opacity="0.5" report-opacity="0.2"></TabHeader>
    <div id="content">
-     <h1>ePRaSE Assessment</h1>
-     <h3>Part 4 - Assessment Scenarios</h3>
+     <h3>Assessment Scenarios</h3>
      <p>Please follow the instructions for each scenario.<br/></p>
      <div align="center">
        <h4>Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</h4>
@@ -22,12 +21,13 @@
     import { settings } from '../settings';
     import Prescription from "./Part4Prescription";
     import ConfigError from "./ConfigError";
-
+    import TabHeader from"./TabHeader";
     export default {
         name: "AssessmentPart4",
         components: {
             Prescription,
-            ConfigError
+            ConfigError,
+            TabHeader
         },
         computed: {
             getCurrentTestIndex() {

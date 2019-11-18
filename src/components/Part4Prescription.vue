@@ -11,11 +11,11 @@
 
         <table id="test-patient">
           <tr>
-            <td><strong>Drug</strong></td>
-            <td><strong>Dose</strong></td>
-            <td><strong>Route</strong></td>
-            <td><strong>Frequency</strong></td>
-            <td><strong>Duration</strong></td>
+            <th>Drug</th>
+            <th>Dose</th>
+            <th>Route</th>
+            <th>Frequency</th>
+            <th>Duration</th>
           </tr>
           <tr>
             <td>{{prescription.drug_name}}</td>
@@ -65,9 +65,9 @@
             <div>
               <label for="patient-intervention">Note any intervention from the system using the box below.</label>
               <div class="alert alert-warning" role="alert">
-                To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
+                To optimise the use of this tool please record ALL types of guidance that appears on your system screen
               </div>
-              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
+              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
             </div>
           </div>
 
@@ -82,8 +82,8 @@
 
     <div class="form-group footer" align="center">
       <div class="buttons">
-        <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
-        <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
+        <button v-show='nextEnabled' id="next-button" type="button" class="scenario-btn btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+        <button v-show='doneEnabled' id="done-button" type="button" class="scenario-btn btn btn-primary" @click="onDoneClick()">Done</button>
       </div>
     </div>
 
@@ -98,12 +98,11 @@
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
     import { settings } from '../settings'
-    import AppHeader from './AppHeader';
 
     export default {
         name: "Part4Prescription",
         components: {
-           AppHeader
+
         },
         computed : {
             // vue allows the use of 'this' with computed....
@@ -323,27 +322,27 @@
     padding-top: 20px;
   }
 
-  #test-scenario {
-    border: 1px solid #c2c2c2;
-    padding: 20px;
-  }
-
-
   #test-patient {
     padding: 15px;
     margin-top: 20px;
     margin-bottom: 20px;
-    width: 600px;
+    width: 100%;
     border: 1px solid #6b9bc7;
+    border-collapse: collapse;
   }
 
+  #test-patient th {
+    border:  1px solid #7f7d81;
+    background-color: #e9e9e9;
+    padding: 5px;
+  }
 
   #test-patient td {
-    width: auto;
+    width: 150px;
     font-size: 16px;
-    background-color: #cdf8ff;
+    background-color: #f5f5f5;
     padding: 5px;
-    border:  1px solid #6b9bc7;
+    border:  1px solid #7f7d81;
   }
 
   #selector-1, #selector-2 {
@@ -384,7 +383,7 @@
   }
 
   #patient-intervention {
-    width: 600px;
+    width: 100%;
     height: 100px;
   }
 
@@ -393,6 +392,11 @@
     width: 100px;
     font-size: 1.2em;
     margin: 0 50px;
+  }
+
+  .scenario-btn {
+    background-color: #02b9b8;
+    border: 0;
   }
 
   .visible {
@@ -418,7 +422,6 @@
 
   select {
     width: 200px;
-    margin-right: 35px;
     float: right;
   }
 

@@ -2,7 +2,7 @@
 
   <div id="page">
 
-    <TabHeader />
+    <TabHeader system-opacity="0.5" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
     <div class="content">
       <h4>Part 1 - EP System Information</h4>
       <p>Please answer the following questions about your ePrescribing system:</p>
@@ -292,6 +292,7 @@
 
   .next-btn {
     background-color: #07818e;
+    border: 0;
   }
 
   .footer {

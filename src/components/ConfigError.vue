@@ -1,6 +1,5 @@
 <template>
 
-  <div id="page">
     <div id="test-scenario">
 
       <div class="config-error-info">
@@ -28,9 +27,9 @@
               <p>Note any intervention from the system using the box below.</p>
               <div align="center">
                 <div class="alert alert-warning" role="alert">
-                  To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
+                  To optimise the use of this tool please record ALL types of guidance that appears on your system screen
                 </div>
-                <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
+                <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
               </div>
             </div>
           </form>
@@ -38,13 +37,11 @@
         </div>
       </div>
 
-    </div>
-
-    <div class="form-group footer" align="center">
-      <div class="buttons">
-        <button type="button" class="btn btn-primary visible" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+      <div class="form-group footer" align="center">
+        <div class="buttons">
+          <button type="button" class="scenario-btn btn btn-primary visible" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+        </div>
       </div>
-    </div>
 
   </div>
 
@@ -52,12 +49,9 @@
 
 <script>
 
-    import AppHeader from './AppHeader';
-
     export default {
         name: "ConfigError",
         components: {
-           AppHeader
         },
         computed: {
             getPreviousPatient() {
@@ -128,13 +122,12 @@
   }
 
   #test-scenario {
-    border: 1px solid #c2c2c2;
+    width: 100%;
     padding: 20px 0px;
   }
 
   .config-error-info {
     margin-bottom: 40px;
-    padding: 0 40px;
   }
 
   .config-error-info p {
@@ -167,7 +160,7 @@
 
 
   #patient-intervention {
-    width: 600px;
+    width: 100%;
     height: 100px;
   }
 
@@ -222,6 +215,10 @@
     border-color: #ffd47d;
   }
 
+  .scenario-btn {
+    background-color: #02b9b8;
+    border: 0;
+  }
 
 
 

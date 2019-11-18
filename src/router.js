@@ -2,11 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router';
 
 import AppWelcome from './components/AppWelcome.vue';
-import AppHome from './components/AppHome.vue';
-import AppAbout from './components/AppAbout.vue';
 import AppLogin from './components/AppLogin.vue';
 import AppRegister from './components/AppRegister.vue';
-import AppInstructions from "./components/AppInstructions";
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
 import AssessmentPart1 from './components/AssessmentPart1';
@@ -34,20 +31,8 @@ export const router = new Router({
       component: AppRegister
     },
     {
-      path: '/home',
-      component: AppHome
-    },
-    {
-      path: '/about',
-      component: AppAbout
-    },
-    {
       path: '/',
       component: AppWelcome
-    },
-    {
-      path: '/instructions',
-      component: AppInstructions
     },
     {
       path: '/assessmentintro',

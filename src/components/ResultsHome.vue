@@ -1,10 +1,12 @@
 <template>
   <div id="page">
-    <AppHeader />
+
+    <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
+
     <div id="content">
       <div class="welcome-text">
         <div>
-          <h1>Reports Home</h1>
+          <h2>Reports Home</h2>
           <p>Here you can browse the reports from all of the ePRaSE assessments that you have participated in.</p>
         </div>
       </div>
@@ -26,8 +28,8 @@
 
 <script>
 
-    import AppHeader from './AppHeader';
     import { settings } from '../settings';
+    import TabHeader from './TabHeader';
     import axios from 'axios'
     import VueAxios from 'vue-axios'
     import Vue from 'vue'
@@ -37,7 +39,7 @@
     export default {
         name: "ResultsHome",
         components: {
-           AppHeader
+          TabHeader
         },
         data() {
             return {

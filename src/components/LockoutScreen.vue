@@ -1,16 +1,17 @@
 <template>
   <div id="page">
-    <AppHeader />
+    <TabHeader system-opacity="1.0" patient-opacity="1.0" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
       <div id="content">
-      <h1>ePRaSE Assessment</h1>
-      <h3>Thank You</h3>
-      <p>You have completed the initial phase of the assessment.</p>
-      <p v-if="counter > 0">You can continue on to the next phase of the assessment in:</p>
-      <p v-if="counter > 0">{{getTimeRemaining()}}</p>
+      <h3>Patient data section completed</h3>
+        <div id="timer">
+          <p>You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
+          <p v-if="counter > 0">You can continue on to the next phase of the assessment in: <strong>{{getTimeRemaining()}}</strong></p>
+        </div>
+
       <div class="form-group footer" style="{text-align: center}">
         <div class="buttons">
-          <button v-show="nextEnabled" id="next-button" type="button" class="btn btn-primary" @click="onNextClick()" disabled>Next</button>
-          <button v-show="skipEnabled" id="skip-button" type="button" class="btn btn-primary" @click="onNextClick()">Skip</button>
+          <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()" disabled>Next</button>
+          <button v-show="skipEnabled" id="skip-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Skip</button>
         </div>
       </div>
     </div>
@@ -20,12 +21,12 @@
 <script>
 
     import { settings } from '../settings'
-    import AppHeader from './AppHeader';
+    import TabHeader from './Tabheader';
 
     export default {
         name: "LockoutScreen",
         components: {
-           AppHeader
+           TabHeader
         },
         data() {
             return {
@@ -95,6 +96,10 @@
     padding: 40px;
   }
 
+  #timer {
+    padding: 20px 0;
+  }
+
   button:disabled {
     background-color: dimgray;
   }
@@ -105,6 +110,11 @@
     margin: 10px 0px;
     font-size: 1.2em;
     margin: 0 50px;
+  }
+
+  .lock-btn {
+    background-color: #029a99;
+    border: 0;
   }
 
   .footer {

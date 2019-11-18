@@ -1,8 +1,9 @@
 <template>
  <div id="page">
 
+   <TabHeader system-opacity="1.0" patient-opacity="0.5" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
+
     <div id="content">
-      <h1>ePRaSE Assessment</h1>
       <h3>Part 3 - Patient Information</h3>
       <p>Please enter the following patient information into your EP system.</p>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields with appropriate self-generated information.</p>
@@ -11,81 +12,92 @@
 
       <div v-for="patient in myPatientList">
 
-        <div align="center">
-          <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
-          <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
+        <div align="center" class="card">
+          <div class="card-header">
+            <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
+            <span class="patient-image" v-if="patient[getCurrentPatient].gender == 'male'">
+              <img src="../assets/anon-male.png" height="80px" />
+            </span>
 
-          <div id="patient-card">
-            <div class="patient-image" v-if="patient[getCurrentPatient].gender == 'male'">
-              <img src="../assets/anon-male.png" height="160px" />
-            </div>
+            <span class="patient-image" v-if="patient[getCurrentPatient].gender == 'female'">
+              <img src="../assets/anon-female.png" height="80px" />
+            </span>
+            <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
+          </div>
 
-            <div class="patient-image" v-if="patient[getCurrentPatient].gender == 'female'">
-              <img src="../assets/anon-female.png" height="160px" />
-            </div>
-            <div class="patient-demographics">
-              <p><strong>Demographics:</strong></p>
-              <table>
-                <tr>
-                  <td><strong>Height (m):</strong> {{patient[getCurrentPatient].height}}</td>
-                </tr>
-                <tr>
-                  <td><strong>Weight (kg):</strong> {{patient[getCurrentPatient].weight}}</td>
-                </tr>
-              </table>
-            </div>
 
-            <div class="patient-info">
+          <div class="card-body">
 
-              <div align="left" v-if="patient[getCurrentPatient].allergies.length !== 0">
-                <p><strong>Allergies:</strong></p>
-                <table>
-                  <tr v-for="allergy in patient[0].allergies">
-                    <td>{{allergy}}</td>
-                  </tr>
-                </table>
-              </div>
+            <div class="left=col">
 
-              <div align="left" v-if="patient[getCurrentPatient].allergies.length == 0">
-                <p><strong>Allergies:</strong></p>
+              <div class="patient-demographics">
+                <h5 class="card-title">Demographics</h5>
                 <table>
                   <tr>
-                    <td>No Known Drug Allergies</td>
+                    <td><strong>Height (m):</strong> {{patient[getCurrentPatient].height}}</td>
                   </tr>
-                </table>
-              </div>
-
-              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
-                <p><strong>Diagnosis:</strong></p>
-                <table>
-                  <tr v-for="diagnosis in patient[0].diagnosis">
-                    <td>{{diagnosis}}</td>
-                  </tr>
-                </table>
-              </div>
-
-              <div align="left"  v-if="patient[getCurrentPatient].medication_history.length != 0">
-                <p><strong>Current Medication:</strong></p>
-                <table>
                   <tr>
-                    <td><strong>Name</strong></td>
-                    <td><strong>Dose</strong></td>
-                    <td><strong>Route</strong></td>
-                    <td><strong>Form</strong></td>
-                    <td><strong>Frequency</strong></td>
-                  </tr>
-                  <tr v-for="history in patient[getCurrentPatient].medication_history">
-                    <td>{{history.name}}</td>
-                    <td>{{history.dose}} {{history.units}}</td>
-                    <td>{{history.route}}</td>
-                    <td>{{history.form}}</td>
-                    <td>{{history.frequency}}</td>
+                    <td><strong>Weight (kg):</strong> {{patient[getCurrentPatient].weight}}</td>
                   </tr>
                 </table>
               </div>
 
-              <div align="left"  v-if="patient[getCurrentPatient].clinical_data.length != 0">
-                <p><strong>Clinical Data:</strong></p>
+              <div class="patient-info">
+
+                <div align="left" v-if="patient[getCurrentPatient].allergies.length !== 0">
+                  <h5 class="card-title">Allergies</h5>
+                  <table>
+                    <tr v-for="allergy in patient[0].allergies">
+                      <td>{{allergy}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left" v-if="patient[getCurrentPatient].allergies.length == 0">
+                  <h5 class="card-title">Allergies</h5>
+                  <table>
+                    <tr>
+                      <td>No Known Drug Allergies</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+                  <h5 class="card-title">Diagnosis</h5>
+                  <table>
+                    <tr v-for="diagnosis in patient[0].diagnosis">
+                      <td>{{diagnosis}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <div align="left"  v-if="patient[getCurrentPatient].medication_history.length != 0">
+                  <h5 class="card-title">Current Medication</h5>
+                  <table>
+                    <tr>
+                      <td><strong>Name</strong></td>
+                      <td><strong>Dose</strong></td>
+                      <td><strong>Route</strong></td>
+                      <td><strong>Form</strong></td>
+                      <td><strong>Frequency</strong></td>
+                    </tr>
+                    <tr v-for="history in patient[getCurrentPatient].medication_history">
+                      <td>{{history.name}}</td>
+                      <td>{{history.dose}} {{history.units}}</td>
+                      <td>{{history.route}}</td>
+                      <td>{{history.form}}</td>
+                      <td>{{history.frequency}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+            </div>
+           </div>
+
+            <div class="right-col">
+
+              <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
+                <h5 class="card-title">Clinical Data</h5>
                 <table>
                   <tr>
                     <td><strong>Investigation</strong></td>
@@ -99,6 +111,8 @@
               </div>
               <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].id" />
             </div>
+
+
           </div>
         </div>
 
@@ -106,17 +120,17 @@
         <p>Note any intervention from the system using the box below.</p>
         <div align="center">
           <div class="alert alert-warning" role="alert">
-            To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
+            To optimise the use of this tool please record ALL types of guidance that appears on your system screen
           </div>
-          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
+          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
         </div>
       </div>
       <div class="form-group footer" align="center">
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
           <button id="exit-button" type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
-          <button v-show='nextEnabled' id="next-button" type="button" class="btn btn-primary" @click="onNextClick()">Next</button>
-          <button v-show='doneEnabled' id="done-button" type="button" class="btn btn-primary" @click="onDoneClick()">Done</button>
+          <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary" @click="onNextClick()">Next</button>
+          <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary" @click="onDoneClick()">Done</button>
         </div>
       </div>
     </div>
@@ -129,11 +143,12 @@
 
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
+    import  TabHeader from './TabHeader';
 
     export default {
         name: "AssessmentPart3",
         components: {
-
+            TabHeader
         },
         computed: {
             myPatientList() {
@@ -242,16 +257,6 @@
     text-align: center;
   }
 
-  .subtitle-grey {
-    text-align: center;
-    color: darkgrey;
-  }
-
-  .patient-demographics {
-    padding-left: 20px;
-    padding-bottom: 0px;
-  }
-
   .patient-info p {
     text-align: left;
   }
@@ -263,69 +268,75 @@
   table {
     margin-top: 20px;
     margin-bottom: 20px;
-    width: 900px;
-    background-color: #ffffff;
-  }
+    border: 1px solid #c2c2c2;
+    border-collapse: collapse;
+ /*   background-color: rgba(2, 255, 254, 0.09); */
 
+    background-color: #fff;
+  }
 
   td {
     width: auto;
     font-size: 14px;
+    border: 1px solid #c2c2c2;
   }
 
   .patient-image {
-    float: right;
-    padding: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+  }
+
+  .card {
+    margin-bottom: 20px;
+  }
+
+  .card-body {
+    display: grid;
+    grid-template-columns: auto auto;
+    background-color: rgba(2, 255, 254, 0.11);
   }
 
   .patient-demographics {
     text-align: left;
+    padding-left: 20px;
   }
 
-  .patient-demographics table
-  {
-    margin-left: 30px;
+  .patient-demographics table,  .clinical-data table {
     width: 200px;
-    border: solid grey 1px;
+    padding-left: 20px;
+    padding-bottom: 0;
   }
 
-  .patient-demographics table td {
+  .patient-demographics table td{
     width: auto;
     font-size: 14px;
     padding: 10px;
-    border: solid grey 1px;
   }
 
-  .patient-info table
-  {
+  .clinical-data table td,  .patient-info td  {
+    width: auto;
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  .patient-info table {
     text-align: left;
     width: auto;
-    margin-left: 30px;
   }
 
-  .patient-info td
-  {
-    width: auto;
-    border: solid grey 1px;
-    padding: 2px 10px;
-    font-size: 14px;
+  .right-col {
+    text-align: left;
   }
-
 
   #patient-intervention {
-    width: 600px;
+    width: 100%;
     height: 100px;
   }
 
-  #patient-card {
-    width: 900px;
-    background-color: #cdf8ff;
-    padding: 5px;
-    border:  1px solid #6b9bc7;
-    border-radius: 25px;
-    margin-bottom: 20px;
-    -webkit-box-shadow: 1px 3px 8px -1px #000000;
-    box-shadow: 1px 3px 8px -1px #000000;
+  .card-header {
+      position:relative;
   }
 
   button {
@@ -337,8 +348,7 @@
 
   #done-button {
     margin-left: 120px;
-    background-color: #07abb8;
-    border-color: #07818e;
+    background-color: #029a99;
   }
 
   #done-button :hover {
@@ -359,6 +369,10 @@
     border-color: #ffd47d;
   }
 
+  .pat-btn {
+    background-color: #029a99;
+    border: 0;
+  }
 
 
 </style>

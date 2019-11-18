@@ -1,7 +1,7 @@
 <template>
   <div id="page">
 
-    <TabHeader />
+    <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
     <div class="content" v-if="assessmentComplete === false">
       <h1>Welcome to the ePRaSE Assessment</h1>
 
@@ -37,10 +37,10 @@
 
       <div class="header-bar-buttons">
         <button id="show-about-modal" @click="showAboutModal = true"><font-awesome-icon icon="home"></font-awesome-icon><a href="#">About</a></button>
-        <button @click=contact()><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Contact</a></button>
         <button id="show-modal" @click="showModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Instructions</a></button>
-        <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">History</a></button>
+        <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">Reports</a></button>
         <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></button>
+        <button @click=contact()><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Contact</a></button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
     </div>
@@ -99,6 +99,9 @@
             onStartAssessmentClick() {
                 patientService.setPatients();
                 this.$router.push({ path: './assessmentpart1' });
+            },
+            reports() {
+                this.$router.push({ path: './resultshome' });
             }
         },
         created : function() {

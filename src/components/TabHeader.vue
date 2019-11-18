@@ -1,10 +1,10 @@
 <template>
 
   <div id ="tabbedHeader">
-    <div class="tab" id="system" v-bind:style="showSystem">System</div>
-    <div class="tab" id="patients"  v-bind:style="showPatients">Patients</div>
-    <div class="tab" id="scenarios"  v-bind:style="showScenarios">Scenarios</div>
-    <div class="tab" id="report"  v-bind:style="showReport">Report</div>
+    <div class="tab" id="system" >System <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showSystem"></div>
+    <div class="tab" id="patients" >Patients <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showPatients"></div>
+    <div class="tab" id="scenarios" >Scenarios <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showScenarios"></div>
+    <div class="tab" id="report" >Report <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showReport"></div>
   </div>
 
 </template>
@@ -12,12 +12,30 @@
 <script>
     export default {
         name: "TabHeader",
+        props: {
+            systemOpacity : '',
+            patientOpacity : '',
+            scenarioOpacity: '',
+            reportOpacity: '',
+        },
         data() {
             return {
-                showSystem : 'block',
-                showPatients : 'none',
-                showScenarios : 'none',
-                showReport : 'none'
+                showSystem : {
+                   display: 'inline',
+                    opacity: this.systemOpacity
+                },
+                showPatients : {
+                    display: 'inline',
+                    opacity: this.patientOpacity
+                },
+                showScenarios : {
+                    display: 'inline',
+                    opacity: this.scenarioOpacity
+                },
+                showReport : {
+                    display: 'inline',
+                    opacity: this.reportOpacity
+                }
             }
         }
     }
@@ -36,7 +54,6 @@
 
   #system {
     background-color: #07818e;
-  /*  background-image: url("assets/tick.png"); */
   }
   #patients {
     background-color: #029a99;
@@ -46,6 +63,11 @@
   }
   #report {
     background-color: #02dddc;
+  }
+
+  .tick {
+    height: 30px;
+    margin-left: 5px;
   }
 
   .tab {

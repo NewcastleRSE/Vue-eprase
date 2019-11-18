@@ -3,25 +3,20 @@
     <div class="modal-mask">
       <div id='modalContainer'>
         <div class='modal-header'>
-          <h1>About ePRaSE</h1>
+          <h2>About ePRaSE</h2>
         </div>
         <div class='modal-body'>
           <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
             in order to determine their usefulness and to encourage the correct use of these systems
             and deliver improved patient outcomes.</p>
           <p>ePRaSE has been developed by the Pharmacy Department at Newcastle University, in association with The Royal Victoria Infirmary and the NHS Trust.</p>
-          <h3>Credits</h3>
+          <h4>Credits</h4>
           <p>The assessments were developed by Stephanie Klein, Jude Heed and Andrew Heed.</p>
           <p>The ePRaSE tool was developed by Mike Simpson from the Digital Institute at Newcastle University.</p>
-          <h3>Partners</h3>
-          <div id="logo-bar">
-            <span class="logos"><img id="di-logo" src="../assets/Digital_Institute.jpg" alt="Digital Institute" ></span>
-            <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
-            <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span>
-          </div>
+
         </div>
         <div class='modal-footer'>
-          <button type="button" class="btn btn-primary" @click="close">Close</button>
+          <button type="button" class="close-btn btn btn-primary" @click="close">Close</button>
         </div>
 
       </div>
@@ -68,9 +63,14 @@
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     width: 80%;
-    height: 55%;
+    height: 65%;
     background: #FFF;
     border-radius: 25px;
+  }
+
+
+  .close-btn {
+    background-color: #07818e;
   }
 
   .modal-body {

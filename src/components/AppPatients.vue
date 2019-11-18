@@ -66,7 +66,7 @@
     padding: 15px;
     margin-top: 20px;
     margin-bottom: 20px;
-    width: 600px;
+    width: 100%;
     border: 1px solid #6b9bc7;
   }
 

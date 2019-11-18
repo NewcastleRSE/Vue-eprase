@@ -1,7 +1,7 @@
 <template>
 <div id="page">
 
-  <TabHeader />
+  <TabHeader system-opacity="1.0" patient-opacity="0.5" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
 
   <div id="content">
     <h3>Part 2 - Assessment Preparation</h3>
@@ -19,11 +19,11 @@
     <div class="assessment">
       <p>Please note any difficulties or interventions from the system that you encountered when completing this task using the box below.</p>
       <div align="center">
-        <div class="alert alert-warning" role="alert">
-          To optimise the use of this tool please record ALL types of guidance that appears on your system screen in the comments boxes provided
+       <div class="alert alert-warning" role="alert">
+          To optimise the use of this tool please record ALL types of guidance that appears on your system screen
         </div>
         <form>
-          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="250"></textarea>
+          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
         </form>
       </div>
     </div>
@@ -144,20 +144,20 @@
 
 
   #patient-intervention {
-    width: 600px;
+    width: 100%;
     height: 100px;
   }
 
   button {
     height: 40px;
     width: 100px;
-    margin: 10px 0px;
     font-size: 1.2em;
     margin: 0 50px;
   }
 
   .next-btn {
     background-color: #029a99;
+    border: 0;
   }
 
   .footer {
@@ -173,7 +173,6 @@
     background-color: #f6ecb8;
     border-color: #ffd47d;
   }
-
 
 
 </style>
