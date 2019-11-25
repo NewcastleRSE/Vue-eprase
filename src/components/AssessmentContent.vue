@@ -8,10 +8,10 @@
 
 <script>
 
-    import AssessmentPart1 from "./AssessmentPart1";
-    import AssessmentPart2 from "./AssessmentPart2";
-    import AssessmentPart3 from "./AssessmentPart3";
-    import AssessmentPart4 from "./AssessmentPart4";
+    import AssessmentPart1 from "./AssessmentSystem";
+    import AssessmentPart2 from "./AssessmentPatients";
+    import AssessmentPart3 from "./AssessmentPatientDetails";
+    import AssessmentPart4 from "./AssessmentScenarios";
 
     export default {
         name: "AssessmentContent",

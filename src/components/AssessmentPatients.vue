@@ -4,7 +4,7 @@
   <TabHeader system-opacity="1.0" patient-opacity="0.5" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
 
   <div id="content">
-    <h3>Part 2 - Assessment Preparation</h3>
+    <h3>Assessment Patient Preparation</h3>
     <p>In preparation for the assessment, please complete the following tasks:</p>
     <div align="center">
       <div class="patient-info">
@@ -31,7 +31,7 @@
     <div class="form-group footer" align="center">
       <div class="buttons">
         <p>When all of the patients have been admitted to your ePrescription System, click <strong>Next</strong>.</p>
-        <button type="button" class="btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
+        <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
         <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
       </div>
     </div>
@@ -47,7 +47,7 @@
     import  TabHeader from './TabHeader';
 
     export default {
-        name: "AssessmentPart2",
+        name: "AssessmentPatients",
         components: {
             TabHeader,
             AppPatients
@@ -55,6 +55,9 @@
         computed: {
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
+            },
+            user() {
+                return this.$store.state.authentication.user;
             }
         },
         data() {
@@ -92,6 +95,10 @@
                         if (time_taken){
                             dispatch('savePart2Data', { qualitative_data, time_taken });
                         }
+
+                        // audit
+                        const user_id =  this.user.user_id;
+                        dataService.audit(user_id, 'Add patient list', '/assessmentpatients');
                     }
                 });
             }
@@ -155,7 +162,7 @@
     margin: 0 50px;
   }
 
-  .next-btn {
+  .exit-btn, .next-btn {
     background-color: #029a99;
     border: 0;
   }

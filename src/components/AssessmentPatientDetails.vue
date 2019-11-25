@@ -4,7 +4,7 @@
    <TabHeader system-opacity="1.0" patient-opacity="0.5" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
 
     <div id="content">
-      <h3>Part 3 - Patient Information</h3>
+      <h3>Patient Information</h3>
       <p>Please enter the following patient information into your EP system.</p>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields with appropriate self-generated information.</p>
       <p>When you are done, click <strong>Next</strong> to continue.</p>
@@ -128,7 +128,7 @@
       <div class="form-group footer" align="center">
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
-          <button id="exit-button" type="button" class="btn btn-primary" @click="onExitClick()">Exit</button>
+          <button id="exit-button" type="button" class="exit-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary" @click="onNextClick()">Next</button>
           <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary" @click="onDoneClick()">Done</button>
         </div>
@@ -146,7 +146,7 @@
     import  TabHeader from './TabHeader';
 
     export default {
-        name: "AssessmentPart3",
+        name: "AssessmentPatientDetails",
         components: {
             TabHeader
         },
@@ -156,6 +156,9 @@
             },
             getCurrentPatient() {
                 return this.$store.state.patientIndex;
+            },
+            user() {
+                return this.$store.state.authentication.user;
             }
         },
         data() {
@@ -184,7 +187,7 @@
             },
             onNextClick()  {
                 this.saveData();
-                this.$router.push('/assessmentpart3');
+                this.$router.push('/assessmentpatientdetails');
             },
             onDoneClick() {
                 const unlockTime = new Date();
@@ -196,6 +199,11 @@
 
                 // save the last patient data
                 this.saveData();
+
+                // audit
+                const user_id =  this.user.user_id;
+                dataService.audit(user_id, 'Completed patient details', '/assessmentpatientdetails');
+
                 this.$router.push('/lockoutscreen');
             },
             saveData() {
@@ -205,15 +213,15 @@
                         let index = this.$store.state.patientIndex;
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
-                        this.assessment.time_taken = elapsedTime/1000;
+                        this.assessment.time_taken = elapsedTime / 1000;
                         const qualitative_data = this.assessment.qualitative_data;
                         const patient_id = this.assessment.patient_id;
                         const time_taken = this.assessment.time_taken;
                         const completed = this.completed;
 
-                        const { dispatch } = this.$store;
-                        if (time_taken){
-                            dispatch('savePart3Data', { qualitative_data, patient_id, time_taken, index, completed});
+                        const {dispatch} = this.$store;
+                        if (time_taken) {
+                            dispatch('savePart3Data', {qualitative_data, patient_id, time_taken, index, completed});
                         }
                         this.submitted = true;
                         this.assessment.qualitative_data = '';
@@ -295,7 +303,7 @@
   .card-body {
     display: grid;
     grid-template-columns: auto auto;
-    background-color: rgba(2, 255, 254, 0.11);
+    background-color: rgba(170, 231, 255, 0.11);
   }
 
   .patient-demographics {
@@ -369,7 +377,7 @@
     border-color: #ffd47d;
   }
 
-  .pat-btn {
+  .exit-btn, .pat-btn {
     background-color: #029a99;
     border: 0;
   }

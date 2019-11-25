@@ -107,7 +107,7 @@
             },
             onStartAssessmentClick() {
                 patientService.setPatients();
-                this.$router.push({ path: './assessmentpart1' });
+                this.$router.push({ path: './assessmentsystem' });
             },
             reports() {
                 this.$router.push({ path: './resultshome' });
@@ -119,7 +119,7 @@
             dataService.audit(user_id, 'View assessment intro', '/assessmentintro');
         },
         computed: {
-            user () {
+            user() {
                 return this.$store.state.authentication.user;
             }
         },

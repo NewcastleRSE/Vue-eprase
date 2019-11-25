@@ -2,17 +2,10 @@
   <div>
     <table id="test-patients">
       <tr>
-        <td>
-          <strong>Name</strong>
-        </td>
-        <td>
-          <strong>Date of Birth</strong>
-        </td>
-        <td>
-          <strong>Gender</strong>
-        </td>
+        <th>Name</th>
+        <th>Date of Birth</th>
+        <th>Gender</th>
       </tr>
-
 
     <tr v-for="patient in myPatientList">
       <td>
@@ -70,6 +63,11 @@
     border: 1px solid #6b9bc7;
   }
 
+  #test-patients th {
+    border:  1px solid #7f7d81;
+    background-color: #e9e9e9;
+    padding: 5px;
+  }
 
   #test-patients td {
     width: 150px;

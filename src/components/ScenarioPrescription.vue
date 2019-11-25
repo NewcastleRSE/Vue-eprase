@@ -97,10 +97,11 @@
     import jsonoutcomes from '../json/outcomes.json';
     import jsonoverrides from '../json/overrides.json';
     import jsoncheckboxes from '../json/checkboxes.json';
+    import { dataService } from '../services/data.service';
     import { settings } from '../settings'
 
     export default {
-        name: "Part4Prescription",
+        name: "ScenarioPrescription",
         components: {
 
         },
@@ -120,6 +121,9 @@
             },
             getPresTestIndex() {
                 return this.$store.state.testIndex;
+            },
+            user() {
+                return this.$store.state.authentication.user;
             }
         },
         data() {
@@ -201,7 +205,7 @@
             },
             onNextClick()  {
                this.saveData();
-                this.$router.push('/assessmentpart4');
+                this.$router.push('/assessmentscenarios');
             },
             saveData() {
                 this.submitted = true;
@@ -238,8 +242,15 @@
                 // this is now true
                 this.completed = true;
                 let id = localStorage.getItem('assessmentId');
+
                 // save the last test data
                 this.saveData();
+
+                // audit
+                const user_id =  this.user.user_id;
+                dataService.audit(user_id, 'Completed scenarios', '/assessmentscenarios');
+
+                console.log(id);
                 this.$router.push('/assessmentresults/'+ id);
             },
             clearCheckBoxes() {
@@ -265,7 +276,7 @@
         },
         beforeUpdate: function() {
             let index = this.$store.state.testIndex;
-            if (index === (this.numTests - 1)) {
+            if (index === (this.numTests)) {
                 this.nextEnabled = false;
                 this.doneEnabled = true;
             }

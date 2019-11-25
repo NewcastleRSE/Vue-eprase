@@ -6,10 +6,10 @@ import AppLogin from './components/AppLogin.vue';
 import AppRegister from './components/AppRegister.vue';
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentHome from "./components/AssessmentHome";
-import AssessmentPart1 from './components/AssessmentPart1';
-import AssessmentPart2 from './components/AssessmentPart2';
-import AssessmentPart3 from './components/AssessmentPart3';
-import AssessmentPart4 from './components/AssessmentPart4';
+import AssessmentSystem from './components/AssessmentSystem';
+import AssessmentPatients from './components/AssessmentPatients';
+import AssessmentPatientDetails from './components/AssessmentPatientDetails';
+import AssessmentScenarios from './components/AssessmentScenarios';
 import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
@@ -43,20 +43,20 @@ export const router = new Router({
       component: AssessmentHome
     },
     {
-      path: '/assessmentpart1',
-      component: AssessmentPart1
+      path: '/assessmentSystem',
+      component: AssessmentSystem
     },
     {
-      path: '/assessmentpart2',
-      component: AssessmentPart2
+      path: '/assessmentpatients',
+      component: AssessmentPatients
     },
     {
-      path: '/assessmentpart3',
-      component: AssessmentPart3
+      path: '/assessmentpatientdetails',
+      component: AssessmentPatientDetails
     },
     {
-      path: '/assessmentpart4',
-      component: AssessmentPart4
+      path: '/assessmentscenarios',
+      component: AssessmentScenarios
     },
     {
       path: '/lockoutscreen',

@@ -64,6 +64,7 @@
 
     import {HTTP} from '../http-constants';
     import json from '../json/institutions.json'
+    import { dataService } from '../services/data.service';
 
     export default {
       name: "AppRegister",
@@ -112,7 +113,11 @@
                 password: this.user.password,
                 role: this.user.role
               })
-                .then(response => window.location.href = './login')
+                .then(response => {
+                    // audit
+                    dataService.audit(null, 'Register', '/register');
+                    this.$router.push({path: './login'})
+                })
                 .catch(error => this.errors = error.response.data)
             }
           });

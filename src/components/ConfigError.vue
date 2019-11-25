@@ -82,7 +82,7 @@
         methods : {
             onNextClick()  {
                 this.saveData();
-                this.$router.push('/assessmentpart4');
+                this.$router.push('/assessmentscenarios');
             },
             saveData() {
                 this.submitted = true;

@@ -7,7 +7,7 @@
      <div align="center">
        <h4>Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</h4>
 
-       <Prescription v-if="assessment.isPrescriptionTest"></Prescription>
+       <ScenarioPrescription v-if="assessment.isPrescriptionTest"></ScenarioPrescription>
        <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError>
      </div>
    </div>
@@ -19,13 +19,14 @@
 <script>
 
     import { settings } from '../settings';
-    import Prescription from "./Part4Prescription";
+    import ScenarioPrescription from "./ScenarioPrescription";
     import ConfigError from "./ConfigError";
     import TabHeader from"./TabHeader";
+
     export default {
-        name: "AssessmentPart4",
+        name: "AssessmentScenarios",
         components: {
-            Prescription,
+            ScenarioPrescription,
             ConfigError,
             TabHeader
         },

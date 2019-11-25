@@ -32,7 +32,7 @@ function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_
        // store assessment id
        localStorage.setItem('assessmentId', assessmentId);
        dataService.setAssessmentPart(2);
-       router.push({ path: './assessmentpart2' });
+       router.push({ path: './assessmentpatients' });
      }
     })
     .catch(function() {
@@ -55,7 +55,7 @@ function savePart2Data(qualitative_data, time_taken){
     .then(handleResponse)
     .then(response => {
       dataService.setAssessmentPart(3);
-      router.push({ path: './assessmentpart3' });
+      router.push({ path: './assessmentpatientdetails' });
     })
     .catch(function() {
       console.log('Error returning from savePart2Data');

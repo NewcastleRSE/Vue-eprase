@@ -56,7 +56,7 @@
                 return hour + ':' + mins + ':' + secs;
             },
             onNextClick()  {
-                this.$router.push('/assessmentpart4');
+                this.$router.push('/assessmentscenarios');
             }
         },
         created : function() {

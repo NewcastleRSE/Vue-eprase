@@ -4,10 +4,10 @@
 
     <TabHeader system-opacity="0.5" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
     <div class="content">
-      <h4>Part 1 - EP System Information</h4>
+      <h4>EP System Information</h4>
       <p>Please answer the following questions about your ePrescribing system:</p>
 
-      <div class="assessment-part1">
+      <div class="assessment-system">
         <div>
           <form id="ep-system-form" @submit.prevent="handleSubmit">
             <div class="form-group">
@@ -86,7 +86,7 @@
             <div class="form-group footer">
               <div class="buttons">
                 <p>When you have answered all of the questions, click <strong>Next</strong>.</p>
-                <button type="button" class="btn btn-primary" id="exit-button" @click="onExitClick()">Exit</button>
+                <button type="button" class="exit-btn btn btn-primary" id="exit-button" @click="onExitClick()">Exit</button>
                 <button type="button" class="next-btn btn btn-primary" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
               </div>
             </div>
@@ -107,7 +107,7 @@
     import { dataService } from '../services/data.service';
 
     export default {
-        name: "AssessmentPart1",
+        name: "AssessmentSystem",
         components: {
             AssessmentHome,
             TabHeader
@@ -115,6 +115,9 @@
         computed: {
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
+            },
+            user() {
+                return this.$store.state.authentication.user;
             }
         },
         data() {
@@ -166,6 +169,9 @@
                         if (time_taken){
                             dispatch('savePart1Data', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
                         }
+                        // audit
+                        const user_id =  this.user.user_id;
+                        dataService.audit(user_id, 'Save system data', '/assessmentSystem');
                     }
                 });
             }
@@ -275,7 +281,7 @@
     font-size: 14px;
   }
 
-  .assessment-part1 {
+  .assessment-system {
     padding-bottom: 25px;
   }
 
@@ -290,7 +296,7 @@
     margin: 0 50px;
   }
 
-  .next-btn {
+  .exit-btn, .next-btn {
     background-color: #07818e;
     border: 0;
   }

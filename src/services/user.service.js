@@ -1,6 +1,7 @@
 import {dataService} from "./data.service";
+import {settings} from "../settings";
 
-let baseURL = 'http://localhost:6001';
+let baseURL = settings.baseUrl;
 
 export const userService = {
   login,
@@ -14,7 +15,7 @@ function login(username, password) {
     body: JSON.stringify({ username, password })
   };
 
-  return fetch(baseURL + '/auth/signin', requestOptions)
+  return fetch(baseURL + 'auth/signin', requestOptions)
     .then(handleResponse)
     .then(response => {
       // login successful if there's a jwt token in the response
