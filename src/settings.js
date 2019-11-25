@@ -1,4 +1,5 @@
 export const settings = {
+  year: '2020',
   skipButton: true,
   outcomeIntervention : -4,
   outcomeUnableToInitiate : -10,

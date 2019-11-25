@@ -11,6 +11,10 @@
         </div>
       </div>
 
+      <div v-if="assessments">
+        <p>You currently have no reports available.</p>
+      </div>
+
       <div class="list-group">
         <div v-for="assessment in assessments">
           <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment.part1.id }}" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -22,6 +26,12 @@
       </div>
 
     </div>
+
+    <div class="footer-bar-buttons">
+      <button><font-awesome-icon icon="home"></font-awesome-icon><span class="headerLink"><router-link to="/assessmentintro">Home</router-link></span></button>
+        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+    </div>
+
   </div>
 
 </template>
@@ -76,14 +86,19 @@
   }
 
   button {
-    margin-top: 3px;
-    margin-bottom: 3px;
-    height: 50px;
-    width: 500px;
+    height: 40px;
+    width: 170px;
+    margin: 10px 0px;
+    font-size: 1em;
   }
 
-  .button-div {
-    margin-top: 20px;
+  button a {
+    padding: 3px;
+  }
+
+  .footer-bar-buttons {
+    padding-left: 40px;
+    padding-bottom: 20px;
   }
 
 </style>

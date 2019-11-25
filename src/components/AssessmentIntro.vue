@@ -13,18 +13,18 @@
       <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions system and then
         to prescribe a series medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
 
-      <h3>2020 ePRaSE Assessment</h3>
+      <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
 
       <div class="buttons">
-        <button class="start-btn btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin 2020 Assessment</button>
-        <button class="btn btn-primary" v-if="assessment.currentPart>1" @click="onStartAssessmentClick()">Continue 2019 Assessment</button>
+        <button class="start-btn btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
+        <button class="btn btn-primary" v-if="assessment.currentPart>1" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
       </div>
     </div>
 
     <div class="content" v-if="assessmentComplete === true">
       <h1>Assessment Complete</h1>
-      <p>Thank you for taking part in the 2019 ePRaSE Assessment.</p>
+      <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
       <p>To view the results of this assessment, click the 'View Results' button below.</p>
       <br/>
       <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.</p>
@@ -33,43 +33,25 @@
       </div>
     </div>
 
-    <div class="header-content">
-
-      <div class="header-bar-buttons">
-        <button @click="showAboutModal = true"><font-awesome-icon icon="home"></font-awesome-icon><a href="#">About</a></button>
-        <button @click="showModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Instructions</a></button>
-        <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">Reports</a></button>
-        <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></button>
-        <button @click="showContactModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Contact</a></button>
-        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
-      </div>
-    </div>
-
-    <AboutModal v-if="showAboutModal" :aboutModalData='aboutCustomData' :user-id="user.user_id" @close="showAboutModal = false"  />
-    <InstructionsModal v-if="showModal" :modalData='customData' :user-id="user.user_id" @close="showModal = false"  />
-    <ContactModal v-if="showContactModal" :contactModalData='contactCustomData' :user-id="user.user_id" @close="showContactModal = false"  />
+    <AppFooter />
 
   </div>
-
 
 </template>
 
 <script>
 
+    import { settings } from '../settings';
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
     import TabHeader from './TabHeader';
-    import InstructionsModal from './InstructionsModal';
-    import AboutModal from './AboutModal';
-    import ContactModal from './ContactModal';
+    import AppFooter from "./AppFooter";
 
     export default {
         name: "AssessmentIntro",
         components: {
-           TabHeader,
-            InstructionsModal,
-            AboutModal,
-            ContactModal
+            AppFooter,
+            TabHeader
         },
         data() {
             return {
@@ -77,21 +59,7 @@
                 assessment : {
                     currentPart : dataService.getAssessmentPart()
                 },
-                showModal : false,
-                showAboutModal : false,
-                showContactModal : false,
-                customData : {
-                    title: 'ePRaSE Instructions',
-                    closeButtonText: 'Close'
-                },
-                aboutCustomData : {
-                    title: 'About ePRaSE',
-                    closeButtonText: 'Close'
-                },
-                contactCustomData : {
-                    title: 'Contacts for ePRaSE',
-                    closeButtonText: 'Close'
-                }
+                year: settings.year
             }
         },
         methods: {
@@ -108,9 +76,6 @@
             onStartAssessmentClick() {
                 patientService.setPatients();
                 this.$router.push({ path: './assessmentsystem' });
-            },
-            reports() {
-                this.$router.push({ path: './resultshome' });
             }
         },
         created : function() {
@@ -139,12 +104,6 @@
   .start-btn {
     font-size: 1.2em;
     width: 280px;
-  }
-
-
-  .header-bar-buttons {
-    padding-left: 40px;
-    padding-bottom: 20px;
   }
 
   button a {

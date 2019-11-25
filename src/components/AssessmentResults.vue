@@ -5,7 +5,7 @@
 
     <div id="content">
       <h2>Assessment Results</h2>
-      <p>Your results from the 2020 ePRaSE assessment. </p>
+      <p>Your results from the ePRaSE assessment. </p>
 
       <div class="assessment-results">
 
@@ -47,11 +47,11 @@
                 <img v-if="score.resultAverage >= -4  &&  score.resultAverage  <= -2" src="../assets/smiley3.jpg" title="3"  class="smiley">
                 <img v-if="score.resultAverage >= -7  &&  score.resultAverage  <= -5" src="../assets/smiley4.jpg" title="4"  class="smiley">
                 <img v-if="score.resultAverage >= -10 &&  score.resultAverage  <= -8" src="../assets/smiley5.jpg" title="5"  class="smiley">
-                <span v-if="score.resultAverage >    6  &&  score.resultAverage <=  10">Your system is not correctly mitigating the risk of erroneous prescriptions.</span>
-                <span v-if="score.resultAverage >    2  &&  score.resultAverage <=   6">Your system may be failing to mitigate the risk of some erroneous prescriptions.</span>
-                <span v-if="score.resultAverage >=  -2  &&  score.resultAverage <=   2">Your system appears to be handling correct and incorrect prescriptions appropriately.</span>
-                <span v-if="score.resultAverage >=  -6  &&  score.resultAverage <   -2">Your system may be intervening when it is not necessary, or presenting the user with unnecessary popups.</span>
-                <span v-if="score.resultAverage >= -10  &&  score.resultAverage <   -6">Your system is intervening when it is not necessary and/or is presenting the user with unnecessary popups.</span>
+                <span v-if="score.resultAverage > 6  &&  score.resultAverage <= 10">Your system is not correctly mitigating the risk of erroneous prescriptions.</span>
+                <span v-if="score.resultAverage > 2  &&  score.resultAverage <= 6">Your system may be failing to mitigate the risk of some erroneous prescriptions.</span>
+                <span v-if="score.resultAverage >= -2  &&  score.resultAverage <= 2">Your system appears to be handling correct and incorrect prescriptions appropriately.</span>
+                <span v-if="score.resultAverage >= -6  &&  score.resultAverage < -2">Your system may be intervening when it is not necessary, or presenting the user with unnecessary popups.</span>
+                <span v-if="score.resultAverage >= -10  &&  score.resultAverage < -6">Your system is intervening when it is not necessary and/or is presenting the user with unnecessary popups.</span>
                 <!--<span v-if="!isNaN(score.correlation)" class="badge badge-primary badge-pill">{{score.correlation}}</span>--></td>
             </tr>
           </table>
@@ -72,12 +72,11 @@
 
 <script>
 
-    import { settings } from '../settings';
     import jsonindicators from '../json/indicators.json';
     import jsontests from '../json/prescriptions.json'
     import { dataService } from '../services/data.service';
     import _ from 'lodash';
-    import jStat from 'jStat';
+    import jStat from 'jstat';
     import TabHeader from './TabHeader';
 
     import axios from 'axios'
@@ -116,6 +115,9 @@
             },
             getLabResults() {
                 return this.part1.lab_results;
+            },
+            user() {
+                return this.$store.state.authentication.user;
             }
         },
         methods : {
@@ -235,6 +237,11 @@
                 this.prescriptionList = data.prescriptionList;
                 this.part1.ep_usage = data.part1.ep_usage;
                 this.part1.lab_results = data.part1.lab_results.toString();
+
+                // audit
+                const user_id =  this.user.user_id;
+                dataService.audit(user_id, 'View report', '/assessmentresults');
+
                 this.createResults();
             });
         }
