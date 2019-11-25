@@ -10,7 +10,8 @@ export const dataService = {
   savePart2Data,
   savePart3Data,
   savePrescriptionData,
-  saveConfigError
+  saveConfigError,
+  audit
 };
 
 function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
@@ -121,6 +122,24 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
     .catch(function() {
       console.log('Error returning from savePrescriptionData');
     });
+}
+
+function audit(user_id, action, uri) {
+
+  console.log('Audit ' + user_id, action, uri);
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify( {user_id, action, uri})
+  };
+
+  /* return fetch(settings.baseUrl + 'audit', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    }) */
+
 }
 
 

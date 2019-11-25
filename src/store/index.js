@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { alert } from './alert.module';
 import { authentication } from './authentication.module';
 import {dataService} from "../services/data.service";
 
@@ -9,8 +8,7 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   modules: {
-    alert,
-    authentication,
+    authentication
   },
   state : {
     patientList : null,

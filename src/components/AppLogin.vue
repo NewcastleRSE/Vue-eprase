@@ -80,7 +80,7 @@
             });
         },
         onRegisterClick() {
-          window.location.href = './register'
+            this.$router.push({ path: './register' });
         },
       },
       created () {

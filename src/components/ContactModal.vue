@@ -4,21 +4,15 @@
       <div id='modalContainer'>
         <div class='modal-header'>
           <h2>
-            {{ aboutModalData.title }}
+            {{ contactModalData.title }}
           </h2>
         </div>
         <div class='modal-body'>
-          <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
-            in order to determine their usefulness and to encourage the correct use of these systems
-            and deliver improved patient outcomes.</p>
-          <p>ePRaSE has been developed by the Pharmacy Department at Newcastle University, in association with The Royal Victoria Infirmary and the NHS Trust.</p>
-          <h4>Credits</h4>
-          <p>The assessments were developed by Stephanie Klein, Jude Heed and Andrew Heed.</p>
-          <p>The ePRaSE tool was developed by Mike Simpson from the Digital Institute at Newcastle University.</p>
+         <p> Contacts for the ePrase project are: rseteam@newcastle.ac.uk</p>
 
         </div>
         <div class='modal-footer'>
-          <button type="button" class="close-btn btn btn-primary" @click="close">{{aboutModalData.closeButtonText}}</button>
+          <button type="button" class="close-btn btn btn-primary" @click="close">{{ contactModalData.closeButtonText }}</button>
         </div>
 
       </div>
@@ -31,9 +25,9 @@
     import { dataService } from '../services/data.service';
 
     export default {
-        name: "AboutModal",
+        name: "ContactModal",
         props: {
-            aboutModalData: {
+            contactModalData: {
                 title: '',
                 closeButtonText: ''
             },
@@ -41,7 +35,7 @@
         },
         methods: {
             close (){
-                dataService.audit(this.userId, 'View about', '/assessmentintro');
+                dataService.audit(this.userId, 'View contact', '/assessmentintro');
                 this.$emit('close')
             }
         }
@@ -49,6 +43,10 @@
 </script>
 
 <style scoped>
+
+  h4 {
+    margin-left: 15px;
+  }
 
   .modal-mask {
     position: fixed;
@@ -75,17 +73,12 @@
     border-radius: 25px;
   }
 
-
-  .close-btn {
-    background-color: #07818e;
-  }
-
   .modal-body {
-    padding: 30px;
+    padding: 30px 0px;
   }
 
   .modal-body p {
-    padding: 5px;
+    padding: 15px 15px;
   }
 
   .modal-footer{
@@ -94,23 +87,16 @@
     bottom: 0;
   }
 
-  #di-logo, #pharm-logo {
-    height: 50px;
-    max-width: 200px;
+  .close-btn {
+    background-color: #07818e;
   }
 
-  #nuth-logo {
-    height: 50px;
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: 0.2s opacity ease-out;
   }
 
-  #logo-bar {
-    padding-top: 20px;
-    width: 100%;
-  }
-
-  .logos {
-
-    padding-right: 70px;
-  }
 
 </style>

@@ -21,7 +21,7 @@
 <script>
 
     import { settings } from '../settings'
-    import TabHeader from './Tabheader';
+    import TabHeader from './TabHeader';
 
     export default {
         name: "LockoutScreen",

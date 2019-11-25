@@ -142,7 +142,7 @@
                 this.errors.clear();
             },
             onExitClick() {
-                window.location.href = './logout'
+                this.$router.push('/logout');
             },
             onNextClick()  {
                 this.submitted = true;

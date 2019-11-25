@@ -1,3 +1,4 @@
+import {dataService} from "./data.service";
 
 let baseURL = 'http://localhost:6001';
 
@@ -21,14 +22,20 @@ function login(username, password) {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
         localStorage.setItem('token', response.jwt.accessToken);
         localStorage.setItem('user', username);
+        localStorage.setItem('userId', response.user_id);
       }
       return response;
     });
 }
 
 function logout() {
+  // audit
+  const user_id = localStorage.getItem('userId');
+  dataService.audit(user_id, 'logout', '/logout')
   // remove all items from local storage
   localStorage.clear();
+
+
 }
 
 function handleResponse(response) {

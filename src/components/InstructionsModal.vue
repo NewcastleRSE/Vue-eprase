@@ -28,16 +28,21 @@
 </template>
 
 <script>
+
+    import { dataService } from '../services/data.service';
+
     export default {
         name: "InstructionsModal",
         props: {
             modalData: {
-                type: Object,
-                required: true
-            }
+                title: '',
+                closeButtonText: ''
+            },
+            userId: ''
         },
         methods: {
             close (){
+                dataService.audit(this.userId, 'View instructions', '/assessmentintro');
                 this.$emit('close')
             }
         }
