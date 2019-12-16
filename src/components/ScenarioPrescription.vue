@@ -248,7 +248,7 @@
 
                 // audit
                 const user_id =  this.user.user_id;
-                dataService.audit(user_id, 'Completed scenarios', '/assessmentscenarios');
+                dataService.audit('Completed scenarios', '/assessmentscenarios');
 
                 console.log(id);
                 this.$router.push('/assessmentresults/'+ id);

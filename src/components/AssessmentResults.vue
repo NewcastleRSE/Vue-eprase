@@ -239,8 +239,7 @@
                 this.part1.lab_results = data.part1.lab_results.toString();
 
                 // audit
-                const user_id =  this.user.user_id;
-                dataService.audit(user_id, 'View report', '/assessmentresults');
+                dataService.audit('View report', '/assessmentresults');
 
                 this.createResults();
             });

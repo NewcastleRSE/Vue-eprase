@@ -11,7 +11,7 @@
       <p></p>
       <h4>Instructions</h4>
       <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions system and then
-        to prescribe a series medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
+        to prescribe a series of medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
 
       <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
@@ -80,8 +80,7 @@
         },
         created : function() {
             this.checkAssessmentComplete();
-            const user_id =  this.user.user_id;
-            dataService.audit(user_id, 'View assessment intro', '/assessmentintro');
+            dataService.audit('View assessment intro', '/assessmentintro');
         },
         computed: {
             user() {
@@ -96,7 +95,7 @@
   button {
     height: 40px;
     width: 170px;
-    margin: 10px 0px;
+    margin: 10px 0;
     font-size: 1em;
     /*border-radius: 5px; */
   }

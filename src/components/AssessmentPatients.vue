@@ -98,7 +98,7 @@
 
                         // audit
                         const user_id =  this.user.user_id;
-                        dataService.audit(user_id, 'Add patient list', '/assessmentpatients');
+                        dataService.audit('Add patient list', '/assessmentpatients');
                     }
                 });
             }

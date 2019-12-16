@@ -32,8 +32,9 @@
           <div class="form-group">
             <label for="institution"> Select Institution: </label>
             <select name="singleSelect" id ="institution" v-validate="'required'" v-model="user.institution" class="form-control" >
-              <option v-for="data in institutions" v-bind:value="data.org_code">{{data.org_name}}</option>
+              <option v-for="institution in institutions" v-bind:value="institution.orgCode">{{institution.orgName}}</option>
             </select>
+
           </div>
           <p>Choose a password.</p>
           <div class="form-group">
@@ -50,7 +51,7 @@
 
           <div id="buttons" class="form-group" align="center">
             <button type="submit" class="reg-btn btn btn-primary" :disabled="isFormInvalid">Register</button>
-            <button type="button" class="btn btn-primary" @click.prevent="resetForm">Cancel</button>
+            <button type="button" class="reg-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
            <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
           </div>
         </form>
@@ -88,7 +89,7 @@
             confirmPassword: '',
           },
           submitted: false,
-          institutions: json
+          institutions: []
         }
       },
       methods: {
@@ -114,21 +115,16 @@
                 role: this.user.role
               })
                 .then(response => {
-                    // audit
-                    dataService.audit(null, 'Register', '/register');
                     this.$router.push({path: './login'})
                 })
                 .catch(error => this.errors = error.response.data)
             }
           });
-        },
-
+        }
       },
       created() {
-          this.institutions.sort(function(a, b) {
-              if(a.org_name < b.org_name) return -1;
-              if(a.org_name > b.org_name) return 1;
-              return 0;
+          dataService.getInstitutions().then(data => {
+              this.institutions = data;
           });
       }
     }

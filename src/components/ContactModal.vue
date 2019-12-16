@@ -35,7 +35,7 @@
         },
         methods: {
             close (){
-                dataService.audit(this.userId, 'View contact', '/assessmentintro');
+                dataService.audit('View contact', '/assessmentintro');
                 this.$emit('close')
             }
         }

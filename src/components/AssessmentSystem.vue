@@ -170,8 +170,7 @@
                             dispatch('savePart1Data', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
                         }
                         // audit
-                        const user_id =  this.user.user_id;
-                        dataService.audit(user_id, 'Save system data', '/assessmentSystem');
+                        dataService.audit('Save system data', '/assessmentSystem');
                     }
                 });
             }

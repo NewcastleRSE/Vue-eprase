@@ -3,7 +3,7 @@
   <div class="footer-content">
 
     <div class="footer-bar-buttons">
-      <button @click="showAboutModal = true"><font-awesome-icon icon="home"></font-awesome-icon><a href="#">About</a></button>
+      <button @click="showAboutModal = true"><font-awesome-icon icon="info-circle"></font-awesome-icon><a href="#">About</a></button>
       <button @click="showModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Instructions</a></button>
       <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">Reports</a></button>
       <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></button>

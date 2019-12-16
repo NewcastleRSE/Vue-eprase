@@ -18,12 +18,12 @@ export const authentication = {
         .then(
           user => {
             commit('loginSuccess', user);
-            dataService.audit(user.user_id, 'Successful login', '/login');
+            dataService.audit('Successful login', '/login');
             router.push('/assessmentintro');
           },
           error => {
             commit('loginFailure', error);
-            dataService.audit(user, 'Failed login', '/login');
+            dataService.audit('Failed login', '/login');
           }
         );
     },

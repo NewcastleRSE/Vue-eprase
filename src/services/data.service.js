@@ -5,6 +5,7 @@ import { router } from '../router';
 export const dataService = {
   getAssessment,
   getAssessmentPart,
+  getInstitutions,
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
@@ -123,22 +124,24 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
       console.log('Error returning from savePrescriptionData');
     });
 }
+// change to remove user_id
+function audit(action, uri) {
 
-function audit(user_id, action, uri) {
+  let token = getToken();
 
-  console.log('Audit ' + user_id, action, uri);
+  console.log('Audit ' + action, uri);
 
   const requestOptions = {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify( {user_id, action, uri})
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify( {action, uri})
   };
 
-  /* return fetch(settings.baseUrl + 'audit', requestOptions)
+   return fetch(settings.baseUrl + 'audit', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
-    }) */
+    })
 
 }
 
@@ -177,8 +180,26 @@ function getAssessment(id) {
     .catch(function() {
       console.log('Error returning from getAssessment');
     });
-
 }
+
+function getInstitutions() {
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  };
+
+  return fetch(settings.baseUrl + 'auth/institutions', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+     // console.log(response);
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getInstitutions');
+    });
+}
+
 
 function getAssessmentPart() {
 

@@ -30,9 +30,6 @@ function login(username, password) {
 }
 
 function logout() {
-  // audit
-  const user_id = localStorage.getItem('userId');
-  dataService.audit(user_id, 'logout', '/logout')
   // remove all items from local storage
   localStorage.clear();
 

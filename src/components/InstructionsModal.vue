@@ -42,7 +42,7 @@
         },
         methods: {
             close (){
-                dataService.audit(this.userId, 'View instructions', '/assessmentintro');
+                dataService.audit('View instructions', '/assessmentintro');
                 this.$emit('close')
             }
         }

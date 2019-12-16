@@ -4,10 +4,10 @@ import {router} from './router'
 import { store } from './store'
 import VeeValidate from 'vee-validate'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHome, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt} from '@fortawesome/free-solid-svg-icons'
+import { faHome, faInfoCircle, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faHome, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt);
+library.add(faHome, faInfoCircle, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 Vue.use(VeeValidate, {
