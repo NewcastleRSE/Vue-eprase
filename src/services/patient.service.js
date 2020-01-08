@@ -10,12 +10,13 @@ export const patientService = {
   getDOB,
   getNumPatients,
   getPatientIndex,
-  getTestIndex
+  getTestIndex,
+  getAllPatients
 };
 
 function setPatients() {
 
-  const patients = jsonpatients;
+  let patients = [];
   const tests = jsontests;
   const errors = jsonerrors;
   const patientList = [];
@@ -39,36 +40,45 @@ function setPatients() {
     }
   }
 
+  console.log(patientIds);
+
   // create a random point to insert a config error between 2 and 5
   let configInsert = Math.floor(Math.random() * 4) + 2;
 
   // add it into the array without deleting anything
   testList.splice(configInsert, 0, errors);
 
-  // loop through patients and set the patient list
-  for(let index in patients)
-  {
-    if(patients.hasOwnProperty(index)){
-      let id = patients[index].id;
-      if (patientIds.includes(id)){
-        patientList.push(patients[index]);
+  // returns a promise
+  getPatientDetails().then(data => {
+    patients = data;
+    // loop through patients and set the patient list
+    for(let index in patients)
+    {
+      if(patients.hasOwnProperty(index)){
+        let patientarray = patients[index];
+        let mypatient = formatData(patientarray);
+        if (patientIds.includes(mypatient.patient_id)){
+          patientList.push(mypatient);
+        }
       }
     }
-  }
 
-  for(let i = 0; i < patientList.length; i++) {
-    // fix patient DOBs
-    patientList[i].dob = patientService.getDOB(patientList[i]);
+    console.log(patientList.length);
 
-    // assign id and name to local storage
-    let myid = patientList[i].id;
-    let myname = patientList[i].first_name + ' ' + patientList[i].surname;
-    localStorage.setItem(myid, myname);
-  }
+    for(let i = 0; i < patientList.length; i++) {
+      // fix patient DOBs
+      patientList[i].dob = patientService.getDOB(patientList[i]);
 
-  localStorage.setItem('numPatients', patientList.length);
-  store.dispatch('setPatientList', { patientList, patientIds, testList });
+      // assign id and name to local storage
+      let myid = patientList[i].id;
+      let myname = patientList[i].first_name + ' ' + patientList[i].surname;
+      localStorage.setItem(myid, myname);
+    }
 
+    localStorage.setItem('numPatients', patientList.length);
+    store.dispatch('setPatientList', { patientList, patientIds, testList });
+
+  });
 }
 
 function getDOB(patient) {
@@ -100,6 +110,48 @@ function getDOB(patient) {
   return dd + '/' + mm + '/' + yyyy;
 }
 
+function getAllPatients() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'patients', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getAllPatients');
+    });
+}
+
+function getPatientDetails() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'patientdetails', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getPatientDetails');
+    });
+}
+
+function getToken(){
+  return localStorage.getItem('token');
+}
+
 function getPatients() {
   return store.state.patientList;
 }
@@ -114,5 +166,38 @@ function getNumPatients() {
 
 function getTestIndex() {
   return store.state.testIndex;
+}
+
+function handleResponse(response) {
+  return response.text().then(text => {
+    const data = text && JSON.parse(text);
+    if (!response.ok) {
+      if (response.status === 401) {
+        // auto logout if 401 response returned from api
+        logout();
+        location.reload(true);
+      }
+
+      const error = (data && data.message) || response.statusText;
+      return Promise.reject(error);
+    }
+
+    return data;
+  });
+}
+
+function formatData(patientarray){
+
+  let patient = {
+    patient_id: patientarray[0],
+    first_name : patientarray[1],
+    surname : patientarray[2],
+    age : patientarray[3],
+    gender : patientarray[4]
+  }
+
+  console.log(patient);
+  return patient;
+
 }
 
