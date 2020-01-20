@@ -12,6 +12,8 @@
 
       <div v-for="patient in myPatientList">
 
+        {{ patient[getCurrentPatient].medication_histories}}
+
         <div align="center" class="card">
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
@@ -44,16 +46,16 @@
 
               <div class="patient-info">
 
-                <div align="left" v-if="patient[getCurrentPatient].allergies.length !== 0">
+               <div align="left" v-if="patient[getCurrentPatient].allergy.length !== 0">
                   <h5 class="card-title">Allergies</h5>
                   <table>
-                    <tr v-for="allergy in patient[0].allergies">
+                    <tr v-for="allergy in patient[getCurrentPatient].allergy">
                       <td>{{allergy}}</td>
                     </tr>
                   </table>
                 </div>
 
-                <div align="left" v-if="patient[getCurrentPatient].allergies.length == 0">
+                <div align="left" v-if="patient[getCurrentPatient].allergy.length == 0">
                   <h5 class="card-title">Allergies</h5>
                   <table>
                     <tr>
@@ -62,16 +64,16 @@
                   </table>
                 </div>
 
-                <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
                   <h5 class="card-title">Diagnosis</h5>
                   <table>
-                    <tr v-for="diagnosis in patient[0].diagnosis">
+                    <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
                       <td>{{diagnosis}}</td>
                     </tr>
                   </table>
                 </div>
 
-                <div align="left"  v-if="patient[getCurrentPatient].medication_history.length != 0">
+                <div align="left"  v-if="patient[getCurrentPatient].medication_histories.length != 0">
                   <h5 class="card-title">Current Medication</h5>
                   <table>
                     <tr>
@@ -81,7 +83,7 @@
                       <td><strong>Form</strong></td>
                       <td><strong>Frequency</strong></td>
                     </tr>
-                    <tr v-for="history in patient[getCurrentPatient].medication_history">
+                    <tr v-for="history in patient[getCurrentPatient].medication_histories">
                       <td>{{history.name}}</td>
                       <td>{{history.dose}} {{history.units}}</td>
                       <td>{{history.route}}</td>
@@ -96,7 +98,7 @@
 
             <div class="right-col">
 
-              <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
+            <!--  <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
                 <h5 class="card-title">Clinical Data</h5>
                 <table>
                   <tr>
@@ -108,7 +110,7 @@
                     <td>{{clinical.value}}</td>
                   </tr>
                 </table>
-              </div>
+              </div> -->
               <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].id" />
             </div>
 

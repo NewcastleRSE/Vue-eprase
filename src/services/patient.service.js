@@ -49,7 +49,7 @@ function setPatients() {
   testList.splice(configInsert, 0, errors);
 
   // returns a promise
-  getPatientDetails().then(data => {
+  getAllPatients().then(data => {
     patients = data;
     // loop through patients and set the patient list
     for(let index in patients)
@@ -62,7 +62,6 @@ function setPatients() {
         }
       }
     }
-
     console.log(patientList.length);
 
     for(let i = 0; i < patientList.length; i++) {
@@ -70,7 +69,7 @@ function setPatients() {
       patientList[i].dob = patientService.getDOB(patientList[i]);
 
       // assign id and name to local storage
-      let myid = patientList[i].id;
+      let myid = patientList[i].patient_id;
       let myname = patientList[i].first_name + ' ' + patientList[i].surname;
       localStorage.setItem(myid, myname);
     }
@@ -186,18 +185,78 @@ function handleResponse(response) {
   });
 }
 
-function formatData(patientarray){
+function formatPartialData(patientarray){
 
   let patient = {
     patient_id: patientarray[0],
     first_name : patientarray[1],
     surname : patientarray[2],
     age : patientarray[3],
-    gender : patientarray[4]
-  }
+    gender : patientarray[4],
+    height : patientarray[5],
+    weight: patientarray[6],
+    is_adult: patientarray[7]
+  };
 
   console.log(patient);
   return patient;
 
 }
+
+function formatData(patientarray){
+
+  let patient = {
+    patient_id: patientarray['patient_id'],
+    first_name : patientarray['first_name'],
+    surname : patientarray['surname'],
+    age : patientarray['age'],
+    gender : patientarray['gender'],
+    height : patientarray['height'],
+    weight: patientarray['weight'],
+    is_adult: patientarray['is_adult'],
+    allergy: formatAllergy(patientarray['allergy']),
+    diagnosis: formatDiagnosis(patientarray['diagnosis']),
+    medication_histories: patientarray['medication_histories']
+  };
+  return patient;
+}
+
+function formatAllergy(allergy){
+  let allergyArray = [];
+  for(let index in allergy){
+    allergyArray.push(allergy[index].allergy);
+  }
+  return allergyArray;
+}
+
+function formatDiagnosis(diagnosis){
+  let diagnosisArray = [];
+
+  for(let index in diagnosis){
+    diagnosisArray.push(diagnosis[index].diagnosis);
+  }
+  return diagnosisArray;
+}
+
+function formatMedicationHistories(medication_histories){
+  let medicationHistoriesArray = {
+    name : '',
+    dose : '',
+    units: '',
+    route: '',
+    form : '',
+    frequency : ''
+  };
+
+  for(let index in medication_histories){
+    medicationHistoriesArray.name = medication_histories[index].medication_histories['name'];
+    medicationHistoriesArray.dose = medication_histories[index].medication_histories['dose'];
+
+  }
+
+  console.log(medicationHistoriesArray);
+  return medicationHistoriesArray;
+}
+
+
 
