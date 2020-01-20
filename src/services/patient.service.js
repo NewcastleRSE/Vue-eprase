@@ -216,7 +216,8 @@ function formatData(patientarray){
     is_adult: patientarray['is_adult'],
     allergy: formatAllergy(patientarray['allergy']),
     diagnosis: formatDiagnosis(patientarray['diagnosis']),
-    medication_histories: patientarray['medication_histories']
+    medication_histories: patientarray['medication_histories'],
+    clinical_data : patientarray['clinical_data']
   };
   return patient;
 }
@@ -238,6 +239,7 @@ function formatDiagnosis(diagnosis){
   return diagnosisArray;
 }
 
+/*
 function formatMedicationHistories(medication_histories){
   let medicationHistoriesArray = {
     name : '',
@@ -251,12 +253,11 @@ function formatMedicationHistories(medication_histories){
   for(let index in medication_histories){
     medicationHistoriesArray.name = medication_histories[index].medication_histories['name'];
     medicationHistoriesArray.dose = medication_histories[index].medication_histories['dose'];
-
   }
 
   console.log(medicationHistoriesArray);
   return medicationHistoriesArray;
-}
+} */
 
 
 

@@ -12,8 +12,6 @@
 
       <div v-for="patient in myPatientList">
 
-        {{ patient[getCurrentPatient].medication_histories}}
-
         <div align="center" class="card">
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
@@ -26,7 +24,6 @@
             </span>
             <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
           </div>
-
 
           <div class="card-body">
 
@@ -98,7 +95,7 @@
 
             <div class="right-col">
 
-            <!--  <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
+              <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
                 <h5 class="card-title">Clinical Data</h5>
                 <table>
                   <tr>
@@ -110,8 +107,8 @@
                     <td>{{clinical.value}}</td>
                   </tr>
                 </table>
-              </div> -->
-              <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].id" />
+              </div>
+              <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].patient_id" />
             </div>
 
 
