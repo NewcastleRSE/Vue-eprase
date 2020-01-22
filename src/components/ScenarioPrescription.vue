@@ -10,64 +10,98 @@
         <p><strong>Patient:</strong> {{ getCurrentPatient }} </p>
 
         <table id="test-patient">
-          <tr>
-            <th>Drug</th>
-            <th>Dose</th>
-            <th>Route</th>
-            <th>Frequency</th>
-            <th>Duration</th>
-          </tr>
-          <tr>
-            <td>{{prescription.drug_name}}</td>
-            <td>{{prescription.drug_dose}}</td>
-            <td>{{prescription.route}}</td>
-            <td>{{prescription.drug_frequency}}</td>
-            <td>{{prescription.duration}}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>Drug</th>
+              <th>Dose</th>
+              <th>Route</th>
+              <th>Frequency</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{prescription.drug_name}}</td>
+              <td>{{prescription.drug_dose}}</td>
+              <td>{{prescription.route}}</td>
+              <td>{{prescription.drug_frequency}}</td>
+              <td>{{prescription.duration}}</td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <div>
         <div class="questionnaire">
           <h4>Questions</h4>
-          <div class="question" id="question-1">
-            <label for="selector-1">What of the following best describes the response from the system when you attempted to prescribe the specified drug?</label>
-            <select name="singleSelect" id="selector-1" class="form-control" v-model="response.outcomes" v-validate="{required: true, min: 1 }" >
-              <option value="" >Select an Response...</option>
-              <option v-for="response in outcomeResponses" :value="response.display">{{response.display}}</option>
-            </select>
+          <div class="question form-group" id="question-1">
+            <div class="outcomes">Which of the following best describes the response from the system when you attempted to prescribe the specified drug?</div>
+
+              <div class="radio-buttons">
+                <div>
+                   <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes">
+                   <label for="no-intervention">You were able to complete the prescription <strong><em>without</em></strong> any additional user or system input (includes followed order sentence)</label>
+                </div>
+                <div>
+                   <input type="radio" name="outcome-radios" value="order-set-not-followed" id="order-set-not-followed" v-model="response.outcomes">
+                   <label for="order-set-not-followed">Order set provided, but you were able to override to complete the prescription</label>
+                </div>
+                <div>
+                   <input type="radio" name="outcome-radios" value="intervention" id="intervention" v-model="response.outcomes">
+                   <label for="intervention">Prescription completed <strong><em>with</em></strong> system/user intervention</label>
+                </div>
+                <div>
+                   <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented" v-model="response.outcomes">
+                   <label for="order-prevented">Prescribing prevented (includes order sentence, provided that you were <strong><em>unable to overrride</em></strong>)</label></div>
+                <div>
+                   <input type="radio" name="outcome-radios" value="not-available" id="not-available" v-model="response.outcomes">
+                   <label for="not-available">Medicine or formulary alternative not available in the system</label>
+                </div>
+             </div>
 
           </div>
-          <div v-show="response.outcomes === 'Intervention'" class="question" id="question-2">
-            <p>What was the stated reason(s) for the intervention? Please choose any that apply.</p>
+          <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
+            <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert (interruptive type, maybe a pop-up that requires  action) OR advisory (passive dialogue, maybe a banner message on the bottom of the screen) you would expect.</div>
+            <p>What was the stated reason(s) for the intervention? Please choose <strong>one</strong>.</p>
 
-            <div class="intervention bottom-border" v-for="check in checkBoxList">
-              <label>{{check.name}}</label>
-              <input type="checkbox" :value="check.name" v-model="check.selected">
 
-              <div v-show="check.name === 'Other Please Specify' && check.selected" id="response-other">
+            <table id="drug-table" class="table-striped">
+              <tbody>
+              <tr><td><input type="radio" name="advice-radios" value="drug-age" id="drug-age" v-model="response.intervention_type"></td><td><label for="drug-age">Drug and patient age</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-dose" id="drug-dose" v-model="response.intervention_type"></td><td><label for="drug-dose">Drug dose level</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-interaction" id="drug-interaction" v-model="response.intervention_type"></td><td> <label for="drug-interaction">Drug interaction</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-allergies" id="drug-allergies" v-model="response.intervention_type"></td><td> <label for="drug-allergies">Drug allergies</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label for="drug-duplication">Drug duplication</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label for="drug-disease">Drug disease</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label for="drug-ommissions">Drug omissions</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label for="theraputic_duplication">Theraputic duplication</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label for="drug-lab">Lab results/monitoring/TDM</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label for="drug-route">Drug brand</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label for="drug-route">Incorrect route</label></td></tr>
+              <tr><td><input type="radio" name="advice-radios" value="other" id="other" v-model="response.intervention_type"></td><td><label for="other">Other Please Specify</label></td></tr>
+              </tbody>
+            </table>
+
+            <div v-show="response.intervention_type === 'other' && response.intervention_type" id="response-other">
                 <label for="advice-other"> Other: </label>
                 <input type="text" id="advice-other" class="form-control" v-model="response.other" minlength="3" maxlength="50">
                 <div v-if="response.other.invalid && response.other.touched" class="alert alert-danger">
                   Other is required with a minimum of 3 characters
                 </div>
               </div>
-            </div>
-
           </div>
-          <div v-show="response.outcomes === 'Intervention'" class="question" id="question-3">
-            <label for="selector-2">Were you given any option to override and complete the prescription?</label>
-            <select name="singleSelect" id="selector-2" class="form-control" v-model="response.overrides">
-              <option value="">Select an Response...</option>
-              <option v-for="response in interventionOverrides" :value="response.display">{{response.display}}</option>
+
+          <div class="intervention-select">
+            <select v-show="response.intervention_type !== ''" class="form-control" v-model="selected_type" >
+              <option value="null">Please select a type...</option>
+              <option value="alert">Alert</option>
+              <option value="advisory">Advisory</option>
             </select>
           </div>
+
+
           <div class="assessment">
             <div>
-              <label for="patient-intervention">Note any intervention from the system using the box below.</label>
-              <div class="alert alert-warning" role="alert">
-                To optimise the use of this tool please record ALL types of guidance that appears on your system screen
-              </div>
-              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
+              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Note any intervention from the system..." maxlength="500"></textarea>
             </div>
           </div>
 
@@ -93,10 +127,6 @@
 
 <script>
 
-    import jsoninterventions from '../json/interventions.json';
-    import jsonoutcomes from '../json/outcomes.json';
-    import jsonoverrides from '../json/overrides.json';
-    import jsoncheckboxes from '../json/checkboxes.json';
     import { dataService } from '../services/data.service';
     import { settings } from '../settings'
 
@@ -113,7 +143,7 @@
                 return prescription.testList[this.getPresTestIndex];
             },
             getCurrentPatient() {
-                let testPatientId = this.prescription.patient_id;
+                let testPatientId = this.prescription['patient'].patient_id;
                 return localStorage.getItem(testPatientId);
             },
             isFormInvalid() {
@@ -135,17 +165,13 @@
                 response: {
                     outcomes: '',
                     other: '',
-                    overrides: '',
                     time_taken: '',
                     test_id : '',
                     risk_score : '',
-                    interventions : [],
+                    intervention_type : '',
+                    selected_type: '',
                     qualitative_data : ''
                 },
-                outcomeResponses: jsonoutcomes,
-                interventionDetails: jsoninterventions,
-                interventionOverrides: jsonoverrides,
-                checkBoxList: jsoncheckboxes,
                 result_score : null,
                 showInterventions: false,
                 completed: false,
@@ -180,27 +206,23 @@
             getResultScore() {
 
                 // get outcomes scoring
-                if (this.response.outcomes === 'Intervention') {
-                    this.result_score += settings.outcomeIntervention;
+                if (this.response.outcomes === 'intervention') {
+                    this.result_score += settings.intervention;
                 }
-                else if (this.response.outcomes === 'Unable to Initiate Order'){
-                    this.result_score += settings.outcomeUnableToInitiate;
+                else if (this.response.outcomes === 'order-prevented'){
+                    this.result_score += settings.orderPrevented;
                 }
-                else {
-                    this.result_score += 0;
+                else if(this.response.overrides === 'no-intervention'){
+                    this.result_score += settings.noIntervention;
                 }
-                console.log('Result score after outcome ' + this.result_score);
-                // get overrides scoring
-                if(this.response.overrides === 'Unable to Override'){
-                    this.result_score += settings.unableToOverride;
+                else if (this.response.overrides === 'order-set-not-followed'){
+                    this.result_score += settings.orderSetNotFollowed;
                 }
-                else if (this.response.overrides !== ''){
-                    this.result_score += settings.defaultOverride;
+                else if (this.response.overrides === 'not-available'){
+                  this.result_score = 0;
                 }
-                else {
-                    this.result_score += 0;
-                }
-                console.log('Result score after override ' + this.result_score);
+
+                console.log('Result score ' + this.result_score);
                 return this.result_score;
             },
             onNextClick()  {
@@ -223,7 +245,7 @@
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
                         const risk_score = this.response.risk_score;
-                        const assessmentResponses = this.getInterventions();
+                        //const assessmentResponses = this.getInterventions();
                         const result_score = this.getResultScore();
                         const index = this.getPresTestIndex;
                         const completed = this.completed;
@@ -317,6 +339,10 @@
     margin-bottom: 40px;
   }
 
+  .outcomes {
+    padding-bottom: 20px;
+    font-weight: bold;
+  }
 
   .question p {
     margin-top: 20px;
@@ -326,6 +352,7 @@
 
   #question-2 {
     padding-bottom: 30px;
+    text-align: left;
   }
 
   #question-2 p {
@@ -338,13 +365,13 @@
     margin-top: 20px;
     margin-bottom: 20px;
     width: 100%;
-    border: 1px solid #6b9bc7;
+    border: 1px solid #b0aeb2;
     border-collapse: collapse;
   }
 
   #test-patient th {
     border:  1px solid #7f7d81;
-    background-color: #e9e9e9;
+    background-color: #ffffff;
     padding: 5px;
   }
 
@@ -353,15 +380,11 @@
     font-size: 16px;
     background-color: #f5f5f5;
     padding: 5px;
-    border:  1px solid #7f7d81;
+    border:  1px solid #b0aeb2;
   }
-
-  #selector-1, #selector-2 {
-    width: 250px;
-  }
-
-  #selector-2 {
-    width: 280px;
+  #drug-table td{
+    text-align: left;
+    padding: 3px 5px 3px 5px;
   }
 
   td {
@@ -371,7 +394,7 @@
   }
 
   .question table {
-    width: auto;
+    width: 100%;
   }
 
   .question td {
@@ -428,31 +451,16 @@
 
   label {
     text-align: left;
-    max-width: 550px;
+    padding-left: 10px;
+  }
+
+  .intervention-select {
+    padding-bottom: 50px;
   }
 
   select {
-    width: 200px;
+    width: 220px;
     float: right;
-  }
-
-  .intervention {
-    text-align: left;
-    padding: 5px 0px;
-    /* border-bottom: 1px solid #c2c2c2; */
-    max-width: 95%;
-  }
-
-  .intervention label {
-    max-width: 300px;
-    margin-bottom: 0;
-    line-height: 1.2em;
-  }
-
-  .intervention input[type=checkbox] {
-    height: 12px;
-    position: absolute;
-    left: 50%;
   }
 
   #response-other {
@@ -477,7 +485,7 @@
   .alert-warning {
     background-color: #f6ecb8;
     border-color: #ffd47d;
-    height: 50px;
+    height: 100px;
     padding: 15px;
     margin-bottom: 20px;
     width: 100%;

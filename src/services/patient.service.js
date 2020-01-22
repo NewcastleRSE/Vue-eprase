@@ -11,13 +11,70 @@ export const patientService = {
   getNumPatients,
   getPatientIndex,
   getTestIndex,
-  getAllPatients
+  getAllPatients,
+  getPatientTests,
+  setPatientsInStore
 };
+
+function setPatientsInStore() {
+
+  let patients = [];
+  let tests = [];
+  let tempList = [];
+  let testList = [];
+  const errors = jsonerrors;
+  const patientList = [];
+  const patientIds = [];
+  const patientIndex = [];
+
+  // get all the patients
+  // returns a promise
+  getAllPatients().then(data => {
+    patients = data;
+    // loop through patients and set the patient list
+    for(let index in patients) {
+      if(patients.hasOwnProperty(index)){
+        let patientarray = patients[index];
+        let mypatient = formatData(patientarray);
+        patientList.push(mypatient);
+        patientIds.push(patients[index].patient_id);
+      }
+
+      // increment to get valid patient ids
+      if(patients.hasOwnProperty(index)){
+        index++;
+        getPatientTests(index).then(data => {
+          tempList = data;
+          for(let i = 0; i < tempList.length; i++){
+             testList.push(tempList[i]);
+          }
+          store.dispatch('setTestList', { testList});
+        });
+      }
+    }
+
+    for(let i = 0; i < patientList.length; i++) {
+      // fix patient DOBs
+      patientList[i].dob = patientService.getDOB(patientList[i]);
+
+      // assign id and name to local storage
+      let myid = patientList[i].patient_id;
+      let myname = patientList[i].first_name + ' ' + patientList[i].surname;
+      localStorage.setItem(myid, myname);
+    }
+
+    //console.log(patientIds);
+    //console.log(patientList);
+
+    localStorage.setItem('numPatients', patientList.length);
+    store.dispatch('setPatientList', { patientList, patientIds});
+  });
+}
 
 function setPatients() {
 
   let patients = [];
-  const tests = jsontests;
+  let tests = [];
   const errors = jsonerrors;
   const patientList = [];
   const patientIds = [];
@@ -147,6 +204,25 @@ function getPatientDetails() {
     });
 }
 
+function getPatientTests(index) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'prescriptions?ID=' + index, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getPatientTests');
+    });
+}
+
 function getToken(){
   return localStorage.getItem('token');
 }
@@ -225,39 +301,41 @@ function formatData(patientarray){
 function formatAllergy(allergy){
   let allergyArray = [];
   for(let index in allergy){
-    allergyArray.push(allergy[index].allergy);
+    if(allergy.hasOwnProperty(index)){
+      allergyArray.push(allergy[index].allergy);
+    }
   }
   return allergyArray;
 }
 
-function formatDiagnosis(diagnosis){
+function formatDiagnosis(diagnosis) {
   let diagnosisArray = [];
-
-  for(let index in diagnosis){
-    diagnosisArray.push(diagnosis[index].diagnosis);
+  for (let index in diagnosis) {
+    if (diagnosis.hasOwnProperty(index)) {
+      diagnosisArray.push(diagnosis[index].diagnosis);
+    }
   }
   return diagnosisArray;
 }
 
-/*
-function formatMedicationHistories(medication_histories){
-  let medicationHistoriesArray = {
-    name : '',
-    dose : '',
-    units: '',
-    route: '',
-    form : '',
-    frequency : ''
+function formatTestList(testList){
+
+  let test = {
+    id: testList['id'],
+    patient_id : testList['patient'].patient_id,
+    prescription_id : testList['prescription_id'],
+    description : testList['indicator'].description,
+    risk_score : testList['risk_score'],
+    drug_name : testList['drug_name'],
+    drug_dose : testList['drug_dose'],
+    route: testList['route'],
+    duration: testList['duration'],
+    drug_frequency: testList['drug_frequency']
   };
+  //console.log(test);
+  return test;
 
-  for(let index in medication_histories){
-    medicationHistoriesArray.name = medication_histories[index].medication_histories['name'];
-    medicationHistoriesArray.dose = medication_histories[index].medication_histories['dose'];
-  }
-
-  console.log(medicationHistoriesArray);
-  return medicationHistoriesArray;
-} */
+}
 
 
 

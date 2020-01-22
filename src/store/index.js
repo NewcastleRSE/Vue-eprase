@@ -24,8 +24,10 @@ export const store = new Vuex.Store({
     lab_results : null
   },
   actions : {
-    setPatientList({ commit }, { patientList, testList } ) {
+    setPatientList({ commit }, { patientList  } ) {
       commit('setPatientList', { patientList });
+    },
+    setTestList({ commit }, { testList}){
       commit('setTestList', { testList });
     },
     savePart1Data({ commit }, { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
