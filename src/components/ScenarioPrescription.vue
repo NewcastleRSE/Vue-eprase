@@ -90,12 +90,16 @@
               </div>
           </div>
 
-          <div class="intervention-select">
-            <select v-show="response.intervention_type !== ''" class="form-control" v-model="response.selected_type" >
+          <div class="intervention-select" v-show="response.intervention_type !== ''">
+
+            <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
+
               <option value="null">Please select a type...</option>
               <option value="alert">Alert</option>
               <option value="advisory">Advisory</option>
             </select>
+
+            <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
           </div>
 
 
