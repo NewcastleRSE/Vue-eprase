@@ -93,6 +93,10 @@
 
 <style scoped>
 
+  #page {
+    text-align: center;
+  }
+
   h1 {
     font-size: 30px;
   }

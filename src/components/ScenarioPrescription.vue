@@ -3,7 +3,7 @@
   <div >
     <div id="test-scenario">
 
-      <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_score}}></p>
+      <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_level}}></p>
 
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
@@ -42,8 +42,8 @@
                    <label for="no-intervention">You were able to complete the prescription <strong><em>without</em></strong> any additional user or system input (includes followed order sentence)</label>
                 </div>
                 <div>
-                   <input type="radio" name="outcome-radios" value="order-set-not-followed" id="order-set-not-followed" v-model="response.outcomes">
-                   <label for="order-set-not-followed">Order set provided, but you were able to override to complete the prescription</label>
+                   <input type="radio" name="outcome-radios" value="order-set-not-followed" id="order-set-overridden" v-model="response.outcomes">
+                   <label for="order-set-overridden">Order set provided, but you were able to override to complete the prescription</label>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="intervention" id="intervention" v-model="response.outcomes">
@@ -61,7 +61,7 @@
           </div>
           <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
             <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert (interruptive type, maybe a pop-up that requires  action) OR advisory (passive dialogue, maybe a banner message on the bottom of the screen) you would expect.</div>
-            <p>What was the stated reason(s) for the intervention? Please choose <strong>one</strong>.</p>
+            <p>What was the stated reason for the intervention? Please choose <strong>one</strong>.</p>
 
 
             <table id="drug-table" class="table-striped">
@@ -110,8 +110,8 @@
           </div>
 
           <input type="hidden" id="test_id" v-model="response.test_id=prescription.id" />
-          <input type="hidden" id="result_score" v-model="response.result_score=getResultScore" />
-          <input type="hidden" id="risk_score" v-model="response.risk_score=prescription.risk_score" />
+          <input type="hidden" id="result_score" v-model="response.result_score=getResult" />
+          <input type="hidden" id="risk_level" v-model="response.risk_level=prescription.risk_level" />
 
         </div>
       </div>
@@ -171,12 +171,13 @@
                     other: '',
                     time_taken: '',
                     test_id : '',
-                    risk_score : '',
+                    risk_level: '',
                     intervention_type : '',
                     selected_type: '',
                     qualitative_data : ''
                 },
-                result_score : null,
+                result : null,
+                result_score : '',
                 showInterventions: false,
                 completed: false,
                 nextEnabled: true,
@@ -188,7 +189,7 @@
         methods : {
             getInterventions() {
 
-                this.result_score = this.prescription.risk_score;
+             /*  this.result_score = this.prescription.risk_score;
                 console.log('Risk score ' + this.result_score);
 
                 for (let index in this.checkBoxList) {
@@ -204,34 +205,81 @@
                     }
                 }
                 console.log('Result score after interventions ' + this.result_score);
-                return this.response.interventions;
+                return this.response.interventions; */
 
             },
-            getResultScore() {
+            getResult(risk_level, outcome) {
 
-                // get outcomes scoring
-                if (this.response.outcomes === 'intervention') {
-                    this.result_score += settings.intervention;
+                console.log('Risk level is ' + risk_level);
+                console.log('Outcome is ' + outcome);
+                let result = '';
+
+                // get outcome and result_score
+                // if no drug is available, don't bother with the risk level, as all results are null
+                if (outcome === 'not-available'){
+                    result = 'Null';
                 }
-                else if (this.response.outcomes === 'order-prevented'){
-                    this.result_score += settings.orderPrevented;
+                else if(risk_level === 'Extreme'){
+
+                    if(outcome === 'no-intervention'){
+                      result = 'No Mitigation/Fail';
+                    }
+                    else if (outcome === 'order-prevented'){
+                      result = 'Good Mitigation/Pass';
+                    }
+                    else if (outcome === 'order-set-overridden' || outcome === 'intervention'){
+                      result = 'Some Mitigation';
+                    }
                 }
-                else if(this.response.overrides === 'no-intervention'){
-                    this.result_score += settings.noIntervention;
+                else if(risk_level === 'High'){
+
+                    if(outcome === 'no-intervention'){
+                      result = 'No Mitigation/Fail';
+                    }
+                    else if (outcome === 'order-prevented'){
+                      result = 'Over Mitigation';
+                    }
+                    else if (outcome === 'order-set-overridden' || outcome === 'intervention'){
+                     result = 'Good Mitigation/Pass';
+                    }
                 }
-                else if (this.response.overrides === 'order-set-not-followed'){
-                    this.result_score += settings.orderSetNotFollowed;
-                }
-                else if (this.response.overrides === 'not-available'){
-                  this.result_score = 0;
+                else if(risk_level === 'Low'){
+
+                    if(outcome === 'no-intervention'){
+                      result = 'Good Mitigation/Pass';
+                    }
+                    else if (outcome === 'order-prevented'){
+                      result = 'Over Mitigation';
+                    }
+                    else if (outcome === 'order-set-overridden' || outcome === 'intervention'){
+                      result = 'Over Mitigation';
+                    }
                 }
 
-                console.log('Result score ' + this.result_score);
-                return this.result_score;
+                return result;
+            },
+            getResultScore(result) {
+
+                let result_score = 0;
+
+                if (result === 'Over Mitigation'){
+                    result_score = 15;
+                }
+                if(result === 'Good Mitigation/Pass'){
+                    result_score = 10;
+                }
+                else if (result === 'Some Mitigation'){
+                    result_score = 5;
+                }
+                else if (result === 'No Mitigation/Fail'){
+                    result_score = 1;
+                }
+                return result_score;
             },
             onNextClick()  {
-               this.saveData();
-                this.$router.push('/assessmentscenarios');
+                this.saveData();
+              // catch is needed as router keeps going to the same location and causes error
+                this.$router.push('/assessmentscenarios').catch(err => {});
             },
             saveData() {
                 this.submitted = true;
@@ -245,18 +293,18 @@
                         const test_id = this.response.test_id;
                         const outcome = this.response.outcomes;
                         const other = this.response.other;
-                        const override = this.response.overrides;
+                        const intervention_type = this.response.intervention_type;
+                        const selected_type = this.response.selected_type;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
-                        const risk_score = this.response.risk_score;
-                        //const assessmentResponses = this.getInterventions();
-                        const result_score = this.getResultScore();
+                        const risk_level = this.prescription.risk_level;
+                        const result = this.getResult(risk_level, outcome);
+                        const result_score = this.getResultScore(result);
                         const index = this.getPresTestIndex;
                         const completed = this.completed;
-
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, index, completed });
+                            dispatch('savePrescriptionData', {test_id, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
@@ -290,11 +338,13 @@
             },
             resetDataFields() {
                 this.response.outcomes = '';
-                this.response.overrides = '';
-                this.response.qualitative_data = '';
-                this.response.interventions = [];
                 this.response.other = '';
-                this.result_score = null;
+                this.response.risk_level = '';
+                this.response.intervention_type = '';
+                this.response.selected_type = '';
+                this.response.qualitative_data = '';
+                this.test_id = '';
+              //  this.result_score = null;
             }
         },
         created : function() {

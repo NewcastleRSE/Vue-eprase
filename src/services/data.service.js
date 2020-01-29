@@ -85,7 +85,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     });
 }
 
-function savePrescriptionData(test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses){
+function savePrescriptionData(test_id, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -93,7 +93,7 @@ function savePrescriptionData(test_id, outcome, other, override, risk_score, res
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ test_id, outcome, other, override, risk_score, result_score, time_taken, qualitative_data, assessmentResponses })
+    body: JSON.stringify({test_id, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
   return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId, requestOptions)

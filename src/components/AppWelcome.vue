@@ -47,6 +47,10 @@
 
 <style scoped>
 
+  #page {
+    text-align: center;
+  }
+
   .eprase-logo {
     height: 85px;
   }

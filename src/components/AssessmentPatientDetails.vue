@@ -186,7 +186,8 @@
             },
             onNextClick()  {
                 this.saveData();
-                this.$router.push('/assessmentpatientdetails');
+                // catch is needed as router keeps going to the same location and causes error
+                this.$router.push('/assessmentpatientdetails').catch(err => {});
             },
             onDoneClick() {
                 const unlockTime = new Date();
