@@ -42,7 +42,7 @@
                    <label for="no-intervention">You were able to complete the prescription <strong><em>without</em></strong> any additional user or system input (includes followed order sentence)</label>
                 </div>
                 <div>
-                   <input type="radio" name="outcome-radios" value="order-set-not-followed" id="order-set-overridden" v-model="response.outcomes">
+                   <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden" v-model="response.outcomes">
                    <label for="order-set-overridden">Order set provided, but you were able to override to complete the prescription</label>
                 </div>
                 <div>
