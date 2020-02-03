@@ -127,7 +127,7 @@
       <div class="form-group footer" align="center">
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
-          <button id="exit-button" type="button" class="exit-btn btn btn-primary" @click="onExitClick()">Exit</button>
+          <button v-show='doneEnabled' id="exit-button" type="button" class="exit-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary" @click="onNextClick()">Next</button>
           <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary" @click="onDoneClick()">Done</button>
         </div>

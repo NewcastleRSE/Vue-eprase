@@ -38,7 +38,7 @@
 
               <div class="radio-buttons">
                 <div>
-                   <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes">
+                   <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes"  v-validate="'required'" >
                    <label for="no-intervention">You were able to complete the prescription <strong><em>without</em></strong> any additional user or system input (includes followed order sentence)</label>
                 </div>
                 <div>
@@ -93,8 +93,6 @@
           <div class="intervention-select" v-show="response.intervention_type !== ''">
 
             <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
-
-              <option value="null">Please select a type...</option>
               <option value="alert">Alert</option>
               <option value="advisory">Advisory</option>
             </select>
@@ -151,7 +149,14 @@
                 return localStorage.getItem(testPatientId);
             },
             isFormInvalid() {
-                return Object.keys(this.fields).some(key => this.fields[key].invalid);
+
+              if(!this.response.outcomes){
+                return true;
+              }
+              else if(this.response.outcomes === 'intervention' && !this.intervention_type && !this.response.selected_type){
+                return true
+              }
+
             },
             getPresTestIndex() {
                 return this.$store.state.testIndex;
