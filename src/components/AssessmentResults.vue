@@ -36,24 +36,10 @@
         </div>
         <h3>Summary Results</h3>
         <div class="results-summary">
-          <table>
-            <tr><th>Category</th><th>Description</th></tr>
-            <tr v-for="score in scores">
-              <td class="category">{{ score.category }}</td>
-              <td class="description"><img v-if="score.resultAverage >= 8   &&  score.resultAverage  <= 10" src="../assets/smiley5.jpg" title="5"  class="smiley">
-                <img v-if="score.resultAverage >= 5   &&  score.resultAverage  <= 7"  src="../assets/smiley4.jpg" title="4"  class="smiley">
-                <img v-if="score.resultAverage >= 2   &&  score.resultAverage  <= 4"  src="../assets/smiley3.jpg" title="3"  class="smiley">
-                <img v-if="score.resultAverage >= -1  &&  score.resultAverage  <= 1"  src="../assets/smiley2.jpg" title="2"  class="smiley">
-                <img v-if="score.resultAverage >= -4  &&  score.resultAverage  <= -2" src="../assets/smiley3.jpg" title="3"  class="smiley">
-                <img v-if="score.resultAverage >= -7  &&  score.resultAverage  <= -5" src="../assets/smiley4.jpg" title="4"  class="smiley">
-                <img v-if="score.resultAverage >= -10 &&  score.resultAverage  <= -8" src="../assets/smiley5.jpg" title="5"  class="smiley">
-                <span v-if="score.resultAverage > 6  &&  score.resultAverage <= 10">Your system is not correctly mitigating the risk of erroneous prescriptions.</span>
-                <span v-if="score.resultAverage > 2  &&  score.resultAverage <= 6">Your system may be failing to mitigate the risk of some erroneous prescriptions.</span>
-                <span v-if="score.resultAverage >= -2  &&  score.resultAverage <= 2">Your system appears to be handling correct and incorrect prescriptions appropriately.</span>
-                <span v-if="score.resultAverage >= -6  &&  score.resultAverage < -2">Your system may be intervening when it is not necessary, or presenting the user with unnecessary popups.</span>
-                <span v-if="score.resultAverage >= -10  &&  score.resultAverage < -6">Your system is intervening when it is not necessary and/or is presenting the user with unnecessary popups.</span>
-                <!--<span v-if="!isNaN(score.correlation)" class="badge badge-primary badge-pill">{{score.correlation}}</span>--></td>
-            </tr>
+          <table class="table is-striped">
+            <tr><th>Category</th><th>Good mitigation/Pass</th><th>Some mitigation</th><th>Not mitigated</th><th>Over mitigated</th></tr>
+            <tr><td>Drug Allergy</td><td><td><td><td></td></tr>
+            <tr><td>Drug Dose</td><td><td><td><td></td></tr>
           </table>
         </div>
 
@@ -72,10 +58,7 @@
 
 <script>
 
-    import jsonindicators from '../json/indicators.json';
-    import jsontests from '../json/prescriptions.json'
     import { dataService } from '../services/data.service';
-    import _ from 'lodash';
     import jStat from 'jstat';
     import TabHeader from './TabHeader';
 
@@ -93,16 +76,16 @@
         },
         data() {
             return {
-                subcategories : [],
-                indicators : jsonindicators,
-                tests : jsontests,
+                categories : [],
+                indicators : [],
+                tests : [],
                 score : {
                     category : '',
                     resultAverage : ''
                 },
                 scores: null,
                 sub : null,
-                part1 : {
+                system : {
                      ep_usage : '',
                      lab_results: ''
                 },
@@ -111,10 +94,10 @@
         },
         computed: {
             getEpUsage() {
-                return this.part1.ep_usage;
+                return this.system.ep_usage;
             },
             getLabResults() {
-                return this.part1.lab_results;
+                return this.system.lab_results;
             },
             user() {
                 return this.$store.state.authentication.user;
@@ -123,105 +106,13 @@
         methods : {
 
             createResults() {
-                this.subcategories = _.uniq(_.map(this.indicators, 'subcategory'));
 
-                if(this.prescriptionList !== undefined) {
+                if(this.categories !== undefined){
 
-                    // exclude tests with low risk scores
-                    this.prescriptionList = _.reject(this.prescriptionList, { risk_score: 2 });
-                    const totalCorrelation = this.calcSpearmans();
-
-                    this.scores = [{
-                        category: 'Total',
-                        correlation: Number.isNaN(totalCorrelation) ? null : totalCorrelation,
-                        resultAverage: _.meanBy(this.prescriptionList, 'result_score')
-                    }];
-                }
-
-                this.subcategories.forEach((subCategory) => {
-
-                    const questions = _.filter(this.prescriptionList, { subCategory });
-
-                    if (questions.length > 0) {
-
-                        const correlation = jStat.spearmancoeff(_.map(questions, 'rankedMitigation'),
-                            _.map(questions, 'rankedRisk'));
-
-                        this.scores.push({
-                            category: subCategory.replace('Drug - ', ''),
-                            correlation: Number.isNaN(correlation) ? null : correlation.toFixed(2),
-                            resultAverage: _.meanBy(questions, 'result_score')
-                        });
-                    }
-                });
-
-            },
-            calcSpearmans() {
-                /** Spearman Correlation */
-                for (let i = 0; i <  this.prescriptionList.length; i++) {
-                    this.prescriptionList[i].mitigation_score = 10 - this.prescriptionList[i].result_score;
-                    this.prescriptionList[i].subCategory = this.getSubcategory(this.prescriptionList[i].test_id);
-                }
-
-                for (let i = 0; i < this.prescriptionList.length; i++) {
-                    this.prescriptionList[i].rankedMitigation = this.rankAverage(
-                        this.prescriptionList[i].mitigation_score,
-                        _.map(this.prescriptionList, 'mitigation_score'),
-                        1
-                    );
-                    this.prescriptionList[i].rankedRisk = this.rankAverage(
-                        this.prescriptionList[i].risk_score,
-                        _.map(this.prescriptionList, 'risk_score'),
-                        1
-                    );
-                }
-                const mitigations = _.map(this.prescriptionList, 'rankedMitigation');
-                const risks = _.map(this.prescriptionList, 'rankedRisk');
-                return jStat.spearmancoeff(mitigations, risks).toFixed(2);
-            },
-            rankAverage(value, array, order) {
-                if (order > 0) {
-                    array.sort();
-                } else {
-                    array.sort().reverse();
-                }
-                array.unshift(value + 1);
-
-                const keys = array.reduce(function(a, e, i) {
-                    if (e === value) {
-                        a.push(i);
-                    }
-                    return a;
-                }, []);
-
-                if (keys.length === 0) {
-                    return null;
-                } else {
-                    return _.sum(keys) / keys.length;
-                }
-            },
-            getSubcategory(testID) {
-                let category = '';
-
-                for (let i = 0; i < this.tests.length; i++) {
-                    const test = this.tests[i];
-                    if (test.id === testID) {
-                        const category_id = test.indicator_id;
-
-                        if (category_id === 'CEXXX') {
-                            return 'No Category';
-                        }
-
-                        for (let x = 0; x < this.indicators.length; x++) {
-                            const cat = this.indicators[x];
-
-                            if (category_id === cat.id) {
-                                category = cat.subcategory;
-                            }
-                        }
+                    for(let category in this.categories){
                     }
                 }
-                return category;
+
             },
             onExitClick() {
                 this.$router.push('/logout');
@@ -231,18 +122,27 @@
             }
         },
         created() {
+
+
+            dataService.getCategories().then(data => {
+              console.log(data);
+              this.categories = data;
+            });
+
             // get the assessment id from the url
             let id = this.$route.params.ID;
             dataService.getAssessment(id).then(data => {
                 this.prescriptionList = data.prescriptionList;
-                this.part1.ep_usage = data.part1.ep_usage;
-                this.part1.lab_results = data.part1.lab_results.toString();
+                this.system.ep_usage = data.system.ep_usage;
+                this.system.lab_results = data.system.lab_results.toString();
 
                 // audit
                 dataService.audit('View report', '/assessmentresults');
-
                 this.createResults();
             });
+
+
+
         }
     }
 </script>

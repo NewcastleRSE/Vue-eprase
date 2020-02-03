@@ -6,6 +6,7 @@ export const dataService = {
   getAssessment,
   getAssessmentPart,
   getInstitutions,
+  getCategories,
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
@@ -85,7 +86,7 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     });
 }
 
-function savePrescriptionData(test_id, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
+function savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -93,10 +94,10 @@ function savePrescriptionData(test_id, outcome, other, intervention_type, select
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({test_id, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
+    body: JSON.stringify({outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
-  return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -197,6 +198,27 @@ function getInstitutions() {
     })
     .catch(function() {
       console.log('Error returning from getInstitutions');
+    });
+}
+
+
+function getCategories() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'categories', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      // console.log(response);
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getCategories');
     });
 }
 

@@ -107,7 +107,7 @@
             </div>
           </div>
 
-          <input type="hidden" id="test_id" v-model="response.test_id=prescription.id" />
+          <input type="hidden" id="test_id" v-model="response.prescription=prescription.id" />
           <input type="hidden" id="result_score" v-model="response.result_score=getResult" />
           <input type="hidden" id="risk_level" v-model="response.risk_level=prescription.risk_level" />
 
@@ -175,7 +175,7 @@
                     outcomes: '',
                     other: '',
                     time_taken: '',
-                    test_id : '',
+                    prescription : '',
                     risk_level: '',
                     intervention_type : '',
                     selected_type: '',
@@ -295,7 +295,7 @@
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.response.time_taken = elapsedTime/1000;
 
-                        const test_id = this.response.test_id;
+                        const prescription = this.response.prescription;
                         const outcome = this.response.outcomes;
                         const other = this.response.other;
                         const intervention_type = this.response.intervention_type;
@@ -309,7 +309,7 @@
                         const completed = this.completed;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {test_id, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
+                            dispatch('savePrescriptionData', {prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
