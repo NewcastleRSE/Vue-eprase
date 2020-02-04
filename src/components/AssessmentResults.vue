@@ -202,8 +202,10 @@
                   formattedData.push(tempResult);
                 }
                 this.categoryData = formattedData;
-                console.log(this.categoryData);
-                console.log(this.categories);
+                //console.log(this.categoryData);
+
+                // function to assign category counts here..
+
               });
             },
             formatData(item) {
