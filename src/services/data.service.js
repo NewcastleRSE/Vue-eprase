@@ -7,6 +7,7 @@ export const dataService = {
   getAssessmentPart,
   getInstitutions,
   getCategories,
+  getCategoryData,
   setAssessmentPart,
   savePart1Data,
   savePart2Data,
@@ -97,7 +98,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
     body: JSON.stringify({outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
-  return fetch(settings.baseUrl + 'prescription?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)
+  return fetch(settings.baseUrl + 'prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -219,6 +220,26 @@ function getCategories() {
     })
     .catch(function() {
       console.log('Error returning from getCategories');
+    });
+}
+
+function getCategoryData(id) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'resultCategories?ID=' + id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      // console.log(response);
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from resultCategories');
     });
 }
 

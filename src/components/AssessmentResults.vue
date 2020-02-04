@@ -32,14 +32,26 @@
               </td>
             </tr>
           </table>
+          {{ categoryData }}
+
 
         </div>
         <h3>Summary Results</h3>
         <div class="results-summary">
           <table class="table is-striped">
             <tr><th>Category</th><th>Good mitigation/Pass</th><th>Some mitigation</th><th>Not mitigated</th><th>Over mitigated</th></tr>
-            <tr><td>Drug Allergy</td><td><td><td><td></td></tr>
+            <tr><td>Drug Age</td><td><td><td><td></td></tr>
             <tr><td>Drug Dose</td><td><td><td><td></td></tr>
+            <tr><td>Drug Interaction</td><td><td><td><td></td></tr>
+            <tr><td>Drug Allergies</td><td><td><td><td></td></tr>
+            <tr><td>Drug Duplication</td><td><td><td><td></td></tr>
+            <tr><td>Drug Disease</td><td><td><td><td></td></tr>
+            <tr><td>Drug Omissions</td><td><td><td><td></td></tr>
+            <tr><td>Theraputic Duplication</td><td><td><td><td></td></tr>
+            <tr><td>Drug Lab</td><td><td><td><td></td></tr>
+            <tr><td>Drug Brand</td><td><td><td><td></td></tr>
+            <tr><td>Drug Route</td><td><td><td><td></td></tr>
+            <tr><td>Drug Overdose</td><td><td><td><td></td></tr>
           </table>
         </div>
 
@@ -77,6 +89,7 @@
         data() {
             return {
                 categories : [],
+                categoryData : [],
                 indicators : [],
                 tests : [],
                 score : {
@@ -89,7 +102,79 @@
                      ep_usage : '',
                      lab_results: ''
                 },
-                prescriptionList : []
+                prescriptionList : [],
+                drugAge : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+                },
+              drugDose : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugInteraction : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugAllergies : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugDuplication : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugDisease : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugOmissions : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              theraputicDuplication : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugLab : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugBrand : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugRoute : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              },
+              drugOverdose : {
+                "Good" : 0,
+                "Some" : 0,
+                "Not" : 0,
+                "Over" : 0
+              }
             }
         },
         computed: {
@@ -104,15 +189,29 @@
             }
         },
         methods : {
+            createResults(id) {
 
-            createResults() {
+              let tempData = [];
+              let formattedData = [];
+              let tempResult =[];
 
-                if(this.categories !== undefined){
-
-                    for(let category in this.categories){
-                    }
+              dataService.getCategoryData(id).then(data => {
+                tempData = data;
+                for(let index in tempData){
+                  tempResult = this.formatData(tempData[index]);
+                  formattedData.push(tempResult);
                 }
-
+                this.categoryData = formattedData;
+                console.log(this.categoryData);
+                console.log(this.categories);
+              });
+            },
+            formatData(item) {
+              let result = {
+                categoryName : item.prescription.indicator.category['categoryName'],
+                mitigation : item.result
+              }
+              return result;
             },
             onExitClick() {
                 this.$router.push('/logout');
@@ -122,26 +221,22 @@
             }
         },
         created() {
+              // get the system id from the url
+             let id = this.$route.params.ID;
 
-
-            dataService.getCategories().then(data => {
-              console.log(data);
+            dataService.getCategories(id).then(data => {
               this.categories = data;
             });
 
-            // get the assessment id from the url
-            let id = this.$route.params.ID;
             dataService.getAssessment(id).then(data => {
-                this.prescriptionList = data.prescriptionList;
-                this.system.ep_usage = data.system.ep_usage;
-                this.system.lab_results = data.system.lab_results.toString();
+                  this.prescriptionList = data.prescriptionList;
+                  this.system.ep_usage = data.system.ep_usage;
+                  this.system.lab_results = data.system.lab_results.toString();
 
-                // audit
-                dataService.audit('View report', '/assessmentresults');
-                this.createResults();
-            });
-
-
+                  // audit
+                  dataService.audit('View report', '/assessmentresults');
+                  this.createResults(id);
+              });
 
         }
     }
