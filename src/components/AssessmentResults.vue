@@ -18,17 +18,17 @@
             <tr>
               <th>eP Usage</th><td>{{ getEpUsage }}%</td>
               <td>
-                <img v-if="getEpUsage === '76-100'" src="../assets/smiley1.jpg" title="great" class="smiley">
-                <img v-if="getEpUsage === '51-75'"  src="../assets/smiley2.jpg" title="good"  class="smiley">
-                <img v-if="getEpUsage === '26-50'"  src="../assets/smiley3.jpg" title="ok"    class="smiley">
-                <img v-if="getEpUsage === '0-25'"  src="../assets/smiley4.jpg" title="poor"  class="smiley">
+                <span v-if="getEpUsage === '76-100'" >This is an excellent result</span>
+                <span v-if="getEpUsage === '51-75'" >This is a good result</span>
+                <span v-if="getEpUsage === '26-50'">This is a moderate result</span>
+                <span v-if="getEpUsage === '0-25'" >This is a weak result</span>
               </td>
             </tr>
             <tr>
               <th>Lab Results</th><td>{{ getLabResults }}</td>
               <td>
-                <img v-if="getLabResults === 'true'"  src="../assets/smiley2.jpg" title="good" class="smiley">
-                <img v-if="getLabResults === 'false'" src="../assets/smiley4.jpg" title="bad"   class="smiley">
+                <span v-if="getLabResults === 'true'" >This is a good result</span>
+                <span v-if="getLabResults === 'false'">This is a weak result</span>
               </td>
             </tr>
           </table>
@@ -104,6 +104,10 @@
           </table>
         </div>
 
+        <div>Total valid tests: {{ totalValidTests }}</div>
+        <div>Total null tests: {{ totalNulls }}</div>
+        <div>Total configuration tests: {{ totalConfigTests }}</div>
+
       </div>
       <div align="center">
         <div class="buttons">
@@ -148,6 +152,8 @@
                        lab_results: ''
                   },
                   totalNulls : 0,
+                  totalValidTests : 0,
+                  totalConfigTests : 0,
                   prescriptionList : [],
                   drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugDose : { good : 0, some : 0, not : 0, over : 0, count : 0 },
@@ -191,6 +197,8 @@
                 }
                 this.categoryData = formattedData;
                 this.countCategories(this.categoryData);
+                // calculate number of valid tests, ignoring null results
+                this.totalValidTests = settings.numPrescriptions - this.totalNulls;
               });
             },
             formatData(item) {
@@ -221,7 +229,6 @@
                     this.totalNulls++;
                   }
                   else {
-
                     switch(name){
                       case "Drug Age":
                         if(mitigation === 'Good Mitigation/Pass'){
@@ -516,11 +523,6 @@
     margin-left: 10px;
   }
 
-  .results-data td {
-    text-transform: capitalize;
-  }
-
-
   .smiley {
     width: 40px;
     border: none;
@@ -545,5 +547,7 @@
   h4 {
     font-size: 18px;
   }
+
+
 
 </style>
