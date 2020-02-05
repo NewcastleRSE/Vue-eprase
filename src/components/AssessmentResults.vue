@@ -113,8 +113,6 @@
       </div>
     </div>
   </div>
-
-
 </template>
 
 <script>
@@ -140,106 +138,29 @@
               return {
                   categories : [],
                   categoryData : [],
-                  indicators : [],
-                  tests : [],
                   score : {
                       category : '',
                       resultAverage : ''
                   },
                   scores: null,
-                  sub : null,
                   system : {
                        ep_usage : '',
                        lab_results: ''
                   },
+                  totalNulls : 0,
                   prescriptionList : [],
-                  drugAge : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0,
-                    percent : 0
-                  },
-                  drugDose : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0,
-                    percent : 0
-                  },
-                  drugInteraction : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugAllergy : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0,
-                    percent : 0
-                  },
-                  drugDuplication : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugDisease : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugOmissions : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  theraputicDuplication : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugLab : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugBrand : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugRoute : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
-                  drugOverdose : {
-                      good : 0,
-                      some : 0,
-                      not : 0,
-                      over : 0,
-                      count : 0
-                  },
+                  drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugDose : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugInteraction : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugAllergy : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugDuplication : { good : 0, some : 0, not : 0, over : 0, count : 0},
+                  drugDisease : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugOmissions : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  theraputicDuplication : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugLab : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
+                  drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
               }
         },
         computed: {
@@ -279,7 +200,7 @@
               };
             },
             calc(num,total){
-              if(num !== 0 && total !== 0) {
+              if(total !== 0) {
                 let percent = ((num/total) *100).toFixed(1) + '%';
                 return percent;
               }
@@ -296,230 +217,232 @@
                 if(data.hasOwnProperty(index)){
                   let name = data[index].categoryName;
                   let mitigation = data[index].mitigation;
+                  if(mitigation === 'Null'){
+                    this.totalNulls++;
+                  }
+                  else {
 
-                  console.log(name);
-                  console.log(mitigation);
+                    switch(name){
+                      case "Drug Age":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugAge.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugAge.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugAge.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugAge.over++;
+                        }
 
-                  // ignores null results
-                   switch(name){
-                     case "Drug Age":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugAge.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugAge.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugAge.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugAge.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugAge.count++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugAge.count++;
-                       }
-                       break;
-                     case "Drug Dose":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugDose.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugDose.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugDose.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugDose.over++;
-                       }
-                       if(mitigation !== 'Null'){
-                         this.drugDose.count++;
-                       }
-                       break;
-                     case "Drug Interaction":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugInteraction.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugInteraction.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugInteraction.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugInteraction.over++;
-                       }
+                        break;
+                      case "Drug Dose":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugDose.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugDose.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugDose.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugDose.over++;
+                        }
+                        if(mitigation !== 'Null'){
+                          this.drugDose.count++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugInteraction.count++;
-                       }
-                       break;
-                     case "Drug Allergy":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugAllergy.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugAllergy.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugAllergy.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugAllergy.over++;
-                       }
+                        break;
+                      case "Drug Interaction":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugInteraction.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugInteraction.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugInteraction.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugInteraction.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugAllergy.count++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugInteraction.count++;
+                        }
 
-                       this.calc(drugAllergy.good, drugAllergy.count)
-                       break;
-                     case "Drug Duplication":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugDuplication.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugDuplication.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugDuplication.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugDuplication.over++;
-                       }
+                        break;
+                      case "Drug Allergy":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugAllergy.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugAllergy.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugAllergy.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugAllergy.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugDuplication.count++;
-                       }
-                       break;
-                     case "Drug Disease":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugDisease.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugDisease.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugDisease.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugDisease.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugAllergy.count++;
+                        }
+                        break;
+                      case "Drug Duplication":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugDuplication.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugDuplication.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugDuplication.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugDuplication.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugDisease.count++;
-                       }
-                       break;
-                     case "Drug Omissions":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugOmissions.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugOmissions.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugOmissions.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugOmissions.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugDuplication.count++;
+                        }
+                        break;
+                      case "Drug Disease":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugDisease.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugDisease.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugDisease.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugDisease.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugOmissions.count++;
-                       }
-                       break;
-                     case "Theraputic Duplication":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.theraputicDuplication.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.theraputicDuplication.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.theraputicDuplication.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.theraputicDuplication.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugDisease.count++;
+                        }
+                        break;
+                      case "Drug Omissions":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugOmissions.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugOmissions.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugOmissions.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugOmissions.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.theraputicDuplication.count++;
-                       }
-                       break;
-                     case "Drug Lab":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugLab.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugLab.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugLab.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugLab.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugOmissions.count++;
+                        }
+                        break;
+                      case "Theraputic Duplication":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.theraputicDuplication.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.theraputicDuplication.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.theraputicDuplication.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.theraputicDuplication.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugLab.count++;
-                       }
-                       break;
-                     case "Drug Brand":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugBrand.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugBrand.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugBrand.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugBrand.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.theraputicDuplication.count++;
+                        }
+                        break;
+                      case "Drug Lab":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugLab.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugLab.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugLab.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugLab.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugBrand.count++;
-                       }
-                       break;
-                     case "Drug Route":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugRoute.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugRoute.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugRoute.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugRoute.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugLab.count++;
+                        }
+                        break;
+                      case "Drug Brand":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugBrand.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugBrand.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugBrand.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugBrand.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugRoute.count++;
-                       }
-                       break;
-                     case "Drug Overdose":
-                       if(mitigation === 'Good Mitigation/Pass'){
-                         this.drugOverdose.good++;
-                       }
-                       else if (mitigation === 'Some Mitigation'){
-                         this.drugOverdose.some++;
-                       }
-                       else if (mitigation === 'No Mitigation/Fail'){
-                         this.drugOverdose.not++;
-                       }
-                       else if (mitigation === 'Over Mitigation'){
-                         this.drugOverdose.over++;
-                       }
+                        if(mitigation !== 'Null'){
+                          this.drugBrand.count++;
+                        }
+                        break;
+                      case "Drug Route":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugRoute.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugRoute.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugRoute.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugRoute.over++;
+                        }
 
-                       if(mitigation !== 'Null'){
-                         this.drugOverdose.count++;
-                       }
-                       break;
-                   }
+                        if(mitigation !== 'Null'){
+                          this.drugRoute.count++;
+                        }
+                        break;
+                      case "Drug Overdose":
+                        if(mitigation === 'Good Mitigation/Pass'){
+                          this.drugOverdose.good++;
+                        }
+                        else if (mitigation === 'Some Mitigation'){
+                          this.drugOverdose.some++;
+                        }
+                        else if (mitigation === 'No Mitigation/Fail'){
+                          this.drugOverdose.not++;
+                        }
+                        else if (mitigation === 'Over Mitigation'){
+                          this.drugOverdose.over++;
+                        }
+
+                        if(mitigation !== 'Null'){
+                          this.drugOverdose.count++;
+                        }
+                        break;
+                    }
+                  }
                 }
               }
             }
