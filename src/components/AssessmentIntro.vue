@@ -74,7 +74,6 @@
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-              //  patientService.setPatients();
                 patientService.setPatientsInStore();
                 this.$router.push({ path: './assessmentsystem' });
             }

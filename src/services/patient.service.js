@@ -27,10 +27,11 @@ function setPatientsInStore() {
   const patientIds = [];
   const patientIndex = [];
 
-  // create local variables to work with
+  // create local variables to help set up insert points for config errors
   let numTests = settings.numPrescriptions;
   let numConfigErrors = settings.numConfigError;
   let insertPoints = [];
+
 
   while(insertPoints.length < numConfigErrors){
     // create a random point to insert a config error between 2 and the total number of tests
@@ -54,8 +55,6 @@ function setPatientsInStore() {
         patientIds.push(patients[index].patient_id);
       }
 
-
-
       // add it into the array without deleting anything
      // testList.splice(configInsert, 0, errors);
 
@@ -67,10 +66,20 @@ function setPatientsInStore() {
           for(let i = 0; i < tempList.length; i++){
              testList.push(tempList[i]);
           }
+
+          for(let j = 0; j < insertPoints.length; j++){
+            if(index === insertPoints[j]){
+              console.log('Insert Point ' + insertPoints[j]);
+              testList.splice(insertPoints[j], 0, 'config-error' + (j+1));
+            }
+          }
+
           store.dispatch('setTestList', { testList});
         });
       }
     }
+
+
 
     for(let i = 0; i < patientList.length; i++) {
       // fix patient DOBs
@@ -222,6 +231,7 @@ function getPatientDetails() {
       console.log('Error returning from getPatientDetails');
     });
 }
+
 
 function getPatientTests(index) {
 
