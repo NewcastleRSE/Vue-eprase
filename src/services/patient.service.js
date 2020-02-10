@@ -3,13 +3,11 @@ import { store } from '../store/index';
 import { settings } from '../settings';
 
 export const patientService = {
-  setPatients,
   getPatients,
   getDOB,
   getNumPatients,
   getPatientIndex,
   getTestIndex,
-  getAllPatients,
   getPatientTests,
   setPatientsInStore
 };
@@ -88,79 +86,11 @@ function setPatientsInStore() {
       localStorage.setItem(myid, myname);
     }
 
-    //console.log(patientIds);
-    //console.log(patientList);
-
     localStorage.setItem('numPatients', patientList.length);
     store.dispatch('setPatientList', { patientList, patientIds});
   });
 }
 
-function setPatients() {
-
-  let patients = [];
-  let tests = [];
-  const errors = jsonerrors;
-  const patientList = [];
-  const patientIds = [];
-  const testList = [];
-  const testIndex = [];
-  const allTests = tests.length;
-
-  // loop through the tests at random and assign them to testList
-  for(let i = 0; i < allTests; i++){
-    let index = Math.floor(Math.random() * allTests);
-
-    // don't want the same test twice
-    if (testIndex.indexOf(index) === -1) {
-      // keep a note of the index
-      testIndex.push(index);
-      if (testList.length < settings.numPrescriptions) {
-        testList.push(tests[index]);
-        patientIds.push(tests[index].patient_id);
-      }
-    }
-  }
-
-  console.log(patientIds);
-
-  // create a random point to insert a config error between 2 and 5
-  let configInsert = Math.floor(Math.random() * 4) + 2;
-
-  // add it into the array without deleting anything
-  testList.splice(configInsert, 0, errors);
-
-  // returns a promise
-  getAllPatients().then(data => {
-    patients = data;
-    // loop through patients and set the patient list
-    for(let index in patients)
-    {
-      if(patients.hasOwnProperty(index)){
-        let patientarray = patients[index];
-        let mypatient = formatData(patientarray);
-        if (patientIds.includes(mypatient.patient_id)){
-          patientList.push(mypatient);
-        }
-      }
-    }
-    console.log(patientList.length);
-
-    for(let i = 0; i < patientList.length; i++) {
-      // fix patient DOBs
-      patientList[i].dob = patientService.getDOB(patientList[i]);
-
-      // assign id and name to local storage
-      let myid = patientList[i].patient_id;
-      let myname = patientList[i].first_name + ' ' + patientList[i].surname;
-      localStorage.setItem(myid, myname);
-    }
-
-    localStorage.setItem('numPatients', patientList.length);
-    store.dispatch('setPatientList', { patientList, patientIds, testList });
-
-  });
-}
 
 function getDOB(patient) {
 
@@ -191,6 +121,7 @@ function getDOB(patient) {
   return dd + '/' + mm + '/' + yyyy;
 }
 
+// used by setPatientsInStore
 function getAllPatients() {
 
   let token = getToken();
@@ -282,7 +213,6 @@ function handleResponse(response) {
       const error = (data && data.message) || response.statusText;
       return Promise.reject(error);
     }
-
     return data;
   });
 }
@@ -299,10 +229,7 @@ function formatPartialData(patientarray){
     weight: patientarray[6],
     is_adult: patientarray[7]
   };
-
-  console.log(patient);
   return patient;
-
 }
 
 function formatData(patientarray){
@@ -358,7 +285,6 @@ function formatTestList(testList){
     duration: testList['duration'],
     drug_frequency: testList['drug_frequency']
   };
-  //console.log(test);
   return test;
 
 }
