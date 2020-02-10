@@ -1,6 +1,4 @@
-import jsonpatients from '../json/patients.json'
-import jsontests from '../json/prescriptions.json'
-import jsonerrors from '../json/configerror.json'
+import { dataService } from '../services/data.service'
 import { store } from '../store/index';
 import { settings } from '../settings';
 
@@ -22,7 +20,7 @@ function setPatientsInStore() {
   let tests = [];
   let tempList = [];
   let testList = [];
-  const errors = jsonerrors;
+  let configErrors = [];
   const patientList = [];
   const patientIds = [];
   const patientIndex = [];
@@ -32,7 +30,6 @@ function setPatientsInStore() {
   let numConfigErrors = settings.numConfigError;
   let insertPoints = [];
 
-
   while(insertPoints.length < numConfigErrors){
     // create a random point to insert a config error between 2 and the total number of tests
     let configInsert = Math.floor(Math.random() * numTests) + 2;
@@ -40,7 +37,6 @@ function setPatientsInStore() {
       insertPoints.push(configInsert);
     }
   }
-  console.log(insertPoints);
 
   // get all the patients
   // returns a promise
@@ -55,31 +51,32 @@ function setPatientsInStore() {
         patientIds.push(patients[index].patient_id);
       }
 
-      // add it into the array without deleting anything
-     // testList.splice(configInsert, 0, errors);
-
-      // increment to get valid patient ids
+      // increment to get valid patient ids (promise)
       if(patients.hasOwnProperty(index)){
         index++;
+        // get the tests associated with each patient
         getPatientTests(index).then(data => {
           tempList = data;
           for(let i = 0; i < tempList.length; i++){
              testList.push(tempList[i]);
           }
 
-          for(let j = 0; j < insertPoints.length; j++){
-            if(index === insertPoints[j]){
-              console.log('Insert Point ' + insertPoints[j]);
-              testList.splice(insertPoints[j], 0, 'config-error' + (j+1));
-            }
-          }
+          // get all the config errors (another promise)
+          dataService.getConfigErrors().then(data => {
+            configErrors = data;
 
-          store.dispatch('setTestList', { testList});
+            // splice the config errors into the testList at the insertPoints (array length changes after each insert)
+            for(let j = 0; j < insertPoints.length; j++){
+              if(index === insertPoints[j]){
+                // add new element without deleting anything
+                testList.splice(insertPoints[j], 0, configErrors[j]);
+              }
+            }
+            store.dispatch('setTestList', { testList});
+          });
         });
       }
     }
-
-
 
     for(let i = 0; i < patientList.length; i++) {
       // fix patient DOBs
