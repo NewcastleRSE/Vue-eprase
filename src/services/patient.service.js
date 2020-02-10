@@ -27,6 +27,20 @@ function setPatientsInStore() {
   const patientIds = [];
   const patientIndex = [];
 
+  // create local variables to work with
+  let numTests = settings.numPrescriptions;
+  let numConfigErrors = settings.numConfigError;
+  let insertPoints = [];
+
+  while(insertPoints.length < numConfigErrors){
+    // create a random point to insert a config error between 2 and the total number of tests
+    let configInsert = Math.floor(Math.random() * numTests) + 2;
+    if(!insertPoints.includes(configInsert)){
+      insertPoints.push(configInsert);
+    }
+  }
+  console.log(insertPoints);
+
   // get all the patients
   // returns a promise
   getAllPatients().then(data => {
@@ -39,6 +53,11 @@ function setPatientsInStore() {
         patientList.push(mypatient);
         patientIds.push(patients[index].patient_id);
       }
+
+
+
+      // add it into the array without deleting anything
+     // testList.splice(configInsert, 0, errors);
 
       // increment to get valid patient ids
       if(patients.hasOwnProperty(index)){
