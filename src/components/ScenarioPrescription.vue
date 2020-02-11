@@ -100,12 +100,12 @@
             <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
           </div>
 
-
+<!--
           <div class="assessment">
             <div>
               <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Note any intervention from the system..." maxlength="500"></textarea>
             </div>
-          </div>
+          </div> -->
 
           <input type="hidden" id="test_id" v-model="response.prescription=prescription.id" />
           <input type="hidden" id="result_score" v-model="response.result_score=getResult" />
@@ -188,31 +188,10 @@
                 nextEnabled: true,
                 doneEnabled: false,
                 startTime: '',
-                numTests : settings.numPrescriptions
+                numTests : settings.numPrescriptions  + settings.numConfigError
             }
         },
         methods : {
-            getInterventions() {
-
-             /*  this.result_score = this.prescription.risk_score;
-                console.log('Risk score ' + this.result_score);
-
-                for (let index in this.checkBoxList) {
-                    if(this.checkBoxList.hasOwnProperty(index)){
-                        if (this.checkBoxList[index].selected === true) {
-                            this.response.interventions.push({
-                                display: this.checkBoxList[index].name,
-                                score_value: this.checkBoxList[index].score_value
-                            });
-                            // add to interventionTotal
-                            this.result_score += parseInt(this.checkBoxList[index].score_value);
-                        }
-                    }
-                }
-                console.log('Result score after interventions ' + this.result_score);
-                return this.response.interventions; */
-
-            },
             getResult(risk_level, outcome) {
 
                 console.log('Risk level is ' + risk_level);

@@ -48,8 +48,8 @@ export const store = new Vuex.Store({
       commit('savePart4Data', completed);
       commit('updateTestIndex', index);
     },
-    saveConfigError({ commit }, { test_id, risk_score, result_score, result, time_taken, qualitative_data, index }){
-      dataService.saveConfigError( test_id, risk_score, result_score, result, time_taken, qualitative_data );
+    saveConfigError({ commit }, { test_id,  result, time_taken, index }){
+      dataService.saveConfigError( test_id, result, time_taken);
       commit('saveConfigError');
       commit('updateTestIndex', index);
     }

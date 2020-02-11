@@ -14,6 +14,7 @@ export const dataService = {
   savePart3Data,
   savePrescriptionData,
   saveConfigError,
+  getConfigErrors,
   audit
 };
 
@@ -106,7 +107,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
 
 }
 
-function saveConfigError(  test_id, risk_score, result_score, result, time_taken, qualitative_data ) {
+function saveConfigError(  test_id, result, time_taken ) {
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -114,7 +115,7 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ test_id, risk_score, result_score, result, time_taken, qualitative_data })
+    body: JSON.stringify({ test_id, result, time_taken })
   };
 
   return fetch(settings.baseUrl + 'config?ID=' + assessmentId, requestOptions)
@@ -123,10 +124,11 @@ function saveConfigError(  test_id, risk_score, result_score, result, time_taken
       return response;
     })
     .catch(function() {
-      console.log('Error returning from savePrescriptionData');
+      console.log('Error returning from saveConfigError');
     });
 }
-// change to remove user_id
+
+
 function audit(action, uri) {
 
   let token = getToken();
@@ -223,6 +225,7 @@ function getCategories() {
     });
 }
 
+
 function getCategoryData(id) {
 
   let token = getToken();
@@ -240,6 +243,25 @@ function getCategoryData(id) {
     })
     .catch(function() {
       console.log('Error returning from resultCategories');
+    });
+}
+
+function getConfigErrors() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'configerrors', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getConfigErrors');
     });
 }
 

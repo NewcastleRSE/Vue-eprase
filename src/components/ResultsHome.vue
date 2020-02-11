@@ -11,16 +11,16 @@
         </div>
       </div>
 
-      <div v-if="assessments">
+      <!--<div v-if="assessments">
         <p>You currently have no reports available.</p>
-      </div>
+      </div> -->
 
       <div class="list-group">
         <div v-for="assessment in assessments">
-          <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment.part1.id }}" class="list-group-item list-group-item-action flex-column align-items-start">
-            <h4>{{assessment.part1.ep_service}}</h4>
-            <small>{{assessment.part1.time_created}}</small>
-          <span>{{ assessment.user.name }} - <strong>{{ assessment.user.institution }}</strong></span>
+          <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment.system.id }}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <h4>{{assessment.system.ep_service}}</h4>
+            <p>{{ assessment.user.name }}</p>
+            <p>{{assessment.system.time_created}}</p>
           </router-link>
         </div>
       </div>
@@ -67,6 +67,14 @@
             axios.get(baseURL + 'results', requestOptions)
                 .then(response => {
                     this.assessments = response.data;
+
+                    for (let assessment in this.assessments){
+                      if(this.assessments.hasOwnProperty(assessment)){
+                        let timestamp = this.assessments[assessment].system.time_created;
+                        var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
+                        this.assessments[assessment].system.time_created = date;
+                      }
+                    }
                 })
                 .catch(function (error) {
                     console.log('error ' + error);

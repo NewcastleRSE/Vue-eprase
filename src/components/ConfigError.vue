@@ -4,17 +4,12 @@
 
       <div class="config-error-info">
         <p>
-          Are you still able to access the patient record for <strong>{{ getPreviousPatient }}</strong>?<br/><br/>
-          (Click 'No' if you had to close the patient record to continue or if the system closed it for you automatically.
-          Click 'Yes' if you manually closed it but were not required to do so by the system.)
+          {{ configError.description }}
         </p>
       </div>
       <div align="center">
         <div class="questionnaire">
-          <h4>Questions</h4>
           <form>
-            <div class="question form-group" id="question-1">
-              <p class="recordlabel">Was the patient record still open?</p>
               <span class="radio-buttons">
           <label for="radio-yes" class="radio-label">Yes</label>
             <input type="radio" value=1 id="radio-yes" name="patientrecord" v-model="response.result" v-validate="'required'">
@@ -22,16 +17,6 @@
           <label for="radio-no" class="radio-label">No </label>
             <input type="radio" value=0 id="radio-no" name="patientrecord" v-model="response.result">
         </span>
-            </div>
-            <div class="assessment">
-              <p>Note any intervention from the system using the box below.</p>
-              <div align="center">
-                <div class="alert alert-warning" role="alert">
-                  To optimise the use of this tool please record ALL types of guidance that appears on your system screen
-                </div>
-                <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
-              </div>
-            </div>
           </form>
 
         </div>
@@ -39,7 +24,8 @@
 
       <div class="form-group footer" align="center">
         <div class="buttons">
-          <button type="button" class="scenario-btn btn btn-primary visible" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+          <button v-show='nextEnabled' id="next-button" type="button" class="scenario-btn btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+          <button v-show='doneEnabled' id="done-button" type="button" class="scenario-btn btn btn-primary" @click="onDoneClick()">Done</button>
         </div>
       </div>
 
@@ -49,6 +35,8 @@
 
 <script>
 
+    import {settings} from "../settings";
+
     export default {
         name: "ConfigError",
         components: {
@@ -56,33 +44,40 @@
         computed: {
             getPreviousPatient() {
                 let tests = this.$store.state.testList;
-                let previousPatientId = tests.testList[0].patient_id;
+                let previousPatientId = tests.testList[0].patient.patient_id;
                 return localStorage.getItem(previousPatientId);
             },
+            configError() {
+              let configError = this.$store.state.testList;
+              return configError.testList[this.getPresTestIndex];
+            },
+          getPresTestIndex() {
+            return this.$store.state.testIndex;
+          },
             isFormInvalid() {
                 if(!this.response.result){
                     return true;
                 }
-            },
-            getPresTestIndex() {
-                return this.$store.state.testIndex;
             }
         },
         data() {
             return {
                 response: {
-                    test_id : 'C001',
+                    test_id : '',
                     result: '',
-                    qualitative_data: '',
                     time_taken: ''
                 },
-                startTime: ''
+                startTime: '',
+                index: '',
+                numTests : settings.numPrescriptions + settings.numConfigError,
+                doneEnabled: false,
+                nextEnabled: true
             }
         },
         methods : {
             onNextClick()  {
                 this.saveData();
-                this.$router.push('/assessmentscenarios');
+                this.$router.push('/assessmentscenarios').catch(err => {});
             },
             saveData() {
                 this.submitted = true;
@@ -94,16 +89,13 @@
                         this.response.time_taken = elapsedTime/1000;
 
                         const test_id = this.response.test_id;
-                        const risk_score = 0;
-                        const result_score = 0;
                         const result = this.response.result;
                         const time_taken = this.response.time_taken;
-                        const qualitative_data = this.response.qualitative_data;
-                        const index = this.getPresTestIndex;
+                        const index = this.index;
 
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveConfigError', {test_id, risk_score, result_score, result, time_taken, qualitative_data, index });
+                            dispatch('saveConfigError', {test_id, result, time_taken, index });
                         }
                     }
                 });
@@ -111,6 +103,15 @@
         },
         created : function() {
             this.startTime = new Date();
+            this.index = this.$store.state.testIndex;
+            this.response.test_id = this.$store.state.testList.testList[this.index].configErrorCode;
+        },
+        beforeUpdate: function() {
+          let index = this.$store.state.testIndex;
+          if (index === (this.numTests)) {
+            this.nextEnabled = false;
+            this.doneEnabled = true;
+          }
         }
     }
 </script>
@@ -140,7 +141,7 @@
   }
 
   .questionnaire {
-    max-width: 890px;
+    width: 100%;
     margin-top: 20px;
     margin-bottom: 30px;
   }
