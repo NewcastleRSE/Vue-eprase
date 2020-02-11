@@ -109,6 +109,7 @@
         <div>Total valid tests: {{ totalValidTests }}</div>
         <div>Total null tests: {{ totalNulls }}</div>
         <div>Total configuration tests: {{ totalConfigTests }}</div>
+        <div>Total alerts : {{ totalAlerts }} out of x interventions</div>
 
       </div>
       <div align="center">
@@ -159,6 +160,7 @@
                   totalSome : 0,
                   totalNot : 0,
                   totalOver : 0,
+                  totalAlerts : 0,
                   totalConfigTests : settings.numConfigError,
                   prescriptionList : [],
                   drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
@@ -210,7 +212,8 @@
             formatData(item) {
               return {
                 categoryName: item.prescription.indicator.category['categoryName'],
-                mitigation: item.result
+                mitigation: item.result,
+                selected_type: item.selected_type
               };
             },
             calc(num,total){
@@ -231,6 +234,10 @@
                 if(data.hasOwnProperty(index)){
                   let name = data[index].categoryName;
                   let mitigation = data[index].mitigation;
+                  let selected_type = data[index].selected_type;
+                  if(selected_type === 'alert'){
+                    this.totalAlerts++;
+                  }
                   if(mitigation === 'Null'){
                     this.totalNulls++;
                   }
