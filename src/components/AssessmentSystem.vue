@@ -62,25 +62,71 @@
               </select>
             </div>
 
-            <div class="question form-group" id="question-4">
-              <p class="lab-results-label"> Is your hospital laboratory results system fully integrated with your e-prescribing system?</p>
-              <span class="radio-buttons">
+            <div id="radio-button-group">
+
+              <div class="question form-group" id="question-4">
+                <p class="results-label"> Is your hospital laboratory results system fully integrated with your e-prescribing system?</p>
+                <span class="radio-buttons">
                 <label for="lab-results-yes">Yes</label>
                 <input type="radio" value=true class="radio-yes" name="lab-results" id="lab-results-yes"  v-model="results.lab_results" v-validate="'required'">
 
                 <label for="lab-results-no">No</label>
                 <input type="radio" value=false class="radio-no" name="lab-results" id="lab-results-no"  v-model="results.lab_results">
               </span>
-            </div>
+              </div>
 
-            <div class="question form-group" id="question-5">
-              <p class="med-history-label">Are you able to manually enter diagnosis and medical history into your test system?</p>
-              <span class="radio-buttons">
+
+              <div v-show="results.lab_results === 'true'"  class="question form-group" id="question-5">
+                <p class="add_results_label"><font-awesome-icon icon="caret-right"></font-awesome-icon> Are you able to manually enter laboratory results into your patient admin and/ or e-prescribing test system that you are using to do this assessments?</p>
+                <span class="radio-buttons">
+                  <label for="man-results-yes">Yes</label>
+                  <input type="radio" value=true class="radio-yes" name="man-results" id="man-results-yes"  v-model="results.man_results">
+
+                  <label for="man-results-no">No</label>
+                  <input type="radio" value=false class="radio-no" name="man-results" id="man-results-no"  v-model="results.man_results">
+                </span>
+              </div>
+
+              <div class="question form-group" id="question-6">
+                <p class="results-label">Are you able to manually enter diagnosis and medical history into your test system?</p>
+                <span class="radio-buttons">
                   <label for="med-history-yes">Yes</label>
-                    <input type="radio" value=true class="radio-yes" name="med-history" id="med-history-yes" v-model="results.med_history" v-validate="'required'">
+                  <input type="radio" value=true class="radio-yes" name="med-history" id="med-history-yes" v-model="results.med_history" v-validate="'required'">
                   <label for="med-history-no">No</label>
-                    <input type="radio" value=false class="radio-no" name="med-history" id="med-history-no" v-model="results.med_history">
-            </span>
+                  <input type="radio" value=false class="radio-no" name="med-history" id="med-history-no" v-model="results.med_history">
+                </span>
+              </div>
+
+              <div v-if="results.med_history === 'true'"  class="question form-group" id="question-7">
+                <p class="add_results_label"><font-awesome-icon icon="caret-right"></font-awesome-icon> Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessments?</p>
+                <span class="radio-buttons">
+                <label for="diagnosis-results-yes">Yes</label>
+                <input type="radio" value=true class="radio-yes" name="diagnosis-results" id="diagnosis-results-yes"  v-model="results.diagnosis_results">
+
+                <label for="diagnosis-results-no">No</label>
+                <input type="radio" value=false class="radio-no" name="diagnosis-results" id="diagnosis-results-no"  v-model="results.diagnosis_results">
+              </span>
+              </div>
+
+            </div>
+            <div class="hm-checkbox">
+              <b-form-group label="Is the e-prescribing system used to prescribe the following?">
+                <b-form-checkbox-group
+                  id="high_risk"
+                  v-model="results.high_risk_meds"
+                  :options="results.options"
+                  name="high_risk_meds"
+                  stacked
+                ></b-form-checkbox-group>
+              </b-form-group>
+
+              <!--<ul>
+                <li v-for="option in results.options">
+                  <input type="checkbox" :id="option.value" :value="option.value" v-model="results.high_risk_meds">
+                  <label :for="option.value">{{option.text}}</label>
+                </li>
+              </ul> -->
+
             </div>
 
             <div class="form-group footer">
@@ -130,7 +176,22 @@
                     patient_type: null,
                     lab_results: '',
                     med_history: '',
-                    time_taken: ''
+                    man_results : '',
+                    diagnosis_results: '',
+                    time_taken: '',
+                    high_risk_meds: [],
+                    options: [
+                      { text: 'Warfarin', value: 'Warfarin'},
+                      { text: 'Insulin', value: 'Insulin'},
+                      { text: 'Fluids', value: 'Fluids'},
+                      { text: 'Oxygen', value: 'Oxygen'},
+                      { text: 'Patient controlled analgesia (PCA)', value: 'PCA'},
+                      { text: 'Continuous infusions', value: 'Continuous infusions'},
+                      { text: 'Parenteral nutrition', value: 'Parenteral nutrition'},
+                      { text: 'Enteral nutrition', value: 'Enteral nutrition'},
+                      { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements'},
+                      { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines'}
+                    ]
                 },
                 submitted: false,
                 assessment: {
@@ -199,7 +260,7 @@
     margin-top: 40px;
     padding: 20px;
     border-radius: 25px;
-    max-width: 950px;
+    width: 100%;
   }
 
   #version, #other-service {
@@ -219,10 +280,16 @@
     text-align: left;
   }
 
-  .lab-results-label, .med-history-label {
+  .results-label{
     font-weight: 700;
-    max-width: 550px;
+    max-width: 650px;
     display: inline-block;
+  }
+
+  .add_results_label {
+    max-width: 750px;
+    display: inline-block;
+    padding-left: 20px;
   }
 
   .radio-yes, .radio-no {
@@ -230,7 +297,8 @@
   }
 
   .radio-buttons {
-    margin-left: 140px;
+    float:right;
+    margin-right: 50px;
   }
 
   .form-group {
@@ -312,6 +380,10 @@
   .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
     background: none;
     background-color: #fff;
+  }
+
+  #radio-button-group {
+    padding: 20px 0;
   }
 
 

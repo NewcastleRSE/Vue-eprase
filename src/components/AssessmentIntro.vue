@@ -94,7 +94,7 @@
 
   button {
     height: 40px;
-    width: 170px;
+    width: 250px;
     margin: 10px 0;
     font-size: 1em;
     /*border-radius: 5px; */
