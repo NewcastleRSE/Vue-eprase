@@ -109,7 +109,7 @@
         <div>Total valid tests: {{ totalValidTests }}</div>
         <div>Total null tests: {{ totalNulls }}</div>
         <div>Total configuration tests: {{ totalConfigTests }}</div>
-        <div>Total alerts : {{ totalAlerts }} out of x interventions</div>
+        <div>Total alerts : {{ totalAlerts }} out of {{ totalInterventions }} interventions</div>
 
       </div>
       <div align="center">
@@ -161,6 +161,7 @@
                   totalNot : 0,
                   totalOver : 0,
                   totalAlerts : 0,
+                  totalInterventions: 0,
                   totalConfigTests : settings.numConfigError,
                   prescriptionList : [],
                   drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
@@ -213,6 +214,7 @@
               return {
                 categoryName: item.prescription.indicator.category['categoryName'],
                 mitigation: item.result,
+                outcome: item.outcome,
                 selected_type: item.selected_type
               };
             },
@@ -234,6 +236,11 @@
                 if(data.hasOwnProperty(index)){
                   let name = data[index].categoryName;
                   let mitigation = data[index].mitigation;
+
+                  let outcome = data[index].outcome;
+                  if(outcome === 'intervention'){
+                    this.totalInterventions++;
+                  }
                   let selected_type = data[index].selected_type;
                   if(selected_type === 'alert'){
                     this.totalAlerts++;
@@ -614,14 +621,15 @@
   }
 
   td.some {
-    background-color: #ffc33d;
+    background-color: #ffbd13;
   }
 
-  td.not { background-color: #dc5656;
+  td.not { background-color: #ff0a2d;
    }
 
   td.over {
-    background-color:#ffc33d;
+    background-color: #ffbd13;
+    //background-color: rgba(160, 10, 37, 0.93);
   }
 
 
