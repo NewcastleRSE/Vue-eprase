@@ -9,7 +9,7 @@ export const dataService = {
   getCategories,
   getCategoryData,
   setAssessmentPart,
-  savePart1Data,
+  saveSystemData,
   savePart2Data,
   savePart3Data,
   savePrescriptionData,
@@ -18,14 +18,14 @@ export const dataService = {
   audit
 };
 
-function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken){
+function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
 
   let token = getToken();
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken })
+    body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
   return fetch(settings.baseUrl + 'part1', requestOptions)
@@ -40,7 +40,7 @@ function savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_
      }
     })
     .catch(function() {
-       console.log('Error returning from savePart1Data');
+       console.log('Error returning from saveSystemData');
     });
 }
 

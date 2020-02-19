@@ -19,9 +19,7 @@ export const store = new Vuex.Store({
     part2complete: null,
     part3complete: null,
     part4complete: null,
-    configErrorComplete: null,
-    ep_usage: null,
-    lab_results : null
+    configErrorComplete: null
   },
   actions : {
     setPatientList({ commit }, { patientList  } ) {
@@ -30,9 +28,9 @@ export const store = new Vuex.Store({
     setTestList({ commit }, { testList}){
       commit('setTestList', { testList });
     },
-    savePart1Data({ commit }, { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken }){
-      dataService.savePart1Data(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken);
-      commit('savePart1Data', { ep_usage, lab_results } );
+    saveSystemData({ commit }, { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }){
+      dataService.saveSystemData(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
+      commit('saveSystemData');
     },
     savePart2Data({ commit }, { qualitative_data, time_taken }){
       dataService.savePart2Data( qualitative_data, time_taken);
@@ -67,10 +65,8 @@ export const store = new Vuex.Store({
     updateTestIndex(state, index){
       state.testIndex = index + 1;
     },
-    savePart1Data(state, ep_usage, lab_results) {
+    saveSystemData(state) {
       state.part1complete = true;
-      state.ep_usage = ep_usage;
-      state.lab_results = lab_results;
     },
     savePart2Data(state) {
       state.part2complete = true;

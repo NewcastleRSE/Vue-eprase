@@ -129,6 +129,18 @@
 
             </div>
 
+            <div class="hm-checkbox">
+              <b-form-group label="Is the e-prescribing system used in the following areas?">
+                <b-form-checkbox-group
+                  id="clinical_areas"
+                  v-model="results.clinical_areas"
+                  :options="results.area_options"
+                  name="clinical_areas"
+                  stacked
+                ></b-form-checkbox-group>
+              </b-form-group>
+            </div>
+
             <div class="form-group footer">
               <div class="buttons">
                 <p>When you have answered all of the questions, click <strong>Next</strong>.</p>
@@ -191,6 +203,18 @@
                       { text: 'Enteral nutrition', value: 'Enteral nutrition'},
                       { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements'},
                       { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines'}
+                    ],
+                    clinical_areas: [],
+                    area_options: [
+                      { text: 'Adult Critical Care', value: 'ACC'},
+                      { text: 'Paediatric Critical Care', value: 'PCC'},
+                      { text: 'A & E', value: 'A&E'},
+                      { text: 'Inpatients', value: 'Inpatients'},
+                      { text: 'Outpatients', value: 'Outpatients'},
+                      { text: 'Paediatric', value: 'Paediatric'},
+                      { text: 'Day Cases', value: 'Day cases'},
+                      { text: 'Clinical Trials', value: 'Clinical trials'},
+                      { text: 'Intermediate Care', value: 'Intermediate care'}
                     ]
                 },
                 submitted: false,
@@ -224,11 +248,15 @@
                         const ep_usage = this.results.ep_usage;
                         const patient_type = this.results.patient_type;
                         const lab_results = this.results.lab_results;
+                        const man_results = this.results.man_results;
+                        const diagnosis_results = this.results.diagnosis_results;
                         const med_history = this.results.med_history;
                         const time_taken = this.results.time_taken;
+                        const high_risk_meds = this.results.high_risk_meds.toString();
+                        const clinical_areas = this.results.clinical_areas.toString();
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePart1Data', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, med_history, time_taken });
+                            dispatch('saveSystemData', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken });
                         }
                         // audit
                         dataService.audit('Save system data', '/assessmentSystem');
