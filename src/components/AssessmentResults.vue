@@ -225,11 +225,14 @@
                 let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
                 interventionType = interventionType.slice(0, -1);
                 interventionType = parseInt(interventionType);
-                if(interventionType >= 50){
-                  return this.interventionTypeResult = 'High level of alerts';
+                if(interventionType >= 70){
+                    return this.interventionTypeResult = 'High level of alerts';
+                }
+                else if (interventionType < 70 && interventionType >= 35) {
+                    return this.interventionTypeResult = 'Medium level of alerts';
                 }
                 else {
-                  return this.interventionTypeResult = 'Low level of alerts';
+                    return this.interventionTypeResult = 'Low level of alerts';
                 }
             },
             formatData(item) {
