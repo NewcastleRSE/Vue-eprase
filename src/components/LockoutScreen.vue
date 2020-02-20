@@ -10,6 +10,7 @@
 
       <div class="form-group footer" style="{text-align: center}">
         <div class="buttons">
+          <button type="button" class="lock-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()" disabled>Next</button>
           <button v-show="skipEnabled" id="skip-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Skip</button>
         </div>
@@ -57,6 +58,9 @@
             },
             onNextClick()  {
                 this.$router.push('/assessmentscenarios');
+            },
+            onExitClick() {
+              this.$router.push('/logout');
             }
         },
         created : function() {

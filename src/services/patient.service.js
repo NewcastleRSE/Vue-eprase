@@ -17,6 +17,7 @@ function setPatientsInStore() {
   let patients = [];
   let tests = [];
   let tempList = [];
+  let tempErrors = [];
   let testList = [];
   let configErrors = [];
   const patientList = [];
@@ -25,16 +26,19 @@ function setPatientsInStore() {
 
   // create local variables to help set up insert points for config errors
   let numTests = settings.numPrescriptions;
+  let testLimit = settings.testLimit;
   let numConfigErrors = settings.numConfigError;
   let insertPoints = [];
 
   while(insertPoints.length < numConfigErrors){
     // create a random point to insert a config error between 2 and the total number of tests
-    let configInsert = Math.floor(Math.random() * numTests) + 2;
+    let configInsert = Math.floor(Math.random() * testLimit) + 2;
     if(!insertPoints.includes(configInsert)){
       insertPoints.push(configInsert);
     }
   }
+
+  console.log(insertPoints);
 
   // get all the patients
   // returns a promise
@@ -42,7 +46,7 @@ function setPatientsInStore() {
     patients = data;
     // loop through patients and set the patient list
     for(let index in patients) {
-      if(patients.hasOwnProperty(index)){
+      if (patients.hasOwnProperty(index)) {
         let patientarray = patients[index];
         let mypatient = formatData(patientarray);
         patientList.push(mypatient);
