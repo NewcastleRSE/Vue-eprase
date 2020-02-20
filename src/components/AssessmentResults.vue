@@ -105,11 +105,19 @@
           </table>
         </div>
 
+        <section>
+          <div>Total valid tests: {{ totalValidTests }}</div>
+          <div>Total null tests: {{ totalNulls }}</div>
+          <div>Total configuration tests: {{ totalConfigTests }}</div>
+        </section>
 
-        <div>Total valid tests: {{ totalValidTests }}</div>
-        <div>Total null tests: {{ totalNulls }}</div>
-        <div>Total configuration tests: {{ totalConfigTests }}</div>
-        <div>Total alerts : {{ totalAlerts }} out of {{ totalInterventions }} interventions</div>
+        <section>
+          <h4>Intervention type results</h4>
+          <table>
+            <tr><th>Alerts Total</th><td>{{ totalAlerts }} / {{ totalInterventions }}</td><td> {{ calc(totalAlerts, totalInterventions) }}</td><td>{{  interventionTypeResult }}</td></tr>
+          </table>
+        </section>
+
 
       </div>
       <div align="center">
@@ -162,6 +170,7 @@
                   totalOver : 0,
                   totalAlerts : 0,
                   totalInterventions: 0,
+                  interventionTypeResult: '',
                   totalConfigTests : settings.numConfigError,
                   prescriptionList : [],
                   drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
@@ -208,7 +217,20 @@
                 this.countCategories(this.categoryData);
                 // calculate number of valid tests, ignoring null results
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
+                this.getInterventionTypeResult();
+
               });
+            },
+            getInterventionTypeResult(){
+                let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
+                interventionType = interventionType.slice(0, -1);
+                interventionType = parseInt(interventionType);
+                if(interventionType >= 50){
+                  return this.interventionTypeResult = 'High level of alerts';
+                }
+                else {
+                  return this.interventionTypeResult = 'Low level of alerts';
+                }
             },
             formatData(item) {
               return {
@@ -591,13 +613,6 @@
     margin-left: 10px;
   }
 
-  .smiley {
-    width: 40px;
-    border: none;
-    float: right;
-    margin-right: 10px;
-  }
-
 
   button {
     height: 40px;
@@ -632,5 +647,8 @@
     //background-color: rgba(160, 10, 37, 0.93);
   }
 
+  section {
+    padding: 20px 0;
+  }
 
 </style>

@@ -49,17 +49,18 @@
             let tests = this.$store.state.testList;
             let currentTest = tests.testList[index];
 
-            console.log(currentTest);
-
-            // make sure we get the right type of test
-            if (currentTest.hasOwnProperty('configErrorCode')) {
+            if(currentTest !== undefined) {
+              // make sure we get the right type of test
+              if (currentTest.hasOwnProperty('configErrorCode')) {
                 this.assessment.isPrescriptionTest = false;
                 this.assessment.isConfigErrorTest = true;
-            }
-            else {
+              }
+              else {
                 this.assessment.isPrescriptionTest = true;
                 this.assessment.isConfigErrorTest = false;
+              }
             }
+
         }
     }
 </script>

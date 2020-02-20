@@ -14,6 +14,7 @@ import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
 import AssessmentContent from './components/AssessmentContent';
+import CategoryTable from './components/CategoryTable';
 
 Vue.use(Router);
 
@@ -75,6 +76,10 @@ export const router = new Router({
       path: '/assessmentcontent',
       component: AssessmentContent
     },
+    {
+      path: '/categorytable',
+      component: CategoryTable
+    },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
   ]
@@ -86,7 +91,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // list public pages
-  const publicPages = ['/','/login','/register','/instructions', '/assessmentcontent'];
+  const publicPages = ['/','/login','/register','/instructions', '/assessmentcontent', '/categorytable'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
