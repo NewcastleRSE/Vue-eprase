@@ -101,7 +101,7 @@
               <td>{{ calc(drugOverdose.some, drugOverdose.count)  }}</td>
               <td>{{ calc(drugOverdose.not, drugOverdose.count) }}</td>
               <td>{{ calc(drugOverdose.over, drugOverdose.count) }}</td></tr>
-            <tr><th>All Catgeories</th><td class="good">Total : {{ calc(totalGood, totalValidTests) }}</td><td class="some">Total : {{ calc(totalSome, totalValidTests) }} <td class="not">Total :  {{ calc(totalNot, totalValidTests) }} </td><td class="over">Total : {{ calc(totalOver, totalValidTests) }} </td></tr>
+            <tr><th>All Categories</th><td class="good">Total : {{ calc(totalGood, totalValidTests) }}</td><td class="some">Total : {{ calc(totalSome, totalValidTests) }} <td class="not">Total :  {{ calc(totalNot, totalValidTests) }} </td><td class="over">Total : {{ calc(totalOver, totalValidTests) }} </td></tr>
           </table>
         </div>
 
@@ -635,19 +635,18 @@
   }
 
   td.good {
-    background-color: #a2ee6c;
+    background-color: #59ee3e;
   }
 
   td.some {
-    background-color: #ffbd13;
+    background-color: #ffc251;
   }
 
-  td.not { background-color: #ff0a2d;
+  td.not { background-color: #ff3b33;
    }
 
   td.over {
-    background-color: #ffbd13;
-    //background-color: rgba(160, 10, 37, 0.93);
+    background-color: #cd0a2a;
   }
 
   section {
