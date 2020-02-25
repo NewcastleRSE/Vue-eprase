@@ -19,7 +19,11 @@ export const store = new Vuex.Store({
     part2complete: null,
     part3complete: null,
     part4complete: null,
-    configErrorComplete: null
+    configErrorComplete: null,
+    goodPercentage: null,
+    somePercentage: null,
+    notPercentage: null,
+    overPercentage: null
   },
   actions : {
     setPatientList({ commit }, { patientList  } ) {
@@ -50,6 +54,9 @@ export const store = new Vuex.Store({
       dataService.saveConfigError( test_id, result, time_taken);
       commit('saveConfigError');
       commit('updateTestIndex', index);
+    },
+    storePercentageResults({ commit }, { goodPercentage, somePercentage, notPercentage, overPercentage}){
+      commit('setPercentageResults', { goodPercentage, somePercentage, notPercentage, overPercentage });
     }
   },
   mutations: {
@@ -79,6 +86,12 @@ export const store = new Vuex.Store({
     },
     saveConfigError(state){
       state.configErrorComplete = true;
+    },
+    setPercentageResults(state, goodPercentage, somePercentage, notPercentage, overPercentage){
+      state.goodPercentage = goodPercentage;
+      state.somePercentage = somePercentage;
+      state.notPercentage = notPercentage;
+      state.overPercentage = overPercentage;
     }
   }
 });

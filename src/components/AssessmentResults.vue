@@ -36,7 +36,6 @@
         </div>
         <h3>Summary Results</h3>
 
-       <!-- <CategoryTable :category-data="[...categoryData]" ></CategoryTable> -->
         <div class="results-summary">
           <table class="table is-striped">
             <tr><th>Category</th><th>Good mitigation/Pass</th><th>Some mitigation</th><th>Not mitigated</th><th>Over mitigated</th></tr>
@@ -118,12 +117,12 @@
           </table>
         </section>
 
-        <PieChart :good="goodPercentage" :some="somePercentage" :not="notPercentage" :over="overPercentage"></PieChart>
+        <button class="chartbutton" @click="onChartsClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">View Charts</a></button>
 
       </div>
       <div align="center">
         <div class="buttons">
-          <button type="button" class=" results-btn btn btn-primary" @click="onExitClick()">Exit</button>
+          <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>
         </div>
       </div>
@@ -136,6 +135,7 @@
   import {dataService} from '../services/data.service';
   import TabHeader from './TabHeader';
   import PieChart from './PieChart';
+  import StackedChart from './StackedChart';
 
   import axios from 'axios'
   import VueAxios from 'vue-axios'
@@ -148,7 +148,8 @@
           name: "AssessmentResults",
           components: {
              TabHeader,
-             PieChart
+             PieChart,
+              StackedChart
           },
           data() {
               return {
@@ -189,7 +190,9 @@
                   goodPercentage : 0,
                   somePercentage : 0,
                   notPercentage : 0,
-                  overPercentage : 0
+                  overPercentage : 0,
+                  showPieChart : true,
+                  showStackedChart: false
               }
         },
         computed: {
@@ -229,6 +232,17 @@
                 this.somePercentage = this.calcPerCategory(this.totalSome, this.totalValidTests);
                 this.notPercentage = this.calcPerCategory(this.totalNot, this.totalValidTests);
                 this.overPercentage = this.calcPerCategory(this.totalOver, this.totalValidTests);
+
+                // const variables for sending to storage
+                const goodPercentage = this.goodPercentage;
+                const somePercentage = this.somePercentage;
+                const notPercentage = this.notPercentage;
+                const overPercentage = this.overPercentage;
+                const {dispatch} = this.$store;
+
+                if(id) {
+                  dispatch('storePercentageResults', {  goodPercentage, somePercentage, notPercentage, overPercentage });
+                }
               });
             },
             getInterventionTypeResult(){
@@ -255,16 +269,13 @@
             },
             calc(num,total){
               if(total !== 0) {
-                let percent = ((num/total) *100).toFixed(1) + '%';
-                return percent;
+                return ((num/total) *100).toFixed(1) + '%';
               }
               return 'n/a';
             },
             calcPerCategory(num, total){
               if(total !== 0) {
-                let percent = ((num/total) *100).toFixed(1);
-              //  percent = Math.round(percent);
-                return percent;
+                return ((num/total) *100).toFixed(1);
               }
               return 0;
             },
@@ -273,6 +284,9 @@
             },
             onHomeClick() {
                 this.$router.push('/assessmentintro');
+            },
+            onChartsClick() {
+              this.$router.push('/charts');
             },
             countCategories(data){
               for(let index in data){
@@ -563,6 +577,10 @@
                   }
                 }
               }
+            },
+            onShowCharts() {
+              this.showPieChart = false;
+              this.showStackedChart = true;
             }
           },
         created() {
@@ -653,7 +671,7 @@
   }
 
   td.good {
-    background-color: #3cee37;
+    background-color: #35d635;
   }
 
   td.some {
@@ -669,6 +687,17 @@
 
   section {
     padding: 20px 0;
+  }
+
+  .chartbutton {
+    height: 40px;
+    width: 200px;
+    margin: 10px 0;
+    font-size: 1em;
+  }
+
+  button a {
+    padding: 3px;
   }
 
 </style>
