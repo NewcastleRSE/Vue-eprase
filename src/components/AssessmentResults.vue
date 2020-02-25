@@ -101,7 +101,7 @@
               <td>{{ calc(drugOverdose.some, drugOverdose.count)  }}</td>
               <td>{{ calc(drugOverdose.not, drugOverdose.count) }}</td>
               <td>{{ calc(drugOverdose.over, drugOverdose.count) }}</td></tr>
-            <tr><th>All Categories</th><td class="good">Total : {{ calc(totalGood, totalValidTests) }}</td><td class="some">Total : {{ calc(totalSome, totalValidTests) }} <td class="not">Total :  {{ calc(totalNot, totalValidTests) }} </td><td class="over">Total : {{ calc(totalOver, totalValidTests) }} </td></tr>
+            <tr><th>All Categories</th><td class="good">Total : {{ goodPercentage }}%</td><td class="some">Total : {{ somePercentage }}% <td class="not">Total :  {{ notPercentage }}% </td><td class="over">Total : {{ overPercentage}}% </td></tr>
           </table>
         </div>
 
@@ -118,6 +118,7 @@
           </table>
         </section>
 
+        <PieChart :good="goodPercentage" :some="somePercentage" :not="notPercentage" :over="overPercentage"></PieChart>
 
       </div>
       <div align="center">
@@ -134,7 +135,7 @@
 
   import {dataService} from '../services/data.service';
   import TabHeader from './TabHeader';
-  import CategoryTable from './CategoryTable';
+  import PieChart from './PieChart';
 
   import axios from 'axios'
   import VueAxios from 'vue-axios'
@@ -147,7 +148,7 @@
           name: "AssessmentResults",
           components: {
              TabHeader,
-             CategoryTable,
+             PieChart
           },
           data() {
               return {
@@ -185,6 +186,10 @@
                   drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
+                  goodPercentage : 0,
+                  somePercentage : 0,
+                  notPercentage : 0,
+                  overPercentage : 0
               }
         },
         computed: {
@@ -219,6 +224,11 @@
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
                 this.getInterventionTypeResult();
 
+                // do overall calculations
+                this.goodPercentage = this.calcPerCategory(this.totalGood, this.totalValidTests);
+                this.somePercentage = this.calcPerCategory(this.totalSome, this.totalValidTests);
+                this.notPercentage = this.calcPerCategory(this.totalNot, this.totalValidTests);
+                this.overPercentage = this.calcPerCategory(this.totalOver, this.totalValidTests);
               });
             },
             getInterventionTypeResult(){
@@ -249,6 +259,14 @@
                 return percent;
               }
               return 'n/a';
+            },
+            calcPerCategory(num, total){
+              if(total !== 0) {
+                let percent = ((num/total) *100).toFixed(1);
+              //  percent = Math.round(percent);
+                return percent;
+              }
+              return 0;
             },
             onExitClick() {
                 this.$router.push('/logout');
@@ -635,11 +653,11 @@
   }
 
   td.good {
-    background-color: #59ee3e;
+    background-color: #3cee37;
   }
 
   td.some {
-    background-color: #ffc251;
+    background-color: #FFBF00;
   }
 
   td.not { background-color: #ff3b33;

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import VueGoogleCharts from 'vue-google-charts'
 import {router} from './router'
 import { store } from './store'
 import VeeValidate from 'vee-validate'
@@ -13,6 +14,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // Install BootstrapVue
 Vue.use(BootstrapVue);
+Vue.use(VueGoogleCharts);
 
 Vue.use(VeeValidate, {
   classes: true,
