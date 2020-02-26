@@ -14,7 +14,7 @@ import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
 import AssessmentContent from './components/AssessmentContent';
-import PieChart from './components/PieChart';
+import AppCharts from './components/AppCharts';
 
 Vue.use(Router);
 
@@ -78,7 +78,7 @@ export const router = new Router({
     },
     {
       path: '/charts',
-      component: PieChart
+      component: AppCharts
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }

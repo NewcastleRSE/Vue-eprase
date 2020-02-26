@@ -57,7 +57,7 @@
               <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select an Option...</option>
                 <option value="Adults">Adults</option>
-                <option value="Pediatrics">Pediatrics</option>
+                <option value="Pediatrics">Paediatrics</option>
                 <option value="Both">Both</option>
               </select>
             </div>

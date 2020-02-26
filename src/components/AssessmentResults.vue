@@ -117,7 +117,7 @@
           </table>
         </section>
 
-        <button class="chartbutton" @click="onChartsClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">View Charts</a></button>
+        <button class="chartbutton" @click="onChartsClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
 
       </div>
       <div align="center">
@@ -149,7 +149,7 @@
           components: {
              TabHeader,
              PieChart,
-              StackedChart
+             StackedChart
           },
           data() {
               return {
@@ -190,9 +190,7 @@
                   goodPercentage : 0,
                   somePercentage : 0,
                   notPercentage : 0,
-                  overPercentage : 0,
-                  showPieChart : true,
-                  showStackedChart: false
+                  overPercentage : 0
               }
         },
         computed: {
@@ -240,7 +238,7 @@
                 const overPercentage = this.overPercentage;
                 const {dispatch} = this.$store;
 
-                if(id) {
+                if(dispatch) {
                   dispatch('storePercentageResults', {  goodPercentage, somePercentage, notPercentage, overPercentage });
                 }
               });
@@ -577,10 +575,6 @@
                   }
                 }
               }
-            },
-            onShowCharts() {
-              this.showPieChart = false;
-              this.showStackedChart = true;
             }
           },
         created() {

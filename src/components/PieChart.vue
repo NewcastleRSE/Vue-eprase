@@ -1,22 +1,19 @@
 <template>
 
-  <div id="page">
-    <TabHeader system-opacity="1.0" patient-opacity="1.0" scenario-opacity="1.0" report-opacity="1.0"></TabHeader>
-      <section class="section">
-        <div class="container">
-          <div id="pie-chart" style="width: 900px; height: 500px;">
-            <GChart
-              :settings="{ packages: ['corechart']}"
-              type="PieChart"
-              :options="chartOptions"
-              style="width: 900px; height: 500px;"
-              @ready="onChartReady"
-              ref="gChart"
-            />
-          </div>
+    <section class="section">
+      <div class="container">
+        <div id="pie-chart" style="width: 900px; height: 500px;">
+          <GChart
+            :settings="{ packages: ['corechart']}"
+            type="PieChart"
+            :options="chartOptions"
+            style="width: 900px; height: 500px;"
+            @ready="onChartReady"
+            ref="gChart"
+          />
         </div>
-      </section>
-  </div>
+      </div>
+    </section>
 
 </template>
 
@@ -44,19 +41,19 @@
         },
         computed: {
             roundedGood(){
-              let good = this.$store.state.goodPercentage.goodPercentage;
+              let good = this.$store.state.percentage[0];
               return Math.round(good);
             },
             roundedSome(){
-              let some = this.$store.state.goodPercentage.somePercentage;
+              let some = this.$store.state.percentage[1];
               return Math.round(some);
             },
             roundedNot(){
-              let not = this.$store.state.goodPercentage.notPercentage;
+              let not = this.$store.state.percentage[2];
               return Math.round(not);
             },
             roundedOver(){
-              let over = this.$store.state.goodPercentage.overPercentage;
+              let over = this.$store.state.percentage[3];
               return Math.round(over);
             }
         },
@@ -66,10 +63,6 @@
             },
 
             createDataTable(chart, google) {
-
-              console.log(this.roundedGood);
-              console.log(this.roundedSome);
-
                 var container = document.getElementById('pie-chart');
                 var chart = new google.visualization.PieChart(container);
 

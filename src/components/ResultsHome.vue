@@ -73,6 +73,15 @@
                         let timestamp = this.assessments[assessment].system.time_created;
                         var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                         this.assessments[assessment].system.time_created = date;
+
+                        const id = this.assessments[assessment].system.id;
+                        const {dispatch} = this.$store;
+
+                        if(dispatch) {
+                          dispatch('storeAssessmentId', { id });
+                        }
+
+
                       }
                     }
                 })

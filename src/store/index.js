@@ -11,6 +11,7 @@ export const store = new Vuex.Store({
     authentication
   },
   state : {
+    assessmentId: null,
     patientList : null,
     testList: [],
     patientIndex : 0,
@@ -20,10 +21,12 @@ export const store = new Vuex.Store({
     part3complete: null,
     part4complete: null,
     configErrorComplete: null,
-    goodPercentage: null,
-    somePercentage: null,
-    notPercentage: null,
-    overPercentage: null
+    percentage: [
+      'goodPercentage',
+      'somePercentage',
+      'notPercentage',
+      'overPercentage'
+    ],
   },
   actions : {
     setPatientList({ commit }, { patientList  } ) {
@@ -57,6 +60,9 @@ export const store = new Vuex.Store({
     },
     storePercentageResults({ commit }, { goodPercentage, somePercentage, notPercentage, overPercentage}){
       commit('setPercentageResults', { goodPercentage, somePercentage, notPercentage, overPercentage });
+    },
+    storeAssessmentId({commit}, { id }){
+      commit('setAssessmentId', { id} );
     }
   },
   mutations: {
@@ -87,11 +93,14 @@ export const store = new Vuex.Store({
     saveConfigError(state){
       state.configErrorComplete = true;
     },
-    setPercentageResults(state, goodPercentage, somePercentage, notPercentage, overPercentage){
-      state.goodPercentage = goodPercentage;
-      state.somePercentage = somePercentage;
-      state.notPercentage = notPercentage;
-      state.overPercentage = overPercentage;
+    setPercentageResults(state, { goodPercentage, somePercentage, notPercentage, overPercentage} ){
+      state.percentage[0] = goodPercentage;
+      state.percentage[1] = somePercentage;
+      state.percentage[2] = notPercentage;
+      state.percentage[3] = overPercentage;
+    },
+    setAssessmentId(state, id){
+      state.assessmentId = id;
     }
   }
 });
