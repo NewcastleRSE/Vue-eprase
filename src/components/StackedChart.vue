@@ -58,18 +58,18 @@
 
                 var data = google.visualization.arrayToDataTable([
                   ['Error Category', 'Good mitigation', 'Some mitigation', 'Not mitigated', 'Over mitigated'],
-                  ['Drug age',  40, 50, 0, 10],
-                  ['Drug dose',  80, 0, 20, 0],
-                  ['Drug interaction',  80, 10, 10, 0],
-                  ['Drug allergy',  50, 0, 50,0],
-                  ['Drug duplication',  20, 40, 30, 10],
-                  ['Drug disease', 60, 20, 10, 10],
-                  ['Drug omissions',  75, 25, 0, 0],
-                  ['Theraputic duplicate',  100, 0, 0, 0],
-                  ['Drug lab',  0, 0, 0, 0],
-                  ['Drug brand',  30, 50, 10, 10],
-                  ['Drug route',  50, 30, 10, 10],
-                  ['Drug overdose',  60, 40, 0, 0]
+                  ['Drug age',  50, 50, 0, 0],
+                  ['Drug dose',  83, 17, 0, 0],
+                  ['Drug interaction',  75, 0, 0, 25],
+                  ['Drug allergy',  100, 0, 0, 0],
+                  ['Drug duplication',  100, 0, 0, 0],
+                  ['Drug disease', 67, 22, 11, 0],
+                  ['Drug omissions',  100, 0, 0, 0],
+                  ['Theraputic duplication',  100, 0, 0, 0],
+                  ['Drug lab',  50, 50, 0, 0],
+                  ['Drug brand',  100, 0, 0, 0],
+                  ['Drug route',  50, 50, 0, 0],
+                  ['Drug overdose',  100, 0, 0, 0]
                 ]);
 
                 var view = new google.visualization.DataView(data);

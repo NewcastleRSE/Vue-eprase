@@ -56,7 +56,7 @@
               <td>{{ calc(drugInteraction.not, drugInteraction.count)}}</td>
               <td>{{ calc(drugInteraction.over, drugInteraction.count)}}</td></tr>
             <tr><td>Drug Allergy ({{ drugAllergy.count }})</td>
-              <td>{{ calc(drugAllergy.some, drugAllergy.count)   }}</td>
+              <td>{{ calc(drugAllergy.good, drugAllergy.count)   }}</td>
               <td>{{ calc(drugAllergy.some, drugAllergy.count)  }}</td>
               <td>{{ calc(drugAllergy.not, drugAllergy.count) }}</td>
               <td>{{ calc(drugAllergy.over, drugAllergy.count) }}</td></tr>
@@ -100,7 +100,7 @@
               <td>{{ calc(drugOverdose.some, drugOverdose.count)  }}</td>
               <td>{{ calc(drugOverdose.not, drugOverdose.count) }}</td>
               <td>{{ calc(drugOverdose.over, drugOverdose.count) }}</td></tr>
-            <tr><th>All Categories</th><td class="good">Total : {{ goodPercentage }}%</td><td class="some">Total : {{ somePercentage }}% <td class="not">Total :  {{ notPercentage }}% </td><td class="over">Total : {{ overPercentage}}% </td></tr>
+            <tr><th>All Categories</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}% <td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
           </table>
         </div>
 
@@ -187,10 +187,6 @@
                   drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
-                  goodPercentage : 0,
-                  somePercentage : 0,
-                  notPercentage : 0,
-                  overPercentage : 0
               }
         },
         computed: {
@@ -225,17 +221,11 @@
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
                 this.getInterventionTypeResult();
 
-                // do overall calculations
-                this.goodPercentage = this.calcPerCategory(this.totalGood, this.totalValidTests);
-                this.somePercentage = this.calcPerCategory(this.totalSome, this.totalValidTests);
-                this.notPercentage = this.calcPerCategory(this.totalNot, this.totalValidTests);
-                this.overPercentage = this.calcPerCategory(this.totalOver, this.totalValidTests);
-
                 // const variables for sending to storage
-                const goodPercentage = this.goodPercentage;
-                const somePercentage = this.somePercentage;
-                const notPercentage = this.notPercentage;
-                const overPercentage = this.overPercentage;
+                const goodPercentage = this.calcPerCategory(this.totalGood, this.totalValidTests);
+                const somePercentage = this.calcPerCategory(this.totalSome, this.totalValidTests);
+                const notPercentage = this.calcPerCategory(this.totalNot, this.totalValidTests);
+                const overPercentage = this.calcPerCategory(this.totalOver, this.totalValidTests);
                 const {dispatch} = this.$store;
 
                 if(dispatch) {
@@ -291,7 +281,6 @@
                 if(data.hasOwnProperty(index)){
                   let name = data[index].categoryName;
                   let mitigation = data[index].mitigation;
-
                   let outcome = data[index].outcome;
                   if(outcome === 'intervention'){
                     this.totalInterventions++;
