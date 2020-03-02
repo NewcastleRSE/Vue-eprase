@@ -136,7 +136,7 @@
       </div>
     </div>
     </div>
-
+    <AppLogo></AppLogo>
  </div>
 </template>
 
@@ -145,11 +145,13 @@
     import { dataService } from '../services/data.service';
     import { patientService } from '../services/patient.service';
     import  TabHeader from './TabHeader';
+    import AppLogo from "./AppLogo";
 
     export default {
         name: "AssessmentPatientDetails",
         components: {
-            TabHeader
+            TabHeader,
+            AppLogo
         },
         computed: {
             myPatientList() {

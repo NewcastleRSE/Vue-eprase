@@ -25,6 +25,8 @@
     </div>
 
   </div>
+
+  <AppLogo></AppLogo>
 </div>
 </template>
 
@@ -32,13 +34,15 @@
 
     import { dataService } from '../services/data.service';
     import  AppPatients from './AppPatients';
+    import AppLogo from "./AppLogo";
     import  TabHeader from './TabHeader';
 
     export default {
         name: "AssessmentPatients",
         components: {
             TabHeader,
-            AppPatients
+            AppPatients,
+            AppLogo
         },
         computed: {
             user() {

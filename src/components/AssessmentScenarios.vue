@@ -11,7 +11,7 @@
        <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError>
      </div>
    </div>
-
+   <AppLogo></AppLogo>
  </div>
 
 </template>
@@ -22,13 +22,15 @@
     import ScenarioPrescription from "./ScenarioPrescription";
     import ConfigError from "./ConfigError";
     import TabHeader from"./TabHeader";
+    import AppLogo from "./AppLogo";
 
     export default {
         name: "AssessmentScenarios",
         components: {
             ScenarioPrescription,
             ConfigError,
-            TabHeader
+            TabHeader,
+            AppLogo
         },
         computed: {
             getCurrentTestIndex() {

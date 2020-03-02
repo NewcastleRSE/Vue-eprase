@@ -16,6 +16,7 @@
         </div>
       </div>
     </div>
+    <AppLogo></AppLogo>
   </div>
 </template>
 
@@ -23,11 +24,13 @@
 
     import { settings } from '../settings'
     import TabHeader from './TabHeader';
+    import AppLogo from './AppLogo';
 
     export default {
         name: "LockoutScreen",
         components: {
-           TabHeader
+           TabHeader,
+           AppLogo
         },
         data() {
             return {

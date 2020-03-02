@@ -153,6 +153,7 @@
       </div>
 
     </div>
+    <AppLogo></AppLogo>
 
   </div>
 
@@ -162,13 +163,15 @@
 
     import AssessmentHome from './AssessmentHome';
     import TabHeader from './TabHeader';
+    import AppLogo from './AppLogo';
     import { dataService } from '../services/data.service';
 
     export default {
         name: "AssessmentSystem",
         components: {
             AssessmentHome,
-            TabHeader
+            TabHeader,
+            AppLogo
         },
         computed: {
             isFormInvalid() {
@@ -286,7 +289,7 @@
 
   #ep-system-form {
     margin-top: 40px;
-    padding: 20px;
+    padding: 20px 20px 0 20px;
     border-radius: 25px;
     width: 100%;
   }
