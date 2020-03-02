@@ -34,6 +34,8 @@
     </div>
 
     <AppFooter />
+    <AppLogo></AppLogo>
+
 
   </div>
 
@@ -46,12 +48,14 @@
     import { patientService } from '../services/patient.service';
     import TabHeader from './TabHeader';
     import AppFooter from "./AppFooter";
+    import AppLogo from "./AppLogo";
 
     export default {
         name: "AssessmentIntro",
         components: {
             AppFooter,
-            TabHeader
+            TabHeader,
+            AppLogo
         },
         data() {
             return {
