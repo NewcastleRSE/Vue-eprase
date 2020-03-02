@@ -127,6 +127,7 @@
         </div>
       </div>
     </div>
+    <AppLogo></AppLogo>
   </div>
 </template>
 
@@ -141,12 +142,14 @@
   import VueAxios from 'vue-axios'
   import Vue from 'vue'
   import {settings} from "../settings";
+  import AppLogo from "./AppLogo";
 
   Vue.use(VueAxios, axios);
 
       export default {
           name: "AssessmentResults",
           components: {
+             AppLogo,
              TabHeader,
              PieChart,
              StackedChart

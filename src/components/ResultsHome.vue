@@ -31,6 +31,7 @@
       <button><font-awesome-icon icon="home"></font-awesome-icon><span class="headerLink"><router-link to="/assessmentintro">Home</router-link></span></button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
     </div>
+    <AppLogo></AppLogo>
 
   </div>
 
@@ -43,13 +44,15 @@
     import axios from 'axios'
     import VueAxios from 'vue-axios'
     import Vue from 'vue'
+    import AppLogo from "./AppLogo";
 
     Vue.use(VueAxios, axios);
 
     export default {
         name: "ResultsHome",
         components: {
-          TabHeader
+          TabHeader,
+          AppLogo
         },
         data() {
             return {
