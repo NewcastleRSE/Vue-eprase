@@ -39,16 +39,16 @@
               <div class="radio-buttons">
                 <div>
                    <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes"  v-validate="'required'" >
-                  <label for="no-intervention">You were able to complete the prescription (includes followed order sentence) <strong><em>without any additional user or system input</em></strong>. </label> <font-awesome-icon icon="info-circle"></font-awesome-icon>
+                  <label for="no-intervention">You were able to complete the prescription (includes followed order sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
 
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden" v-model="response.outcomes">
-                  <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to override components of the order sentence</em></strong>.</label> <font-awesome-icon icon="info-circle" title="testing"></font-awesome-icon>
+                  <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="intervention" id="intervention" v-model="response.outcomes">
-                   <label for="intervention">You were able to complete the prescription, <strong><em>with system/user intervention</em></strong></label> <font-awesome-icon icon="info-circle"></font-awesome-icon>
+                   <label for="intervention">You were able to complete the prescription, <strong><em>with system/user intervention</em></strong></label><b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented" v-model="response.outcomes">
@@ -431,15 +431,20 @@
   }
 
   button {
-    height: 40px;
-    width: 100px;
-    font-size: 1.2em;
-    margin: 0 50px;
+    width: 30px;
+    height: 20px;
+    margin: 0 10px;
+    line-height: 0.5em;
+    font-weight: bold;
   }
 
   .scenario-btn {
     background-color: #02b9b8;
     border: 0;
+    height: 40px;
+    width: 100px;
+    font-size: 1.2em;
+    margin: 0 50px;
   }
 
   .visible {
