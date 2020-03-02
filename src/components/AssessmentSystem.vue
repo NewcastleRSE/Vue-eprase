@@ -209,9 +209,9 @@
                       { text: 'Adult Critical Care', value: 'ACC'},
                       { text: 'Paediatric Critical Care', value: 'PCC'},
                       { text: 'A & E', value: 'A&E'},
-                      { text: 'Inpatients', value: 'Inpatients'},
+                      { text: 'Chemotherapy', value: 'Chemotherapy'},
                       { text: 'Outpatients', value: 'Outpatients'},
-                      { text: 'Paediatric', value: 'Paediatric'},
+                      { text: 'Community Care', value: 'Community care'},
                       { text: 'Day Cases', value: 'Day cases'},
                       { text: 'Clinical Trials', value: 'Clinical trials'},
                       { text: 'Intermediate Care', value: 'Intermediate care'}

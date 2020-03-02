@@ -16,23 +16,11 @@
       </div>
     </div>
 
-    <div class="assessment">
-      <p>Please note any difficulties or interventions from the system that you encountered when completing this task using the box below.</p>
-      <div align="center">
-       <div class="alert alert-warning" role="alert">
-          To optimise the use of this tool please record ALL types of guidance that appears on your system screen
-        </div>
-        <form>
-          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
-        </form>
-      </div>
-    </div>
-
     <div class="form-group footer" align="center">
       <div class="buttons">
         <p>When all of the patients have been admitted to your ePrescription System, click <strong>Next</strong>.</p>
         <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
-        <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
+        <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()">Next</button>
       </div>
     </div>
 
@@ -53,9 +41,6 @@
             AppPatients
         },
         computed: {
-            isFormInvalid() {
-                return Object.keys(this.fields).some(key => this.fields[key].invalid);
-            },
             user() {
                 return this.$store.state.authentication.user;
             }
@@ -65,7 +50,6 @@
                 submitted: false,
                 assessment: {
                     currentPart: dataService.getAssessmentPart(),
-                    qualitative_data : '',
                     time_taken: ''
                 },
                 startTime: ''
@@ -88,12 +72,10 @@
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
-
-                        const qualitative_data = this.assessment.qualitative_data;
                         const time_taken = this.assessment.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePart2Data', { qualitative_data, time_taken });
+                            dispatch('savePart2Data', { time_taken });
                         }
 
                         // audit

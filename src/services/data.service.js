@@ -44,7 +44,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient
     });
 }
 
-function savePart2Data(qualitative_data, time_taken){
+function savePart2Data(time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -52,10 +52,10 @@ function savePart2Data(qualitative_data, time_taken){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ qualitative_data, time_taken })
+    body: JSON.stringify({ time_taken })
   };
 
-  return fetch(settings.baseUrl + 'part2?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'createpatients?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
       dataService.setAssessmentPart(3);
@@ -238,7 +238,7 @@ function getCategoryData(id) {
   return fetch(settings.baseUrl + 'resultCategories?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
-      // console.log(response);
+     // console.log(response);
       return response;
     })
     .catch(function() {
