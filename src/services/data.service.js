@@ -11,7 +11,7 @@ export const dataService = {
   setAssessmentPart,
   saveSystemData,
   savePart2Data,
-  savePart3Data,
+  savePatientData,
   savePrescriptionData,
   saveConfigError,
   getConfigErrors,
@@ -28,7 +28,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient
     body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'part1', requestOptions)
+  return fetch(settings.baseUrl + 'system', requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
@@ -67,7 +67,7 @@ function savePart2Data(time_taken){
 
 }
 
-function savePart3Data(qualitative_data, patient_id, time_taken){
+function savePatientData(qualitative_data, patient_id, time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -78,17 +78,17 @@ function savePart3Data(qualitative_data, patient_id, time_taken){
     body: JSON.stringify({ qualitative_data, patient_id, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'part3?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'patientdata?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
     })
     .catch(function() {
-      console.log('Error returning from savePart3Data');
+      console.log('Error returning from savePatientData');
     });
 }
 
-function savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
+function savePrescriptionData(prescription, outcome, other, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -96,7 +96,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
+    body: JSON.stringify({outcome, other, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
   return fetch(settings.baseUrl + 'prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)

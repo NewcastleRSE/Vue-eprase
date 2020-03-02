@@ -62,7 +62,7 @@
                 </div>
 
               <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
-                  <h5 class="card-title">Diagnosis</h5>
+                  <h5 class="card-title">Presents with/Comorbidities</h5>
                   <table>
                     <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
                       <td>{{diagnosis}}</td>
@@ -101,10 +101,12 @@
                   <tr>
                     <td><strong>Investigation</strong></td>
                     <td><strong>Value</strong></td>
+                    <td><strong>Unit</strong></td>
                   </tr>
                   <tr v-for="clinical in patient[getCurrentPatient].clinical_data">
                     <td>{{clinical.investigation}}</td>
                     <td>{{clinical.value}}</td>
+                    <td>{{ clinical.unit }}</td>
                   </tr>
                 </table>
               </div>
@@ -116,12 +118,12 @@
         </div>
 
       <div class="assessment">
-        <p>Note any intervention from the system using the box below.</p>
+        <p></p>
         <div align="center">
           <div class="alert alert-warning" role="alert">
             To optimise the use of this tool please record ALL types of guidance that appears on your system screen
           </div>
-          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Enter notes here..." maxlength="500"></textarea>
+          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Please note any interventions from the system..." maxlength="500"></textarea>
         </div>
       </div>
       <div class="form-group footer" align="center">
@@ -220,7 +222,7 @@
 
                         const {dispatch} = this.$store;
                         if (time_taken) {
-                            dispatch('savePart3Data', {qualitative_data, patient_id, time_taken, index, completed});
+                            dispatch('savePatientData', {qualitative_data, patient_id, time_taken, index, completed});
                         }
                         this.submitted = true;
                         this.assessment.qualitative_data = '';

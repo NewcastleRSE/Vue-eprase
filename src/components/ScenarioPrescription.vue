@@ -39,19 +39,21 @@
               <div class="radio-buttons">
                 <div>
                    <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes"  v-validate="'required'" >
-                   <label for="no-intervention">You were able to complete the prescription <strong><em>without</em></strong> any additional user or system input (includes followed order sentence)</label>
+                  <label for="no-intervention">You were able to complete the prescription (includes followed order sentence) <strong><em>without any additional user or system input</em></strong>. </label> <font-awesome-icon icon="info-circle"></font-awesome-icon>
+
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden" v-model="response.outcomes">
-                   <label for="order-set-overridden">Order set provided, but you were able to override to complete the prescription</label>
+                  <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to override components of the order sentence</em></strong>.</label> <font-awesome-icon icon="info-circle" title="testing"></font-awesome-icon>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="intervention" id="intervention" v-model="response.outcomes">
-                   <label for="intervention">Prescription completed <strong><em>with</em></strong> system/user intervention</label>
+                   <label for="intervention">You were able to complete the prescription, <strong><em>with system/user intervention</em></strong></label> <font-awesome-icon icon="info-circle"></font-awesome-icon>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented" v-model="response.outcomes">
-                   <label for="order-prevented">Prescribing prevented (includes order sentence, provided that you were <strong><em>unable to overrride</em></strong>)</label></div>
+                  <label for="order-prevented">Prevented from prescribing</label>
+                </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="not-available" id="not-available" v-model="response.outcomes">
                    <label for="not-available">Medicine or formulary alternative not available in the system</label>
@@ -59,53 +61,24 @@
              </div>
 
           </div>
+
           <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
             <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert (interruptive type, maybe a pop-up that requires  action) OR advisory (passive dialogue, maybe a banner message on the bottom of the screen) you would expect.</div>
-            <p>What was the stated reason for the intervention? Please choose <strong>one</strong>.</p>
 
 
-            <table id="drug-table" class="table-striped">
-              <tbody>
-              <tr><td><input type="radio" name="advice-radios" value="drug-age" id="drug-age" v-model="response.intervention_type"></td><td><label for="drug-age">Drug and patient age</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-dose" id="drug-dose" v-model="response.intervention_type"></td><td><label for="drug-dose">Drug dose level</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-interaction" id="drug-interaction" v-model="response.intervention_type"></td><td> <label for="drug-interaction">Drug interaction</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-allergies" id="drug-allergies" v-model="response.intervention_type"></td><td> <label for="drug-allergies">Drug allergies</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label for="drug-duplication">Drug duplication</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label for="drug-disease">Drug disease</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label for="drug-ommissions">Drug omissions</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label for="theraputic_duplication">Theraputic duplication</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label for="drug-lab">Lab results/monitoring/TDM</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label for="drug-route">Drug brand</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label for="drug-route">Incorrect route</label></td></tr>
-              <tr><td><input type="radio" name="advice-radios" value="other" id="other" v-model="response.intervention_type"></td><td><label for="other">Other Please Specify</label></td></tr>
-              </tbody>
-            </table>
+            <div id="selected-type">
+              <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
+                <option value="alert">Alert</option>
+                <option value="advisory">Advisory</option>
+                <option value="advisory">Both</option>
+              </select>
 
-            <div v-show="response.intervention_type === 'other' && response.intervention_type" id="response-other">
-                <label for="advice-other"> Other: </label>
-                <input type="text" id="advice-other" class="form-control" v-model="response.other" minlength="3" maxlength="50">
-                <div v-if="response.other.invalid && response.other.touched" class="alert alert-danger">
-                  Other is required with a minimum of 3 characters
-                </div>
-              </div>
-          </div>
-
-          <div class="intervention-select" v-show="response.intervention_type !== ''">
-
-            <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
-              <option value="alert">Alert</option>
-              <option value="advisory">Advisory</option>
-            </select>
-
-            <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
-          </div>
-
-<!--
-          <div class="assessment">
-            <div>
-              <textarea type="text" name="input" id="patient-intervention" class="form-control" v-model="response.qualitative_data" placeholder="Note any intervention from the system..." maxlength="500"></textarea>
+              <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
             </div>
-          </div> -->
+
+
+            <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="response.qualitative_data" placeholder="Please tell us about the system response..." maxlength="500"></textarea>
+          </div>
 
           <input type="hidden" id="test_id" v-model="response.prescription=prescription.id" />
           <input type="hidden" id="result_score" v-model="response.result_score=getResult" />
@@ -153,7 +126,7 @@
               if(!this.response.outcomes){
                 return true;
               }
-              else if(this.response.outcomes === 'intervention' && !this.intervention_type && !this.response.selected_type){
+              else if(this.response.outcomes === 'intervention' &&  !this.response.selected_type){
                 return true
               }
 
@@ -177,7 +150,6 @@
                     time_taken: '',
                     prescription : '',
                     risk_level: '',
-                    intervention_type : '',
                     selected_type: '',
                     qualitative_data : ''
                 },
@@ -277,7 +249,6 @@
                         const prescription = this.response.prescription;
                         const outcome = this.response.outcomes;
                         const other = this.response.other;
-                        const intervention_type = this.response.intervention_type;
                         const selected_type = this.response.selected_type;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
@@ -288,7 +259,7 @@
                         const completed = this.completed;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
+                            dispatch('savePrescriptionData', {prescription, outcome, other, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
@@ -492,8 +463,8 @@
     padding-left: 10px;
   }
 
-  .intervention-select {
-    padding-bottom: 50px;
+  #selected-type {
+    padding: 30px 0;
   }
 
   select {
