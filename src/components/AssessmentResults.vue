@@ -39,8 +39,7 @@
         </div> -->
 
         <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
-        <StackedChart></StackedChart>
-
+        <StackedChart :mydata="chartCategoryData" ></StackedChart>
 
         <section>
           <div>Total valid tests: {{ totalValidTests }}</div>
@@ -51,7 +50,7 @@
         <section>
           <h4>Intervention type results</h4>
           <table>
-            <tr><th>Alerts Total</th><td>{{ totalAlerts }} / {{ totalInterventions }}</td><td> {{ calc(totalAlerts, totalInterventions) }}</td><td>{{  interventionTypeResult }}</td></tr>
+            <tr><th>Alerts Total</th><td>({{ totalAlerts }}/{{ totalInterventions }})</td><td> {{ calc(totalAlerts, totalInterventions) }}</td><td>{{  interventionTypeResult }}</td></tr>
           </table>
         </section>
 
@@ -97,6 +96,7 @@
                   categories : [],
                   categoryData : [],
                   mitigationData: [],
+                  chartCategoryData: [],
                   goodMitigation: '',
                   someMitigation: '',
                   notMitigated: '',
@@ -164,20 +164,46 @@
                 this.categoryData = formattedData;
                 this.countCategories(this.categoryData);
 
+                this.chartCategoryData = [{
+                  "category": "Drug Age",
+                  "good": this.drugAge.good,
+                  "some" :this.drugAge.some,
+                  "not":  this.drugAge.not,
+                  "over": this.drugAge.over
+                } ,
+                {
+                  "category": "Drug Dose",
+                  "good": this.drugDose.good,
+                  "some": this.drugDose.some,
+                  "not":  this.drugDose.not,
+                  "over": this.drugDose.over
+                },
+                {
+                  "category": "Drug Interaction",
+                  "good": this.drugInteraction.good,
+                  "some" : this.drugInteraction.some,
+                  "not":  this.drugInteraction.not,
+                  "over": this.drugInteraction.over
+                },
+                {
+                  "category": "Drug Allergy",
+                  "good": this.drugAllergy.good,
+                  "some": this.drugAllergy.some,
+                  "not":  this.drugAllergy.not,
+                  "over": this.drugAllergy.over
+                },
+                {
+                  "category": "Drug Duplication",
+                  "good": this.drugDuplication.good,
+                  "some": this.drugDuplication.some,
+                  "not":  this.drugDuplication.not,
+                  "over": this.drugDuplication.over
+                }];
+
                 // calculate number of valid tests, ignoring null results
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
                 this.getInterventionTypeResult();
 
-                // const variables for sending to storage
-                const goodPercentage = this.calcPerCategory(this.totalGood, this.totalValidTests);
-                const somePercentage = this.calcPerCategory(this.totalSome, this.totalValidTests);
-                const notPercentage = this.calcPerCategory(this.totalNot, this.totalValidTests);
-                const overPercentage = this.calcPerCategory(this.totalOver, this.totalValidTests);
-                const {dispatch} = this.$store;
-
-                if(dispatch) {
-                  dispatch('storePercentageResults', {  goodPercentage, somePercentage, notPercentage, overPercentage });
-                }
               });
             },
             countCategories(data){
@@ -219,7 +245,6 @@
                           if(mitigation !== 'Null'){
                             this.drugAge.count++;
                           }
-
                           break;
                         case "Drug Dose":
                           if(mitigation === 'Good Mitigation/Pass'){
@@ -523,12 +548,12 @@
               });
 
               dataService.getAssessment(id).then(data => {
-                    this.prescriptionList = data.prescriptionList;
-                   /* this.system.ep_usage = data.system.ep_usage;
-                    this.system.lab_results = data.system.lab_results.toString(); */
+                  this.prescriptionList = data.prescriptionList;
+                 /* this.system.ep_usage = data.system.ep_usage;
+                  this.system.lab_results = data.system.lab_results.toString(); */
 
-                    // audit
-                    dataService.audit('View report', '/assessmentresults');
+                  // audit
+                  dataService.audit('View report', '/assessmentresults');
 
                   dataService.getMitigationResults(id).then(data => {
                     this.mitigationData = data;
@@ -536,12 +561,10 @@
                     this.someMitigation = data.someMitigation;
                     this.notMitigated = data.notMitigated;
                     this.overMitigated = data.notMitigated;
-                    if(!data){
-                      this.createResults(id);
-                    }
+
+                    this.createResults(id);
 
                   })
-
               });
 
 
