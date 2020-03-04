@@ -59,6 +59,7 @@ export const store = new Vuex.Store({
       commit('updateTestIndex', index);
     },
     storePercentageResults({ commit }, { goodPercentage, somePercentage, notPercentage, overPercentage}){
+      dataService.saveMitigationResults( goodPercentage, somePercentage, notPercentage, overPercentage);
       commit('setPercentageResults', { goodPercentage, somePercentage, notPercentage, overPercentage });
     },
     storeAssessmentId({commit}, { id }){

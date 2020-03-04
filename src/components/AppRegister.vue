@@ -32,7 +32,8 @@
           <div class="form-group">
             <label for="institution"> Select Institution: </label>
             <select name="singleSelect" id ="institution" v-validate="'required'" v-model="user.institution" class="form-control" >
-              <option v-for="institution in institutions" v-bind:value="institution.orgCode">{{institution.orgName}}</option>
+              <option v-for="institution in institutions" v-bind:value="institution.id">{{institution.orgName}}</option>
+              <div v-show="submitted && errors.has('institution')" class="invalid-feedback alert alert-danger">{{ errors.first('institution') }}</div>
             </select>
 
           </div>

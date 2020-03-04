@@ -13,6 +13,8 @@ export const dataService = {
   savePart2Data,
   savePatientData,
   savePrescriptionData,
+  saveMitigationResults,
+  getMitigationResults,
   saveConfigError,
   getConfigErrors,
   audit
@@ -107,6 +109,27 @@ function savePrescriptionData(prescription, outcome, other, selected_type, risk_
 
 }
 
+function saveMitigationResults(goodMitigation, someMitigation, notMitigated, overMitigated){
+
+  let token = getToken();
+  let assessmentId = getAssessmentId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated })
+  };
+
+  return fetch(settings.baseUrl + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + 145, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from saveMitigationResults');
+    });
+}
+
 function saveConfigError(  test_id, result, time_taken ) {
 
   let token = getToken();
@@ -179,6 +202,8 @@ function getAssessment(id) {
   return fetch(settings.baseUrl + 'result?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
+
+      console.log(response);
       return response;
     })
     .catch(function() {
@@ -196,7 +221,7 @@ function getInstitutions() {
   return fetch(settings.baseUrl + 'auth/institutions', requestOptions)
     .then(handleResponse)
     .then(response => {
-     // console.log(response);
+      console.log(response);
       return response;
     })
     .catch(function() {
@@ -243,6 +268,25 @@ function getCategoryData(id) {
     })
     .catch(function() {
       console.log('Error returning from resultCategories');
+    });
+}
+
+function getMitigationResults(id) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'getMitigationResults?ID=' + id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getMitigationResults');
     });
 }
 

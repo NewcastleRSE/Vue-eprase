@@ -24,6 +24,12 @@
 
     export default {
         name: "PieChart",
+        props: {
+          goodMitigation: '',
+          someMitigation: '',
+          notMitigated: '',
+          overMitigated: ''
+        },
         components: {
           GChart,
           TabHeader
@@ -41,19 +47,19 @@
         },
         computed: {
             roundedGood(){
-              let good = this.$store.state.percentage[0];
+              let good = this.goodMitigation;
               return Math.round(good);
             },
             roundedSome(){
-              let some = this.$store.state.percentage[1];
+              let some = this.someMitigation;
               return Math.round(some);
             },
             roundedNot(){
-              let not = this.$store.state.percentage[2];
+              let not = this.notMitigated;
               return Math.round(not);
             },
             roundedOver(){
-              let over = this.$store.state.percentage[3];
+              let over = this.overMitigated;
               return Math.round(over);
             }
         },

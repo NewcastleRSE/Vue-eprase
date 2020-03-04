@@ -5,7 +5,10 @@
 
     <div id="content">
       <h2>Assessment Results</h2>
-      <p>Your results from the ePRaSE assessment. </p>
+      <p>Your results from the ePRaSE assessment.</p>
+        <strong>User:</strong> {{ user.username }}<br />
+        <strong>Institution:</strong> {{ }} <br />
+        <strong>Assessment Id:</strong> {{ }}
 
       <div class="assessment-results">
 
@@ -35,7 +38,7 @@
 
         </div> -->
 
-        <PieChart></PieChart>
+        <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
         <StackedChart></StackedChart>
 
 
@@ -93,6 +96,11 @@
               return {
                   categories : [],
                   categoryData : [],
+                  mitigationData: [],
+                  goodMitigation: '',
+                  someMitigation: '',
+                  notMitigated: '',
+                  overMitigated: '',
                   score : {
                       category : '',
                       resultAverage : ''
@@ -194,8 +202,6 @@
                           if(mitigation === 'Good Mitigation/Pass'){
                             this.drugAge.good++;
                             this.totalGood++;
-
-                            console.log(this.totalGood);
                           }
                           else if (mitigation === 'Some Mitigation'){
                             this.drugAge.some++;
@@ -462,8 +468,6 @@
                     }
                   }
                 }
-
-              console.log(this.totalGood);
             },
             getInterventionTypeResult(){
                 let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
@@ -525,8 +529,22 @@
 
                     // audit
                     dataService.audit('View report', '/assessmentresults');
-                    this.createResults(id);
+
+                  dataService.getMitigationResults(id).then(data => {
+                    this.mitigationData = data;
+                    this.goodMitigation = data.goodMitigation;
+                    this.someMitigation = data.someMitigation;
+                    this.notMitigated = data.notMitigated;
+                    this.overMitigated = data.notMitigated;
+                    if(!data){
+                      this.createResults(id);
+                    }
+
+                  })
+
               });
+
+
           }
     }
 </script>
