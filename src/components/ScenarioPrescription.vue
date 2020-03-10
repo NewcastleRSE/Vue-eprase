@@ -303,7 +303,7 @@
         },
         beforeUpdate: function() {
             let index = this.$store.state.testIndex;
-            if (index === (this.numTests -1)) {
+            if (index === (this.numTests -1) || index > (this.numTests -1)) {
                 this.nextEnabled = false;
                 this.doneEnabled = true;
             }

@@ -11,9 +11,9 @@
         </div>
       </div>
 
-      <!--<div v-if="assessments">
+      <div v-show="assessment_id">
         <p>You currently have no reports available.</p>
-      </div> -->
+      </div>
 
       <div class="list-group">
         <div v-for="assessment in assessments">
@@ -56,7 +56,8 @@
         },
         data() {
             return {
-                assessments : []
+                assessments : [],
+                assessment_id: ''
             }
         },
         created() {
@@ -77,14 +78,8 @@
                         var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                         this.assessments[assessment].system.time_created = date;
 
-                        const id = this.assessments[assessment].system.id;
-                        const {dispatch} = this.$store;
-
-                        if(dispatch) {
-                          dispatch('storeAssessmentId', { id });
-                        }
-
-
+                        this.assessment_id = this.assessments[assessment].system.id;
+                        localStorage.setItem('assessmentId', this.assessment_id);
                       }
                     }
                 })

@@ -12,32 +12,6 @@
 
       <div class="assessment-results">
 
-       <!-- <h3>eP Usage Results</h3>
-        <p>The following results are based on your answers to the questions in the system section of the assessment. </p>
-        <p>Higher usage of the eP system is considered safer and in order to properly test your eP system, you should be able to input lab results. </p>
-        <div class="results-data">
-
-          <table>
-            <tr>
-              <th>eP Usage</th><td>{{ getEpUsage }}%</td>
-              <td>
-                <span v-if="getEpUsage === '76-100'" >This is an excellent result</span>
-                <span v-if="getEpUsage === '51-75'" >This is a good result</span>
-                <span v-if="getEpUsage === '26-50'">This is a moderate result</span>
-                <span v-if="getEpUsage === '0-25'" >This is a weak result</span>
-              </td>
-            </tr>
-            <tr>
-              <th>Lab Results</th><td>{{ getLabResults }}</td>
-              <td>
-                <span v-if="getLabResults === 'true'" >This is a good result</span>
-                <span v-if="getLabResults === 'false'">This is a weak result</span>
-              </td>
-            </tr>
-          </table>
-
-        </div> -->
-
         <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
         <StackedChart :mydata="chartCategoryData" ></StackedChart>
 
@@ -136,15 +110,10 @@
               }
         },
         computed: {
-          /*  getEpUsage() {
-                return this.system.ep_usage;
-            },
-            getLabResults() {
-                return this.system.lab_results;
-            }, */
             user() {
                 return this.$store.state.authentication.user;
-            }
+            },
+
         },
         methods : {
             createResults(id) {
@@ -203,6 +172,7 @@
                 // calculate number of valid tests, ignoring null results
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
                 this.getInterventionTypeResult();
+                this.saveMitigationResult();
 
               });
             },
@@ -494,6 +464,16 @@
                   }
                 }
             },
+            saveMitigationResult() {
+
+              this.goodMitigation = this.calcPerCategory(this.totalGood, this.totalValidTests);
+              this.someMitigation = this.calcPerCategory(this.totalSome, this.totalValidTests);
+              this.notMitigated = this.calcPerCategory(this.totalNot, this.totalValidTests);
+              this.overMitigated = this.calcPerCategory(this.totalOver, this.totalValidTests);
+              // dataservice does the save
+              dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
+
+            },
             getInterventionTypeResult(){
                 let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
                 interventionType = interventionType.slice(0, -1);
@@ -549,13 +529,13 @@
 
               dataService.getAssessment(id).then(data => {
                   this.prescriptionList = data.prescriptionList;
-                 /* this.system.ep_usage = data.system.ep_usage;
-                  this.system.lab_results = data.system.lab_results.toString(); */
 
                   // audit
                   dataService.audit('View report', '/assessmentresults');
 
                   dataService.getMitigationResults(id).then(data => {
+
+                    console.log(data);
                     this.mitigationData = data;
                     this.goodMitigation = data.goodMitigation;
                     this.someMitigation = data.someMitigation;
