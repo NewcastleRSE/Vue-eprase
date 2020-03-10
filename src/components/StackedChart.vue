@@ -70,9 +70,6 @@
 
                 let rows = [];
 
-                console.log('in stacked chart');
-                console.log(this.chartData);
-
                 for(let index in this.chartData){
                     if(this.chartData.hasOwnProperty(index)){
                       this.category = this.chartData[index].category;

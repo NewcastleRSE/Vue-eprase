@@ -166,8 +166,6 @@
         methods : {
             getResult(risk_level, outcome) {
 
-                console.log('Risk level is ' + risk_level);
-                console.log('Outcome is ' + outcome);
                 let result = '';
 
                 // get outcome and result_score
@@ -278,8 +276,6 @@
                 // audit
                 const user_id =  this.user.user_id;
                 dataService.audit('Completed scenarios', '/assessmentscenarios');
-
-                console.log(id);
                 this.$router.push('/assessmentresults/'+ id);
             },
             clearCheckBoxes() {

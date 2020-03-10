@@ -156,8 +156,6 @@ function audit(action, uri) {
 
   let token = getToken();
 
-  console.log('Audit ' + action, uri);
-
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -202,8 +200,6 @@ function getAssessment(id) {
   return fetch(settings.baseUrl + 'result?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
-
-      console.log(response);
       return response;
     })
     .catch(function() {
@@ -221,7 +217,6 @@ function getInstitutions() {
   return fetch(settings.baseUrl + 'auth/institutions', requestOptions)
     .then(handleResponse)
     .then(response => {
-      console.log(response);
       return response;
     })
     .catch(function() {

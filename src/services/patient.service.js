@@ -38,8 +38,6 @@ function setPatientsInStore() {
     }
   }
 
-  console.log(insertPoints);
-
   // get all the patients
   // returns a promise
   getAllPatients().then(data => {
