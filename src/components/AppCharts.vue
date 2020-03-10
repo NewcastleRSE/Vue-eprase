@@ -7,8 +7,8 @@
     <h2>Results by Chart</h2>
 
       <div id="charts">
-        <PieChart></PieChart>
-        <StackedChart></StackedChart>
+        <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
+        <StackedChart :mydata="chartCategoryData" ></StackedChart>
       </div>
 
     <button class="chartbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
@@ -39,6 +39,11 @@
           PieChart,
           StackedChart
         },
+        data() {
+            return {
+              assessment_id : ''
+            }
+        },
         methods: {
           onExitClick() {
             this.$router.push('/logout');
@@ -47,8 +52,9 @@
             this.$router.push('/assessmentintro');
           },
           onReportClick() {
-            let id = this.$store.state.assessmentId.id;
-            this.$router.push('/assessmentresults/'+ id);
+            // get the system id from the url
+            this.assessment_id  = this.$route.params.ID;
+            this.$router.push('/assessmentresults/'+ this.assessment_id);
           },
         }
     }

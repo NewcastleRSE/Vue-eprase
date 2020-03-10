@@ -8,7 +8,7 @@
       <p>Your results from the ePRaSE assessment.</p>
         <strong>User:</strong> {{ user.username }}<br />
         <strong>Institution:</strong> {{ }} <br />
-        <strong>Assessment Id:</strong> {{ }}
+        <strong>Assessment Id:</strong> {{ assessment_id }}
 
       <div class="assessment-results">
 
@@ -29,6 +29,7 @@
         </section>
 
         <button class="chartbutton" @click="onTableClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Results Table</button>
+        <button class="chartbutton" @click="onChartClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
 
       </div>
       <div align="center">
@@ -75,15 +76,6 @@
                   someMitigation: '',
                   notMitigated: '',
                   overMitigated: '',
-                  score : {
-                      category : '',
-                      resultAverage : ''
-                  },
-                  scores: null,
-                  /*system : {
-                       ep_usage : '',
-                       lab_results: ''
-                  },*/
                   totalGood : 0,
                   totalSome : 0,
                   totalNot : 0,
@@ -106,7 +98,8 @@
                   drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
                   interventionTypeResult: '',
                   totalConfigTests : settings.numConfigError,
-                  prescriptionList : []
+                  prescriptionList : [],
+                  assessment_id : ''
               }
         },
         computed: {
@@ -515,25 +508,27 @@
                 this.$router.push('/assessmentintro');
             },
             onTableClick() {
-                let id = this.$store.state.assessmentId.id;
-                this.$router.push('/resultstable/'+ id);
+                this.$router.push('/resultstable/'+ this.assessment_id);
+              },
+            onChartClick() {
+              this.$router.push('/charts/'+ this.assessment_id);
             }
           },
           created() {
                 // get the system id from the url
-               let id = this.$route.params.ID;
+               this.assessment_id  = this.$route.params.ID;
 
-              dataService.getCategories(id).then(data => {
+              dataService.getCategories(this.assessment_id ).then(data => {
                 this.categories = data;
               });
 
-              dataService.getAssessment(id).then(data => {
+              dataService.getAssessment(this.assessment_id ).then(data => {
                   this.prescriptionList = data.prescriptionList;
 
                   // audit
                   dataService.audit('View report', '/assessmentresults');
 
-                  dataService.getMitigationResults(id).then(data => {
+                  dataService.getMitigationResults(this.assessment_id ).then(data => {
 
                     console.log(data);
                     this.mitigationData = data;
@@ -542,7 +537,7 @@
                     this.notMitigated = data.notMitigated;
                     this.overMitigated = data.notMitigated;
 
-                    this.createResults(id);
+                    this.createResults(this.assessment_id );
 
                   })
               });

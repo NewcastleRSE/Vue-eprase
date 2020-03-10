@@ -74,6 +74,9 @@
 
                     for (let assessment in this.assessments){
                       if(this.assessments.hasOwnProperty(assessment)){
+
+                       // console.log(this.assessments[assessment]);
+
                         let timestamp = this.assessments[assessment].system.time_created;
                         var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                         this.assessments[assessment].system.time_created = date;
