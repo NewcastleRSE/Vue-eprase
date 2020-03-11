@@ -8,9 +8,7 @@
 
       <div id="charts">
 
-        {{ good }} {{ some}} {{ not }} {{ over}}
-
-        <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
+        <PieChart :goodMitigation="good" :someMitigation="some" :notMitigated="not" :overMitigated="over"></PieChart>
        <StackedChart :mydata="chartCategoryData" ></StackedChart>
       </div>
 
@@ -33,7 +31,6 @@
   import PieChart from "./PieChart";
   import StackedChart from "./StackedChart";
   import TabHeader from "./TabHeader";
-  import {dataService} from '../services/data.service';
 
     export default {
         name: "AppCharts",
@@ -44,26 +41,24 @@
         },
         data() {
             return {
-              assessment_id : '',
-              goodMitigation: '',
-              someMitigation: '',
-              notMitigated: '',
-              overMitigated: '',
-              chartCategoryData: []
+              assessment_id : ''
             }
         },
         computed: {
           good() {
-              this.goodMitigation =  this.$store.state.mitigationData[0].goodPercentage;
+              return this.$store.state.mitigationData[0].goodPercentage;
           },
           some() {
-            this.someMitigation = this.$store.state.mitigationData[0].somePercentage;
+             return this.$store.state.mitigationData[0].somePercentage;
           },
           not() {
-            this.notMitigated = this.$store.state.mitigationData[0].notPercentage;
+            return this.$store.state.mitigationData[0].notPercentage;
           },
           over() {
-            this.overMitigated = this.$store.state.mitigationData[0].overPercentage;
+            return this.$store.state.mitigationData[0].overPercentage;
+          },
+          chartCategoryData() {
+            return this.$store.state.stackedChartData.stackedChartData;
           }
         },
         methods: {
@@ -81,9 +76,6 @@
           created() {
             // get the system id from the url
             this.assessment_id  = this.$route.params.ID;
-
-            this.chartCategoryData =  localStorage.getItem('chartdata');
-
           }
         }
     }

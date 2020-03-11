@@ -16,11 +16,6 @@
 
       <div class="assessment-results">
 
-
-
-        <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
-        <StackedChart :mydata="chartCategoryData" ></StackedChart>
-
         <section>
           <div>Total valid tests: {{ totalValidTests }}</div>
           <div>Total null tests: {{ totalNulls }}</div>
@@ -168,7 +163,13 @@
                   "over": this.drugDuplication.over
                 }];
 
-                localStorage.setItem('chartdata', this.chartCategoryData);
+                // const variable for sending to storage
+                const stackedChartData = this.chartCategoryData;
+
+                const {dispatch} = this.$store;
+                if(id) {
+                  dispatch('storeStackedChartData', { stackedChartData });
+                }
 
                 // calculate number of valid tests, ignoring null results
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;

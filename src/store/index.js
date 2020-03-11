@@ -21,8 +21,7 @@ export const store = new Vuex.Store({
     part3complete: null,
     part4complete: null,
     configErrorComplete: null,
-    mitigationData: [],
-    stackedChartData: []
+    mitigationData: []
   },
   actions : {
     setPatientList({ commit }, { patientList  } ) {
@@ -102,7 +101,7 @@ export const store = new Vuex.Store({
       state.mitigationData[3] = overPercentage;
     },
     setStackedChartData(state, stackedChartData){
-
+        state.stackedChartData = stackedChartData
     }
   }
 });
