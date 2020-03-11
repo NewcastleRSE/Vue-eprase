@@ -7,8 +7,11 @@
     <h2>Results by Chart</h2>
 
       <div id="charts">
+
+        {{ good }} {{ some}} {{ not }} {{ over}}
+
         <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
-        <StackedChart :mydata="chartCategoryData" ></StackedChart>
+       <StackedChart :mydata="chartCategoryData" ></StackedChart>
       </div>
 
     <button class="chartbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
@@ -30,7 +33,7 @@
   import PieChart from "./PieChart";
   import StackedChart from "./StackedChart";
   import TabHeader from "./TabHeader";
-
+  import {dataService} from '../services/data.service';
 
     export default {
         name: "AppCharts",
@@ -41,8 +44,27 @@
         },
         data() {
             return {
-              assessment_id : ''
+              assessment_id : '',
+              goodMitigation: '',
+              someMitigation: '',
+              notMitigated: '',
+              overMitigated: '',
+              chartCategoryData: []
             }
+        },
+        computed: {
+          good() {
+              this.goodMitigation =  this.$store.state.mitigationData[0].goodPercentage;
+          },
+          some() {
+            this.someMitigation = this.$store.state.mitigationData[0].somePercentage;
+          },
+          not() {
+            this.notMitigated = this.$store.state.mitigationData[0].notPercentage;
+          },
+          over() {
+            this.overMitigated = this.$store.state.mitigationData[0].overPercentage;
+          }
         },
         methods: {
           onExitClick() {
@@ -56,6 +78,13 @@
             this.assessment_id  = this.$route.params.ID;
             this.$router.push('/assessmentresults/'+ this.assessment_id);
           },
+          created() {
+            // get the system id from the url
+            this.assessment_id  = this.$route.params.ID;
+
+            this.chartCategoryData =  localStorage.getItem('chartdata');
+
+          }
         }
     }
 

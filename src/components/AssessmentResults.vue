@@ -10,7 +10,13 @@
         <strong>Institution:</strong> {{ }} <br />
         <strong>Assessment Id:</strong> {{ assessment_id }}
 
+      <div class="text">Congratulations, you have reached the end of the scenarios. Please use the buttons below to see your results.
+
+      </div>
+
       <div class="assessment-results">
+
+
 
         <PieChart :goodMitigation="goodMitigation" :someMitigation="someMitigation" :notMitigated="notMitigated" :overMitigated="overMitigated"></PieChart>
         <StackedChart :mydata="chartCategoryData" ></StackedChart>
@@ -162,10 +168,12 @@
                   "over": this.drugDuplication.over
                 }];
 
+                localStorage.setItem('chartdata', this.chartCategoryData);
+
                 // calculate number of valid tests, ignoring null results
                 this.totalValidTests = settings.numPrescriptions - this.totalNulls;
                 this.getInterventionTypeResult();
-                this.saveMitigationResult();
+                this.saveMitigationResult(id);
 
               });
             },
@@ -457,14 +465,26 @@
                   }
                 }
             },
-            saveMitigationResult() {
+            saveMitigationResult(id) {
 
               this.goodMitigation = this.calcPerCategory(this.totalGood, this.totalValidTests);
               this.someMitigation = this.calcPerCategory(this.totalSome, this.totalValidTests);
               this.notMitigated = this.calcPerCategory(this.totalNot, this.totalValidTests);
               this.overMitigated = this.calcPerCategory(this.totalOver, this.totalValidTests);
-              // dataservice does the save
-              dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
+
+              // const variables for sending to storage
+              const goodPercentage = this.goodMitigation;
+              const somePercentage = this.someMitigation;
+              const notPercentage = this.notMitigated ;
+              const overPercentage = this.overMitigated;
+              const {dispatch} = this.$store;
+              if(id) {
+                dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage });
+              }
+
+              // dataservice does the save if not already stored
+              // TODO check
+             // dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
 
             },
             getInterventionTypeResult(){
@@ -565,7 +585,9 @@
     padding-bottom: 20px;
   }
 
-
+ .text {
+   padding: 20px 0;
+ }
   .results-data  {
     margin: 25px 0;
   }
