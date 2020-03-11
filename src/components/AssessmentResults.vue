@@ -123,43 +123,91 @@
 
                   this.chartCategoryData = [{
                     "category": "Drug Age",
-                    "good": this.drugAge.good,
-                    "some" :this.drugAge.some,
-                    "not":  this.drugAge.not,
-                    "over": this.drugAge.over
-                  } ,
+                    "good": this.calcNum(this.drugAge.good, this.drugAge.count),
+                    "some" : this.calcNum(this.drugAge.some, this.drugAge.count),
+                    "not":  this.calcNum(this.drugAge.not, this.drugAge.count),
+                    "over": this.calcNum(this.drugAge.over, this.drugAge.count)
+                  },
                   {
                     "category": "Drug Dose",
-                    "good": this.drugDose.good,
-                    "some": this.drugDose.some,
-                    "not":  this.drugDose.not,
-                    "over": this.drugDose.over
+                    "good":  this.calcNum(this.drugDose.good, this.drugDose.count),
+                    "some":  this.calcNum(this.drugDose.some, this.drugDose.count),
+                    "not":   this.calcNum(this.drugDose.not, this.drugDose.count),
+                    "over":  this.calcNum(this.drugDose.over,this.drugDose.count)
                   },
                   {
                     "category": "Drug Interaction",
-                    "good": this.drugInteraction.good,
-                    "some" : this.drugInteraction.some,
-                    "not":  this.drugInteraction.not,
-                    "over": this.drugInteraction.over
+                    "good":  this.calcNum(this.drugInteraction.good, this.drugAge.count),
+                    "some" :  this.calcNum(this.drugInteraction.some, this.drugAge.count),
+                    "not":   this.calcNum(this.drugInteraction.not, this.drugAge.count),
+                    "over":  this.calcNum(this.drugInteraction.over, this.drugAge.count)
                   },
                   {
                     "category": "Drug Allergy",
-                    "good": this.drugAllergy.good,
-                    "some": this.drugAllergy.some,
-                    "not":  this.drugAllergy.not,
-                    "over": this.drugAllergy.over
+                    "good":  this.calcNum(this.drugAllergy .good, this.drugInteraction.count),
+                    "some":  this.calcNum(this.drugAllergy.some, this.drugInteraction.count),
+                    "not":   this.calcNum(this.drugAllergy.not, this.drugInteraction.count),
+                    "over":  this.calcNum(this.drugAllergy.over, this.drugInteraction.count)
                   },
                   {
                     "category": "Drug Duplication",
-                    "good": this.drugDuplication.good,
-                    "some": this.drugDuplication.some,
-                    "not":  this.drugDuplication.not,
-                    "over": this.drugDuplication.over
-                  }];
+                    "good":  this.calcNum(this.drugDuplication.good, this.drugDuplication.count),
+                    "some":  this.calcNum(this.drugDuplication.some, this.drugDuplication.count),
+                    "not":   this.calcNum(this.drugDuplication.not, this.drugDuplication.count),
+                    "over":  this.calcNum(this.drugDuplication.over, this.drugDuplication.count)
+                  },
+                    {
+                      "category": "Drug Disease",
+                      "good":  this.calcNum(this.drugDisease.good, this.drugDisease.count),
+                      "some" : this.calcNum(this.drugDisease.some, this.drugDisease.count),
+                      "not":   this.calcNum(this.drugDisease.not, this.drugDisease.count),
+                      "over":  this.calcNum(this.drugDisease.over, this.drugDisease.count)
+                    },
+                    {
+                      "category": "Drug Omissions",
+                      "good":  this.calcNum(this.drugOmissions.good, this.drugOmissions.count),
+                       "some":  this.calcNum(this.drugOmissions.some, this.drugOmissions.count),
+                       "not":   this.calcNum(this.drugOmissions.not, this.drugOmissions.count),
+                       "over":  this.calcNum(this.drugOmissions.over, this.drugOmissions.count)
+                    },
+                    {
+                      "category": "Theraputic Duplication",
+                      "good": this.calcNum(this.theraputicDuplication.good, this.theraputicDuplication.count),
+                      "some" : this.calcNum(this.theraputicDuplication.some, this.theraputicDuplication.count),
+                      "not":  this.calcNum(this.theraputicDuplication.not, this.theraputicDuplication.count),
+                      "over": this.calcNum(this.theraputicDuplication.over, this.theraputicDuplication.count)
+                    },
+                    {
+                      "category": "Drug Lab",
+                      "good": this.calcNum(this.drugLab.good, this.drugLab.count),
+                      "some": this.calcNum(this.drugLab.some, this.drugLab.count),
+                      "not":  this.calcNum(this.drugLab.not, this.drugLab.count),
+                      "over": this.calcNum(this.drugLab.over, this.drugLab.count)
+                    },
+                    {
+                      "category": "Drug Brand",
+                      "good":  this.calcNum(this.drugBrand.good, this.drugBrand.count),
+                      "some":  this.calcNum(this.drugBrand.some,this.drugBrand.count),
+                      "not":   this.calcNum(this.drugBrand.not, this.drugBrand.count),
+                      "over":  this.calcNum(this.drugBrand.over, this.drugBrand.count)
+                    },
+                    {
+                      "category": "Drug Route",
+                      "good":  this.calcNum(this.drugRoute.good, this.drugRoute.count),
+                      "some":  this.calcNum(this.drugRoute.some, this.drugRoute.count),
+                       "not":   this.calcNum(this.drugRoute.not, this.drugRoute.count),
+                       "over":  this.calcNum(this.drugRoute.over, this.drugRoute.count)
+                    },
+                    {
+                      "category": "Drug Overdose",
+                       "good":  this.calcNum(this.drugOverdose.good, this.drugOverdose.count),
+                       "some":  this.calcNum(this.drugOverdose.some, this.drugOverdose.count),
+                       "not":   this.calcNum(this.drugOverdose.not, this.drugOverdose.count),
+                       "over":  this.calcNum(this.drugOverdose.over, this.drugOverdose.count)
+                    }];
 
                   // const variable for sending to storage
                   const stackedChartData = this.chartCategoryData;
-
                   const {dispatch} = this.$store;
                   if(id) {
                     dispatch('storeStackedChartData', { stackedChartData });
@@ -511,6 +559,13 @@
               calcPerCategory(num, total){
                 if(total !== 0) {
                   return ((num/total) *100).toFixed(1);
+                }
+                return 0;
+              },
+              calcNum(num, total) {
+                if(total !== 0) {
+                  let tempnum = ((num/total) *100).toFixed(1);
+                  return parseInt(tempnum);
                 }
                 return 0;
               },
