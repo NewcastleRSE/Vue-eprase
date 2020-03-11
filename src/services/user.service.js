@@ -24,6 +24,7 @@ function login(username, password) {
         localStorage.setItem('token', response.jwt.accessToken);
         localStorage.setItem('user', username);
         localStorage.setItem('userId', response.user_id);
+        localStorage.setItem('institutionId', response.institution_id);
       }
       return response;
     });

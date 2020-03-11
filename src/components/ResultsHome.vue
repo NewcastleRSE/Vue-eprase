@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <div v-show="assessment_id">
+      <div v-show="assessment_id == null">
         <p>You currently have no reports available.</p>
       </div>
 
@@ -57,7 +57,7 @@
         data() {
             return {
                 assessments : [],
-                assessment_id: ''
+                assessment_id: null
             }
         },
         created() {

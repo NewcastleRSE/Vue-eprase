@@ -109,10 +109,13 @@ function savePrescriptionData(prescription, outcome, other, selected_type, risk_
 
 }
 
+
+// should only save if result doesn't already exist
 function saveMitigationResults(goodMitigation, someMitigation, notMitigated, overMitigated){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
+  let institutionId = getInstitutionId();
 
   const requestOptions = {
     method: 'POST',
@@ -120,7 +123,7 @@ function saveMitigationResults(goodMitigation, someMitigation, notMitigated, ove
     body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated })
   };
 
-  return fetch(settings.baseUrl + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + 145, requestOptions)
+  return fetch(settings.baseUrl + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -169,7 +172,6 @@ function audit(action, uri) {
     })
 
 }
-
 
 function handleResponse(response) {
   return response.text().then(text => {
@@ -328,6 +330,10 @@ function getUser() {
 
 function getAssessmentId() {
   return localStorage.getItem('assessmentId');
+}
+
+function getInstitutionId() {
+  return localStorage.getItem('institutionId');
 }
 
 
