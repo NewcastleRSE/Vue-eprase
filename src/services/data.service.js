@@ -5,6 +5,7 @@ import { router } from '../router';
 export const dataService = {
   getAssessment,
   getAssessmentPart,
+  getAssessmentStatus,
   getInstitutions,
   getCategories,
   getCategoryData,
@@ -306,6 +307,28 @@ function getConfigErrors() {
     });
 }
 
+function getAssessmentStatus() {
+
+  let token = getToken();
+  let user_id = getUserId();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'getAssessmentStatus?USER_ID=' + user_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      // console.log(response);
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getAssessmentStatus');
+    });
+
+}
+
 
 function getAssessmentPart() {
 
@@ -324,8 +347,8 @@ function getToken(){
   return localStorage.getItem('token');
 }
 
-function getUser() {
-  return localStorage.getItem('user');
+function getUserId() {
+  return localStorage.getItem('userId');
 }
 
 function getAssessmentId() {

@@ -2,7 +2,7 @@
   <div id="page">
 
     <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
-    <div class="content" v-if="assessmentComplete === false">
+    <div class="content" v-if="assessmentComplete !== true">
       <h1>Welcome to the ePRaSE Assessment</h1>
 
       <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of indicators.</p>
@@ -23,13 +23,12 @@
     </div>
 
     <div class="content" v-if="assessmentComplete === true">
-      <h1>Assessment Complete</h1>
-      <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
-      <p>To view the results of this assessment, click the 'View Results' button below.</p>
-      <br/>
-      <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.</p>
-      <div class="buttons">
-        <button class="btn btn-primary" @click="onResultsClick()">View Results</button>
+
+      <h2>Assessment Complete</h2>
+      <div class="divcontent">
+        <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
+        <p>To view the results of this assessment, click the 'Reports' button below.</p>
+        <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.</p>
       </div>
     </div>
 
@@ -68,11 +67,9 @@
         },
         methods: {
             checkAssessmentComplete() {
-                this.assessmentComplete = localStorage.getItem('assessmentComplete');
-                if(this.assessmentComplete == null){
-                    this.assessmentComplete = false;
-                }
-               return this.assessmentComplete;
+                dataService.getAssessmentStatus().then(data => {
+                this.assessmentComplete = data;
+                });
             },
             onResultsClick() {
                 this.$router.push({ path: './resultshome' });
@@ -123,6 +120,10 @@
 
   .btn-primary {
     background-color: #07818e;
+  }
+
+  .divcontent {
+    padding: 20px 0;
   }
 
 </style>
