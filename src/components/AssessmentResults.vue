@@ -477,9 +477,7 @@
                   dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage });
                 }
 
-                // dataservice does the save if not already stored
-                // TODO check
-               // dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
+                dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
 
               },
               getInterventionTypeResult(){
