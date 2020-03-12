@@ -18,7 +18,7 @@
         </div>
         <div align="center">
           <div class="buttons form-group" align="center">
-            <button type=" button" id="login" class="login-btn btn btn-primary" @click="onRequestClick()" :disabled="isFormInvalid">Submit</button>
+            <button type="button" id="login" class="login-btn btn btn-primary" @click="onRequestClick()" :disabled="isFormInvalid">Submit</button>
           </div>
         </div>
       </form>
@@ -119,7 +119,6 @@
     width: 120px;
     height: 40px;
     font-size: 1.2em;
-    margin-left: 50px;
   }
 
   .login-btn {

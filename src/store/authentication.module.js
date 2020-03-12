@@ -31,6 +31,22 @@ export const authentication = {
     logout({ commit }) {
       userService.logout();
       commit('logout');
+    },
+    requestNewPassword({ dispatch, commit }, { email }) {
+      commit('newPasswordRequest', { email });
+
+      userService.newPasswordRequest(email)
+        .then(
+          user => {
+            commit('newPasswordSuccess', user);
+            router.push('/assessmentintro');
+          },
+          error => {
+            commit('newPasswordFailure', error);
+            return Promise.reject(new Error('failed'));
+          }
+        ).catch((err => {}));
+
     }
   },
   mutations: {
@@ -47,6 +63,18 @@ export const authentication = {
       state.user = null;
     },
     logout(state) {
+      state.status = {};
+      state.user = null;
+    },
+    newPasswordRequest(state){
+      state.status = {};
+      state.user = null;
+    },
+    newPasswordSuccess(state){
+      state.status = {};
+      state.user = null;
+    },
+    newPasswordFailure(state){
       state.status = {};
       state.user = null;
     }
