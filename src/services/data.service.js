@@ -18,7 +18,9 @@ export const dataService = {
   getMitigationResults,
   saveConfigError,
   getConfigErrors,
-  audit
+  failedLoginAudit,
+  audit,
+  logout
 };
 
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
@@ -172,7 +174,23 @@ function audit(action, uri) {
     .then(response => {
       return response;
     })
+}
 
+function failedLoginAudit(action, uri) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify( {action, uri})
+  };
+
+  return fetch(settings.baseUrl + 'failedLoginAudit', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
 }
 
 function handleResponse(response) {
@@ -182,7 +200,7 @@ function handleResponse(response) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
         logout();
-        location.reload(true);
+        router.push({ path: './login' }).catch(err => {});
       }
       const error = (data && data.message) || response.statusText;
       return Promise.reject(error);
@@ -190,6 +208,12 @@ function handleResponse(response) {
     return data;
   });
 }
+
+function logout() {
+  // remove all items from local storage
+  localStorage.clear();
+}
+
 
 function getAssessment(id) {
 
