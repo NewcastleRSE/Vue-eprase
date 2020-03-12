@@ -23,7 +23,7 @@ export const authentication = {
           },
           error => {
             commit('loginFailure', error);
-            dataService.audit('Failed login', '/login');
+            dataService.failedLoginAudit('Failed login', '/login');
           }
         );
     },
