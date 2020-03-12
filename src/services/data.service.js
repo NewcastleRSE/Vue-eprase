@@ -24,6 +24,7 @@ export const dataService = {
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
 
   let token = getToken();
+  let year = settings.year;
 
   const requestOptions = {
     method: 'POST',
@@ -31,7 +32,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, patient
     body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'system', requestOptions)
+  return fetch(settings.baseUrl + 'system?YEAR=' + year, requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
