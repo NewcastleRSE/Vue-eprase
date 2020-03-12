@@ -3,7 +3,7 @@
 
     <div class="register">
 
-      <div align="center">
+      <div id="logo" align="center">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="register-text">
@@ -137,6 +137,11 @@
   #page {
     text-align: center;
   }
+
+  #logo {
+    padding-bottom: 40px;
+  }
+
 
   .eprase-logo {
     height: 75px;

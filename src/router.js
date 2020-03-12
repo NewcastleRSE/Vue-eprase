@@ -15,6 +15,9 @@ import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
 import AssessmentContent from './components/AssessmentContent';
 import ResultsTable from './components/ResultsTable';
+import AppCharts from "./components/AppCharts";
+import ResetPassword from "./components/ResetPassword";
+import RequestPassword from "./components/RequestPassword";
 
 Vue.use(Router);
 
@@ -80,6 +83,18 @@ export const router = new Router({
       path: '/resultstable/:ID',
       component: ResultsTable
     },
+    {
+      path: '/charts/:ID',
+      component: AppCharts
+    },
+    {
+      path: '/resetpassword',
+      component: ResetPassword
+    },
+    {
+      path: '/requestpassword',
+      component: RequestPassword
+    },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
   ]
@@ -91,7 +106,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // list public pages
-  const publicPages = ['/','/login','/register','/instructions', '/assessmentcontent', '/categorytable'];
+  const publicPages = ['/','/login','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 

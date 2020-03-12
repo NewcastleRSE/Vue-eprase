@@ -24,8 +24,9 @@ export const authentication = {
           error => {
             commit('loginFailure', error);
             dataService.failedLoginAudit('Failed login', '/login');
+            return Promise.reject(new Error('failed'));
           }
-        );
+        ).catch((err => {}));
     },
     logout({ commit }) {
       userService.logout();

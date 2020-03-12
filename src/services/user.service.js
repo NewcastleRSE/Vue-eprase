@@ -1,5 +1,6 @@
 import {dataService} from "./data.service";
 import {settings} from "../settings";
+import {router} from "../router";
 
 let baseURL = settings.baseUrl;
 
@@ -33,8 +34,6 @@ function login(username, password) {
 function logout() {
   // remove all items from local storage
   localStorage.clear();
-
-
 }
 
 function handleResponse(response) {
@@ -44,13 +43,12 @@ function handleResponse(response) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
         logout();
-        location.reload(true);
+        router.push({ path: './login' }).catch(err => {});
       }
 
       const error = (data && data.message) || response.statusText;
       return Promise.reject(error);
     }
-
     return data;
   });
 }

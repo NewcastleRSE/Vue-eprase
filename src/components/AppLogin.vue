@@ -3,7 +3,7 @@
 
     <div class="loginpage">
 
-      <div align="center">
+      <div id="logo" align="center">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
 
@@ -23,13 +23,14 @@
           </div>
         </form>
         <p v-if="serverError" class="text-error">Incorrect username or password<br/><br/></p>
-        <!--<p><a routerLink="">Forgotten your Password? Click here.</a><br/><br/></p>-->
+        <p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>
 
-        <p id="email-link">If you are having difficulty logging in or wish to reset your password, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>
+        <p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>
 
         <div align="center">
-          <div class="buttons">
+          <div class="buttons form-group" align="center">
             <button type=" button" id="login" class="login-btn btn btn-primary" @click="onLoginClick()">Login</button>
+            <button type="button" id="reset" class="login-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
             <button type="button" id="register" class="btn btn-primary" @click="onRegisterClick()">Register</button>
           </div>
         </div>
@@ -41,6 +42,8 @@
 
 <script>
 
+
+    import {router} from "../router";
 
     export default {
       name: "AppLogin",
@@ -74,13 +77,22 @@
                     const password = this.user.password;
                     const { dispatch } = this.$store;
                     if (username && password) {
-                        dispatch('authentication/login', { username, password });
+                        dispatch('authentication/login', { username, password }).then(() => router.push({ path: './login' }) )
+                          .catch(err => {
+                              console.log(err);
+                              this.serverError = true
+                          })
                     }
                 }
             });
         },
         onRegisterClick() {
             this.$router.push({ path: './register' });
+        },
+        resetForm: function() {
+          this.$data.user = {};
+          this.errors.clear();
+          this.serverError = false;
         },
       },
       created () {
@@ -96,6 +108,11 @@
   #page {
     text-align: center;
   }
+
+  #logo {
+    padding-bottom: 40px;
+  }
+
 
   h1 {
     font-size: 30px;
@@ -126,11 +143,17 @@
     margin-top: -25px;
   }
 
+  .buttons{
+    margin-left: -40px;
+  }
+
   button {
     width: 120px;
     height: 40px;
     font-size: 1.2em;
+    margin-left: 50px;
   }
+
   .login-btn {
     background-color: #07818e;
   }
@@ -140,7 +163,6 @@
   }
 
   #register {
-    margin-left: 120px;
     background-color: #07abb8;
     border-color: #07818e;
   }
@@ -181,6 +203,10 @@
   .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
     background: none;
     background-color: #fff;
+  }
+
+  .text-error {
+    color: red;
   }
 
 
