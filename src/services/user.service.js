@@ -6,7 +6,8 @@ let baseURL = settings.baseUrl;
 
 export const userService = {
   login,
-  logout
+  logout,
+  newPasswordRequest
 };
 
 function login(username, password) {
@@ -29,6 +30,26 @@ function login(username, password) {
       }
       return response;
     });
+}
+
+function newPasswordRequest(email){
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  };
+
+  return fetch(baseURL + 'auth/newPassword', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      // request successful if there's a password reset token in the response
+      if (response.passwordResetToken) {
+        // success
+      }
+      return response;
+    });
+
+
 }
 
 function logout() {
