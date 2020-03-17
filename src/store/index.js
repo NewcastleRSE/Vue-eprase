@@ -30,8 +30,8 @@ export const store = new Vuex.Store({
     setTestList({ commit }, { testList}){
       commit('setTestList', { testList });
     },
-    saveSystemData({ commit }, { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }){
-      dataService.saveSystemData(ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
+    saveSystemData({ commit }, { ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }){
+      dataService.saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
       commit('saveSystemData');
     },
     savePart2Data({ commit }, { qualitative_data, time_taken }){

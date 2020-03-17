@@ -47,6 +47,23 @@ export const authentication = {
           }
         ).catch((err => {}));
 
+    },
+    resetPassword({ dispatch, commit }, { password, confirmPassword, token }) {
+      commit('resetPassword');
+
+      userService.resetPassword(password, confirmPassword, token)
+        .then(
+          user => {
+            commit('passwordResetSuccess', user);
+            router.push('/login');
+          },
+          error => {
+            commit('passwordResetFailure', error);
+            return Promise.reject(new Error('reset failed'));
+          }
+        ).catch((err => {}));
+
+
     }
   },
   mutations: {
@@ -77,6 +94,18 @@ export const authentication = {
     newPasswordFailure(state){
       state.status = {};
       state.user = null;
-    }
+    },
+    passwordResetSuccess(state){
+      state.status = {};
+      state.user = null;
+    },
+    passwordResetFailure(state){
+      state.status = {};
+      state.user = null;
+    },
+    resetPassword(state){
+      state.status = {};
+      state.user = null;
+    },
   }
 }

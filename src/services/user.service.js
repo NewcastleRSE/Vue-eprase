@@ -42,14 +42,29 @@ function newPasswordRequest(email){
   return fetch(baseURL + 'auth/newPassword', requestOptions)
     .then(handleResponse)
     .then(response => {
+      if (response) {
+        // success
+      }
+      return response;
+    });
+}
+
+function resetPassword(password, confirmPassword, token){
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify( { password, confirmPassword, token } )
+  };
+
+  return fetch(baseURL + 'auth/resetPassword', requestOptions)
+    .then(handleResponse)
+    .then(response => {
       // request successful if there's a password reset token in the response
       if (response.passwordResetToken) {
         // success
       }
       return response;
     });
-
-
 }
 
 function logout() {

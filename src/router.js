@@ -88,7 +88,7 @@ export const router = new Router({
       component: AppCharts
     },
     {
-      path: '/resetpassword',
+      path: '/resetpassword/:token?',
       component: ResetPassword
     },
     {
@@ -97,7 +97,16 @@ export const router = new Router({
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    if (to.hash) {
+      return { selector: to.hash };
+    }
+    return { x: 0, y: 0 };
+  }
 
 })
 

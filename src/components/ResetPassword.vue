@@ -25,7 +25,7 @@
 
         <div align="center">
           <div class="buttons form-group" align="center">
-            <button type=" button" id="login" class="login-btn btn btn-primary" @click="onLoginClick()">Submit</button>
+            <button type="button" id="login" class="login-btn btn btn-primary" @click="onResetClick()">Submit</button>
             <button type="button" id="reset" class="login-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
           </div>
         </div>
@@ -41,18 +41,45 @@
 </template>
 
 <script>
+    import {router} from "../router";
+
     export default {
         name: "ResetPassword",
-      data() {
-        return {
-          user: {
-            password: '',
-            confirmPassword: '',
-          },
-          submitted: false,
-          serverError: false,
+        data() {
+          return {
+            user: {
+              password: '',
+              confirmPassword: '',
+            },
+            token : '',
+            submitted: false,
+            serverError: false,
+          }
+        },
+        methods: {
+          onLoginClick() {
+            this.submitted = true;
+            this.$validator.validate().then(valid => {
+              if (valid) {
+                const password = this.user.password;
+                const confirmPassword = this.user.confirmPassword;
+                const token = this.token;
+                const { dispatch } = this.$store;
+                if (password && password && token) {
+                  dispatch('authentication/resetPassword', { password, confirmPassword, token }).then(() => router.push({ path: './login' }) )
+                    .catch(err => {
+                      console.log(err);
+                      this.serverError = true
+                    })
+                }
+              }
+            });
+          }
+        },
+        created() {
+          // get the system id from the url
+          this.token  = this.$route.params.token;
         }
-      },
     }
 </script>
 
@@ -80,7 +107,7 @@
   }
 
   #loginform label {
-    margin-bottom : 0px;
+    margin-bottom : 0;
     margin-left: -550px;
   }
 

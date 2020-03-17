@@ -62,6 +62,12 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <label for="other-ep-system">Are there other e-prescribing systems in use in the organisation?</label>
+              <input type="text" name="other-ep-system" id="other-ep-system" class="form-control" v-model="results.other_ep_system" minlength="3" maxlength="50" placeholder="Other...">
+              <div v-if="submitted && errors.has('other_ep_system')" class="invalid-feedback alert alert-danger">{{ errors.first('other_ep_system') }}</div>
+            </div>
+
             <div id="radio-button-group">
 
               <div class="question form-group" id="question-4">
@@ -188,6 +194,7 @@
                     ep_version: '',
                     other_service : '',
                     ep_usage: null,
+                    other_ep_system: null,
                     patient_type: null,
                     lab_results: '',
                     med_history: '',
@@ -214,7 +221,7 @@
                       { text: 'A & E', value: 'A&E'},
                       { text: 'Chemotherapy', value: 'Chemotherapy'},
                       { text: 'Outpatients', value: 'Outpatients'},
-                      { text: 'Community Care', value: 'Community care'},
+                      { text: 'Community Beds', value: 'Community beds'},
                       { text: 'Day Cases', value: 'Day cases'},
                       { text: 'Clinical Trials', value: 'Clinical trials'},
                       { text: 'Intermediate Care', value: 'Intermediate care'}
@@ -249,6 +256,7 @@
                         const ep_version = this.results.ep_version;
                         const other_service = this.results.other_service;
                         const ep_usage = this.results.ep_usage;
+                        const other_ep_system = this.results.other_ep_system;
                         const patient_type = this.results.patient_type;
                         const lab_results = this.results.lab_results;
                         const man_results = this.results.man_results;
@@ -259,7 +267,7 @@
                         const clinical_areas = this.results.clinical_areas.toString();
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveSystemData', { ep_service, other_service, ep_version, ep_usage, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken });
+                            dispatch('saveSystemData', { ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken });
                         }
                         // audit
                         dataService.audit('Save system data', '/assessmentSystem');
@@ -294,7 +302,7 @@
     width: 100%;
   }
 
-  #version, #other-service {
+  #version, #other-service, #other-ep-system {
     float: right;
   }
 
