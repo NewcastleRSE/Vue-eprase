@@ -63,14 +63,14 @@
             // get the token from the url
             this.token  = this.$route.query.token;
 
+            // form validation ensures that the passwords match
             this.$validator.validate().then(valid => {
               if (valid) {
                 const password = this.user.password;
-                const confirm_password = this.user.confirmPassword;
                 const token = this.token;
                 const { dispatch } = this.$store;
-                if (password && password && token) {
-                  dispatch('authentication/resetPassword', { password, confirm_password, token }).then(() => router.push({ path: './login' }) )
+                if (password && token) {
+                  dispatch('authentication/resetPassword', { password, token }).then(() => router.push({ path: './login' }) )
                     .catch(err => {
                       console.log(err);
                       this.serverError = true

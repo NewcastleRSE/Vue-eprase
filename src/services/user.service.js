@@ -50,14 +50,14 @@ function newPasswordRequest(email){
     });
 }
 
-function resetPassword(password, confirm_password, token){
+function resetPassword(password, token){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify( { password, confirm_password, token } )
+    body: password
   };
 
-  return fetch(baseURL + 'auth/resetPassword', requestOptions)
+  return fetch(baseURL + 'auth/resetPassword?token=' + token, requestOptions)
     .then(handleResponse)
     .then(response => {
       // request successful if there's a password reset token in the response
