@@ -48,10 +48,10 @@ export const authentication = {
         ).catch((err => {}));
 
     },
-    resetPassword({ dispatch, commit }, { password, confirmPassword, token }) {
+    resetPassword({ dispatch, commit }, { password, confirm_password, token }) {
       commit('resetPassword');
 
-      userService.resetPassword(password, confirmPassword, token)
+      userService.resetPassword(password, confirm_password, token)
         .then(
           user => {
             commit('passwordResetSuccess', user);
@@ -62,8 +62,6 @@ export const authentication = {
             return Promise.reject(new Error('reset failed'));
           }
         ).catch((err => {}));
-
-
     }
   },
   mutations: {

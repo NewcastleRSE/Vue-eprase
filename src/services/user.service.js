@@ -7,7 +7,8 @@ let baseURL = settings.baseUrl;
 export const userService = {
   login,
   logout,
-  newPasswordRequest
+  newPasswordRequest,
+  resetPassword
 };
 
 function login(username, password) {
@@ -49,11 +50,11 @@ function newPasswordRequest(email){
     });
 }
 
-function resetPassword(password, confirmPassword, token){
+function resetPassword(password, confirm_password, token){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify( { password, confirmPassword, token } )
+    body: JSON.stringify( { password, confirm_password, token } )
   };
 
   return fetch(baseURL + 'auth/resetPassword', requestOptions)

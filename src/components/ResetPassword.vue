@@ -57,16 +57,20 @@
           }
         },
         methods: {
-          onLoginClick() {
+          onResetClick() {
             this.submitted = true;
+
+            // get the token from the url
+            this.token  = this.$route.query.token;
+
             this.$validator.validate().then(valid => {
               if (valid) {
                 const password = this.user.password;
-                const confirmPassword = this.user.confirmPassword;
+                const confirm_password = this.user.confirmPassword;
                 const token = this.token;
                 const { dispatch } = this.$store;
                 if (password && password && token) {
-                  dispatch('authentication/resetPassword', { password, confirmPassword, token }).then(() => router.push({ path: './login' }) )
+                  dispatch('authentication/resetPassword', { password, confirm_password, token }).then(() => router.push({ path: './login' }) )
                     .catch(err => {
                       console.log(err);
                       this.serverError = true
@@ -74,11 +78,11 @@
                 }
               }
             });
-          }
-        },
-        created() {
-          // get the system id from the url
-          this.token  = this.$route.params.token;
+          },
+          resetForm: function() {
+            this.$data.user = {};
+            this.errors.clear();
+          },
         }
     }
 </script>
