@@ -61,7 +61,7 @@ function resetPassword(password, token){
     .then(handleResponse)
     .then(response => {
       // request successful if there's a password reset token in the response
-      if (response.passwordResetToken) {
+      if (response) {
         // success
       }
       return response;

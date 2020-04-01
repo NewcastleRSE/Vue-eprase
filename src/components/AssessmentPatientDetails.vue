@@ -61,11 +61,20 @@
                   </table>
                 </div>
 
-              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
-                  <h5 class="card-title">Presents with/Comorbidities</h5>
+                <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+                  <h5 class="card-title">Presenting Complaint</h5>
                   <table>
                     <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
                       <td>{{diagnosis}}</td>
+                    </tr>
+                  </table>
+                </div>
+
+               <div align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
+                  <h5 class="card-title">Comorbidities</h5>
+                  <table>
+                    <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity">
+                      <td>{{comorbidity}}</td>
                     </tr>
                   </table>
                 </div>
@@ -110,8 +119,10 @@
                   </tr>
                 </table>
               </div>
-              <input type="hidden" id="patient_id" v-model="assessment.patient_id=patient[getCurrentPatient].patient_id" />
+              <input type="hidden" id="patient_id" v-model="assessment.patient_code=patient[getCurrentPatient].code" />
             </div>
+
+            {{ patient[getCurrentPatient].code}}
 
 
           </div>
@@ -169,7 +180,7 @@
                 submitted: false,
                 assessment: {
                     currentPart: dataService.getAssessmentPart(),
-                    patient_id : '',
+                    patient_code : '',
                     qualitative_data : '',
                     time_taken: ''
                 },
@@ -218,13 +229,13 @@
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime / 1000;
                         const qualitative_data = this.assessment.qualitative_data;
-                        const patient_id = this.assessment.patient_id;
+                        const code = this.assessment.patient_code;
                         const time_taken = this.assessment.time_taken;
                         const completed = this.completed;
 
                         const {dispatch} = this.$store;
                         if (time_taken) {
-                            dispatch('savePatientData', {qualitative_data, patient_id, time_taken, index, completed});
+                            dispatch('savePatientData', {qualitative_data, code, time_taken, index, completed});
                         }
                         this.submitted = true;
                         this.assessment.qualitative_data = '';

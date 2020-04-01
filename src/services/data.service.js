@@ -73,7 +73,7 @@ function savePart2Data(time_taken){
 
 }
 
-function savePatientData(qualitative_data, patient_id, time_taken){
+function savePatientData(qualitative_data, code, time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -81,7 +81,7 @@ function savePatientData(qualitative_data, patient_id, time_taken){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ qualitative_data, patient_id, time_taken })
+    body: JSON.stringify({ qualitative_data, code, time_taken })
   };
 
   return fetch(settings.baseUrl + 'patientdata?ID=' + assessmentId, requestOptions)
@@ -94,7 +94,7 @@ function savePatientData(qualitative_data, patient_id, time_taken){
     });
 }
 
-function savePrescriptionData(prescription, outcome, other, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
+function savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -102,7 +102,7 @@ function savePrescriptionData(prescription, outcome, other, selected_type, risk_
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({outcome, other, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
+    body: JSON.stringify({outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
   return fetch(settings.baseUrl + 'prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)

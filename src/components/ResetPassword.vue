@@ -23,6 +23,8 @@
           <div v-show="submitted && errors.has('confirmPassword')" class="invalid-feedback alert alert-danger">{{ errors.first('confirmPassword') }}</div>
         </div>
 
+        <p v-if="serverError" class="text-error">Token not found<br/><br/></p>
+
         <div align="center">
           <div class="buttons form-group" align="center">
             <button type="button" id="login" class="login-btn btn btn-primary" @click="onResetClick()">Submit</button>

@@ -38,13 +38,13 @@ export const store = new Vuex.Store({
       dataService.savePart2Data( qualitative_data, time_taken);
       commit('savePart2Data');
     },
-    savePatientData({ commit }, { qualitative_data, patient_id, time_taken, index, completed }){
-      dataService.savePatientData( qualitative_data, patient_id, time_taken);
+    savePatientData({ commit }, { qualitative_data, code, time_taken, index, completed }){
+      dataService.savePatientData( qualitative_data, code, time_taken);
       commit('savePatientData', completed);
       commit('updatePatientIndex', index);
     },
-    savePrescriptionData({ commit }, { prescription, outcome, other, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed}){
-      dataService.savePrescriptionData( prescription, outcome, other, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed );
+    savePrescriptionData({ commit }, { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed}){
+      dataService.savePrescriptionData( prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed );
       commit('savePart4Data', completed);
       commit('updateTestIndex', index);
     },

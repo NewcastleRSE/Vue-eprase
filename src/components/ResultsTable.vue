@@ -470,7 +470,6 @@
         },
         created() {
           // get the system id from the url
-
           let id = this.$route.params.ID;
 
           dataService.getCategories(id).then(data => {

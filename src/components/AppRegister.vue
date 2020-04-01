@@ -11,16 +11,7 @@
         <p>To register with the ePRaSE system, please provide the following information.</p>
 
         <form id="regForm" @submit.prevent="handleSubmit()">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" v-model="user.name" v-validate="{required: true, min: 3, max: 50}" id="name" name="name" class="form-control" :class="{ 'is-invalid': errors.has('name') }"  />
-            <div v-if="submitted && errors.has('name')" class="invalid-feedback alert alert-danger">{{ errors.first('name') }}</div>
-          </div>
-          <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" v-model="user.username" v-validate="{required: true, min: 3, max: 50}" id="username" name="username" class="form-control" :class="{ 'is-invalid': errors.has('username') }" />
-            <div v-if="submitted && errors.has('username')" class="invalid-feedback alert alert-danger">{{ errors.first('username') }}</div>
-          </div>
+
           <p>Please enter an "nhs.uk" or "nhs.net" email address.</p>
           <div class="form-group">
             <label for="email">E-mail Address:</label>
@@ -81,12 +72,10 @@
       data() {
         return {
           user: {
-            name: '',
             username: '',
             institution: '',
             email: '',
             password: '',
-            role: ["user"],
             confirmPassword: '',
           },
           submitted: false,
@@ -103,17 +92,19 @@
         },
         handleSubmit() {
           this.submitted = true;
+
+          this.user.username = this.getUsernameFromEmail(this.user.email);
+
           this.$validator.validate().then(valid => {
             if (valid) {
 
               HTTP.post('/auth/signup/user', {
 
-                name: this.user.name,
-                username: this.user.username,
+                username : this.user.username,
                 institution: this.user.institution,
                 email: this.user.email,
                 password: this.user.password,
-                role: this.user.role
+                role: ["user"]
               })
                 .then(response => {
                     this.$router.push({path: './login'})
@@ -121,6 +112,11 @@
                 .catch(error => this.errors = error.response.data)
             }
           });
+        },
+        getUsernameFromEmail(email){
+          let parts =[];
+          parts = email.split('@');
+          return parts[0];
         }
       },
       created() {

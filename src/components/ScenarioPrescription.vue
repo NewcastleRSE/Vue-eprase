@@ -66,6 +66,25 @@
             <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert (interruptive type, maybe a pop-up that requires  action) OR advisory (passive dialogue, maybe a banner message on the bottom of the screen) you would expect.</div>
 
 
+            <p>You have received advice or information concerning (check all that apply).</p>
+
+
+            <table id="drug-table" class="table-striped">
+              <tbody>
+              <tr><td><input type="checkbox" value="drug-age" id="drug-age" v-model="response.intervention_type"></td><td><label for="drug-age">Drug and patient age</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-dose" id="drug-dose" v-model="response.intervention_type"></td><td><label for="drug-dose">Drug dose level</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-interaction" id="drug-interaction" v-model="response.intervention_type"></td><td> <label for="drug-interaction">Drug interaction</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-allergies" id="drug-allergies" v-model="response.intervention_type"></td><td> <label for="drug-allergies">Drug allergies</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label for="drug-duplication">Drug duplication</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label for="drug-disease">Drug disease</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label for="drug-ommissions">Drug omissions</label></td></tr>
+              <tr><td><input type="checkbox" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label for="theraputic_duplication">Theraputic duplication</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label for="drug-lab">Lab results/monitoring/TDM</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label for="drug-route">Drug brand</label></td></tr>
+              <tr><td><input type="checkbox" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label for="drug-route">Incorrect route</label></td></tr>
+              </tbody>
+            </table>
+
             <div id="selected-type">
               <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
                 <option value="alert">Alert</option>
@@ -79,6 +98,8 @@
 
             <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="response.qualitative_data" placeholder="Please tell us about the system response..." maxlength="500"></textarea>
           </div>
+
+          <div id="discontinue">Please discontinue the prescription order before proceeding to the next scenario.</div>
 
           <input type="hidden" id="test_id" v-model="response.prescription=prescription.id" />
           <input type="hidden" id="result_score" v-model="response.result_score=getResult" />
@@ -118,7 +139,7 @@
                 return prescription.testList[this.getPresTestIndex];
             },
             getCurrentPatient() {
-                let testPatientId = this.prescription['patient'].patient_id;
+                let testPatientId = this.prescription['code'];
                 return localStorage.getItem(testPatientId);
             },
             isFormInvalid() {
@@ -151,7 +172,8 @@
                     prescription : '',
                     risk_level: '',
                     selected_type: '',
-                    qualitative_data : ''
+                    qualitative_data : '',
+                    intervention_type : []
                 },
                 result : null,
                 result_score : '',
@@ -247,6 +269,7 @@
                         const prescription = this.response.prescription;
                         const outcome = this.response.outcomes;
                         const other = this.response.other;
+                        const intervention_type = this.response.intervention_type.toString();
                         const selected_type = this.response.selected_type;
                         const time_taken = this.response.time_taken;
                         const qualitative_data = this.response.qualitative_data;
@@ -257,7 +280,7 @@
                         const completed = this.completed;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePrescriptionData', {prescription, outcome, other, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
+                            dispatch('savePrescriptionData', {prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed });
                         }
                         // reset data fields
                         this.resetDataFields();
@@ -291,7 +314,7 @@
                 this.response.outcomes = '';
                 this.response.other = '';
                 this.response.risk_level = '';
-                this.response.intervention_type = '';
+                this.response.intervention_type = [];
                 this.response.selected_type = '';
                 this.response.qualitative_data = '';
                 this.test_id = '';
@@ -413,8 +436,9 @@
     background-color: dimgray;
   }
 
-  .assessment {
+  #discontinue {
     padding-top: 25px;
+    font-weight: bold;
   }
 
   .assessment p {

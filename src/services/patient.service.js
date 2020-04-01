@@ -1,6 +1,7 @@
 import { dataService } from '../services/data.service'
 import { store } from '../store/index';
 import { settings } from '../settings';
+import _ from 'lodash';
 
 export const patientService = {
   getPatients,
@@ -9,9 +10,213 @@ export const patientService = {
   getPatientIndex,
   getTestIndex,
   getPatientTests,
-  setPatientsInStore
+ // setPatientsInStore,
+  setPrescriptionsInStore
 };
 
+function setPrescriptionsInStore() {
+
+  let drugAgeTests = [];
+  let drugLabTests = [];
+  let drugInteractionTests = [];
+  let drugDiseaseTests = [];
+  let drugDoseTests = [];
+  let drugFrequencyTests = [];
+  let theraputicDuplicationTests = [];
+  let drugAllergyTests = [];
+  let drugBrandTests = [];
+  let drugRouteTests = [];
+  let drugOmissionTests = [];
+  let drugOverdoseTests = [];
+  let drugDuplicationTests = [];
+
+  // get all prescription tests
+  getAllPrescriptions().then(data => {
+
+    let testList= [];
+    let tests = data;
+
+    for(let index in tests){
+      if(tests.hasOwnProperty(index)){
+        let testarray = tests[index];
+        let mytest= formatTestList(testarray);
+        testList.push(mytest);
+      }
+    }
+
+    // group the tests by category
+    for(let index in testList){
+      if(testList.hasOwnProperty(index)){
+
+        if(testList[index].in_use === true){
+
+          switch(testList[index].category_name){
+            case "Drug Age":
+              drugAgeTests.push(testList[index]);
+              break;
+            case "Drug Dose":
+              drugDoseTests.push(testList[index]);
+              break;
+            case "Drug Interaction":
+              drugInteractionTests.push(testList[index]);
+              break;
+            case "Drug Allergy":
+              drugAllergyTests.push(testList[index]);
+              break;
+            case "Drug Duplication":
+              drugDuplicationTests.push(testList[index]);
+              break;
+            case "Drug Disease":
+              drugDiseaseTests.push(testList[index]);
+              break;
+            case "Drug Omission":
+              drugOmissionTests.push(testList[index]);
+              break;
+            case "Theraputic Duplication":
+              theraputicDuplicationTests.push(testList[index]);
+              break;
+            case "Drug Lab":
+              drugLabTests.push(testList[index]);
+              break;
+            case "Drug Brand":
+              drugBrandTests.push(testList[index]);
+              break;
+            case "Drug Route":
+              drugRouteTests.push(testList[index]);
+              break;
+            case "Drug Overdose":
+              drugOverdoseTests.push(testList[index]);
+              break;
+            case "Drug Frequency":
+              drugFrequencyTests.push(testList[index]);
+              break;
+          }
+        }
+      }
+    }
+    // select 4 at random from each category
+    let allTests = [];
+    let temp;
+
+    temp = _.sampleSize(drugAgeTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugDoseTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugInteractionTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugAllergyTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugDuplicationTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugDiseaseTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugOmissionTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(theraputicDuplicationTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugLabTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugBrandTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugRouteTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugOverdoseTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+    temp = _.sampleSize(drugFrequencyTests, 4);
+    for(let index in temp){
+      allTests.push(temp[index]);
+    }
+
+    // get the patients and set the patientList
+    let tempPatientCodes = [];
+    let tempPatientList = [];
+
+    for(let index in allTests) {
+      if(allTests.hasOwnProperty(index)){
+          tempPatientCodes.push(allTests[index].code)
+      }
+    }
+    tempPatientCodes =  _.uniq(tempPatientCodes);
+    localStorage.setItem('numPatients', tempPatientCodes.length);
+
+    // set the patient list
+    for(let index in tempPatientCodes){
+      if(tempPatientCodes.hasOwnProperty(index)){
+        getPatientByCode(tempPatientCodes[index]).then(data => {
+          let patient = data;
+            patient = formatPatientData(patient);
+
+            // fix patient DOBs
+            patient.dob = patientService.getDOB(patient);
+
+            // assign id and name to local storage
+            let myid = patient.code;
+            let myname = patient.first_name + ' ' + patient.surname;
+            localStorage.setItem(myid, myname);
+            tempPatientList.push(patient);
+        });
+      }
+    }
+
+    // set const for dispatch
+    const patientCodes = tempPatientCodes;
+    const patientList = tempPatientList;
+    store.dispatch('setPatientList', { patientList, patientCodes});
+
+    // set up insert points for config errors
+    let numConfigErrors = settings.numConfigError;
+    let insertPoints = [];
+
+    while(insertPoints.length < numConfigErrors){
+      // create a random point to insert a config error between 2 and 20
+      let configInsert = Math.floor(Math.random() * 20) + 2;
+      if(!insertPoints.includes(configInsert)){
+        insertPoints.push(configInsert);
+      }
+    }
+
+    // get all the config errors (another promise)
+    dataService.getConfigErrors().then(data => {
+      let configErrors = data;
+
+      // splice the config errors into allTests at the insertPoints (array length changes after each insert)
+      for(let i = 0; i < insertPoints.length; i++){
+          // add new element without deleting anything
+          allTests.splice(insertPoints[i], 0, configErrors[i]);
+      }
+
+      const testList = allTests;
+      store.dispatch('setTestList', { testList });
+    });
+
+  });
+}
+
+/*
 function setPatientsInStore() {
 
   let patients = [];
@@ -92,7 +297,7 @@ function setPatientsInStore() {
     store.dispatch('setPatientList', { patientList, patientIds});
   });
 }
-
+*/
 
 function getDOB(patient) {
 
@@ -123,6 +328,7 @@ function getDOB(patient) {
   return dd + '/' + mm + '/' + yyyy;
 }
 
+/*
 // used by setPatientsInStore
 function getAllPatients() {
 
@@ -141,7 +347,28 @@ function getAllPatients() {
     .catch(function() {
       console.log('Error returning from getAllPatients');
     });
-}
+} */
+
+// used by setPrescriptionsInStore
+  function getAllPrescriptions() {
+
+    let token = getToken();
+
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+    };
+
+    return fetch(settings.baseUrl + 'allprescriptions', requestOptions)
+      .then(handleResponse)
+      .then(response => {
+        return response;
+      })
+      .catch(function() {
+        console.log('Error returning from getAllPrescriptions');
+      });
+  }
+
 
 function getPatientDetails() {
 
@@ -159,6 +386,25 @@ function getPatientDetails() {
     })
     .catch(function() {
       console.log('Error returning from getPatientDetails');
+    });
+}
+
+function getPatientByCode(code) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'patientByCode?code=' + code, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getPatientByCode');
     });
 }
 
@@ -222,7 +468,7 @@ function handleResponse(response) {
 function formatPartialData(patientarray){
 
   let patient = {
-    patient_id: patientarray[0],
+    code: patientarray[0],
     first_name : patientarray[1],
     surname : patientarray[2],
     age : patientarray[3],
@@ -234,10 +480,10 @@ function formatPartialData(patientarray){
   return patient;
 }
 
-function formatData(patientarray){
+function formatPatientData(patientarray){
 
   let patient = {
-    patient_id: patientarray['patient_id'],
+    code: patientarray['code'],
     first_name : patientarray['first_name'],
     surname : patientarray['surname'],
     age : patientarray['age'],
@@ -247,6 +493,7 @@ function formatData(patientarray){
     is_adult: patientarray['is_adult'],
     allergy: formatAllergy(patientarray['allergy']),
     diagnosis: formatDiagnosis(patientarray['diagnosis']),
+    comorbidity: formatComorbidity(patientarray['comorbidity']),
     medication_histories: patientarray['medication_histories'],
     clinical_data : patientarray['clinical_data']
   };
@@ -273,14 +520,28 @@ function formatDiagnosis(diagnosis) {
   return diagnosisArray;
 }
 
+function formatComorbidity(comorbidity) {
+  let comorbidityArray = [];
+  for(let index in comorbidity){
+    if(comorbidity.hasOwnProperty(index)){
+      comorbidityArray.push(comorbidity[index].comorbidity);
+    }
+  }
+  return comorbidityArray;
+}
+
+
+
 function formatTestList(testList){
 
   let test = {
     id: testList['id'],
-    patient_id : testList['patient'].patient_id,
+    code : testList['patient'].code,
     prescription_id : testList['prescription_id'],
+    category_name : testList['indicator'].category['categoryName'],
+    in_use : testList['indicator'].category['in_use2020'],
     description : testList['indicator'].description,
-    risk_score : testList['risk_score'],
+    risk_level : testList['risk_level'],
     drug_name : testList['drug_name'],
     drug_dose : testList['drug_dose'],
     route: testList['route'],
@@ -288,6 +549,11 @@ function formatTestList(testList){
     drug_frequency: testList['drug_frequency']
   };
   return test;
+
+}
+
+function groupTests(test){
+
 
 }
 

@@ -12,9 +12,9 @@
 
         <form id="loginform" class="form-group">
           <div class="form-group">
-            <label>Username: </label>
-            <input type="text"  v-model="user.username" v-validate="'required'" class="form-control" name="username"  minlength="3" maxlength="50" :class="{ 'is-invalid': submitted && errors.has('username') }" />
-            <div v-if="submitted && errors.has('username')" class="invalid-feedback alert alert-danger">{{ errors.first('username') }}</div>
+            <label for="email">E-mail Address:</label>
+            <input type="email" v-model="user.email" v-validate="{ required: true, regex:/^[a-zA-Z0-9.]+@([a-z]+.|)nhs.(uk|net)+$/ }" id="email" name="email" class="form-control" :class="{ 'is-invalid':  submitted && errors.has('email') }" />
+            <div v-show="submitted && errors.has('email')" class="invalid-feedback alert alert-danger">{{ errors.first('email') }}</div>
           </div>
           <div class="form-group">
             <label>Password: </label>
@@ -61,6 +61,7 @@
       data() {
           return {
               user: {
+                  email: '',
                   username: '',
                   password: '',
               },
@@ -71,13 +72,17 @@
       methods: {
         onLoginClick() {
             this.submitted = true;
+
+            this.user.username = this.getUsernameFromEmail(this.user.email);
+
             this.$validator.validate().then(valid => {
                 if (valid) {
                     const username  = this.user.username;
                     const password = this.user.password;
                     const { dispatch } = this.$store;
                     if (username && password) {
-                        dispatch('authentication/login', { username, password }).then(() => router.push({ path: './login' }) )
+                        dispatch('authentication/login', { username, password })
+                          .then(() => router.push({ path: './login' }) )
                           .catch(err => {
                               console.log(err);
                               this.serverError = true
@@ -88,6 +93,11 @@
         },
         onRegisterClick() {
             this.$router.push({ path: './register' });
+        },
+        getUsernameFromEmail(email){
+          let parts =[];
+          parts = email.split('@');
+          return parts[0];
         },
         resetForm: function() {
           this.$data.user = {};

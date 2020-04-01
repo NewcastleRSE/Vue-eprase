@@ -48,10 +48,10 @@ export const authentication = {
         ).catch((err => {}));
 
     },
-    resetPassword({ dispatch, commit }, { password, confirm_password, token }) {
+    resetPassword({ dispatch, commit }, { password, token }) {
       commit('resetPassword');
 
-      userService.resetPassword(password, confirm_password, token)
+      userService.resetPassword(password, token)
         .then(
           user => {
             commit('passwordResetSuccess', user);
