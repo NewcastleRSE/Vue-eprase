@@ -18,6 +18,7 @@ import ResultsTable from './components/ResultsTable';
 import AppCharts from "./components/AppCharts";
 import ResetPassword from "./components/ResetPassword";
 import RequestPassword from "./components/RequestPassword";
+import SetPatients from "./components/SetPatients";
 
 Vue.use(Router);
 
@@ -86,6 +87,10 @@ export const router = new Router({
     {
       path: '/charts/:ID',
       component: AppCharts
+    },
+    {
+      path: '/setpatients/:type',
+      component: SetPatients
     },
     {
       path: '/resetpassword/:token?',

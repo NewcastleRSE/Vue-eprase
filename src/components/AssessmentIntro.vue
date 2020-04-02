@@ -75,7 +75,6 @@
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-                patientService.setPatientsInStore();
                 this.$router.push({ path: './assessmentsystem' });
             }
         },
@@ -83,11 +82,7 @@
             this.checkAssessmentComplete();
             dataService.audit('View assessment intro', '/assessmentintro');
         },
-        computed: {
-            user() {
-                return this.$store.state.authentication.user;
-            }
-        },
+
     }
 </script>
 

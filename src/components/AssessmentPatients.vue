@@ -12,7 +12,30 @@
         <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
         <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click <strong>Next</strong> to continue.</p>
 
-       <AppPatients />
+        <div>
+          <table id="test-patients" class="table table-striped">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Date of Birth</th>
+              <th>Gender</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="patient in patients.patientList">
+              <td>
+                {{patient.first_name}} {{patient.surname}}
+              </td>
+              <td>
+                {{patient.dob}}
+              </td>
+              <td>
+                {{patient.gender}}
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -36,18 +59,22 @@
     import  AppPatients from './AppPatients';
     import AppLogo from "./AppLogo";
     import  TabHeader from './TabHeader';
+    import {patientService} from "../services/patient.service";
 
     export default {
         name: "AssessmentPatients",
         components: {
             TabHeader,
-            AppPatients,
             AppLogo
         },
         computed: {
             user() {
                 return this.$store.state.authentication.user;
+            },
+            patients() {
+              return this.$store.state.patientList;
             }
+
         },
         data() {
             return {
@@ -56,7 +83,8 @@
                     currentPart: dataService.getAssessmentPart(),
                     time_taken: ''
                 },
-                startTime: ''
+                startTime: '',
+                myPatientList: []
             }
         },
         methods: {
@@ -91,6 +119,7 @@
         },
         created : function() {
             this.startTime = new Date();
+
         }
     }
 </script>

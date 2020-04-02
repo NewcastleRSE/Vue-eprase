@@ -6,8 +6,8 @@ export const settings = {
   intervention: -10,
   orderPrevented : -20,
   notAvailable : 0,
-  numPrescriptions: 36,
+  numPrescriptions: 45,
   numConfigError : 2,
-  testLimit : 13,
+  testLimit : 45,
   baseUrl : 'http://localhost:6001/'
 };

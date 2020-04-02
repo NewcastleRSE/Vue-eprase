@@ -171,6 +171,7 @@
     import TabHeader from './TabHeader';
     import AppLogo from './AppLogo';
     import { dataService } from '../services/data.service';
+    import { patientService } from "../services/patient.service";
 
     export default {
         name: "AssessmentSystem",

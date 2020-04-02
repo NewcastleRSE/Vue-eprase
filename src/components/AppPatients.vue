@@ -32,26 +32,28 @@
 
     export default {
         name: "AppPatients",
+        props: {
+          patients : ['patients']
+        },
         components: {
         },
         data() {
             return {
-                patients : [],
+                mypatients : this.patients,
                 myPatientList : []
             }
         },
         methods: {
             getPatients() {
-                this.patients = patientService.getPatients();
+                console.log(this.mypatients);
                 // format : patientList[0] etc
-                for (let i = 0; i < this.patients.patientList.length; i++) {
-                    this.myPatientList.push(this.patients.patientList[i])
+                for (let i = 0; i < this.mypatients.patientList.length; i++) {
+                    this.myPatientList.push(this.mypatients.patientList[i])
                 }
             }
         },
-        created() {
+        created : function() {
             this.getPatients();
-
         }
     }
 </script>
