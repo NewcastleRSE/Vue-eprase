@@ -263,75 +263,126 @@ function setPatientsInStore(patient_type) {
 
         if(mypatient.age >= 18){
           adultPatientList.push(mypatient);
-          adultPatientCodes.push(mypatient.code);
+          // adultPatientCodes.push(mypatient.code);
         }
         else {
           childPatientList.push(mypatient);
-          childPatientCodes.push(mypatient.code);
+          // childPatientCodes.push(mypatient.code);
         }
         allPatientList.push(mypatient);
-        allPatientCodes.push(patients[index].code);
+       // patientCodes.push(patients[index].code);
       }
-
-       /*
-      // increment to get valid patient ids (promise)
-      if(patients.hasOwnProperty(index)){
-        index++;
-        // get the tests associated with each patient
-        getPatientTests(index).then(data => {
-          tempList = data;
-          for(let i = 0; i < tempList.length; i++){
-             testList.push(tempList[i]);
-          }
-
-          // get all the config errors (another promise)
-          dataService.getConfigErrors().then(data => {
-            configErrors = data;
-
-            // splice the config errors into the testList at the insertPoints (array length changes after each insert)
-            for(let j = 0; j < insertPoints.length; j++){
-              if(index === insertPoints[j]){
-                // add new element without deleting anything
-                testList.splice(insertPoints[j], 0, configErrors[j]);
-              }
-            }
-            store.dispatch('setTestList', { testList});
-          });
-        });
-      } */
     }
 
-    //console.log(adultPatientList);
-    //console.log(childPatientList);
+    console.log(childPatientList);
 
     if(patient_type === 'Adults'){
 
-      for(let index in adultPatientList){
-        if(adultPatientList.hasOwnProperty(index)){
-           let id = adultPatientList[index].id;
+      // reduce to 15 patients (currently 20 patients)
+      adultPatientList.splice(0,5);
+
+      let myAdultPatientList = adultPatientList;
+
+      for(let index in myAdultPatientList){
+        if(myAdultPatientList.hasOwnProperty(index)){
+           let id = myAdultPatientList[index].id;
+
            getPatientTests(id).then(data => {
             tempList = data;
             for(let i = 0; i < tempList.length; i++){
               testList.push(tempList[i]);
             }
-             store.dispatch('setTestList', { testList});
+
+             // get all the config errors (another promise)
+             dataService.getConfigErrors().then(data => {
+               configErrors = data;
+
+               console.log(insertPoints);
+
+               // splice the config errors into the testList at the insertPoints (array length changes after each insert)
+               insertConfigErrors(index, testList, insertPoints);
+             });
            });
+
+          for(let i = 0; i < patientList.length; i++) {
+            // fix patient DOBs
+            myAdultPatientList[i].dob = patientService.getDOB(myAdultPatientList[i]);
+
+            // assign id and name to local storage
+            let myid = myAdultPatientList[i].code;
+            let myname = myAdultPatientList[i].first_name + ' ' + myAdultPatientList[i].surname;
+            localStorage.setItem(myid, myname);
+          }
+
+          localStorage.setItem('numPatients', myAdultPatientList.length);
+          patientList = myAdultPatientList;
+          patientCodes = adultPatientCodes;
+        }
+      }
+    }
+    else if (patient_type === 'Paediatrics'){
+      for(let index in childPatientList){
+        if(childPatientList.hasOwnProperty(index)){
+          let id = childPatientList[index].id;
+          getPatientTests(id).then(data => {
+            tempList = data;
+            for(let i = 0; i < tempList.length; i++){
+              testList.push(tempList[i]);
+            }
+            store.dispatch('setTestList', { testList});
+          });
         }
       }
 
-      for(let i = 0; i < adultPatientList.length; i++) {
+      for(let i = 0; i < childPatientList.length; i++) {
         // fix patient DOBs
-        adultPatientList[i].dob = patientService.getDOB(adultPatientList[i]);
+        childPatientList[i].dob = patientService.getDOB(childPatientList[i]);
 
         // assign id and name to local storage
-        let myid = adultPatientList[i].code;
-        let myname = adultPatientList[i].first_name + ' ' + adultPatientList[i].surname;
+        let myid = childPatientList[i].code;
+        let myname = childPatientList[i].first_name + ' ' + childPatientList[i].surname;
         localStorage.setItem(myid, myname);
       }
 
-      localStorage.setItem('numPatients', adultPatientList.length);
-      patientList = adultPatientList;
-      patientCodes = adultPatientCodes;
+      localStorage.setItem('numPatients', childPatientList.length);
+      patientList = childPatientList;
+      patientCodes = childPatientCodes;
+
+    }
+    else if (patient_type === 'Both'){
+
+      // shuffle the patient list
+      shuffle(allPatientList);
+      // reduce to 15 patients (currently 35 patients)
+      allPatientList.splice(0,20);
+
+      let myAllPatientList = allPatientList;
+
+      for(let index in myAllPatientList){
+        if(myAllPatientList.hasOwnProperty(index)){
+          let id = myAllPatientList[index].id;
+          getPatientTests(id).then(data => {
+            tempList = data;
+            for(let i = 0; i < tempList.length; i++){
+              testList.push(tempList[i]);
+            }
+            store.dispatch('setTestList', { testList});
+          });
+        }
+      }
+
+      for(let i = 0; i < myAllPatientList.length; i++) {
+        // fix patient DOBs
+        myAllPatientList[i].dob = patientService.getDOB(myAllPatientList[i]);
+
+        // assign id and name to local storage
+        let myid = myAllPatientList[i].code;
+        let myname = myAllPatientList[i].first_name + ' ' +  myAllPatientList[i].surname;
+        localStorage.setItem(myid, myname);
+      }
+
+      localStorage.setItem('numPatients', myAllPatientList.length);
+      patientList = myAllPatientList;
 
     }
 
@@ -339,6 +390,28 @@ function setPatientsInStore(patient_type) {
     store.dispatch('setPatientList', { patientList });
 
   });
+}
+
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// sets the test list with config errors inserted
+function insertConfigErrors(index, testList, insertPoints){
+
+  for(let j = 0; j < insertPoints.length; j++){
+    if(index === insertPoints[j]){
+      // add new element without deleting anything
+      testList.splice(insertPoints[j], 0, configErrors[j]);
+    }
+  }
+  store.dispatch('setTestList', { testList});
+
 }
 
 
