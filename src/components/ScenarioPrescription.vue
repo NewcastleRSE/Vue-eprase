@@ -1,9 +1,9 @@
 <template>
 
-  <div >
+  <div>
     <div id="test-scenario">
 
-      <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_level}}></p>
+      <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_level}} ></p>
 
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
@@ -139,7 +139,7 @@
                 return prescription.testList[this.getPresTestIndex];
             },
             getCurrentPatient() {
-                let testPatientId = this.prescription['code'];
+                let testPatientId = this.prescription['patient'].code;
                 return localStorage.getItem(testPatientId);
             },
             isFormInvalid() {

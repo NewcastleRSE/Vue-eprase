@@ -82,7 +82,7 @@
                     const { dispatch } = this.$store;
                     if (username && password) {
                         dispatch('authentication/login', { username, password })
-                          .then(() => router.push({ path: './login' }) )
+                          .then(() => router.push({ path: '/' }) )
                           .catch(err => {
                               console.log(err);
                               this.serverError = true
