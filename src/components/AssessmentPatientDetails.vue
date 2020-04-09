@@ -122,9 +122,6 @@
               <input type="hidden" id="patient_id" v-model="assessment.patient_code=patient[getCurrentPatient].code" />
             </div>
 
-            {{ patient[getCurrentPatient].code}}
-
-
           </div>
         </div>
 
@@ -245,6 +242,8 @@
         },
         created : function() {
             this.startTime = new Date();
+            // update the testList with config errors
+            patientService.setConfigErrors();
         },
         beforeUpdate: function() {
             let index = this.$store.state.patientIndex;

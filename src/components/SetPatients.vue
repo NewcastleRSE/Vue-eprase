@@ -16,7 +16,6 @@
         name: "SetPatients",
         data() {
             return {
-
             }
         },
         computed: {

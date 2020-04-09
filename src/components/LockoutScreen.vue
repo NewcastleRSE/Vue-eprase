@@ -25,6 +25,7 @@
     import { settings } from '../settings'
     import TabHeader from './TabHeader';
     import AppLogo from './AppLogo';
+    import {patientService} from "../services/patient.service";
 
     export default {
         name: "LockoutScreen",

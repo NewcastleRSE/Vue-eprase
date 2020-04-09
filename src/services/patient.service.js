@@ -9,8 +9,10 @@ export const patientService = {
   getNumPatients,
   getPatientIndex,
   getTestIndex,
+  getTestList,
   getPatientTests,
   setPatientsInStore,
+  setConfigErrors
  // setPrescriptionsInStore
 };
 
@@ -218,26 +220,8 @@ function setPrescriptionsInStore() {
   });
 } */
 
+function setConfigErrors() {
 
-function setPatientsInStore(patient_type) {
-
-  let patients = [];
-  let tempList = [];
-  let testList = [];
-  let configErrors = [];
-  const adultPatientList = [];
-  const childPatientList = [];
-  const allPatientList = [];
-  const adultPatientCodes = [];
-  const childPatientCodes = [];
-  const allPatientCodes = [];
-  const patientIndex = [];
-  let patientList = [];
-  let patientCodes = [];
-
-  // create local variables to help set up insert points for config errors
-  let numTests = settings.numPrescriptions;
-  let testLimit = settings.testLimit;
   let numConfigErrors = settings.numConfigError;
   let insertPoints = [];
 
@@ -248,6 +232,38 @@ function setPatientsInStore(patient_type) {
       insertPoints.push(configInsert);
     }
   }
+
+  // get all the config errors (another promise)
+  dataService.getConfigErrors().then(data => {
+    let configErrors = data;
+
+    let testList = JSON.parse(localStorage.getItem('testList'));
+    console.log(testList);
+
+    // splice the config errors into allTests at the insertPoints (array length changes after each insert)
+    for(let i = 0; i < insertPoints.length; i++){
+      // add new element without deleting anything
+      testList.splice(insertPoints[i], 0, configErrors[i]);
+    }
+    // update the test list
+    store.dispatch('setTestList', { testList });
+  });
+}
+
+function setPatientsInStore(patient_type) {
+
+  let patients = [];
+  let tempList = [];
+  const adultPatientList = [];
+  const childPatientList = [];
+  const allPatientList = [];
+  const adultPatientCodes = [];
+  const childPatientCodes = [];
+  const allPatientCodes = [];
+  const patientIndex = [];
+  let patientList = [];
+  let patientCodes = [];
+  let testList = [];
 
   // get all the patients
   // returns a promise
@@ -275,9 +291,9 @@ function setPatientsInStore(patient_type) {
     let requiredAdultPatients = [];
     let requiredChildPatients = [];
     let allRequiredPatients = [];
-    let numRequiredChildPatients = settings.numRequiredChildPatients;
-    let numRequiredAdultPatients = settings.numRequiredAdultPatients;
-    let numAllRequiredPatients = settings.numAllRequiredPatients;
+  //  let numRequiredChildPatients = settings.numRequiredChildPatients;
+  //  let numRequiredAdultPatients = settings.numRequiredAdultPatients;
+ //   let numAllRequiredPatients = settings.numAllRequiredPatients;
 
     getRequiredTests().then(data => {
       let tests = data;
@@ -304,34 +320,30 @@ function setPatientsInStore(patient_type) {
       // (currently 20 patients, but may increase)
       let numAdultPatients = myAdultPatientList.length;
       let diff = numAdultPatients - 15;
-      diff += numRequiredAdultPatients;
+      // diff += numRequiredAdultPatients;
 
-      // reduce number of patients
+      // reduce number of patients (5)
       myAdultPatientList.splice(0,diff);
 
-      // add the required patients (in case they have been spliced out), reduce list if necessary
-      myAdultPatientList.concat(requiredAdultPatients);
-      myAdultPatientList = _.uniq(myAdultPatientList);
+      // check to see if the list contains any required patients (works with single required at the moment)
+      if(!myAdultPatientList.includes(requiredAdultPatients)){
+        // add the required patients
+         myAdultPatientList.concat(requiredAdultPatients);
+      }
 
       for(let index in myAdultPatientList){
         if(myAdultPatientList.hasOwnProperty(index)){
            let id = myAdultPatientList[index].id;
 
+           // promise, must return testList
            getPatientTests(id).then(data => {
             tempList = data;
             for(let i = 0; i < tempList.length; i++){
               testList.push(tempList[i]);
             }
+             store.dispatch('setTestList', { testList });
+             localStorage.setItem('testList',  JSON.stringify(testList));
 
-             // get all the config errors (another promise)
-             dataService.getConfigErrors().then(data => {
-               configErrors = data;
-
-               console.log(insertPoints);
-
-               // splice the config errors into the testList at the insertPoints (array length changes after each insert)
-               insertConfigErrors(index, testList, insertPoints);
-             });
            });
 
           for(let i = 0; i < patientList.length; i++) {
@@ -347,8 +359,10 @@ function setPatientsInStore(patient_type) {
           localStorage.setItem('numPatients', myAdultPatientList.length);
           patientList = myAdultPatientList;
           patientCodes = adultPatientCodes;
+
         }
       }
+
     }
     else if (patient_type === 'Paediatrics'){
 
@@ -369,6 +383,7 @@ function setPatientsInStore(patient_type) {
               testList.push(tempList[i]);
             }
             store.dispatch('setTestList', { testList});
+            localStorage.setItem('testList',  JSON.stringify(testList));
           });
         }
       }
@@ -414,6 +429,7 @@ function setPatientsInStore(patient_type) {
               testList.push(tempList[i]);
             }
             store.dispatch('setTestList', { testList});
+            localStorage.setItem('testList',  JSON.stringify(testList));
           });
         }
       }
@@ -448,19 +464,23 @@ function shuffle(a) {
   return a;
 }
 
-// sets the test list with config errors inserted
-function insertConfigErrors(index, testList, insertPoints){
+function insertConfigErrors(i, testList, insertPoints, configErrors){
 
+  console.log(testList.length);
+
+  // loop through the insertpoints
   for(let j = 0; j < insertPoints.length; j++){
-    if(index === insertPoints[j]){
       // add new element without deleting anything
-      testList.splice(insertPoints[j], 0, configErrors[j]);
-    }
+     console.log('Inserting config error at ' + insertPoints[j]);
+     if(i === insertPoints[j]){
+       testList.push(configErrors[j]);
+     }
+     console.log(testList.length);
+     return testList;
   }
+
   store.dispatch('setTestList', { testList});
-
 }
-
 
 function getDOB(patient) {
 
@@ -627,6 +647,10 @@ function getPatients() {
 
 function getPatientIndex() {
   return store.state.patientIndex;
+}
+
+function getTestList() {
+  return store.state.testList;
 }
 
 function getNumPatients() {
