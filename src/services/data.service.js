@@ -11,7 +11,7 @@ export const dataService = {
   getCategoryData,
   setAssessmentPart,
   saveSystemData,
-  savePart2Data,
+  saveCreatePatientData,
   savePatientData,
   savePrescriptionData,
   saveMitigationResults,
@@ -26,7 +26,6 @@ export const dataService = {
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
 
   let token = getToken();
-  let year = settings.year;
 
   const requestOptions = {
     method: 'POST',
@@ -34,7 +33,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'system?YEAR=' + year, requestOptions)
+  return fetch(settings.baseUrl + 'system', requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
@@ -51,7 +50,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     });
 }
 
-function savePart2Data(time_taken){
+function saveCreatePatientData(time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -69,7 +68,7 @@ function savePart2Data(time_taken){
       router.push({ path: './assessmentpatientdetails' });
     })
     .catch(function() {
-      console.log('Error returning from savePart2Data');
+      console.log('Error returning from saveCreatePatientData');
     });
 
 }
@@ -215,7 +214,7 @@ function logout() {
   localStorage.clear();
 }
 
-
+// param institution id
 function getAssessment(id) {
 
   let token = getToken();
@@ -226,7 +225,7 @@ function getAssessment(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'result?ID=' + assessmentId, requestOptions)
+  return fetch(settings.baseUrl + 'result?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -336,14 +335,14 @@ function getConfigErrors() {
 function getAssessmentStatus() {
 
   let token = getToken();
-  let user_id = getUserId();
+  let institution_id = getInstitutionId();
 
   const requestOptions = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getAssessmentStatus?USER_ID=' + user_id, requestOptions)
+  return fetch(settings.baseUrl + 'getAssessmentStatus?INSTITUTION_ID=' + institution_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       // console.log(response);

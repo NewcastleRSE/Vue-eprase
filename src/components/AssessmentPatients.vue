@@ -12,7 +12,7 @@
         <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
         <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click <strong>Next</strong> to continue.</p>
 
-        <div>
+        <div v-if="patients">
           <table id="test-patients" class="table table-striped">
             <thead>
             <tr>
@@ -107,7 +107,7 @@
                         const time_taken = this.assessment.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('savePart2Data', { time_taken });
+                            dispatch('saveCreatePatientData', { time_taken });
                         }
 
                         // audit

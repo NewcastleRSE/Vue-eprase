@@ -34,9 +34,9 @@ export const store = new Vuex.Store({
       dataService.saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
       commit('saveSystemData');
     },
-    savePart2Data({ commit }, { qualitative_data, time_taken }){
-      dataService.savePart2Data( qualitative_data, time_taken);
-      commit('savePart2Data');
+    saveCreatePatientData({ commit }, { qualitative_data, time_taken }){
+      dataService.saveCreatePatientData( qualitative_data, time_taken);
+      commit('saveCreatePatientData');
     },
     savePatientData({ commit }, { qualitative_data, code, time_taken, index, completed }){
       dataService.savePatientData( qualitative_data, code, time_taken);
@@ -79,7 +79,7 @@ export const store = new Vuex.Store({
     saveSystemData(state) {
       state.part1complete = true;
     },
-    savePart2Data(state) {
+    saveCreatePatientData(state) {
       state.part2complete = true;
     },
     savePatientData(state, completed) {

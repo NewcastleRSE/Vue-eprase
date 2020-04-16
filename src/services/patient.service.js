@@ -236,9 +236,7 @@ function setConfigErrors() {
   // get all the config errors (another promise)
   dataService.getConfigErrors().then(data => {
     let configErrors = data;
-
     let testList = JSON.parse(localStorage.getItem('testList'));
-    console.log(testList);
 
     // splice the config errors into allTests at the insertPoints (array length changes after each insert)
     for(let i = 0; i < insertPoints.length; i++){
@@ -293,7 +291,7 @@ function setPatientsInStore(patient_type) {
     let allRequiredPatients = [];
   //  let numRequiredChildPatients = settings.numRequiredChildPatients;
   //  let numRequiredAdultPatients = settings.numRequiredAdultPatients;
- //   let numAllRequiredPatients = settings.numAllRequiredPatients;
+    let numAllRequiredPatients = settings.numAllRequiredPatients;
 
     getRequiredTests().then(data => {
       let tests = data;
@@ -411,7 +409,7 @@ function setPatientsInStore(patient_type) {
       // (currently 35 patients, but may increase)
       let numAllPatients = myAllPatientList.length;
       let diff = numAllPatients - 15;
-      diff += numAllRequiredPatients;
+      //diff += numAllRequiredPatients;
 
       // reduce number of patients (currently 35 patients)
       myAllPatientList.splice(0, diff);
@@ -637,7 +635,6 @@ function getToken(){
 }
 
 function getPatients() {
-
     let mypatients = store.state.patientList;
     console.log('in get patients');
     console.log(mypatients);

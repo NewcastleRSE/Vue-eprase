@@ -7,8 +7,7 @@
       <h2>Assessment Results</h2>
       <p>Your results from the ePRaSE assessment.</p>
         <strong>User:</strong> {{ user.username }}<br />
-        <strong>Institution:</strong> {{ }} <br />
-        <strong>Assessment Id:</strong> {{ assessment_id }}
+        <strong>Institution:</strong> {{ institution.org_name }} <br />
 
       <div class="text">Congratulations, you have reached the end of the scenarios. Please use the buttons below to see your results.
 
@@ -94,14 +93,15 @@
                   drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
                   interventionTypeResult: '',
                   totalConfigTests : settings.numConfigError,
-                  assessment_id : ''
+                  assessment_id : '',
+                  institution_id: '',
+                  institution: ''
               }
           },
           computed: {
               user() {
                   return this.$store.state.authentication.user;
-              },
-
+              }
           },
           methods : {
               createResults(id) {
@@ -585,12 +585,15 @@
               created() {
                     // get the system id from the url
                    this.assessment_id  = this.$route.params.ID;
+                   this.institution_id = localStorage.getItem('institutionId');
 
                   dataService.getCategories(this.assessment_id ).then(data => {
                     this.categories = data;
                   });
 
-                  dataService.getAssessment(this.assessment_id ).then(data => {
+                  dataService.getAssessment(this.institution_id).then(data => {
+
+                    console.log(data);
 
                       // audit
                       dataService.audit('View report', '/assessmentresults');
