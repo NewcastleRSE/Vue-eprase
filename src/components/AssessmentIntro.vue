@@ -17,8 +17,8 @@
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
 
       <div class="buttons">
-        <button class="start-btn btn btn-primary" v-if="assessment.currentPart===1" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
-        <button class="btn btn-primary" v-if="assessment.currentPart>1" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
+        <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
+        <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started'" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
       </div>
     </div>
 
@@ -59,9 +59,7 @@
         data() {
             return {
                 assessmentComplete : false,
-                assessment : {
-                    currentPart : dataService.getAssessmentPart()
-                },
+                assessmentStatus : '',
                 year: settings.year
             }
         },
@@ -69,6 +67,11 @@
             checkAssessmentComplete() {
                 dataService.getAssessmentStatus().then(data => {
                 this.assessmentComplete = data;
+                });
+            },
+            getAssessmentStatus() {
+              dataService.getAssessmentLatestCompletedPart().then(data => {
+                  this.assessmentStatus = data.status;
                 });
             },
             onResultsClick() {
@@ -80,8 +83,9 @@
         },
         created : function() {
             this.checkAssessmentComplete();
+            this.getAssessmentStatus();
             dataService.audit('View assessment intro', '/assessmentintro');
-        },
+        }
 
     }
 </script>

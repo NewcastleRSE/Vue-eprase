@@ -11,13 +11,13 @@
         </div>
       </div>
 
-      <div v-show="assessment == null">
+      <div v-show="!assessment">
         <p>You currently have no reports available.</p>
       </div>
 
       <div class="list-group">
      <!--   <div v-for="assessment in assessments"> -->
-          <div v-if="assessment">
+          <div v-if="assessment || assessment.length">
           <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment.system_id }}" class="list-group-item list-group-item-action flex-column align-items-start">
             <h4>{{assessment.ep_service}}</h4>
             <p>{{ assessment.username }}</p>
@@ -79,22 +79,30 @@
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
             };
-            axios.get(baseURL + 'result?ID=' + this.institution_id, requestOptions)
+            axios.get(baseURL + 'resultById?ID=' + this.institution_id, requestOptions)
                 .then(response => {
 
                     let data = response.data;
 
-                    this.assessment.username = data.user.username;
-                    this.assessment.institution = 145;
-                    this.assessment.ep_service = data.system.ep_service;
-                    let timestamp = data.system.time_created;
-                    var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
-                    this.assessment.time_created = date;
+                    // empty array if assessment not started
+                    if(data !== undefined){
 
-                    this.assessment.system_id = data.system.id;
+                      this.assessment.username = data.user.username;
+                      this.assessment.institution = 145;
+                      this.assessment.ep_service = data.system.ep_service;
+                      let timestamp = data.system.time_created;
+                      var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
+                      this.assessment.time_created = date;
 
-                    //TODO should be assessment id?
-                    localStorage.setItem('assessmentId', this.assessment.system_id);
+                      this.assessment.system_id = data.system.id;
+
+                      //TODO should be assessment id?
+                      localStorage.setItem('assessmentId', this.assessment.system_id);
+                    }
+                    else {
+                      this.assessment = [];
+                      this.assessment.system_id = 0;
+                    }
 
                   /*
                   for (let assessment in this.assessments){

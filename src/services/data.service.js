@@ -4,7 +4,7 @@ import { router } from '../router';
 
 export const dataService = {
   getAssessment,
-  getAssessmentPart,
+  getAssessmentLatestCompletedPart,
   getAssessmentStatus,
   getInstitutions,
   getCategories,
@@ -225,7 +225,7 @@ function getAssessment(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'result?ID=' + id, requestOptions)
+  return fetch(settings.baseUrl + 'resultById?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -355,13 +355,25 @@ function getAssessmentStatus() {
 }
 
 
-function getAssessmentPart() {
+function getAssessmentLatestCompletedPart() {
 
-  let part = localStorage.getItem('assessmentPart');
-  if(part == null){
-    part = 1
-  }
-  return part;
+  let token = getToken();
+  let institution_id = getInstitutionId();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'getAssessmentLatestCompletedPart?INSTITUTION_ID=' + institution_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getAssessmentLatestCompletedPart');
+    });
+
 }
 
 function setAssessmentPart(value) {
