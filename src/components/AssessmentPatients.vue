@@ -80,7 +80,6 @@
             return {
                 submitted: false,
                 assessment: {
-                    currentPart: dataService.getAssessmentPart(),
                     time_taken: ''
                 },
                 startTime: '',
@@ -101,6 +100,11 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
+                        let patient_ids = this.savePatientIds();
+                        console.log(patient_ids);
+
+                        //TODO  add patient_ids to saveCreatePatientData
+
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
@@ -115,11 +119,22 @@
                         dataService.audit('Add patient list', '/assessmentpatients');
                     }
                 });
-            }
+            },
+          savePatientIds() {
+
+              let patients = this.$store.state.patientList;
+              let patient_ids = '';
+
+              for(let index in patients.patientList){
+                if(patients.patientList.hasOwnProperty(index)){
+                  patient_ids += patients.patientList[index].id + ',';
+                }
+              }
+              return patient_ids;
+          }
         },
         created : function() {
             this.startTime = new Date();
-
         }
     }
 </script>

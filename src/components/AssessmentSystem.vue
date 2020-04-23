@@ -229,9 +229,6 @@
                     ]
                 },
                 submitted: false,
-                assessment: {
-                    currentPart: dataService.getAssessmentPart(),
-                },
                 startTime: ''
             }
         },

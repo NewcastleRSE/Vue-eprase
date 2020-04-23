@@ -5,6 +5,7 @@ import { router } from '../router';
 export const dataService = {
   getAssessment,
   getAssessmentLatestCompletedPart,
+  updateAssessmentStatus,
   getAssessmentStatus,
   getInstitutions,
   getCategories,
@@ -375,6 +376,28 @@ function getAssessmentLatestCompletedPart() {
     });
 
 }
+
+function updateAssessmentStatus(section){
+
+  let token = getToken();
+  let institutionId = getInstitutionId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(section)
+  };
+
+  return fetch(settings.baseUrl + 'updateAssessmentStatus?ID=' + institutionId, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from saveConfigError');
+    });
+}
+
 
 function setAssessmentPart(value) {
   localStorage.setItem('assessmentPart', value);

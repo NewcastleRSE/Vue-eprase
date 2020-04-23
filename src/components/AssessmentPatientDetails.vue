@@ -176,7 +176,6 @@
             return {
                 submitted: false,
                 assessment: {
-                    currentPart: dataService.getAssessmentPart(),
                     patient_code : '',
                     qualitative_data : '',
                     time_taken: ''
@@ -211,8 +210,9 @@
 
                 // save the last patient data
                 this.saveData();
+                this.updateAssessmentStatus();
 
-                // audit
+              // audit
                 dataService.audit('Completed patient details', '/assessmentpatientdetails');
 
                 this.$router.push('/lockoutscreen');
@@ -238,6 +238,9 @@
                         this.assessment.qualitative_data = '';
                     }
                 });
+            },
+            updateAssessmentStatus() {
+              patientService.updateAssessmentStatus('PatientDataCompleted');
             }
         },
         created : function() {
