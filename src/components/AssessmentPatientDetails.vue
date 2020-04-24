@@ -240,7 +240,7 @@
                 });
             },
             updateAssessmentStatus() {
-              patientService.updateAssessmentStatus('PatientDataCompleted');
+              dataService.updateInstitutionAssessment();
             }
         },
         created : function() {

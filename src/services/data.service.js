@@ -5,7 +5,6 @@ import { router } from '../router';
 export const dataService = {
   getAssessment,
   getAssessmentLatestCompletedPart,
-  updateAssessmentStatus,
   getAssessmentStatus,
   getInstitutions,
   getCategories,
@@ -21,7 +20,8 @@ export const dataService = {
   getConfigErrors,
   failedLoginAudit,
   audit,
-  logout
+  logout,
+  updateInstitutionAssessment
 };
 
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
@@ -51,7 +51,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     });
 }
 
-function saveCreatePatientData(time_taken){
+function saveCreatePatientData(patient_list, time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -59,7 +59,7 @@ function saveCreatePatientData(time_taken){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ time_taken })
+    body: JSON.stringify({ patient_list, time_taken })
   };
 
   return fetch(settings.baseUrl + 'createpatients?ID=' + assessmentId, requestOptions)
@@ -377,25 +377,25 @@ function getAssessmentLatestCompletedPart() {
 
 }
 
-function updateAssessmentStatus(section){
+function updateInstitutionAssessment(){
 
   let token = getToken();
   let institutionId = getInstitutionId();
 
   const requestOptions = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify(section)
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'updateAssessmentStatus?ID=' + institutionId, requestOptions)
+  return fetch(settings.baseUrl + 'updateInstitutionAssessment?INSTITUTION_ID=' + institutionId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
     })
     .catch(function() {
-      console.log('Error returning from saveConfigError');
+      console.log('Error returning from updateInstitutionAssessment');
     });
+
 }
 
 

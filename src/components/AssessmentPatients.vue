@@ -100,22 +100,17 @@
                 this.$validator.validate().then(valid => {
                     if (valid) {
 
-                        let patient_ids = this.savePatientIds();
-                        console.log(patient_ids);
-
-                        //TODO  add patient_ids to saveCreatePatientData
-
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
                         const time_taken = this.assessment.time_taken;
+                        const patient_list = this.savePatientIds();
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveCreatePatientData', { time_taken });
+                            dispatch('saveCreatePatientData', { patient_list, time_taken });
                         }
 
                         // audit
-                        const user_id =  this.user.user_id;
                         dataService.audit('Add patient list', '/assessmentpatients');
                     }
                 });
