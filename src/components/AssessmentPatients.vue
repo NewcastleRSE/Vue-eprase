@@ -104,10 +104,9 @@
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime/1000;
                         const time_taken = this.assessment.time_taken;
-                        const patient_list = this.savePatientIds();
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveCreatePatientData', { patient_list, time_taken });
+                            dispatch('saveCreatePatientData', { time_taken });
                         }
 
                         // audit
@@ -115,21 +114,31 @@
                     }
                 });
             },
-          savePatientIds() {
+            getPatients() {
+               return this.patients;
+            },
+            savePatientIds() {
 
-              let patients = this.$store.state.patientList;
-              let patient_ids = '';
+                 // use computed value of patients
+                let patients = this.patients;
+                let patient_list = '';
 
-              for(let index in patients.patientList){
-                if(patients.patientList.hasOwnProperty(index)){
-                  patient_ids += patients.patientList[index].id + ',';
+                for(let index in patients.patientList){
+                  if(patients.patientList.hasOwnProperty(index)){
+                    patient_list += patients.patientList[index].id + ',';
+                  }
                 }
-              }
-              return patient_ids;
-          }
+                dataService.savePatientList(patient_list);
+                dataService.audit('save patient list', '/assessmentpatients');
+            }
         },
         created : function() {
             this.startTime = new Date();
+        },
+        mounted() {
+          setTimeout(() => {
+              this.savePatientIds();
+          }, 1000)
         }
     }
 </script>

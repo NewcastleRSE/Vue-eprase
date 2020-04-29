@@ -89,7 +89,7 @@ export const router = new Router({
       component: AppCharts
     },
     {
-      path: '/setpatients/:type',
+      path: '/setpatients/:type?',
       component: SetPatients
     },
     {

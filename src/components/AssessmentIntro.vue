@@ -16,11 +16,15 @@
       <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
 
+      <div class="progress"> Your organisation progress is : {{ assessmentStatus }}</div>
+
       <div class="buttons">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
         <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started'" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
       </div>
     </div>
+
+
 
     <div class="content" v-if="assessmentComplete === true">
 
@@ -72,13 +76,28 @@
             getAssessmentStatus() {
               dataService.getAssessmentLatestCompletedPart().then(data => {
                   this.assessmentStatus = data.status;
+
                 });
             },
             onResultsClick() {
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-                this.$router.push({ path: './assessmentsystem' });
+
+                console.log(this.assessmentStatus);
+
+                if(this.assessmentStatus === 'System Complete'){
+                    this.$router.push({ path: './setpatients' });
+                }
+                else if(this.assessmentStatus === 'Create Patients in Progress'){
+                    this.$router.push({ path: './assessmentpatientdetails' });
+                }
+                else if(this.assessmentStatus === 'Create Patients Complete'){
+                    this.$router.push({ path: './assessmentscenarios' });
+                }
+                else {
+                     this.$router.push({ path: './assessmentsystem' });
+                }
             }
         },
         created : function() {
@@ -123,6 +142,10 @@
 
   .divcontent {
     padding: 20px 0;
+  }
+
+  .progress {
+    color: #cd0a2a;
   }
 
 </style>

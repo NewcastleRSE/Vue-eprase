@@ -13,6 +13,7 @@ export const dataService = {
   saveSystemData,
   saveCreatePatientData,
   savePatientData,
+  savePatientList,
   savePrescriptionData,
   saveMitigationResults,
   getMitigationResults,
@@ -51,7 +52,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     });
 }
 
-function saveCreatePatientData(patient_list, time_taken){
+function saveCreatePatientData(time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -59,7 +60,7 @@ function saveCreatePatientData(patient_list, time_taken){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ patient_list, time_taken })
+    body: JSON.stringify({ time_taken })
   };
 
   return fetch(settings.baseUrl + 'createpatients?ID=' + assessmentId, requestOptions)
@@ -92,6 +93,27 @@ function savePatientData(qualitative_data, code, time_taken){
     })
     .catch(function() {
       console.log('Error returning from savePatientData');
+    });
+}
+
+function savePatientList(patient_list){
+
+  let token = getToken();
+  let institutionId = getInstitutionId();
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body:  patient_list
+  };
+
+  return fetch(settings.baseUrl + 'savepatientlist?INSTITUTION_ID=' + institutionId, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from savePatientList');
     });
 }
 
