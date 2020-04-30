@@ -269,6 +269,7 @@
                         }
                         // audit
                         dataService.audit('Save system data', '/assessmentSystem');
+                        this.$router.push({ path: './setpatients/' + patient_type });
                     }
                 });
             }

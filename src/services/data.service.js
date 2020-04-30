@@ -43,8 +43,6 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
        // store assessment id
        localStorage.setItem('assessmentId', assessmentId);
        dataService.setAssessmentPart(2);
-       let type = patient_type;
-       router.push({ path: './setpatients/' + type});
      }
     })
     .catch(function() {
@@ -67,7 +65,6 @@ function saveCreatePatientData(time_taken){
     .then(handleResponse)
     .then(response => {
       dataService.setAssessmentPart(3);
-      router.push({ path: './assessmentpatientdetails' });
     })
     .catch(function() {
       console.log('Error returning from saveCreatePatientData');

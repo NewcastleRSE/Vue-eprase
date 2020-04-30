@@ -64,13 +64,16 @@
             return {
                 assessmentComplete : false,
                 assessmentStatus : '',
+                assessmentId : '',
                 year: settings.year
             }
         },
         methods: {
             checkAssessmentComplete() {
                 dataService.getAssessmentStatus().then(data => {
-                this.assessmentComplete = data;
+                   this.assessmentComplete = data.status;
+                   this.assessmentId = data.id;
+                   localStorage.setItem('assessmentId', this.assessmentId);
                 });
             },
             getAssessmentStatus() {
@@ -90,7 +93,7 @@
                     this.$router.push({ path: './setpatients' });
                 }
                 else if(this.assessmentStatus === 'Create Patients in Progress'){
-                    this.$router.push({ path: './assessmentpatientdetails' });
+                    this.$router.push({ path: './setpatients' });
                 }
                 else if(this.assessmentStatus === 'Create Patients Complete'){
                     this.$router.push({ path: './assessmentscenarios' });

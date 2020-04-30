@@ -111,6 +111,7 @@
 
                         // audit
                         dataService.audit('Add patient list', '/assessmentpatients');
+                        this.$router.push({ path: './assessmentpatientdetails' });
                     }
                 });
             },
@@ -136,6 +137,8 @@
             this.startTime = new Date();
         },
         mounted() {
+
+          // TODO make this conditional
           setTimeout(() => {
               this.savePatientIds();
           }, 1000)

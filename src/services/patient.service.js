@@ -11,7 +11,9 @@ export const patientService = {
   getTestIndex,
   getTestList,
   getPatientTests,
+  getPatientIds,
   setPatientsInStore,
+  setPatientsInStoreFromIds,
   setConfigErrors,
   // setPrescriptionsInStore
 };
@@ -255,12 +257,7 @@ function setPatientsInStore(patient_type) {
   const adultPatientList = [];
   const childPatientList = [];
   const allPatientList = [];
-  const adultPatientCodes = [];
-  const childPatientCodes = [];
-  const allPatientCodes = [];
-  const patientIndex = [];
   let patientList = [];
-  let patientCodes = [];
   let testList = [];
 
   // get all the patients
@@ -275,14 +272,11 @@ function setPatientsInStore(patient_type) {
 
         if(mypatient.age >= 18){
           adultPatientList.push(mypatient);
-          // adultPatientCodes.push(mypatient.code);
         }
         else {
           childPatientList.push(mypatient);
-          // childPatientCodes.push(mypatient.code);
         }
         allPatientList.push(mypatient);
-       // patientCodes.push(patients[index].code);
       }
     }
 
@@ -356,8 +350,6 @@ function setPatientsInStore(patient_type) {
 
           localStorage.setItem('numPatients', myAdultPatientList.length);
           patientList = myAdultPatientList;
-          patientCodes = adultPatientCodes;
-
         }
       }
 
@@ -398,8 +390,6 @@ function setPatientsInStore(patient_type) {
 
       localStorage.setItem('numPatients', myChildPatientList.length);
       patientList = myChildPatientList;
-      patientCodes = childPatientCodes;
-
     }
     else if (patient_type === 'Both'){
 
@@ -444,13 +434,61 @@ function setPatientsInStore(patient_type) {
 
       localStorage.setItem('numPatients', myAllPatientList.length);
       patientList = myAllPatientList;
-
     }
 
-    // TODO set patient codes?
     store.dispatch('setPatientList', { patientList });
 
   });
+}
+
+function setPatientsInStoreFromIds() {
+
+  let patient_ids = [];
+  let tempList = [];
+  let patientList = [];
+  let testList = [];
+
+  getPatientIds().then(data => {
+
+      let ids = data.split(',');
+      ids.forEach(function(obj){
+        patient_ids.push(parseInt(obj));
+      });
+      if(isNaN(patient_ids[patient_ids.length-1])){
+        patient_ids.pop();
+      }
+
+      for(let index in patient_ids){
+          if(patient_ids.hasOwnProperty(index)){
+              let id = patient_ids[index];
+
+              console.log('patient id is: ' + id);
+
+              // promise, must return testList
+              getPatientTests(id).then(data => {
+                  tempList = data;
+                  for(let i = 0; i < tempList.length; i++){
+                    testList.push(tempList[i]);
+                  }
+                  store.dispatch('setTestList', { testList });
+                  localStorage.setItem('testList',  JSON.stringify(testList));
+              });
+
+              getPatientById(id).then(patient => {
+                   patient.dob = patientService.getDOB(patient);
+                  let myid = patient.code;
+                  let myname = patient.first_name + ' ' + patient.surname;
+                  localStorage.setItem(myid, myname);
+                  patientList.push(patient);
+              });
+          }
+      }
+
+      console.log(patientList);
+
+      localStorage.setItem('numPatients', patient_ids.length);
+      store.dispatch('setPatientList', { patientList });
+  })
 }
 
 
@@ -589,6 +627,27 @@ function getPatientByCode(code) {
     });
 }
 
+// used by setPatientsInStoreFromIds
+function getPatientById(patient_id) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'patientById?PATIENT_ID=' + patient_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getPatientById');
+    });
+}
+
+
 // takes patient ID as param, used by setPatientsinStore
 function getPatientTests(index) {
 
@@ -608,6 +667,29 @@ function getPatientTests(index) {
       console.log('Error returning from getPatientTests');
     });
 }
+
+
+// used by setPatientsInStoreFromIds
+function getPatientIds() {
+
+  let token = getToken();
+  let institution_id = getInstitutionId();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'getPatientIds?INSTITUTION_ID=' + institution_id , requestOptions)
+    .then(handleTextResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getPatientIds');
+    });
+}
+
 
 // used by setPatientsinStore
 function getRequiredTests() {
@@ -630,10 +712,6 @@ function getRequiredTests() {
 
 }
 
-function getToken(){
-  return localStorage.getItem('token');
-}
-
 function getPatients() {
     let mypatients = store.state.patientList;
     console.log('in get patients');
@@ -642,25 +720,28 @@ function getPatients() {
 
 }
 
-function getPatientIndex() {
-  return store.state.patientIndex;
-}
-
-function getTestList() {
-  return store.state.testList;
-}
-
-function getNumPatients() {
-  return localStorage.getItem('numPatients');
-}
-
-function getTestIndex() {
-  return store.state.testIndex;
-}
 
 function handleResponse(response) {
   return response.text().then(text => {
     const data = text && JSON.parse(text);
+    if (!response.ok) {
+      if (response.status === 401) {
+        // auto logout if 401 response returned from api
+        logout();
+        location.reload(true);
+      }
+
+      const error = (data && data.message) || response.statusText;
+      return Promise.reject(error);
+    }
+    return data;
+  });
+}
+
+
+function handleTextResponse(response) {
+  return response.text().then(text => {
+    const data = text;
     if (!response.ok) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
@@ -766,6 +847,35 @@ function formatTestList(testList){
 function groupTests(test){
 
 
+}
+
+
+// store getters
+
+function getPatientIndex() {
+  return store.state.patientIndex;
+}
+
+function getTestList() {
+  return store.state.testList;
+}
+
+function getTestIndex() {
+  return store.state.testIndex;
+}
+
+// local storage getters
+
+function getNumPatients() {
+  return localStorage.getItem('numPatients');
+}
+
+function getInstitutionId() {
+  return localStorage.getItem('institutionId');
+}
+
+function getToken(){
+  return localStorage.getItem('token');
 }
 
 

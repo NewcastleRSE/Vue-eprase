@@ -11,8 +11,6 @@
 <script>
     import {patientService} from "../services/patient.service";
     import {dataService} from "../services/data.service";
-    import {settings} from "../settings";
-    import axios from "axios";
 
     export default {
         name: "SetPatients",
@@ -33,33 +31,13 @@
           // if we've jumped over the system stage, look for db values
           if(this.patient_type === undefined){
 
-            let baseURL = settings.baseUrl;
-            let token = localStorage.getItem('token');
-            this.institution_id = localStorage.getItem('institutionId');
-
-            const requestOptions = {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
-            };
-            axios.get(baseURL + 'getPatientIds?INSTITUTION_ID=' + this.institution_id, requestOptions)
-              .then(response => {
-
-                let data = response.data;
-                // empty array if assessment not started
-                if(data !== undefined){
-
-                  console.log(data);
-                }
-              })
-              .catch(function (error) {
-                console.log('error ' + error);
-              });
-
+              patientService.setPatientsInStoreFromIds();
+          }
+          else {
+            // set the patient list and test list in store
+            patientService.setPatientsInStore(this.patient_type);
           }
 
-          // set the patient list and test list in store
-         // patientService.setPrescriptionsInStore(patient_type);
-          patientService.setPatientsInStore(this.patient_type);
           // audit
           dataService.audit('Create patient and test list', '/setpatients/'+ this.patient_type);
           this.$router.push('/assessmentpatients');
