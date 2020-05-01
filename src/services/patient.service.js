@@ -462,8 +462,6 @@ function setPatientsInStoreFromIds() {
           if(patient_ids.hasOwnProperty(index)){
               let id = patient_ids[index];
 
-              console.log('patient id is: ' + id);
-
               // promise, must return testList
               getPatientTests(id).then(data => {
                   tempList = data;
@@ -475,7 +473,10 @@ function setPatientsInStoreFromIds() {
               });
 
               getPatientById(id).then(patient => {
-                   patient.dob = patientService.getDOB(patient);
+                  patient.dob = patientService.getDOB(patient);
+                  patient.allergy = formatAllergy(patient['allergy']);
+                  patient.comorbidity = formatComorbidity(patient['comorbidity']);
+                  patient.diagnosis = formatDiagnosis(patient['diagnosis']);
                   let myid = patient.code;
                   let myname = patient.first_name + ' ' + patient.surname;
                   localStorage.setItem(myid, myname);
@@ -499,8 +500,6 @@ function shuffle(a) {
 
 function insertConfigErrors(i, testList, insertPoints, configErrors){
 
-  console.log(testList.length);
-
   // loop through the insertpoints
   for(let j = 0; j < insertPoints.length; j++){
       // add new element without deleting anything
@@ -508,7 +507,6 @@ function insertConfigErrors(i, testList, insertPoints, configErrors){
      if(i === insertPoints[j]){
        testList.push(configErrors[j]);
      }
-     console.log(testList.length);
      return testList;
   }
 

@@ -145,9 +145,10 @@
   }
 
   .progress {
-    color: #cd0a2a;
+    color: #07818e;
     background-color: #fff;
     font-size: 0.8em;
+    height: 30px;
   }
 
 </style>
