@@ -5,13 +5,14 @@
       <h3>Patient data section completed</h3>
         <div id="timer">
           <p>You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
+          <p><strong>Once you have entered this section, you will need to complete it fully, so please make sure you have enough time set aside to complete the scenarios.</strong></p>
           <p v-if="counter > 0">You can continue on to the next phase of the assessment in: <strong>{{getTimeRemaining()}}</strong></p>
         </div>
 
       <div class="form-group footer" style="{text-align: center}">
         <div class="buttons">
           <button type="button" class="lock-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()" disabled>Next</button>
+          <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()" :disabled="disabled">Next</button>
           <button v-show="skipEnabled" id="skip-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Skip</button>
         </div>
       </div>
@@ -40,7 +41,9 @@
                 unlockTime : null,
                 timeDiff : null,
                 nextEnabled: true,
-                skipEnabled : settings.skipButton
+                skipEnabled : settings.skipButton,
+                patientscompleted : false,
+                disabled : true
             }
         },
         methods : {
@@ -61,34 +64,48 @@
                 return hour + ':' + mins + ':' + secs;
             },
             onNextClick()  {
+                if(this.patientscompleted){
+                    patientService.setConfigErrors();
+                }
                 this.$router.push('/assessmentscenarios');
             },
             onExitClick() {
-              this.$router.push('/logout');
+                this.$router.push('/logout');
             }
         },
         created : function() {
 
-            this.currentTime = new Date();
-            this.unlockTime = new Date(localStorage.getItem('assessmentUnlockTime'));
+             // if this is true, then the user has jumped from assessmentintro and will need to create patientlist and testlist
+            this.patientscompleted = this.$route.params.patientscompleted;
+            if(this.patientscompleted){
+                this.nextEnabled = true;
+                this.disabled = false;
 
-            const timeDiff = this.unlockTime.getTime() - this.currentTime.getTime();
-
-            if (timeDiff <= 0) {
-                this.counter = 0;
-                this.nextEnabled = false
+                patientService.setPatientsInStoreFromIds();
             }
             else {
-                this.counter = timeDiff / 1000;
+                this.currentTime = new Date();
+                this.unlockTime = new Date(localStorage.getItem('assessmentUnlockTime'));
 
-                const intervalId = setInterval(() => {
-                    this.counter = this.counter - 1;
-                    if (this.counter === 0) {
-                        clearInterval(intervalId);
-                        this.nextEnabled = true;
-                    }
+                const timeDiff = this.unlockTime.getTime() - this.currentTime.getTime();
 
-                }, 1000);
+                if (timeDiff <= 0) {
+                    this.counter = 0;
+                    this.nextEnabled = false;
+                }
+                else {
+                    this.counter = timeDiff / 1000;
+
+                    const intervalId = setInterval(() => {
+                        this.counter = this.counter - 1;
+                        if (this.counter === 0) {
+                          clearInterval(intervalId);
+                          this.nextEnabled = true;
+                          this.disabled = false;
+                        }
+
+                    }, 1000);
+                }
             }
         }
     }

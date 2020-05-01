@@ -5,9 +5,12 @@
 
     <div id="content">
       <h2>Assessment Results</h2>
-      <p>Your results from the ePRaSE assessment.</p>
-        <strong>User:</strong> {{ user.username }}<br />
-        <strong>Institution:</strong> {{ institution.org_name }} <br />
+
+      <div class="text">
+        <strong>Institution:</strong> {{ institution}} <br />
+        <strong>EP System:</strong> {{ ep_service }}<br />
+      </div>
+
 
       <div class="text">Congratulations, you have reached the end of the scenarios. Please use the buttons below to see your results.
 
@@ -95,7 +98,8 @@
                   totalConfigTests : settings.numConfigError,
                   assessment_id : '',
                   institution_id: '',
-                  institution: ''
+                  institution: '',
+                  ep_service: ''
               }
           },
           computed: {
@@ -593,7 +597,8 @@
 
                   dataService.getAssessment(this.institution_id).then(data => {
 
-                    console.log(data);
+                      this.ep_service = data.system.ep_service;
+                      this.institution = data.user.institution.orgName;
 
                       // audit
                       dataService.audit('View report', '/assessmentresults');

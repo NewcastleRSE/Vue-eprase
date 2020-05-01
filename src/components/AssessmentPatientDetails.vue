@@ -137,6 +137,7 @@
       <div class="form-group footer" align="center">
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
+          <p v-show='doneEnabled'><strong>Please ensure you click the Done button to save your progress</strong></p>
           <button v-show='getCurrentPatient+1 === 1' id="exit-button" type="button" class="exit-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary" @click="onNextClick()">Next</button>
           <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary" @click="onDoneClick()">Done</button>
@@ -207,6 +208,8 @@
 
                 // this is now true
                 this.completed = true;
+                // update the testList with config errors, before the
+                patientService.setConfigErrors();
 
                 // save the last patient data
                 this.saveData();
@@ -244,11 +247,6 @@
         },
         created : function() {
             this.startTime = new Date();
-
-
-
-            // update the testList with config errors
-            patientService.setConfigErrors();
         },
         beforeUpdate: function() {
             let index = this.$store.state.patientIndex;
@@ -256,6 +254,13 @@
                 this.nextEnabled = false;
                 this.doneEnabled = true;
             }
+        },
+        mounted() {
+            setTimeout(() => {
+               if(this.myPatientList === null){
+                 patientService.setPatientsInStoreFromIds();
+               }
+            }, 1000);
         }
     }
 </script>

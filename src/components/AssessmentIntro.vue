@@ -20,8 +20,9 @@
 
       <div class="buttons">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
-        <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started'" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
+        <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
       </div>
+      <p></p>
     </div>
 
 
@@ -79,24 +80,20 @@
             getAssessmentStatus() {
               dataService.getAssessmentLatestCompletedPart().then(data => {
                   this.assessmentStatus = data.status;
-
                 });
             },
             onResultsClick() {
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-
-                console.log(this.assessmentStatus);
-
                 if(this.assessmentStatus === 'System Complete'){
                     this.$router.push({ path: './setpatients' });
                 }
                 else if(this.assessmentStatus === 'Create Patients in Progress'){
-                    this.$router.push({ path: './setpatients' });
+                    this.$router.push({ path: './assessmentpatientdetails' });
                 }
                 else if(this.assessmentStatus === 'Create Patients Complete'){
-                    this.$router.push({ path: './assessmentscenarios' });
+                    this.$router.push({ path: './lockoutscreen/' + true });
                 }
                 else {
                      this.$router.push({ path: './assessmentsystem' });
@@ -149,6 +146,8 @@
 
   .progress {
     color: #cd0a2a;
+    background-color: #fff;
+    font-size: 0.8em;
   }
 
 </style>

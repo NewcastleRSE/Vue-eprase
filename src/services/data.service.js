@@ -1,10 +1,12 @@
 
 import { settings } from '../settings';
 import { router } from '../router';
+import axios from "axios";
 
 export const dataService = {
   getAssessment,
   getAssessmentLatestCompletedPart,
+  getReportByInstitutionId,
   getAssessmentStatus,
   getInstitutions,
   getCategories,
@@ -394,6 +396,25 @@ function getAssessmentLatestCompletedPart() {
       console.log('Error returning from getAssessmentLatestCompletedPart');
     });
 
+}
+
+function getReportByInstitutionId() {
+
+  let token = getToken();
+  let institution_id = getInstitutionId();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'resultById?ID=' + institution_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function () {
+    });
 }
 
 function updateInstitutionAssessment(){

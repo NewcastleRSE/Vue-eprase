@@ -483,9 +483,6 @@ function setPatientsInStoreFromIds() {
               });
           }
       }
-
-      console.log(patientList);
-
       localStorage.setItem('numPatients', patient_ids.length);
       store.dispatch('setPatientList', { patientList });
   })
