@@ -60,7 +60,8 @@ function resetPassword(password, token){
   return fetch(baseURL + 'auth/resetPassword?token=' + token, requestOptions)
     .then(handleResponse)
     .then(response => {
-      // request successful if there's a password reset token in the response
+      // request successful if returns 'Password updated'
+      // may return unauthorized if token has expired
       if (response) {
         // success
       }
@@ -81,6 +82,23 @@ function handleResponse(response) {
         // auto logout if 401 response returned from api
         logout();
         router.push({ path: './login' }).catch(err => {});
+      }
+
+      const error = (data && data.message) || response.statusText;
+      return Promise.reject(error);
+    }
+    return data;
+  });
+}
+
+function handleTextResponse(response) {
+  return response.text().then(text => {
+    const data = text;
+    if (!response.ok) {
+      if (response.status === 401) {
+        // auto logout if 401 response returned from api
+        logout();
+        location.reload(true);
       }
 
       const error = (data && data.message) || response.statusText;

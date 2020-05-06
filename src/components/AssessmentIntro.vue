@@ -1,8 +1,13 @@
 <template>
   <div id="page">
 
-    <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
+   <!-- <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader> -->
+
+    <div id="header" class="level">
+    </div>
+
     <div class="content" v-if="assessmentComplete !== true">
+
       <h1>Welcome to the ePRaSE Assessment</h1>
 
       <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of indicators.</p>
@@ -110,6 +115,18 @@
 </script>
 
 <style scoped>
+
+
+  #header {
+    background-image: url("../assets/pills-bw.png");
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+  }
+  .level {
+    height: 80px;
+  }
 
   button {
     height: 40px;

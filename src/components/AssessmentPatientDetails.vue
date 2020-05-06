@@ -27,7 +27,7 @@
 
           <div class="card-body">
 
-            <div class="left=col">
+            <div class="left-col">
 
               <div class="patient-demographics">
                 <h5 class="card-title">Demographics</h5>
@@ -61,23 +61,6 @@
                   </table>
                 </div>
 
-                <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
-                  <h5 class="card-title">Presenting Complaint</h5>
-                  <table>
-                    <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
-                      <td>{{diagnosis}}</td>
-                    </tr>
-                  </table>
-                </div>
-
-               <div align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
-                  <h5 class="card-title">Comorbidities</h5>
-                  <table>
-                    <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity">
-                      <td>{{comorbidity}}</td>
-                    </tr>
-                  </table>
-                </div>
 
                 <div align="left"  v-if="patient[getCurrentPatient].medication_histories.length != 0">
                   <h5 class="card-title">Current Medication</h5>
@@ -99,7 +82,7 @@
                   </table>
                 </div>
 
-            </div>
+              </div>
            </div>
 
             <div class="right-col">
@@ -119,6 +102,25 @@
                   </tr>
                 </table>
               </div>
+
+              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+                <h5 class="card-title">Presenting Complaint</h5>
+                <table>
+                  <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
+                    <td>{{diagnosis}}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
+                <h5 class="card-title">Comorbidities</h5>
+                <table>
+                  <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity">
+                    <td>{{comorbidity}}</td>
+                  </tr>
+                </table>
+              </div>
+
               <input type="hidden" id="patient_id" v-model="assessment.patient_code=patient[getCurrentPatient].code" />
             </div>
 
@@ -261,6 +263,9 @@
                  patientService.setPatientsInStoreFromIds();
                }
             }, 1000);
+
+            this.numPatients = 15;
+           // this.numPatients = localStorage.getItem('numPatients');
         }
     }
 </script>

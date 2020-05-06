@@ -11,25 +11,36 @@
         <strong>EP System:</strong> {{ ep_service }}<br />
       </div>
 
-
-      <div class="text">Congratulations, you have reached the end of the scenarios. Please use the buttons below to see your results.
-
-      </div>
+      <section>
+        <div>Total valid tests: {{ totalValidTests }}</div>
+        <div>Total null tests: {{ totalNulls }}</div>
+      </section>
 
       <div class="assessment-results">
-
-        <section>
-          <div>Total valid tests: {{ totalValidTests }}</div>
-          <div>Total null tests: {{ totalNulls }}</div>
-          <div>Total configuration tests: {{ totalConfigTests }}</div>
-        </section>
-
-        <section>
-          <h4>Intervention type results</h4>
-          <table>
-            <tr><th>Alerts Total</th><td>({{ totalAlerts }}/{{ totalInterventions }})</td><td> {{ calc(totalAlerts, totalInterventions) }}</td><td>{{  interventionTypeResult }}</td></tr>
+        <div class="results-summary">
+          <table class="table is-striped">
+            <tr><th>Category</th><th>Outcome</th></tr>
+            <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenarios. Out of these, {{ extremeRiskFails.length  }} were not mitigated. </td></tr>
+            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
+            <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
-        </section>
+        </div>
+
+        <div v-if="extremeRiskFails.length > 0">
+
+          <div class="table-header">Extreme risk scenarios with no mitigation</div>
+          <table class="table table-striped">
+            <thead>
+            <tr><th width="20%">Drug name</th><th>Scenario description</th></tr>
+            </thead>
+            <tbody>
+            <tr v-for="test in extremeRiskFails">
+              <td>{{test.prescription.drug_name}}</td><td>{{ test.prescription.indicator.description }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
 
         <button class="chartbutton" @click="onTableClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Results Table</button>
         <button class="chartbutton" @click="onChartClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
@@ -70,6 +81,8 @@
                   categories : [],
                   categoryData : [],
                   chartCategoryData: [],
+                  extremeRiskScenarios : [],
+                  extremeRiskFails: [],
                   goodMitigation: '',
                   someMitigation: '',
                   notMitigated: '',
@@ -537,13 +550,13 @@
                   interventionType = interventionType.slice(0, -1);
                   interventionType = parseInt(interventionType);
                   if(interventionType >= 70){
-                      return this.interventionTypeResult = 'High level of alerts';
+                      return this.interventionTypeResult = 'high level of alerts';
                   }
                   else if (interventionType < 70 && interventionType >= 35) {
-                      return this.interventionTypeResult = 'Medium level of alerts';
+                      return this.interventionTypeResult = 'medium level of alerts';
                   }
                   else {
-                      return this.interventionTypeResult = 'Low level of alerts';
+                      return this.interventionTypeResult = 'low level of alerts';
                   }
               },
               formatData(item) {
@@ -587,7 +600,7 @@
               }
               },
               created() {
-                    // get the system id from the url
+                    // get the assessment id from the url
                    this.assessment_id  = this.$route.params.ID;
                    this.institution_id = localStorage.getItem('institutionId');
 
@@ -597,6 +610,22 @@
 
                   dataService.getAssessment(this.institution_id).then(data => {
 
+                      let prescriptionList = data.prescriptionList;
+
+                      for(let index in prescriptionList){
+                          if(prescriptionList.hasOwnProperty(index)){
+                             let risk_level = prescriptionList[index].risk_level;
+                             if(risk_level === 'Extreme'){
+                               this.extremeRiskScenarios.push(prescriptionList[index]);
+                               if(prescriptionList[index].result === 'No Mitigation/Fail'){
+                                 this.extremeRiskFails.push(prescriptionList[index]);
+
+                                 console.log(prescriptionList[index]);
+                               }
+                             }
+                          }
+                      }
+
                       this.ep_service = data.system.ep_service;
                       this.institution = data.user.institution.orgName;
 
@@ -604,11 +633,11 @@
                       dataService.audit('View report', '/assessmentresults');
 
                       dataService.getMitigationResults(this.assessment_id ).then(data => {
-                        this.goodMitigation = data.goodMitigation;
-                        this.someMitigation = data.someMitigation;
-                        this.notMitigated = data.notMitigated;
-                        this.overMitigated = data.notMitigated;
-                        this.createResults(this.assessment_id );
+                          this.goodMitigation = data.goodMitigation;
+                          this.someMitigation = data.someMitigation;
+                          this.notMitigated = data.notMitigated;
+                          this.overMitigated = data.notMitigated;
+                          this.createResults(this.assessment_id );
                       })
                   });
               }
@@ -675,6 +704,11 @@
 
   button a {
     padding: 3px;
+  }
+
+  .table-header {
+    padding: 20px 0;
+    color: red;
   }
 
 </style>

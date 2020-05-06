@@ -733,7 +733,6 @@ function handleResponse(response) {
   });
 }
 
-
 function handleTextResponse(response) {
   return response.text().then(text => {
     const data = text;

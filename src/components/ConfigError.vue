@@ -17,6 +17,8 @@
           <label for="radio-no" class="radio-label">No </label>
             <input type="radio" value=0 id="radio-no" name="patientrecord" v-model="response.result">
         </span>
+
+            <input type="hidden" id="test_id" v-model="response.test_id=configError.configErrorCode" >
           </form>
 
         </div>
@@ -87,7 +89,6 @@
                         let endTime = new Date();
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.response.time_taken = elapsedTime/1000;
-
                         const test_id = this.response.test_id;
                         const result = this.response.result;
                         const time_taken = this.response.time_taken;

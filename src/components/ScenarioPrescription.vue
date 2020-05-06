@@ -109,6 +109,8 @@
       </div>
     </div>  <!-- end box -->
 
+    <div class="text">Congratulations, you have reached the end of the scenarios.</div>
+
 
     <div class="form-group footer" align="center">
       <div class="buttons">
