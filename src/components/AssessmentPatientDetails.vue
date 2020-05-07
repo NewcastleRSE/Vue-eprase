@@ -87,7 +87,7 @@
 
             <div class="right-col">
 
-              <div class="clinical-data " v-if="patient[getCurrentPatient].clinical_data.length != 0">
+              <div class="clinical-data" v-if="patient[getCurrentPatient].clinical_data.length != 0">
                 <h5 class="card-title">Clinical Data</h5>
                 <table>
                   <tr>
@@ -103,7 +103,7 @@
                 </table>
               </div>
 
-              <div align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+              <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
                 <h5 class="card-title">Presenting Complaint</h5>
                 <table>
                   <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
@@ -112,7 +112,7 @@
                 </table>
               </div>
 
-              <div align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
+              <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
                 <h5 class="card-title">Comorbidities</h5>
                 <table>
                   <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity">

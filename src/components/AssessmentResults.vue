@@ -4,7 +4,7 @@
     <TabHeader system-opacity="1.0" patient-opacity="1.0" scenario-opacity="1.0" report-opacity="1.0"></TabHeader>
 
     <div id="content">
-      <h2>Assessment Results</h2>
+      <h2>Assessment Report</h2>
 
       <div class="text">
         <strong>Institution:</strong> {{ institution}} <br />
@@ -18,9 +18,10 @@
 
       <div class="assessment-results">
         <div class="results-summary">
-          <table class="table is-striped">
+          <table class="table table-striped">
             <tr><th>Category</th><th>Outcome</th></tr>
             <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenarios. Out of these, {{ extremeRiskFails.length  }} were not mitigated. </td></tr>
+            <tr><td>High risk scenarios</td><td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{ highRiskFails.length  }} were not mitigated. </td></tr>
             <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
             <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
@@ -29,7 +30,7 @@
         <div v-if="extremeRiskFails.length > 0">
 
           <div class="table-header">Extreme risk scenarios with no mitigation</div>
-          <table class="table table-striped">
+          <table class="table table-striped extreme-risk-table">
             <thead>
             <tr><th width="20%">Drug name</th><th>Scenario description</th></tr>
             </thead>
@@ -41,8 +42,24 @@
           </table>
         </div>
 
+        <div v-if="configErrorResults.length > 0">
 
-        <button class="chartbutton" @click="onTableClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Results Table</button>
+          <div class="table-header">Configuration Error Results</div>
+          <table class="table table-striped extreme-risk-table">
+            <thead>
+            <tr><th width="50%">Question</th><th>Result</th><th>Outcome</th></tr>
+            </thead>
+            <tbody>
+            <tr v-for="test in configErrorResults">
+              <td>{{test.question}}</td>
+              <td><span v-if="test.result === 1">True</span><span v-if="test.result === 0">False</span></td>
+              <td><span v-if="test.result === 1">This is undesirable system behaviour</span><span v-if="test.result === 0">This is good system behaviour</span></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="chartbutton" @click="onTableClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Percentages</button>
         <button class="chartbutton" @click="onChartClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
 
       </div>
@@ -83,6 +100,9 @@
                   chartCategoryData: [],
                   extremeRiskScenarios : [],
                   extremeRiskFails: [],
+                  highRiskScenarios : [],
+                  highRiskFails : [],
+                  configErrorResults: [],
                   goodMitigation: '',
                   someMitigation: '',
                   notMitigated: '',
@@ -610,6 +630,18 @@
 
                   dataService.getAssessment(this.institution_id).then(data => {
 
+                      let configErrorList = data.configErrorDataList;
+
+                      for(let index in configErrorList){
+                        if(configErrorList.hasOwnProperty(index)){
+                          dataService.getConfigErrorByCode(configErrorList[index].test_id).then(data => {
+                            // assign a new element to the JSON
+                            configErrorList[index]["question"] = data[0].description;
+                            this.configErrorResults.push(configErrorList[index]);
+                          });
+                        }
+                      }
+
                       let prescriptionList = data.prescriptionList;
 
                       for(let index in prescriptionList){
@@ -619,8 +651,12 @@
                                this.extremeRiskScenarios.push(prescriptionList[index]);
                                if(prescriptionList[index].result === 'No Mitigation/Fail'){
                                  this.extremeRiskFails.push(prescriptionList[index]);
-
-                                 console.log(prescriptionList[index]);
+                               }
+                             }
+                             else if(risk_level === 'High'){
+                               this.highRiskScenarios.push(prescriptionList[index]);
+                               if(prescriptionList[index].result === 'No Mitigation/Fail'){
+                                 this.highRiskFails.push(prescriptionList[index]);
                                }
                              }
                           }
@@ -709,6 +745,10 @@
   .table-header {
     padding: 20px 0;
     color: red;
+  }
+
+  .extreme-risk-table {
+    margin-bottom: 40px;
   }
 
 </style>

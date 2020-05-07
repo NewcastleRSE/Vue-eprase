@@ -86,7 +86,6 @@
                       rows[index][4] = this.over;
                     }
                 }
-                console.log(rows);
                 data.addRows(rows);
 
                 var view = new google.visualization.DataView(data);

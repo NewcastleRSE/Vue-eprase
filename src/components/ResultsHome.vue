@@ -1,7 +1,8 @@
 <template>
   <div id="page">
 
-    <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
+    <div id="header" class="level">
+    </div>
 
     <div id="content">
       <div class="welcome-text">
@@ -18,8 +19,8 @@
       <div class="list-group">
           <div v-if="id > 0">
           <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: id }}" class="list-group-item list-group-item-action flex-column align-items-start">
-            <h4>{{ ep_service }}</h4>
-            <p>{{ institution }}</p>
+            <p><strong>{{ institution }}</strong></p>
+            <p>{{ ep_service }}</p>
             <p>{{ time_created }}</p>
           </router-link>
         </div>
@@ -97,6 +98,17 @@
 
   #content {
     padding: 40px;
+  }
+
+  #header {
+    background-image: url("../assets/pills-bw.png");
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+  }
+  .level {
+    height: 80px;
   }
 
   button {

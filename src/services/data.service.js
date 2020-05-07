@@ -21,6 +21,7 @@ export const dataService = {
   getMitigationResults,
   saveConfigError,
   getConfigErrors,
+  getConfigErrorByCode,
   failedLoginAudit,
   audit,
   logout,
@@ -351,6 +352,25 @@ function getConfigErrors() {
     })
     .catch(function() {
       console.log('Error returning from getConfigErrors');
+    });
+}
+
+function getConfigErrorByCode(code){
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'configerrorbycode?CODE=' + code, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getConfigErrorByCode');
     });
 }
 

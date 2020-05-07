@@ -65,9 +65,7 @@
           <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
             <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert (interruptive type, maybe a pop-up that requires  action) OR advisory (passive dialogue, maybe a banner message on the bottom of the screen) you would expect.</div>
 
-
             <p>You have received advice or information concerning (check all that apply).</p>
-
 
             <table id="drug-table" class="table-striped">
               <tbody>
@@ -89,7 +87,7 @@
               <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
                 <option value="alert">Alert</option>
                 <option value="advisory">Advisory</option>
-                <option value="advisory">Both</option>
+                <option value="alert">Both</option>
               </select>
 
               <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
@@ -109,7 +107,7 @@
       </div>
     </div>  <!-- end box -->
 
-    <div class="text">Congratulations, you have reached the end of the scenarios.</div>
+    <div v-show="doneEnabled" class="text">Congratulations, you have reached the end of the scenarios.</div>
 
 
     <div class="form-group footer" align="center">

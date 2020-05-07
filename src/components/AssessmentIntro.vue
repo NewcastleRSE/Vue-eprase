@@ -1,8 +1,6 @@
 <template>
   <div id="page">
 
-   <!-- <TabHeader system-opacity="0.2" patient-opacity="0.2" scenario-opacity="0.2" report-opacity="0.2"></TabHeader> -->
-
     <div id="header" class="level">
     </div>
 
