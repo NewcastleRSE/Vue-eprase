@@ -28,8 +28,6 @@
       <p></p>
     </div>
 
-
-
     <div class="content" v-if="assessmentComplete === true">
 
       <h2>Assessment Complete</h2>
@@ -38,6 +36,10 @@
         <p>To view the results of this assessment, click the 'Reports' button below.</p>
         <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.</p>
       </div>
+    </div>
+
+    <div class="added-content" v-show="userIsAdmin">
+      <button id="reports">View all reports</button>
     </div>
 
     <AppFooter />
@@ -56,6 +58,7 @@
     import TabHeader from './TabHeader';
     import AppFooter from "./AppFooter";
     import AppLogo from "./AppLogo";
+    import {userService} from "../services/user.service";
 
     export default {
         name: "AssessmentIntro",
@@ -69,10 +72,17 @@
                 assessmentComplete : false,
                 assessmentStatus : '',
                 assessmentId : '',
-                year: settings.year
+                year: settings.year,
+                userIsAdmin: false
             }
         },
         methods: {
+            checkIsAdminUser() {
+              let user_id = localStorage.getItem('userId');
+              userService.checkIsAdminUser(user_id).then(data => {
+                this.userIsAdmin = data;
+              });
+            },
             checkAssessmentComplete() {
                 dataService.getAssessmentStatus().then(data => {
                    this.assessmentComplete = data.status;
@@ -104,6 +114,7 @@
             }
         },
         created : function() {
+            this.checkIsAdminUser();
             this.checkAssessmentComplete();
             this.getAssessmentStatus();
             dataService.audit('View assessment intro', '/assessmentintro');
@@ -124,6 +135,10 @@
   }
   .level {
     height: 80px;
+  }
+
+  #reports {
+    width: 170px;
   }
 
   button {
@@ -149,6 +164,10 @@
 
   .content {
     padding: 40px;
+  }
+
+  .added-content {
+    padding: 0 0 30px 40px;
   }
 
   .btn-primary {

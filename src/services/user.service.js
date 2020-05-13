@@ -8,7 +8,8 @@ export const userService = {
   login,
   logout,
   newPasswordRequest,
-  resetPassword
+  resetPassword,
+  checkIsAdminUser
 };
 
 function login(username, password) {
@@ -74,6 +75,27 @@ function logout() {
   localStorage.clear();
 }
 
+function checkIsAdminUser(user_id){
+
+  let token = localStorage.getItem('token');
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(baseURL + 'auth/userIsAdmin?USER_ID=' + user_id, requestOptions)
+    .then(handleTextResponse)
+    .then(response => {
+      if (response) {
+        // success
+      }
+      return response;
+    });
+
+}
+
+
 function handleResponse(response) {
   return response.text().then(text => {
     const data = text && JSON.parse(text);
@@ -107,3 +129,4 @@ function handleTextResponse(response) {
     return data;
   });
 }
+
