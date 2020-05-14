@@ -663,7 +663,7 @@
                       }
 
                       this.ep_service = data.system.ep_service;
-                      this.institution = data.user.institution.orgName;
+                      this.institution = data.institution.orgName;
 
                       // audit
                       dataService.audit('View report', '/assessmentresults');

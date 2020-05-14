@@ -38,14 +38,12 @@
       </div>
     </div>
 
-    <div class="added-content" v-show="userIsAdmin">
-      <button id="reports">View all reports</button>
+    <div class="added-content" v-show="userIsAdmin === 'true'">
+      <button id="reports" @click="getAllReports()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View all reports</button>
     </div>
 
     <AppFooter />
     <AppLogo></AppLogo>
-
-
   </div>
 
 </template>
@@ -111,6 +109,9 @@
                 else {
                      this.$router.push({ path: './assessmentsystem' });
                 }
+            },
+            getAllReports() {
+              this.$router.push({ path: './assessmentreports' });
             }
         },
         created : function() {

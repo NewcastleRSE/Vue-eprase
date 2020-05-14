@@ -7,6 +7,8 @@ export const dataService = {
   getAssessment,
   getAssessmentLatestCompletedPart,
   getReportByInstitutionId,
+  getAssessmentIdByInstitutionId,
+  getAllReports,
   getAssessmentStatus,
   getInstitutions,
   getCategories,
@@ -374,17 +376,24 @@ function getConfigErrorByCode(code){
     });
 }
 
-function getAssessmentStatus() {
+function getAssessmentStatus(institution_id) {
 
   let token = getToken();
-  let institution_id = getInstitutionId();
+  let ins_id = 0;
+
+  if(institution_id !== undefined){
+    ins_id = institution_id;
+  }
+  else {
+    ins_id = getInstitutionId();
+  }
 
   const requestOptions = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getAssessmentStatus?INSTITUTION_ID=' + institution_id, requestOptions)
+  return fetch(settings.baseUrl + 'getAssessmentStatus?INSTITUTION_ID=' + ins_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       // console.log(response);
@@ -429,6 +438,43 @@ function getReportByInstitutionId() {
   };
 
   return fetch(settings.baseUrl + 'resultById?ID=' + institution_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function () {
+    });
+}
+
+function getAssessmentIdByInstitutionId(institution_id) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'assessmentIdByInstitutionId?ID=' + institution_id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function () {
+    });
+
+}
+
+function getAllReports() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'results', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;

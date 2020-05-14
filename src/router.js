@@ -14,6 +14,7 @@ import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
 import AssessmentContent from './components/AssessmentContent';
+import AssessmentReports from "./components/AssessmentReports";
 import ResultsTable from './components/ResultsTable';
 import AppCharts from "./components/AppCharts";
 import ResetPassword from "./components/ResetPassword";
@@ -79,6 +80,10 @@ export const router = new Router({
     {
       path: '/assessmentcontent',
       component: AssessmentContent
+    },
+    {
+      path: '/assessmentreports',
+      component: AssessmentReports
     },
     {
       path: '/resultstable/:ID',

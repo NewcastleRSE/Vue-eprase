@@ -39,7 +39,9 @@
           about() {
             window.location.href = './about'
           }
-
+        },
+        created() {
+         localStorage.clear();
         }
     }
 

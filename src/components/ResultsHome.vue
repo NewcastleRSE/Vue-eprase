@@ -74,7 +74,7 @@
               if(this.assessment){
 
                 this.ep_service = this.assessment.system.ep_service;
-                this.institution = this.assessment.user.institution['orgName'];
+                this.institution = this.assessment.institution['orgName'];
                 let timestamp = this.assessment.system.time_created;
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 this.time_created = date;
