@@ -562,7 +562,7 @@
                   dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage });
                 }
 
-                dataService.saveMitigationResults(this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
+                dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
 
               },
               getInterventionTypeResult(){
@@ -622,13 +622,12 @@
               created() {
                     // get the assessment id from the url
                    this.assessment_id  = this.$route.params.ID;
-                   this.institution_id = localStorage.getItem('institutionId');
 
                   dataService.getCategories(this.assessment_id ).then(data => {
                     this.categories = data;
                   });
 
-                  dataService.getAssessment(this.institution_id).then(data => {
+                  dataService.getAssessmentById(this.assessment_id).then(data => {
 
                       let configErrorList = data.configErrorDataList;
 

@@ -469,15 +469,15 @@
           }
         },
         created() {
-          // get the system id from the url
-          let id = this.$route.params.ID;
+          // get the assessment id from the url
+          let assessment_id = this.$route.params.ID;
 
-          dataService.getCategories(id).then(data => {
+          dataService.getCategories(assessment_id).then(data => {
             this.categories = data;
           });
 
-          dataService.getAssessment(id).then(data => {
-            this.createResults(id);
+          dataService.getAssessmentById(assessment_id).then(data => {
+            this.createResults(assessment_id);
           });
 
         }

@@ -1,10 +1,15 @@
 <template>
 
   <div id ="tabbedHeader">
-    <div class="tab" id="system" >System <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showSystem"></div>
+   <!-- <div class="tab" id="system" >System <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showSystem"></div>
     <div class="tab" id="patients" >Patients <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showPatients"></div>
     <div class="tab" id="scenarios" >Scenarios <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showScenarios"></div>
-    <div class="tab" id="report" >Report <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showReport"></div>
+    <div class="tab" id="report" >Report <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showReport"></div> -->
+
+    <div class="section" id="system" >System <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showSystem"></div>
+    <div class="section" id="patients" >Patients <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showPatients"></div>
+    <div class="section" id="scenarios" >Scenarios <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showScenarios"></div>
+    <div class="section" id="report" >Report <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showReport"></div>
   </div>
 
 </template>
@@ -54,6 +59,7 @@
 
   #system {
     background-color: #07818e;
+    border-top-left-radius: 15px;
   }
   #patients {
     background-color: #029a99;
@@ -63,11 +69,19 @@
   }
   #report {
     background-color: #02dddc;
+    border-top-right-radius: 15px;
   }
 
   .tick {
     height: 30px;
     margin-left: 5px;
+  }
+
+  .section {
+    font-size: 22px;
+    text-align: center;
+    color: #fff;
+    padding-top: 25px;
   }
 
   .tab {

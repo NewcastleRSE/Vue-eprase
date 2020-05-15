@@ -4,10 +4,10 @@ import { router } from '../router';
 import axios from "axios";
 
 export const dataService = {
-  getAssessment,
+ // getAssessment,
+  getAssessmentById,
   getAssessmentLatestCompletedPart,
   getReportByInstitutionId,
-  getAssessmentIdByInstitutionId,
   getAllReports,
   getAssessmentStatus,
   getInstitutions,
@@ -140,10 +140,9 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
 
 
 // should only save if result doesn't already exist
-function saveMitigationResults(goodMitigation, someMitigation, notMitigated, overMitigated){
+function saveMitigationResults(assessmentId, goodMitigation, someMitigation, notMitigated, overMitigated){
 
   let token = getToken();
-  let assessmentId = getAssessmentId();
   let institutionId = getInstitutionId();
 
   const requestOptions = {
@@ -239,6 +238,7 @@ function logout() {
   localStorage.clear();
 }
 
+/*
 // param institution id
 function getAssessment(id) {
 
@@ -250,13 +250,33 @@ function getAssessment(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'resultById?ID=' + id, requestOptions)
+  return fetch(settings.baseUrl + 'resultByInstitutionId?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
     })
     .catch(function() {
       console.log('Error returning from getAssessment');
+    });
+} */
+
+// param assessment id
+function getAssessmentById(id) {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(settings.baseUrl + 'resultByAssessmentId?ID=' + id, requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getAssessmentById');
     });
 }
 
@@ -437,7 +457,7 @@ function getReportByInstitutionId() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'resultById?ID=' + institution_id, requestOptions)
+  return fetch(settings.baseUrl + 'resultByInstitutionId?ID=' + institution_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;

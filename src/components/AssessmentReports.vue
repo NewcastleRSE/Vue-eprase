@@ -17,9 +17,6 @@
           <div v-if="reports.length > 0">
 
             <div v-for="report in reports">
-
-              {{ report.assessmentId }}
-
               <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: report.assessmentId }}" class="list-group-item list-group-item-action flex-column align-items-start">
               <p><strong>{{ report.institution.orgName }}</strong></p>
               <p>{{ report.system.ep_service }}</p>
@@ -63,12 +60,6 @@
                     let temptime = this.reports[index].system.time_created;
                     let formattedTime = this.getFormattedDate(temptime);
                     this.reports[index].system.time_created = formattedTime;
-
-                    let ins_id =  this.reports[index].institution.id;
-                    dataService.getAssessmentStatus(ins_id).then(data =>{
-                       let assessmentId = data.id;
-                       this.reports[index]["assessmentId"] = assessmentId;
-                    });
                   }
                 }
               });

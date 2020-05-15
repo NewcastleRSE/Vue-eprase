@@ -12,13 +12,13 @@
         </div>
       </div>
 
-      <div v-show="id === 0">
+      <div v-show="assessment_id === 0">
         <p>You currently have no reports available.</p>
       </div>
 
       <div class="list-group">
-          <div v-if="id > 0">
-          <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: id }}" class="list-group-item list-group-item-action flex-column align-items-start">
+          <div v-if="assessment_id > 0">
+          <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment_id }}" class="list-group-item list-group-item-action flex-column align-items-start">
             <p><strong>{{ institution }}</strong></p>
             <p>{{ ep_service }}</p>
             <p>{{ time_created }}</p>
@@ -58,7 +58,7 @@
         data() {
             return {
                 assessment : [],
-                id : 0,
+                assessment_id : 0,
                 ep_service : '',
                 institution : '',
                 time_created : '',
@@ -73,13 +73,14 @@
               // empty array if assessment not started
               if(this.assessment){
 
+                this.assessment_id = this.assessment.assessmentId;
                 this.ep_service = this.assessment.system.ep_service;
                 this.institution = this.assessment.institution['orgName'];
                 let timestamp = this.assessment.system.time_created;
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 this.time_created = date;
 
-                this.id = localStorage.getItem('assessmentId');
+                //his.id = localStorage.getItem('assessmentId');
               }
             });
           }
