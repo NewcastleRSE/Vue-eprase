@@ -22,7 +22,7 @@
             <div v-show="submitted & errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
           </div>
         </form>
-        <p v-if="serverError" class="text-error">Incorrect username or password<br/><br/></p>
+        <p v-if="serverError === true" class="text-error">User not recognised, have you remembered to register?<br/><br/></p>
         <p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>
 
         <p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>
@@ -82,11 +82,11 @@
                     const { dispatch } = this.$store;
                     if (username && password) {
                         dispatch('authentication/login', { username, password })
-                          .then(() => router.push({ path: '/' }) )
-                          .catch(err => {
-                              console.log(err);
-                              this.serverError = true
-                          })
+                          .then(()=> {
+                            this.serverError = true;
+                            this.$router.push('/login')
+                            .catch(err => {});
+                      })
                     }
                 }
             });
@@ -216,7 +216,7 @@
   }
 
   .text-error {
-    color: red;
+    color: #214667;
   }
 
 

@@ -159,6 +159,8 @@
       </div>
 
     </div>
+
+    <ExitModal v-if="showExitModal" @close="showExitModal = false" />
     <AppLogo></AppLogo>
 
   </div>
@@ -170,15 +172,16 @@
     import AssessmentHome from './AssessmentHome';
     import TabHeader from './TabHeader';
     import AppLogo from './AppLogo';
+    import ExitModal from "./ExitModal";
     import { dataService } from '../services/data.service';
-    import { patientService } from "../services/patient.service";
 
     export default {
         name: "AssessmentSystem",
         components: {
             AssessmentHome,
             TabHeader,
-            AppLogo
+            AppLogo,
+            ExitModal
         },
         computed: {
             isFormInvalid() {
@@ -229,7 +232,8 @@
                     ]
                 },
                 submitted: false,
-                startTime: ''
+                startTime: '',
+                showExitModal: false
             }
         },
         methods: {
@@ -238,7 +242,8 @@
                 this.errors.clear();
             },
             onExitClick() {
-                this.$router.push('/logout');
+               // this.$router.push('/logout');
+               this.showExitModal = true;
             },
             onNextClick()  {
                 this.submitted = true;

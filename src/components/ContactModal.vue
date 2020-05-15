@@ -3,12 +3,29 @@
     <div class="modal-mask">
       <div id='modalContainer'>
         <div class='modal-header'>
-          <h2>
+          <h4>
             {{ contactModalData.title }}
-          </h2>
+          </h4>
         </div>
         <div class='modal-body'>
-         <p> Contacts for the ePrase project are: rseteam@newcastle.ac.uk</p>
+         <p> Contacts for the ePrase project are:</p>
+
+
+          <b-list-group>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
+              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              rseteam@newcastle.ac.uk
+            </b-list-group-item>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
+              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              stephanie.klein@nhs.net
+            </b-list-group-item>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
+              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              jude.heed@newcastle.ac.uk
+            </b-list-group-item>
+
+          </b-list-group>
 
         </div>
         <div class='modal-footer'>
@@ -67,18 +84,18 @@
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    width: 80%;
-    height: 65%;
+    width: 50%;
+    height: 45%;
     background: #FFF;
     border-radius: 25px;
   }
 
   .modal-body {
-    padding: 30px 0px;
+    padding: 30px 30px;
   }
 
   .modal-body p {
-    padding: 15px 15px;
+    padding: 0;
   }
 
   .modal-footer{

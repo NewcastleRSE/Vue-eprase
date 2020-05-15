@@ -4,9 +4,9 @@
       <div id='modalContainer'>
 
         <div class='modal-header'>
-          <h2>
+          <h3>
             {{modalData.title}}
-          </h2>
+          </h3>
         </div>
         <div class='modal-body'> <p>The ePRaSE assessment involves several test patient scenarios. For each patient, you will be asked to complete a set of tasks. Progress is saved between patients. Each scenario is expected to take approximately 10 minutes to complete. Once the assessment is complete, you will be able to view your results.</p>
           <div class="instructions">
@@ -82,7 +82,7 @@
   }
 
   .modal-body {
-    padding: 30px 0px;
+    padding: 30px;
   }
 
   .modal-body p {

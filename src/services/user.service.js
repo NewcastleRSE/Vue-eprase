@@ -12,6 +12,7 @@ export const userService = {
   checkIsAdminUser
 };
 
+// returns 'user not found' if an error
 function login(username, password) {
   const requestOptions = {
     method: 'POST',
@@ -112,6 +113,7 @@ function handleResponse(response) {
     return data;
   });
 }
+
 
 function handleTextResponse(response) {
   return response.text().then(text => {

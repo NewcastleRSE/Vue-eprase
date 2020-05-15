@@ -4,7 +4,6 @@ import { router } from '../router';
 import axios from "axios";
 
 export const dataService = {
- // getAssessment,
   getAssessmentById,
   getAssessmentLatestCompletedPart,
   getReportByInstitutionId,
@@ -217,48 +216,10 @@ function failedLoginAudit(action, uri) {
     })
 }
 
-function handleResponse(response) {
-  return response.text().then(text => {
-    const data = text && JSON.parse(text);
-    if (!response.ok) {
-      if (response.status === 401) {
-        // auto logout if 401 response returned from api
-        logout();
-        router.push({ path: './login' }).catch(err => {});
-      }
-      const error = (data && data.message) || response.statusText;
-      return Promise.reject(error);
-    }
-    return data;
-  });
-}
-
 function logout() {
   // remove all items from local storage
   localStorage.clear();
 }
-
-/*
-// param institution id
-function getAssessment(id) {
-
-  let token = getToken();
-  let assessmentId = id;
-
-  const requestOptions = {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
-  };
-
-  return fetch(settings.baseUrl + 'resultByInstitutionId?ID=' + id, requestOptions)
-    .then(handleResponse)
-    .then(response => {
-      return response;
-    })
-    .catch(function() {
-      console.log('Error returning from getAssessment');
-    });
-} */
 
 // param assessment id
 function getAssessmentById(id) {
@@ -524,6 +485,24 @@ function updateInstitutionAssessment(){
 
 }
 
+
+function handleResponse(response) {
+  return response.text().then(text => {
+    const data = text && JSON.parse(text);
+    if (!response.ok) {
+      if (response.status === 401) {
+        // auto logout if 401 response returned from api
+        logout();
+        router.push({ path: './login' }).catch(err => {});
+      }
+      const error = (data && data.message) || response.statusText;
+      return Promise.reject(error);
+    }
+    return data;
+  });
+}
+
+//------- local storage functions
 
 function setAssessmentPart(value) {
   localStorage.setItem('assessmentPart', value);

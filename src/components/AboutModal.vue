@@ -3,9 +3,9 @@
     <div class="modal-mask">
       <div id='modalContainer'>
         <div class='modal-header'>
-          <h2>
+          <h3>
             {{ aboutModalData.title }}
-          </h2>
+          </h3>
         </div>
         <div class='modal-body'>
           <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
