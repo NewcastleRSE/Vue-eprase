@@ -49,6 +49,7 @@
 
   </div>
 
+  <ExitModal v-if="showExitModal" @close="showExitModal = false" />
   <AppLogo></AppLogo>
 </div>
 </template>
@@ -60,12 +61,14 @@
     import AppLogo from "./AppLogo";
     import  TabHeader from './TabHeader';
     import {patientService} from "../services/patient.service";
+    import ExitModal from "./ExitModal";
 
     export default {
         name: "AssessmentPatients",
         components: {
             TabHeader,
-            AppLogo
+            AppLogo,
+            ExitModal
         },
         computed: {
             user() {
@@ -83,7 +86,8 @@
                     time_taken: ''
                 },
                 startTime: '',
-                myPatientList: []
+                myPatientList: [],
+                showExitModal: false
             }
         },
         methods: {
@@ -92,7 +96,7 @@
                 this.errors.clear();
             },
             onExitClick() {
-                this.$router.push('/logout');
+                this.showExitModal = true;
             },
             onNextClick()  {
                 this.submitted = true;

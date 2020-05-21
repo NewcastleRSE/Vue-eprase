@@ -15,12 +15,16 @@
         <div align="center" class="card">
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
-            <span class="patient-image" v-if="patient[getCurrentPatient].gender == 'male'">
+            <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'male' && patient[getCurrentPatient].is_adult === 'true'">
               <img src="../assets/anon-male.png" height="80px" />
             </span>
 
-            <span class="patient-image" v-if="patient[getCurrentPatient].gender == 'female'">
+            <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'female' && patient[getCurrentPatient].is_adult === 'true'">
               <img src="../assets/anon-female.png" height="80px" />
+            </span>
+
+            <span class="patient-image" v-if="!patient[getCurrentPatient].is_adult">
+              <img src="../assets/child.png" height="80px" />
             </span>
             <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
           </div>
@@ -147,6 +151,7 @@
       </div>
     </div>
     </div>
+   <ExitModal v-if="showExitModal" @close="showExitModal = false" />
     <AppLogo></AppLogo>
  </div>
 </template>
@@ -157,12 +162,14 @@
     import { patientService } from '../services/patient.service';
     import  TabHeader from './TabHeader';
     import AppLogo from "./AppLogo";
+    import ExitModal from "./ExitModal";
 
     export default {
         name: "AssessmentPatientDetails",
         components: {
             TabHeader,
-            AppLogo
+            AppLogo,
+            ExitModal
         },
         computed: {
             myPatientList() {
@@ -187,6 +194,7 @@
                 nextEnabled: true,
                 doneEnabled: false,
                 completed : false,
+                showExitModal: false,
                 numPatients: patientService.getNumPatients()
             }
         },

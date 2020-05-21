@@ -19,9 +19,9 @@
       <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
 
-      <div class="progress"> Your organisation progress is : {{ assessmentStatus }}</div>
+      <div v-if="assessmentStatus" class="progress"> Your organisation ASSESSMENT STATUS is : {{ assessmentStatus }}</div>
 
-      <div class="buttons">
+      <div v-if="assessmentStatus" class="buttons">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'" @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
         <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'" @click="onStartAssessmentClick()">Continue {{ year }}  Assessment</button>
       </div>
@@ -182,7 +182,7 @@
   .progress {
     color: #07818e;
     background-color: #fff;
-    font-size: 0.8em;
+    font-size: 0.9em;
     height: 30px;
   }
 

@@ -63,7 +63,7 @@
             </div>
 
             <div class="form-group">
-              <label for="other-ep-system">Are there other e-prescribing systems in use in the organisation?</label>
+              <label for="other-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please provide their names.</label>
               <input type="text" name="other-ep-system" id="other-ep-system" class="form-control" v-model="results.other_ep_system" minlength="3" maxlength="50" placeholder="Other...">
               <div v-if="submitted && errors.has('other_ep_system')" class="invalid-feedback alert alert-danger">{{ errors.first('other_ep_system') }}</div>
             </div>

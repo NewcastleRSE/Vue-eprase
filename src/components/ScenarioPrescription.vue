@@ -29,6 +29,10 @@
             </tr>
           </tbody>
         </table>
+
+        <table v-if="prescription.justification">
+          <tr><th>Antibiotic rationale</th><td>{{ prescription.justification}}</td></tr>
+        </table>
       </div>
       <div>
         <div class="questionnaire">
@@ -39,16 +43,16 @@
               <div class="radio-buttons">
                 <div>
                    <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention" v-model="response.outcomes"  v-validate="'required'" >
-                  <label for="no-intervention">You were able to complete the prescription (includes followed order sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
+                  <label for="no-intervention">You were able to complete the prescription (includes followed order sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button v-b-tooltip.hover.right title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system. " variant="primary">i</b-button>
 
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden" v-model="response.outcomes">
-                  <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
+                  <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it" variant="primary">i</b-button>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="intervention" id="intervention" v-model="response.outcomes">
-                   <label for="intervention">You were able to complete the prescription, <strong><em>with system/user intervention</em></strong></label><b-button v-b-tooltip.hover.right title="Tooltip content" variant="primary">i</b-button>
+                   <label for="intervention">You were able to complete the prescription, <strong><em>with system/user intervention</em></strong></label><b-button v-b-tooltip.hover.right title="Tip:  You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option. " variant="primary">i</b-button>
                 </div>
                 <div>
                    <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented" v-model="response.outcomes">
