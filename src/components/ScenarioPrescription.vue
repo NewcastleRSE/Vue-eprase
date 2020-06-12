@@ -30,8 +30,8 @@
           </tbody>
         </table>
 
-        <table v-if="prescription.justification">
-          <tr><th>Antibiotic rationale</th><td>{{ prescription.justification}}</td></tr>
+        <table id="justification" v-if="prescription.justification">
+          <tr><th >Antibiotic rationale</th><td>{{ prescription.justification}}</td></tr>
         </table>
       </div>
       <div>
@@ -434,6 +434,14 @@
     padding-left: 10px;
     padding-right: 10px;
     text-align: right;
+  }
+
+  .justification th {
+    width: 20%;
+  }
+
+  .justification td {
+    width: 80%;
   }
 
   button:disabled {

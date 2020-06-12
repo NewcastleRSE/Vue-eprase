@@ -13,7 +13,7 @@
 
       <section>
         <div>Total valid tests: {{ totalValidTests }}</div>
-        <div>Total null tests: {{ totalNulls }}</div>
+        <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
       </section>
 
       <div class="assessment-results">
@@ -102,6 +102,8 @@
                   extremeRiskFails: [],
                   highRiskScenarios : [],
                   highRiskFails : [],
+                  lowRiskScenarios: [],
+                  lowRiskOverMitigations: [],
                   configErrorResults: [],
                   goodMitigation: '',
                   someMitigation: '',
@@ -546,7 +548,6 @@
                   }
               },
               saveMitigationResult(id) {
-
                 this.goodMitigation = this.calcPerCategory(this.totalGood, this.totalValidTests);
                 this.someMitigation = this.calcPerCategory(this.totalSome, this.totalValidTests);
                 this.notMitigated = this.calcPerCategory(this.totalNot, this.totalValidTests);
@@ -561,9 +562,7 @@
                 if(id) {
                   dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage });
                 }
-
                 dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
-
               },
               getInterventionTypeResult(){
                   let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
@@ -632,13 +631,13 @@
                       let configErrorList = data.configErrorDataList;
 
                       for(let index in configErrorList){
-                        if(configErrorList.hasOwnProperty(index)){
-                          dataService.getConfigErrorByCode(configErrorList[index].test_id).then(data => {
-                            // assign a new element to the JSON
-                            configErrorList[index]["question"] = data[0].description;
-                            this.configErrorResults.push(configErrorList[index]);
-                          });
-                        }
+                          if(configErrorList.hasOwnProperty(index)){
+                              dataService.getConfigErrorByCode(configErrorList[index].test_id).then(data => {
+                              // assign a new element to the JSON
+                              configErrorList[index]["question"] = data[0].description;
+                              this.configErrorResults.push(configErrorList[index]);
+                            });
+                          }
                       }
 
                       let prescriptionList = data.prescriptionList;
@@ -656,6 +655,12 @@
                                this.highRiskScenarios.push(prescriptionList[index]);
                                if(prescriptionList[index].result === 'No Mitigation/Fail'){
                                  this.highRiskFails.push(prescriptionList[index]);
+                               }
+                             }
+                             else if(risk_level === 'Low'){
+                               this.lowRiskScenarios.push(prescriptionList[index]);
+                               if(prescriptionList[index].result === 'Over Mitigation'){
+                                 this.lowRiskOverMitigations.push(prescriptionList[index]);
                                }
                              }
                           }

@@ -46,7 +46,6 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
       if (assessmentId) {
        // store assessment id
        localStorage.setItem('assessmentId', assessmentId);
-       dataService.setAssessmentPart(2);
      }
     })
     .catch(function() {
