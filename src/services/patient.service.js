@@ -444,6 +444,7 @@ function setPatientsInStore(patient_type) {
 function setPatientsInStoreFromIds() {
 
   let patient_ids = [];
+  let patient_codes = [];
   let tempList = [];
   let patientList = [];
   let testList = [];
@@ -472,7 +473,12 @@ function setPatientsInStoreFromIds() {
                   localStorage.setItem('testList',  JSON.stringify(testList));
               });
 
+              console.log('patient id =' + id);
+
               getPatientById(id).then(patient => {
+
+                  console.log(patient);
+
                   patient.dob = patientService.getDOB(patient);
                   patient.allergy = formatAllergy(patient['allergy']);
                   patient.comorbidity = formatComorbidity(patient['comorbidity']);
@@ -622,7 +628,9 @@ function getPatientByCode(code) {
     });
 }
 
-// used by setPatientsInStoreFromIds
+
+
+// used by setPatientsInStoreFromIds, (when patient ids are drawn from the database)
 function getPatientById(patient_id) {
 
   let token = getToken();
@@ -635,6 +643,8 @@ function getPatientById(patient_id) {
   return fetch(settings.baseUrl + 'patientById?PATIENT_ID=' + patient_id, requestOptions)
     .then(handleResponse)
     .then(response => {
+
+      console.log(response);
       return response;
     })
     .catch(function() {

@@ -632,9 +632,9 @@
 
                       for(let index in configErrorList){
                           if(configErrorList.hasOwnProperty(index)){
-                              dataService.getConfigErrorByCode(configErrorList[index].test_id).then(data => {
+                              dataService.getConfigErrorByCode(configErrorList[index].test_id).then(newdata => {
                               // assign a new element to the JSON
-                              configErrorList[index]["question"] = data[0].description;
+                              configErrorList[index]["question"] = newdata.description;
                               this.configErrorResults.push(configErrorList[index]);
                             });
                           }
