@@ -2,6 +2,8 @@ var path = require('path')
 var webpack = require('webpack')
 
 const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 
 module.exports = {
   mode: 'production',
@@ -9,9 +11,11 @@ module.exports = {
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
     filename: 'build.js'
   },
+  plugins: [
+    new HtmlWebpackPlugin()
+  ],
   optimization: {
     minimize: true,
     minimizer: [new TerserPlugin()],

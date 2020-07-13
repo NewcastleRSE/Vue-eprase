@@ -1,11 +1,19 @@
-FROM node:10 as builder
-ARG PROD=false
-RUN mkdir /usr/local/app
-ADD . /usr/local/app
-WORKDIR /usr/local/app
-RUN npm install -g @vue/cli && npm install
-RUN npm run build --prod=${PROD}
+# build environment
+FROM node:12 as build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package.json /app/package.json
+RUN npm install --silent
+RUN npm install @vue/cli@4.2.2 -g
+COPY . /app
+RUN npm run build
 
-FROM nginx
-RUN mkdir -p /etc/nginx/certs
-COPY --from=builder /usr/local/app/dist/eprase-app /usr/share/nginx/html
+# production environment
+FROM nginx:alpine
+RUN rm -rf /usr/share/nginx/html/*
+RUN ls /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
+RUN ls /usr/share/nginx/html
+#RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+
