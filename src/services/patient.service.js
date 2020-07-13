@@ -473,12 +473,7 @@ function setPatientsInStoreFromIds() {
                   localStorage.setItem('testList',  JSON.stringify(testList));
               });
 
-              console.log('patient id =' + id);
-
               getPatientById(id).then(patient => {
-
-                  console.log(patient);
-
                   patient.dob = patientService.getDOB(patient);
                   patient.allergy = formatAllergy(patient['allergy']);
                   patient.comorbidity = formatComorbidity(patient['comorbidity']);
@@ -644,7 +639,6 @@ function getPatientById(patient_id) {
     .then(handleResponse)
     .then(response => {
 
-      console.log(response);
       return response;
     })
     .catch(function() {
@@ -719,12 +713,8 @@ function getRequiredTests() {
 
 function getPatients() {
     let mypatients = store.state.patientList;
-    console.log('in get patients');
-    console.log(mypatients);
     return mypatients;
-
 }
-
 
 function handleResponse(response) {
   return response.text().then(text => {

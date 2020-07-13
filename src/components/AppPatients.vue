@@ -45,7 +45,6 @@
         },
         methods: {
             getPatients() {
-                console.log(this.mypatients);
                 // format : patientList[0] etc
                 for (let i = 0; i < this.mypatients.patientList.length; i++) {
                     this.myPatientList.push(this.mypatients.patientList[i])

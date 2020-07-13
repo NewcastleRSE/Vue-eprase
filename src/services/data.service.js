@@ -299,6 +299,7 @@ function getCategoryData(id) {
     });
 }
 
+// assessment id supplied
 function getMitigationResults(id) {
 
   let token = getToken();
