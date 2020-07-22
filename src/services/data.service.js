@@ -3,6 +3,8 @@ import { settings } from '../settings';
 import { router } from '../router';
 import axios from "axios";
 
+let baseURL = process.env.BASE_URL;
+
 export const dataService = {
   getAssessmentById,
   getAssessmentLatestCompletedPart,
@@ -39,7 +41,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'system', requestOptions)
+  return fetch(baseURL + 'system', requestOptions)
     .then(handleResponse)
     .then(response => {
       let assessmentId = JSON.stringify(response);
@@ -64,7 +66,7 @@ function saveCreatePatientData(time_taken){
     body: JSON.stringify({ time_taken })
   };
 
-  return fetch(settings.baseUrl + 'createpatients?ID=' + assessmentId, requestOptions)
+  return fetch(baseURL + 'createpatients?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
       dataService.setAssessmentPart(3);
@@ -86,7 +88,7 @@ function savePatientData(qualitative_data, code, time_taken){
     body: JSON.stringify({ qualitative_data, code, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'patientdata?ID=' + assessmentId, requestOptions)
+  return fetch(baseURL + 'patientdata?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -107,7 +109,7 @@ function savePatientList(patient_list){
     body:  patient_list
   };
 
-  return fetch(settings.baseUrl + 'savepatientlist?INSTITUTION_ID=' + institutionId, requestOptions)
+  return fetch(baseURL + 'savepatientlist?INSTITUTION_ID=' + institutionId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -128,7 +130,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
     body: JSON.stringify({outcome, other, intervention_type, selected_type, risk_level, result,  result_score, time_taken, qualitative_data})
   };
 
-  return fetch(settings.baseUrl + 'prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)
+  return fetch(baseURL + 'prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -149,7 +151,7 @@ function saveMitigationResults(assessmentId, goodMitigation, someMitigation, not
     body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated })
   };
 
-  return fetch(settings.baseUrl + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, requestOptions)
+  return fetch(baseURL + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -170,7 +172,7 @@ function saveConfigError(  test_id, result, time_taken ) {
     body: JSON.stringify({ test_id, result, time_taken })
   };
 
-  return fetch(settings.baseUrl + 'config?ID=' + assessmentId, requestOptions)
+  return fetch(baseURL + 'config?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -191,7 +193,7 @@ function audit(action, uri) {
     body: JSON.stringify( {action, uri})
   };
 
-   return fetch(settings.baseUrl + 'audit', requestOptions)
+   return fetch(baseURL + 'audit', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -208,7 +210,7 @@ function failedLoginAudit(action, uri) {
     body: JSON.stringify( {action, uri})
   };
 
-  return fetch(settings.baseUrl + 'failedLoginAudit', requestOptions)
+  return fetch(baseURL + 'failedLoginAudit', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -230,7 +232,7 @@ function getAssessmentById(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'resultByAssessmentId?ID=' + id, requestOptions)
+  return fetch(baseURL + 'resultByAssessmentId?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -247,7 +249,7 @@ function getInstitutions() {
     headers: { 'Content-Type': 'application/json' }
   };
 
-  return fetch(settings.baseUrl + 'auth/institutions', requestOptions)
+  return fetch(baseURL + 'auth/institutions', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -267,7 +269,7 @@ function getCategories() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'categories', requestOptions)
+  return fetch(baseURL + 'categories', requestOptions)
     .then(handleResponse)
     .then(response => {
       // console.log(response);
@@ -288,7 +290,7 @@ function getCategoryData(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'resultCategories?ID=' + id, requestOptions)
+  return fetch(baseURL + 'resultCategories?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
      // console.log(response);
@@ -309,7 +311,7 @@ function getMitigationResults(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getMitigationResults?ID=' + id, requestOptions)
+  return fetch(baseURL + 'getMitigationResults?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -328,7 +330,7 @@ function getConfigErrors() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'configerrors', requestOptions)
+  return fetch(baseURL + 'configerrors', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -347,7 +349,7 @@ function getConfigErrorByCode(code){
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'configerrorbycode?CODE=' + code, requestOptions)
+  return fetch(baseURL + 'configerrorbycode?CODE=' + code, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -374,7 +376,7 @@ function getAssessmentStatus(institution_id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getAssessmentStatus?INSTITUTION_ID=' + ins_id, requestOptions)
+  return fetch(baseURL + 'getAssessmentStatus?INSTITUTION_ID=' + ins_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       // console.log(response);
@@ -397,7 +399,7 @@ function getAssessmentLatestCompletedPart() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getAssessmentLatestCompletedPart?INSTITUTION_ID=' + institution_id, requestOptions)
+  return fetch(baseURL + 'getAssessmentLatestCompletedPart?INSTITUTION_ID=' + institution_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -418,7 +420,7 @@ function getReportByInstitutionId() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'resultByInstitutionId?ID=' + institution_id, requestOptions)
+  return fetch(baseURL + 'resultByInstitutionId?ID=' + institution_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -436,7 +438,7 @@ function getAssessmentIdByInstitutionId(institution_id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'assessmentIdByInstitutionId?ID=' + institution_id, requestOptions)
+  return fetch(baseURL + 'assessmentIdByInstitutionId?ID=' + institution_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -455,7 +457,7 @@ function getAllReports() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'results', requestOptions)
+  return fetch(baseURL + 'results', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -474,7 +476,7 @@ function updateInstitutionAssessment(){
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'updateInstitutionAssessment?INSTITUTION_ID=' + institutionId, requestOptions)
+  return fetch(baseURL + 'updateInstitutionAssessment?INSTITUTION_ID=' + institutionId, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;

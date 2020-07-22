@@ -2,7 +2,7 @@ import {dataService} from "./data.service";
 import {settings} from "../settings";
 import {router} from "../router";
 
-let baseURL = settings.baseUrl;
+let baseURL = process.env.BASE_URL;
 
 export const userService = {
   login,

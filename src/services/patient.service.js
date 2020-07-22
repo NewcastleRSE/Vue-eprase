@@ -3,6 +3,8 @@ import { store } from '../store/index';
 import { settings } from '../settings';
 import _ from 'lodash';
 
+let baseURL = process.env.BASE_URL;
+
 export const patientService = {
   getPatients,
   getDOB,
@@ -554,7 +556,7 @@ function getAllPatients() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'patients', requestOptions)
+  return fetch(baseURL + 'patients', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -574,7 +576,7 @@ function getAllPatients() {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
     };
 
-    return fetch(settings.baseUrl + 'allprescriptions', requestOptions)
+    return fetch(baseURL + 'allprescriptions', requestOptions)
       .then(handleResponse)
       .then(response => {
         return response;
@@ -594,7 +596,7 @@ function getPatientDetails() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'patientdetails', requestOptions)
+  return fetch(baseURL + 'patientdetails', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -613,7 +615,7 @@ function getPatientByCode(code) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'patientByCode?code=' + code, requestOptions)
+  return fetch(baseURL + 'patientByCode?code=' + code, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -635,7 +637,7 @@ function getPatientById(patient_id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'patientById?PATIENT_ID=' + patient_id, requestOptions)
+  return fetch(baseURL + 'patientById?PATIENT_ID=' + patient_id, requestOptions)
     .then(handleResponse)
     .then(response => {
 
@@ -657,7 +659,7 @@ function getPatientTests(index) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'prescriptions?ID=' + index, requestOptions)
+  return fetch(baseURL + 'prescriptions?ID=' + index, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -679,7 +681,7 @@ function getPatientIds() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'getPatientIds?INSTITUTION_ID=' + institution_id , requestOptions)
+  return fetch(baseURL + 'getPatientIds?INSTITUTION_ID=' + institution_id , requestOptions)
     .then(handleTextResponse)
     .then(response => {
       return response;
@@ -700,7 +702,7 @@ function getRequiredTests() {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(settings.baseUrl + 'requiredtests', requestOptions)
+  return fetch(baseURL + 'requiredtests', requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;
@@ -837,12 +839,6 @@ function formatTestList(testList){
   return test;
 
 }
-
-function groupTests(test){
-
-
-}
-
 
 // store getters
 
