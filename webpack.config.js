@@ -7,8 +7,6 @@ const HtmlWebpackRootPlugin = require('html-webpack-root-plugin');
 
 
 module.exports = {
-  mode: 'production',
-  //mode: 'development',
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -78,8 +76,22 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"',
-        VUE_APP_TITLE : '"EPRASEQA"',
-        PROD_BASE_URL : '"http://localhost:6001/api/"',
+        BASE_URL : '"http://localhost:6001/api/"'
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  ])
+}
+else {   // development
+
+  module.exports.devtool = '#source-map'
+  // http://vue-loader.vuejs.org/en/workflow/production.html
+  module.exports.plugins = (module.exports.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"development"',
         BASE_URL : '"http://localhost:6001/"'
       }
     }),
@@ -87,4 +99,5 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     })
   ])
+
 }

@@ -109,6 +109,7 @@
                   someMitigation: '',
                   notMitigated: '',
                   overMitigated: '',
+                  percentageNulls: 0,
                   totalGood : 0,
                   totalSome : 0,
                   totalNot : 0,
@@ -129,6 +130,7 @@
                   drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                   drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
+                  drugFrequency : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
                   interventionTypeResult: '',
                   totalConfigTests : settings.numConfigError,
                   assessment_id : '',
@@ -176,17 +178,17 @@
                   },
                   {
                     "category": "Drug Interaction",
-                    "good":  this.calcNum(this.drugInteraction.good, this.drugAge.count),
-                    "some" :  this.calcNum(this.drugInteraction.some, this.drugAge.count),
-                    "not":   this.calcNum(this.drugInteraction.not, this.drugAge.count),
-                    "over":  this.calcNum(this.drugInteraction.over, this.drugAge.count)
+                    "good":  this.calcNum(this.drugInteraction.good, this.drugInteraction.count),
+                    "some" :  this.calcNum(this.drugInteraction.some, this.drugInteraction.count),
+                    "not":   this.calcNum(this.drugInteraction.not, this.drugInteraction.count),
+                    "over":  this.calcNum(this.drugInteraction.over, this.drugInteraction.count)
                   },
                   {
                     "category": "Drug Allergy",
-                    "good":  this.calcNum(this.drugAllergy .good, this.drugInteraction.count),
-                    "some":  this.calcNum(this.drugAllergy.some, this.drugInteraction.count),
-                    "not":   this.calcNum(this.drugAllergy.not, this.drugInteraction.count),
-                    "over":  this.calcNum(this.drugAllergy.over, this.drugInteraction.count)
+                    "good":  this.calcNum(this.drugAllergy.good, this.drugAllergy.count),
+                    "some":  this.calcNum(this.drugAllergy.some, this.drugAllergy.count),
+                    "not":   this.calcNum(this.drugAllergy.not, this.drugAllergy.count),
+                    "over":  this.calcNum(this.drugAllergy.over, this.drugAllergy.count)
                   },
                   {
                     "category": "Drug Duplication",
@@ -243,6 +245,13 @@
                        "some":  this.calcNum(this.drugOverdose.some, this.drugOverdose.count),
                        "not":   this.calcNum(this.drugOverdose.not, this.drugOverdose.count),
                        "over":  this.calcNum(this.drugOverdose.over, this.drugOverdose.count)
+                    },
+                    {
+                      "category": "Drug Frequency",
+                      "good":  this.calcNum(this.drugFrequency.good, this.drugFrequency.count),
+                      "some":  this.calcNum(this.drugFrequency.some, this.drugFrequency.count),
+                      "not":   this.calcNum(this.drugFrequency.not, this.drugFrequency.count),
+                      "over":  this.calcNum(this.drugFrequency.over, this.drugFrequency.count)
                     }];
 
                   // const variable for sending to storage
@@ -542,25 +551,51 @@
                               this.drugOverdose.count++;
                             }
                             break;
+                          case "Drug Frequency":
+                            if(mitigation === 'Good Mitigation/Pass'){
+                              this.drugFrequency.good++;
+                              this.totalGood++;
+                            }
+                            else if (mitigation === 'Some Mitigation'){
+                              this.drugFrequency.some++;
+                              this.totalSome++;
+                            }
+                            else if (mitigation === 'No Mitigation/Fail'){
+                              this.drugFrequency.not++;
+                              this.totalNot++;
+                            }
+                            else if (mitigation === 'Over Mitigation'){
+                              this.drugFrequency.over++;
+                              this.totalOver++;
+                            }
+
+                            if(mitigation !== 'Null'){
+                              this.drugFrequency.count++;
+                            }
+                            break;
                         }
                       }
                     }
                   }
               },
+
+              // calculate as % of all tests
               saveMitigationResult(id) {
-                this.goodMitigation = this.calcPerCategory(this.totalGood, this.totalValidTests);
-                this.someMitigation = this.calcPerCategory(this.totalSome, this.totalValidTests);
-                this.notMitigated = this.calcPerCategory(this.totalNot, this.totalValidTests);
-                this.overMitigated = this.calcPerCategory(this.totalOver, this.totalValidTests);
+                this.goodMitigation = this.calcPerCategory(this.totalGood, settings.numPrescriptions);
+                this.someMitigation = this.calcPerCategory(this.totalSome, settings.numPrescriptions);
+                this.notMitigated = this.calcPerCategory(this.totalNot, settings.numPrescriptions);
+                this.overMitigated = this.calcPerCategory(this.totalOver, settings.numPrescriptions);
+                this.percentageNulls = this.calcPerCategory(this.totalNulls, settings.numPrescriptions);
 
                 // const variables for sending to storage
                 const goodPercentage = this.goodMitigation;
                 const somePercentage = this.someMitigation;
-                const notPercentage = this.notMitigated ;
+                const notPercentage = this.notMitigated;
                 const overPercentage = this.overMitigated;
+                const percentageNulls = this.percentageNulls;
                 const {dispatch} = this.$store;
                 if(id) {
-                  dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage });
+                  dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
                 }
                 dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
               },

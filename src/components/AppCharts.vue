@@ -8,7 +8,7 @@
 
       <div id="charts">
 
-        <PieChart :goodMitigation="good" :someMitigation="some" :notMitigated="not" :overMitigated="over"></PieChart>
+        <PieChart :goodMitigation="good" :someMitigation="some" :notMitigated="not" :overMitigated="over" :nullTests="nullTests"></PieChart>
        <StackedChart :mydata="chartCategoryData" ></StackedChart>
       </div>
 
@@ -56,6 +56,9 @@
           },
           over() {
             return this.$store.state.mitigationData[0].overPercentage;
+          },
+          nullTests(){
+            return this.$store.state.mitigationData[0].percentageNulls;
           },
           chartCategoryData() {
             return this.$store.state.stackedChartData.stackedChartData;

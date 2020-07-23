@@ -42,9 +42,7 @@
         },
         created() {
          localStorage.clear();
-          console.log(process.env.VUE_APP_TITLE);
           console.log(process.env.BASE_URL);
-          console.log(process.env.PROD_BASE_URL);
         }
     }
 

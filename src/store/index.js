@@ -56,8 +56,8 @@ export const store = new Vuex.Store({
     storeAssessmentId({commit}, { id }){
       commit('setAssessmentId', { id} );
     },
-    storeMitigationData({ commit }, { goodPercentage, somePercentage, notPercentage, overPercentage}){
-      commit('setMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage });
+    storeMitigationData({ commit }, { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls}){
+      commit('setMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls});
     },
     storeStackedChartData({commit}, { stackedChartData }){
       commit('setStackedChartData', { stackedChartData })
@@ -94,11 +94,12 @@ export const store = new Vuex.Store({
     setAssessmentId(state, id){
       state.assessmentId = id;
     },
-    setMitigationData(state, goodPercentage, somePercentage, notPercentage, overPercentage){
+    setMitigationData(state, goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls){
       state.mitigationData[0] = goodPercentage;
       state.mitigationData[1] = somePercentage;
       state.mitigationData[2] = notPercentage;
       state.mitigationData[3] = overPercentage;
+      state.mitigationData[4] = percentageNulls;
     },
     setStackedChartData(state, stackedChartData){
         state.stackedChartData = stackedChartData

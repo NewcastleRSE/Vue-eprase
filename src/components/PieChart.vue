@@ -28,7 +28,8 @@
           goodMitigation: '',
           someMitigation: '',
           notMitigated: '',
-          overMitigated: ''
+          overMitigated: '',
+          nullTests: ''
         },
         components: {
           GChart,
@@ -38,8 +39,8 @@
             return {
                 chartOptions: {
                   title: 'EPMA Risk Mitigation',
-                  is3D : true,
-                  colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a'],
+                  is3D : false,
+                  colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a', '#808080'],
                   width: 900,
                   height: 500
                   }
@@ -61,6 +62,10 @@
             roundedOver(){
               let over = this.overMitigated;
               return Math.round(over);
+            },
+            roundedNull() {
+              let nulltests = this.nullTests;
+              return Math.round(nulltests);
             }
         },
         methods: {
@@ -80,7 +85,8 @@
                   ['Good mitigation', this.roundedGood],
                   ['Some mitigation', this.roundedSome],
                   ['Not mitigated', this.roundedNot],
-                  ['Over mitigated', this.roundedOver]
+                  ['Over mitigated', this.roundedOver],
+                  ['Invalid tests', this.roundedNull]
                 ]);
                 chart.draw(dataTable, this.chartOptions);
             }

@@ -71,6 +71,7 @@
                 let rows = [];
 
                 for(let index in this.chartData){
+
                     if(this.chartData.hasOwnProperty(index)){
                       this.category = this.chartData[index].category;
                       this.good = this.chartData[index].good;

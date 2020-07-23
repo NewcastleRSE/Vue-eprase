@@ -184,6 +184,7 @@
     background-color: #fff;
     font-size: 0.9em;
     height: 30px;
+    line-height: 30px;
   }
 
 </style>

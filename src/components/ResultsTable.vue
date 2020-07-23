@@ -70,6 +70,11 @@
             <td>{{ calc(drugOverdose.some, drugOverdose.count)  }}</td>
             <td>{{ calc(drugOverdose.not, drugOverdose.count) }}</td>
             <td>{{ calc(drugOverdose.over, drugOverdose.count) }}</td></tr>
+          <tr><td>Drug Frequency ({{ drugFrequency.count }})</td>
+            <td>{{ calc(drugFrequency.good, drugFrequency.count)   }}</td>
+            <td>{{ calc(drugFrequency.some, drugFrequency.count)  }}</td>
+            <td>{{ calc(drugFrequency.not, drugFrequency.count) }}</td>
+            <td>{{ calc(drugFrequency.over, drugFrequency.count) }}</td></tr>
           <tr><th>All Categories</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}% <td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
         </table>
       </div>
@@ -124,6 +129,7 @@
                 drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
+                drugFrequency : { good : 0, some : 0, not : 0, over : 0,  count : 0 }
             }
         },
         methods: {
@@ -142,6 +148,10 @@
                 }
               }
               this.categoryData = formattedData;
+
+              console.log('results table');
+              console.log(this.categoryData);
+
               this.countCategories(this.categoryData);
 
               // calculate number of valid tests, ignoring null results
@@ -450,6 +460,28 @@
 
                       if(mitigation !== 'Null'){
                         this.drugOverdose.count++;
+                      }
+                      break;
+                    case "Drug Frequency":
+                      if(mitigation === 'Good Mitigation/Pass'){
+                        this.drugFrequency.good++;
+                        this.totalGood++;
+                      }
+                      else if (mitigation === 'Some Mitigation'){
+                        this.drugFrequency.some++;
+                        this.totalSome++;
+                      }
+                      else if (mitigation === 'No Mitigation/Fail'){
+                        this.drugFrequency.not++;
+                        this.totalNot++;
+                      }
+                      else if (mitigation === 'Over Mitigation'){
+                        this.drugFrequency.over++;
+                        this.totalOver++;
+                      }
+
+                      if(mitigation !== 'Null'){
+                        this.drugFrequency.count++;
                       }
                       break;
                   }
