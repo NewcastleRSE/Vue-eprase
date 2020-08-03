@@ -59,6 +59,8 @@
     import json from '../json/institutions.json'
     import { dataService } from '../services/data.service';
 
+    let baseURL = process.env.BASE_URL;
+
     export default {
       name: "AppRegister",
       components: {
@@ -98,7 +100,7 @@
           this.$validator.validate().then(valid => {
             if (valid) {
 
-              HTTP.post('/auth/signup/user', {
+              HTTP.post( '/auth/signup/user', {
 
                 username : this.user.username,
                 institution: this.user.institution,
