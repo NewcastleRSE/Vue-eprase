@@ -102,7 +102,7 @@
   }
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("/dist/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;
@@ -117,6 +117,7 @@
     width: 170px;
     margin: 10px 0px;
     font-size: 1em;
+    border-width: 1px;
   }
 
   button a {

@@ -16,7 +16,7 @@ export const dataService = {
   getCategoryData,
   setAssessmentPart,
   saveSystemData,
-  saveCreatePatientData,
+  saveCreatePatients,
   savePatientData,
   savePatientList,
   savePrescriptionData,
@@ -55,7 +55,7 @@ function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_e
     });
 }
 
-function saveCreatePatientData(time_taken){
+function saveCreatePatients(time_taken){
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -69,7 +69,7 @@ function saveCreatePatientData(time_taken){
   return fetch(baseURL + 'createpatients?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
-      dataService.setAssessmentPart(3);
+      //dataService.setAssessmentPart(3);
     })
     .catch(function() {
       console.log('Error returning from saveCreatePatientData');
@@ -161,7 +161,7 @@ function saveMitigationResults(assessmentId, goodMitigation, someMitigation, not
     });
 }
 
-function saveConfigError(  test_id, result, time_taken ) {
+function saveConfigError(test_id, result, time_taken ) {
 
   let token = getToken();
   let assessmentId = getAssessmentId();
@@ -223,7 +223,7 @@ function logout() {
 }
 
 // param assessment id
-function getAssessmentById(id) {
+function getAssessmentById(assessment_id) {
 
   let token = getToken();
 
@@ -232,7 +232,7 @@ function getAssessmentById(id) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
   };
 
-  return fetch(baseURL + 'resultByAssessmentId?ID=' + id, requestOptions)
+  return fetch(baseURL + 'resultByAssessmentId?ID=' + assessment_id, requestOptions)
     .then(handleResponse)
     .then(response => {
       return response;

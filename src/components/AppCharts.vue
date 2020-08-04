@@ -113,8 +113,9 @@
   button {
     height: 40px;
     width: 100px;
-    margin: 10px 0px;
+    margin: 10px 0;
     font-size: 1.2em;
+    border-width: 1px;
   }
 
   .results-btn {

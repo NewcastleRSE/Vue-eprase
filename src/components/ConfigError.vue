@@ -27,7 +27,6 @@
       <div class="form-group footer" align="center">
         <div class="buttons">
           <button v-show='nextEnabled' id="next-button" type="button" class="scenario-btn btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
-          <button v-show='doneEnabled' id="done-button" type="button" class="scenario-btn btn btn-primary" @click="onDoneClick()">Done</button>
         </div>
       </div>
 
@@ -72,13 +71,13 @@
                 startTime: '',
                 index: '',
                 numTests : settings.numPrescriptions + settings.numConfigError,
-                doneEnabled: false,
                 nextEnabled: true
             }
         },
         methods : {
             onNextClick()  {
                 this.saveData();
+              // catch is needed as router keeps going to the same location and causes error
                 this.$router.push('/assessmentscenarios').catch(err => {});
             },
             saveData() {
@@ -109,10 +108,6 @@
         },
         beforeUpdate: function() {
           let index = this.$store.state.testIndex;
-          if (index === (this.numTests)) {
-            this.nextEnabled = false;
-            this.doneEnabled = true;
-          }
         }
     }
 </script>

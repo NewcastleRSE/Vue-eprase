@@ -579,6 +579,7 @@
     width: 100px;
     margin: 10px 0px;
     font-size: 1.2em;
+    border-width: 1px;
   }
 
   .results-btn {

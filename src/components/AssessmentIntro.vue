@@ -97,7 +97,7 @@
                 this.$router.push({ path: './resultshome' });
             },
             onStartAssessmentClick() {
-                if(this.assessmentStatus === 'System Complete'){
+                if(this.assessmentStatus === 'System Information Complete'){
                     this.$router.push({ path: './setpatients' });
                 }
                 else if(this.assessmentStatus === 'Create Patients in Progress'){
@@ -128,7 +128,7 @@
 
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("/dist/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;
@@ -147,6 +147,7 @@
     width: 250px;
     margin: 10px 0;
     font-size: 1em;
+    border-width: 1px;
     /*border-radius: 5px; */
   }
 

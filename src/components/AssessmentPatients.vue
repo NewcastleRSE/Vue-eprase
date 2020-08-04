@@ -41,8 +41,8 @@
 
     <div class="form-group footer" align="center">
       <div class="buttons">
-        <p>When all of the patients have been admitted to your ePrescription System, click <strong>Next</strong>.</p>
-        <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>
+        <p>When all of the patients have been admitted to your ePrescription System and to SAVE your scenario patients, click <strong>Next</strong>.</p>
+       <!-- <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>-->
         <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()">Next</button>
       </div>
     </div>
@@ -110,7 +110,7 @@
                         const time_taken = this.assessment.time_taken;
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveCreatePatientData', { time_taken });
+                            dispatch('saveCreatePatients', { time_taken });
                         }
 
                         // audit

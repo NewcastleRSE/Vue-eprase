@@ -595,8 +595,9 @@
                 const percentageNulls = this.percentageNulls;
                 const {dispatch} = this.$store;
                 if(id) {
-                  dispatch('storeMitigationData', {  goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
+                  dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
                 }
+                console.log('Assessment ID is ' + id);
                 dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
               },
               getInterventionTypeResult(){
@@ -657,7 +658,7 @@
                     // get the assessment id from the url
                    this.assessment_id  = this.$route.params.ID;
 
-                  dataService.getCategories(this.assessment_id ).then(data => {
+                  dataService.getCategories(this.assessment_id).then(data => {
                     this.categories = data;
                   });
 
@@ -707,12 +708,12 @@
                       // audit
                       dataService.audit('View report', '/assessmentresults');
 
-                      dataService.getMitigationResults(this.assessment_id ).then(data => {
+                      dataService.getMitigationResults(this.assessment_id).then(data => {
                           this.goodMitigation = data.goodMitigation;
                           this.someMitigation = data.someMitigation;
                           this.notMitigated = data.notMitigated;
                           this.overMitigated = data.notMitigated;
-                          this.createResults(this.assessment_id );
+                          this.createResults(this.assessment_id);
                       })
                   });
               }
@@ -775,6 +776,7 @@
     width: 200px;
     margin: 10px 0;
     font-size: 1em;
+    border-width: 1px;
   }
 
   button a {

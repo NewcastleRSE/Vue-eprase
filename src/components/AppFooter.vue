@@ -6,7 +6,7 @@
       <button @click="showAboutModal = true"><font-awesome-icon icon="info-circle"></font-awesome-icon><a href="#">About</a></button>
       <button @click="showModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Instructions</a></button>
       <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">Reports</a></button>
-      <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="../assets/user-guide.pdf" download>Help</a></button>
+      <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="/dist/user-guide.pdf" download>Help</a></button>
       <button @click="showContactModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Contact</a></button>
       <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
     </div>
@@ -72,6 +72,7 @@
     width: 170px;
     margin: 10px 0px;
     font-size: 1em;
+    border-width: 1px;
   }
 
   button a {
@@ -81,6 +82,7 @@
   .footer-bar-buttons {
     padding-left: 40px;
     padding-bottom: 20px;
+    border-width: 1px;
   }
 
 </style>

@@ -79,7 +79,7 @@
 <style scoped>
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("/dist/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

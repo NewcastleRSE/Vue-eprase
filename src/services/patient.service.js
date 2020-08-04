@@ -237,6 +237,11 @@ function setConfigErrors() {
     }
   }
 
+  // fix to prevent config errors following on one after another (this causes an error in the testList increment)
+  let ipvalue = insertPoints[1];
+  ipvalue += 1;
+  insertPoints[1] = ipvalue;
+
   // get all the config errors (another promise)
   dataService.getConfigErrors().then(data => {
     let configErrors = data;

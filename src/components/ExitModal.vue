@@ -83,6 +83,7 @@
     height: 40px;
     width: 40px;
     font-size: 0.8em;
+    border-width: 1px;
   }
 
   #yes {
