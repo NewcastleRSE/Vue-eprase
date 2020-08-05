@@ -87,7 +87,8 @@
   }
 
   #yes {
-    float:left;
+    position: fixed;
+    left: 18px;
   }
 
 

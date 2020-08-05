@@ -204,7 +204,7 @@
                 this.errors.clear();
             },
             onExitClick() {
-                this.$router.push('/logout');
+              this.showExitModal = true;
             },
             onNextClick()  {
                 this.saveData();

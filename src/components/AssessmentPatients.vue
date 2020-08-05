@@ -41,9 +41,11 @@
 
     <div class="form-group footer" align="center">
       <div class="buttons">
-        <p>When all of the patients have been admitted to your ePrescription System and to SAVE your scenario patients, click <strong>Next</strong>.</p>
+        <p>When all of the patients have been admitted to your ePrescription System, click <strong>Done</strong>.</p>
+
+        <p><strong>Please ensure you click the Done button to save your progress</strong></p>
        <!-- <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>-->
-        <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()">Next</button>
+        <button type="button" class="next-btn btn btn-primary"  id="next-button" @click="onNextClick()">Done</button>
       </div>
     </div>
 

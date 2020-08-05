@@ -379,7 +379,9 @@ function getAssessmentStatus(institution_id) {
   return fetch(baseURL + 'getAssessmentStatus?INSTITUTION_ID=' + ins_id, requestOptions)
     .then(handleResponse)
     .then(response => {
-      // console.log(response);
+
+      console.log(response);
+
       return response;
     })
     .catch(function() {

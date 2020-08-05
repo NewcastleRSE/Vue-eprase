@@ -238,9 +238,14 @@ function setConfigErrors() {
   }
 
   // fix to prevent config errors following on one after another (this causes an error in the testList increment)
-  let ipvalue = insertPoints[1];
-  ipvalue += 1;
-  insertPoints[1] = ipvalue;
+  let ipDiff = function (a, b) { return Math.abs(a - b); }
+  if (ipDiff === 1){
+
+        let ipvalue = insertPoints[1];
+        // add enough to push it a little ahead
+        ipvalue += 3;
+        insertPoints[1] = ipvalue;
+  }
 
   // get all the config errors (another promise)
   dataService.getConfigErrors().then(data => {
