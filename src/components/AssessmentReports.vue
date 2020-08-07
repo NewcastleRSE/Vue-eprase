@@ -17,11 +17,12 @@
           <div v-if="reports.length > 0">
 
             <div v-for="report in reports">
-              <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: report.assessmentId }}" class="list-group-item list-group-item-action flex-column align-items-start">
-              <p><strong>{{ report.institution.orgName }}</strong></p>
-              <p>{{ report.system.ep_service }}</p>
-              <p>{{ report.system.time_created }}</p>
-              </router-link>
+              <div class="section" @click="onReportClick(report.assessmentId)">
+                <p><strong>{{ report.institution.orgName }}</strong></p>
+                <p>{{ report.system.ep_service }}</p>
+                <p>{{ report.system.time_created }}</p>
+              </div>
+
             </div>
           </div>
         </div>
@@ -64,6 +65,9 @@
                 }
               });
             },
+          onReportClick(assessmentId) {
+            this.$router.push({ path: './assessmentresults?ID=' + assessmentId });
+          },
           getFormattedDate(time){
             let timestamp = time;
             var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
@@ -79,7 +83,7 @@
 <style scoped>
 
   #header {
-    background-image: url("/dist/pills-bw.png");
+    background-image: url("../assets/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;
@@ -96,5 +100,14 @@
   .content {
     padding: 40px;
   }
+
+  .section {
+    background-color: #eeeeee;
+    border: 1px solid #ced4da;
+    padding: 20px;
+    margin: 5px;
+  }
+
+
 
 </style>

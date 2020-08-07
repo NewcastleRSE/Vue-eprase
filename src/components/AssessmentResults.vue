@@ -648,15 +648,22 @@
                   this.$router.push('/assessmentintro');
               },
               onTableClick() {
-                  this.$router.push('/resultstable/'+ this.assessment_id);
+                  this.$router.push('/resultstable');
                 },
               onChartClick() {
-                this.$router.push('/charts/'+ this.assessment_id);
+                this.$router.push('/charts');
               }
               },
               created() {
-                    // get the assessment id from the url
-                   this.assessment_id  = this.$route.params.ID;
+                // get the assessment id from the url or local storage if it isn't there
+                this.assessment_id  = this.$route.query.ID;
+                if(typeof(this.assessment_id) === 'undefined'){
+                  this.assessment_id = localStorage.getItem('assessmentId');
+                }
+                else {
+                  localStorage.setItem('assessmentId', this.assessment_id);
+                }
+                console.log(this.assessment_id);
 
                   dataService.getCategories(this.assessment_id).then(data => {
                     this.categories = data;

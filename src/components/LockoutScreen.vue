@@ -76,7 +76,8 @@
         created : function() {
 
              // if this is true, then the user has jumped from assessmentintro and will need to create patientlist and testlist
-            this.patientscompleted = this.$route.params.patientscompleted;
+            this.patientscompleted = this.$route.query.patientscompleted;
+
             if(this.patientscompleted){
                 this.nextEnabled = true;
                 this.disabled = false;

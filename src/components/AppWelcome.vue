@@ -2,7 +2,7 @@
   <div id="page">
     <div class="welcome">
       <div align="center">
-        <img src="/dist/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+        <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="welcome-text">
         <h1>Welcome to ePRaSE 2020</h1>
@@ -20,9 +20,9 @@
     </div>
     <div>
       <p id="logo-bar">
-        <span class="logos"><img id="di-logo" src="/dist/Digital_Institute.jpg" alt="Digital Institute" ></span>
-        <span class="logos"><img id="nuth-logo" src="/dist/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
-        <span class="logos"><img id="pharm-logo" src="/dist/pharmacy.png" alt="School of Pharmacy" ></span></p>
+        <span class="logos"><img id="di-logo" src="../assets/Digital_Institute.jpg" alt="Digital Institute" ></span>
+        <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
+        <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span></p>
     </div>
   </div>
 

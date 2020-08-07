@@ -129,7 +129,8 @@
                 drugBrand : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugRoute : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugOverdose : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
-                drugFrequency : { good : 0, some : 0, not : 0, over : 0,  count : 0 }
+                drugFrequency : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
+                assessmentId : ''
             }
         },
         methods: {
@@ -148,10 +149,6 @@
                 }
               }
               this.categoryData = formattedData;
-
-              console.log('results table');
-              console.log(this.categoryData);
-
               this.countCategories(this.categoryData);
 
               // calculate number of valid tests, ignoring null results
@@ -490,8 +487,7 @@
             }
           },
           onReportClick() {
-            let id = this.$route.params.ID;
-            this.$router.push('/assessmentresults/'+ id);
+            this.$router.push('/assessmentresults');
           },
           onExitClick() {
             this.$router.push('/logout');
@@ -502,14 +498,14 @@
         },
         created() {
           // get the assessment id from the url
-          let assessment_id = this.$route.params.ID;
+          this.assessmentId = localStorage.getItem('assessmentId');
 
-          dataService.getCategories(assessment_id).then(data => {
+          dataService.getCategories(this.assessmentId).then(data => {
             this.categories = data;
           });
 
-          dataService.getAssessmentById(assessment_id).then(data => {
-            this.createResults(assessment_id);
+          dataService.getAssessmentById(this.assessmentId).then(data => {
+            this.createResults(this.assessmentId);
           });
 
         }

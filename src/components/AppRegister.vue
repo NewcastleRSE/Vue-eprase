@@ -4,7 +4,7 @@
     <div class="register">
 
       <div id="logo" align="center">
-        <img src="/dist/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+        <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="register-text">
         <h1>Register</h1>

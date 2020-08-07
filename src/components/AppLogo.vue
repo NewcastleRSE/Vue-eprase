@@ -1,6 +1,6 @@
 <template>
   <div id="logo">
-    <img src="/dist/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+    <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
   </div>
 
 </template>

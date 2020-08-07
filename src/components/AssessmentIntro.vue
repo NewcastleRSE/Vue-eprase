@@ -104,7 +104,7 @@
                     this.$router.push({ path: './assessmentpatientdetails' });
                 }
                 else if(this.assessmentStatus === 'Create Patients Complete'){
-                    this.$router.push({ path: './lockoutscreen/' + true });
+                    this.$router.push({ path: './lockoutscreen?patientscompleted=true' });
                 }
                 else {
                      this.$router.push({ path: './assessmentsystem' });
@@ -128,7 +128,7 @@
 
 
   #header {
-    background-image: url("/dist/pills-bw.png");
+    background-image: url("../assets/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

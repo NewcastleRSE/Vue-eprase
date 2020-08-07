@@ -1,10 +1,10 @@
 <template>
 
   <div id ="tabbedHeader">
-    <div class="section" id="system" >System <img class="tick" src="/dist/tick.png" alt="completed" v-bind:style="showSystem"></div>
-    <div class="section" id="patients" >Patients <img class="tick" src="/dist/tick.png" alt="completed"  v-bind:style="showPatients"></div>
-    <div class="section" id="scenarios" >Scenarios <img class="tick" src="/dist/tick.png" alt="completed" v-bind:style="showScenarios"></div>
-    <div class="section" id="report" >Report <img class="tick" src="/dist/tick.png" alt="completed"  v-bind:style="showReport"></div>
+    <div class="section" id="system" >System <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showSystem"></div>
+    <div class="section" id="patients" >Patients <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showPatients"></div>
+    <div class="section" id="scenarios" >Scenarios <img class="tick" src="../assets/tick.png" alt="completed" v-bind:style="showScenarios"></div>
+    <div class="section" id="report" >Report <img class="tick" src="../assets/tick.png" alt="completed"  v-bind:style="showReport"></div>
   </div>
 
 </template>

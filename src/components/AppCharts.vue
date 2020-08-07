@@ -72,13 +72,11 @@
             this.$router.push('/assessmentintro');
           },
           onReportClick() {
-            // get the system id from the url
-            this.assessment_id  = this.$route.params.ID;
-            this.$router.push('/assessmentresults/'+ this.assessment_id);
+            this.$router.push('/assessmentresults');
           },
           created() {
             // get the system id from the url
-            this.assessment_id  = this.$route.params.ID;
+            this.assessment_id  = localStorage.getItem('assessmentId');
           }
         }
     }

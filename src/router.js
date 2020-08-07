@@ -69,7 +69,7 @@ export const router = new Router({
       component: LockoutScreen
     },
     {
-      path: '/assessmentresults/:ID',
+      path: '/assessmentresults/:ID?',
       name: 'assessmentresults',
       component: AssessmentResults
     },
@@ -86,11 +86,11 @@ export const router = new Router({
       component: AssessmentReports
     },
     {
-      path: '/resultstable/:ID',
+      path: '/resultstable',
       component: ResultsTable
     },
     {
-      path: '/charts/:ID',
+      path: '/charts',
       component: AppCharts
     },
     {

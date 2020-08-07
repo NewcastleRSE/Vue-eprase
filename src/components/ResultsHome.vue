@@ -18,7 +18,7 @@
 
       <div class="list-group">
           <div v-if="assessment_id > 0">
-          <router-link v-bind:to="{ name: 'assessmentresults', params: { ID: assessment_id }}" class="list-group-item list-group-item-action flex-column align-items-start">
+          <router-link v-bind:to="{ name: 'assessmentresults'}" class="list-group-item list-group-item-action flex-column align-items-start">
             <p><strong>{{ institution }}</strong></p>
             <p>{{ ep_service }}</p>
             <p>{{ time_created }}</p>
@@ -102,7 +102,7 @@
   }
 
   #header {
-    background-image: url("/dist/pills-bw.png");
+    background-image: url("../assets/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;
