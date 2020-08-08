@@ -78,7 +78,7 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"',
-        BASE_URL : '"http://localhost:6001/api/"'
+        BASE_URL : '"https://eprase.ncldata.dev/api/"'
       }
     }),
     new webpack.LoaderOptionsPlugin({
