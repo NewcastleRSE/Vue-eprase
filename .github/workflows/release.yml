@@ -12,7 +12,7 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           registry: epraseregistry.azurecr.io
-          name: epraseregistry.azurecr.io/hands-on-app
+          name: epraseregistry.azurecr.io/eprase-client
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           tag_semver: true
