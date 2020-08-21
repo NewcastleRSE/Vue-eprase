@@ -16,3 +16,24 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           tag_semver: true
+      - name: Update CLIENT_VERSION
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: export CLIENT_VERSION=${{ github.event.release.tag_name }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+      - name: Compose Down
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sudo docker-compose down
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.PRIVATE_KEY}}
+      - name: Compose Up
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sudo -E docker-compose up -d
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.PRIVATE_KEY}}
