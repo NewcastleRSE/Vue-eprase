@@ -17,6 +17,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
           tag_semver: true
   release:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Update CLIENT_VERSION
