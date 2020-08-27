@@ -12,7 +12,7 @@
 
       <div v-for="patient in myPatientList">
 
-        <div align="center" class="card">
+        <div align="center" class="card" v-if="patient">
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
             <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'male' && patient[getCurrentPatient].is_adult === true">
@@ -36,10 +36,16 @@
               <div class="patient-demographics">
                 <h5 class="card-title">Demographics</h5>
                 <table>
-                  <tr>
+                  <tr v-if="patient[getCurrentPatient].height === 0">
+                    <td><strong>Height (m):</strong> unavailable</td>
+                  </tr>
+                  <tr v-if="patient[getCurrentPatient].height !== 0">
                     <td><strong>Height (m):</strong> {{patient[getCurrentPatient].height}}</td>
                   </tr>
-                  <tr>
+                  <tr v-if="patient[getCurrentPatient].weight === 0">
+                    <td><strong>Weight (kg):</strong> unavailable</td>
+                  </tr>
+                  <tr v-if="patient[getCurrentPatient].weight !== 0">
                     <td><strong>Weight (kg):</strong> {{patient[getCurrentPatient].weight}}</td>
                   </tr>
                 </table>
@@ -253,6 +259,14 @@
             },
             updateAssessmentStatus() {
               dataService.updateInstitutionAssessment();
+            },
+          // checks if an object is empty
+            isEmpty(obj) {
+              for(var key in obj) {
+                if(obj.hasOwnProperty(key))
+                  return false;
+              }
+              return true;
             }
         },
         created : function() {
@@ -267,7 +281,7 @@
         },
         mounted() {
             setTimeout(() => {
-               if(this.myPatientList === null){
+               if(this.isEmpty(this.myPatientList)){
                  patientService.setPatientsInStoreFromIds();
                }
             }, 1000);

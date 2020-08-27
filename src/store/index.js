@@ -12,7 +12,7 @@ export const store = new Vuex.Store({
   },
   state : {
     assessmentId: null,
-    patientList : null,
+    patientList : {},
     testList: [],
     patientIndex : 0,
     testIndex: 0,
