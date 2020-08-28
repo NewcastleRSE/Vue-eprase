@@ -169,7 +169,7 @@
 
 <script>
 
-    import AssessmentHome from './AssessmentHome';
+  //  import AssessmentHome from './AssessmentHome';
     import TabHeader from './TabHeader';
     import AppLogo from './AppLogo';
     import ExitModal from "./ExitModal";
@@ -178,7 +178,7 @@
     export default {
         name: "AssessmentSystem",
         components: {
-            AssessmentHome,
+          //  AssessmentHome,
             TabHeader,
             AppLogo,
             ExitModal

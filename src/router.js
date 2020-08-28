@@ -5,7 +5,7 @@ import AppWelcome from './components/AppWelcome.vue';
 import AppLogin from './components/AppLogin.vue';
 import AppRegister from './components/AppRegister.vue';
 import AssessmentIntro from "./components/AssessmentIntro";
-import AssessmentHome from "./components/AssessmentHome";
+//import AssessmentHome from "./components/AssessmentHome";
 import AssessmentSystem from './components/AssessmentSystem';
 import AssessmentPatients from './components/AssessmentPatients';
 import AssessmentPatientDetails from './components/AssessmentPatientDetails';
@@ -13,7 +13,7 @@ import AssessmentScenarios from './components/AssessmentScenarios';
 import LockoutScreen from './components/LockoutScreen';
 import ResultsHome from './components/ResultsHome';
 import AssessmentResults from './components/AssessmentResults';
-import AssessmentContent from './components/AssessmentContent';
+//import AssessmentContent from './components/AssessmentContent';
 import AssessmentReports from "./components/AssessmentReports";
 import ResultsTable from './components/ResultsTable';
 import AppCharts from "./components/AppCharts";
@@ -44,10 +44,10 @@ export const router = new Router({
       path: '/assessmentintro',
       component: AssessmentIntro
     },
-    {
+   /* {
       path: '/assessmenthome',
       component: AssessmentHome
-    },
+    }, */
     {
       path: '/assessmentSystem',
       component: AssessmentSystem
@@ -77,10 +77,10 @@ export const router = new Router({
       path: '/resultshome',
       component: ResultsHome
     },
-    {
+    /*{
       path: '/assessmentcontent',
       component: AssessmentContent
-    },
+    }, */
     {
       path: '/assessmentreports',
       component: AssessmentReports

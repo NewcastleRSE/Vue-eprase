@@ -1,6 +1,6 @@
 export const settings = {
   year: '2020',
-  skipButton: true,
+  skipButton: false,
   noIntervention : 0,
   orderSetNotFollowed: -10,
   intervention: -10,
