@@ -81,7 +81,6 @@
             if(this.patientscompleted){
                 this.nextEnabled = true;
                 this.disabled = false;
-
                 patientService.setPatientsInStoreFromIds();
             }
             else {

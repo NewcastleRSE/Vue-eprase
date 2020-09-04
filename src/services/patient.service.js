@@ -19,212 +19,8 @@ export const patientService = {
   setConfigErrors,
   formatPatientData,
   getRequiredTests
-  // setPrescriptionsInStore
 };
 
-
-/*
-function setPrescriptionsInStore() {
-
-  let drugAgeTests = [];
-  let drugLabTests = [];
-  let drugInteractionTests = [];
-  let drugDiseaseTests = [];
-  let drugDoseTests = [];
-  let drugFrequencyTests = [];
-  let theraputicDuplicationTests = [];
-  let drugAllergyTests = [];
-  let drugBrandTests = [];
-  let drugRouteTests = [];
-  let drugOmissionTests = [];
-  let drugOverdoseTests = [];
-  let drugDuplicationTests = [];
-
-  // get all prescription tests
-  getAllPrescriptions().then(data => {
-
-    let testList= [];
-    let tests = data;
-
-    for(let index in tests){
-      if(tests.hasOwnProperty(index)){
-        let testarray = tests[index];
-        let mytest= formatTestList(testarray);
-        testList.push(mytest);
-      }
-    }
-
-    // group the tests by category
-    for(let index in testList){
-      if(testList.hasOwnProperty(index)){
-
-        if(testList[index].in_use === true){
-
-          switch(testList[index].category_name){
-            case "Drug Age":
-              drugAgeTests.push(testList[index]);
-              break;
-            case "Drug Dose":
-              drugDoseTests.push(testList[index]);
-              break;
-            case "Drug Interaction":
-              drugInteractionTests.push(testList[index]);
-              break;
-            case "Drug Allergy":
-              drugAllergyTests.push(testList[index]);
-              break;
-            case "Drug Duplication":
-              drugDuplicationTests.push(testList[index]);
-              break;
-            case "Drug Disease":
-              drugDiseaseTests.push(testList[index]);
-              break;
-            case "Drug Omission":
-              drugOmissionTests.push(testList[index]);
-              break;
-            case "Theraputic Duplication":
-              theraputicDuplicationTests.push(testList[index]);
-              break;
-            case "Drug Lab":
-              drugLabTests.push(testList[index]);
-              break;
-            case "Drug Brand":
-              drugBrandTests.push(testList[index]);
-              break;
-            case "Drug Route":
-              drugRouteTests.push(testList[index]);
-              break;
-            case "Drug Overdose":
-              drugOverdoseTests.push(testList[index]);
-              break;
-            case "Drug Frequency":
-              drugFrequencyTests.push(testList[index]);
-              break;
-          }
-        }
-      }
-    }
-    // select 4 at random from each category
-    let allTests = [];
-    let temp;
-
-    temp = _.sampleSize(drugAgeTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugDoseTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugInteractionTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugAllergyTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugDuplicationTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugDiseaseTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugOmissionTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(theraputicDuplicationTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugLabTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugBrandTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugRouteTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugOverdoseTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-    temp = _.sampleSize(drugFrequencyTests, 4);
-    for(let index in temp){
-      allTests.push(temp[index]);
-    }
-
-    // get the patients and set the patientList
-    let tempPatientCodes = [];
-    let tempPatientList = [];
-
-    for(let index in allTests) {
-      if(allTests.hasOwnProperty(index)){
-          tempPatientCodes.push(allTests[index].code)
-      }
-    }
-    tempPatientCodes =  _.uniq(tempPatientCodes);
-    localStorage.setItem('numPatients', tempPatientCodes.length);
-
-    // set the patient list
-    for(let index in tempPatientCodes){
-      if(tempPatientCodes.hasOwnProperty(index)){
-        getPatientByCode(tempPatientCodes[index]).then(data => {
-          let patient = data;
-            patient = formatPatientData(patient);
-
-            // fix patient DOBs
-            patient.dob = patientService.getDOB(patient);
-
-            // assign id and name to local storage
-            let myid = patient.code;
-            let myname = patient.first_name + ' ' + patient.surname;
-            localStorage.setItem(myid, myname);
-            tempPatientList.push(patient);
-        });
-      }
-    }
-
-    // set const for dispatch
-    const patientCodes = tempPatientCodes;
-    const patientList = tempPatientList;
-    store.dispatch('setPatientList', { patientList, patientCodes});
-
-    // set up insert points for config errors
-    let numConfigErrors = settings.numConfigError;
-    let insertPoints = [];
-
-    while(insertPoints.length < numConfigErrors){
-      // create a random point to insert a config error between 2 and 20
-      let configInsert = Math.floor(Math.random() * 20) + 2;
-      if(!insertPoints.includes(configInsert)){
-        insertPoints.push(configInsert);
-      }
-    }
-
-    // get all the config errors (another promise)
-    dataService.getConfigErrors().then(data => {
-      let configErrors = data;
-
-      // splice the config errors into allTests at the insertPoints (array length changes after each insert)
-      for(let i = 0; i < insertPoints.length; i++){
-          // add new element without deleting anything
-          allTests.splice(insertPoints[i], 0, configErrors[i]);
-      }
-
-      const testList = allTests;
-      store.dispatch('setTestList', { testList });
-    });
-
-  });
-} */
 
 function setConfigErrors() {
 
@@ -253,14 +49,14 @@ function setConfigErrors() {
   dataService.getConfigErrors().then(data => {
     let configErrors = data;
     let testList = JSON.parse(localStorage.getItem('testList'));
-    // remove duplicates
-    testList = _uniq(testList);
 
     // splice the config errors into allTests at the insertPoints (array length changes after each insert)
     for(let i = 0; i < insertPoints.length; i++){
       // add new element without deleting anything
       testList.splice(insertPoints[i], 0, configErrors[i]);
     }
+
+    console.log('Updating test list with config errors!');
     // update the test list
     store.dispatch('setTestList', { testList });
   });
@@ -298,9 +94,6 @@ function setPatientsInStore(patient_type) {
               allPatientList.push(mypatient);
           }
       }
-      //  let numRequiredChildPatients = settings.numRequiredChildPatients;
-      //  let numRequiredAdultPatients = settings.numRequiredAdultPatients;
-      //  let numAllRequiredPatients = settings.numAllRequiredPatients;
 
       if(patient_type === 'Adults'){
 
@@ -310,8 +103,6 @@ function setPatientsInStore(patient_type) {
           // (currently 29 patients, but may increase)
           let numAdultPatients = myAdultPatientList.length;
           let diff = numAdultPatients - 15;
-          // diff += numRequiredAdultPatients;
-
           // reduce number of patients to end up with 15
           myAdultPatientList.splice(0,diff);
 
@@ -324,7 +115,6 @@ function setPatientsInStore(patient_type) {
                       // do nothing
                   }
                   else {
-                      alert('Patient not found!');
                       myAdultPatientList.push(requiredAdultPatients[requiredPatient]);
                       // remove a patient
                       myAdultPatientList.shift();
@@ -337,34 +127,39 @@ function setPatientsInStore(patient_type) {
                  let id = myAdultPatientList[index].id;
 
                  // promise, must return testList
-                 getPatientTests(id).then(data => {
-                  tempList = data;
-                  for(let i = 0; i < tempList.length; i++){
-                    testList.push(tempList[i]);
-                  }
-                  store.dispatch('setTestList', { testList });
-                  localStorage.setItem('testList',  JSON.stringify(testList));
-                 });
+                  getPatientTests(id).then(data => {
+                      tempList = data;
+                      for(let i = 0; i < tempList.length; i++){
+                        testList.push(tempList[i]);
+                      }
+                      setStateTestList(testList);
+                  });
 
-                for(let i = 0; i < patientList.length; i++) {
+                 for(let i = 0; i < patientList.length; i++) {
                   // fix patient DOBs
-                  myAdultPatientList[i].dob = patientService.getDOB(myAdultPatientList[i]);
+                    myAdultPatientList[i].dob = patientService.getDOB(myAdultPatientList[i]);
 
-                  // assign id and name to local storage
-                  let myid = myAdultPatientList[i].code;
-                  let myname = myAdultPatientList[i].first_name + ' ' + myAdultPatientList[i].surname;
-                  localStorage.setItem(myid, myname);
-                }
+                    // assign id and name to local storage
+                    let myid = myAdultPatientList[i].code;
+                    let myname = myAdultPatientList[i].first_name + ' ' + myAdultPatientList[i].surname;
+                    localStorage.setItem(myid, myname);
+                 }
 
-                localStorage.setItem('numPatients', myAdultPatientList.length);
-                patientList = myAdultPatientList;
+                  localStorage.setItem('numPatients', myAdultPatientList.length);
+                  patientList = myAdultPatientList;
               }
           }
       } // end adults
       else if (patient_type === 'Paediatrics'){
 
           let myChildPatientList = childPatientList;
-          requiredChildPatients = JSON.parse(localStorage.getItem('requiredChildPatients'));
+          // (currently 19 patients, but may increase)
+          let numChildPatients = myChildPatientList.length;
+          let diff = numChildPatients - 15;
+
+           // reduce number of patients to end up with 15
+           myChildPatientList.splice(0,diff);
+           let requiredChildPatients = JSON.parse(localStorage.getItem('requiredChildPatients'));
 
           for(let requiredPatient in requiredChildPatients){
               if(requiredChildPatients.hasOwnProperty(requiredPatient)){
@@ -376,9 +171,6 @@ function setPatientsInStore(patient_type) {
               }
           }
 
-          // currently correct number of child patients
-          // myChildPatientList.concat(requiredChildPatients);
-          // myChildPatientList = _.uniq(myChildPatientList);
           shuffle(myChildPatientList);
 
           for(let index in myChildPatientList){
@@ -389,8 +181,7 @@ function setPatientsInStore(patient_type) {
                       for(let i = 0; i < tempList.length; i++){
                           testList.push(tempList[i]);
                       }
-                      store.dispatch('setTestList', { testList});
-                      localStorage.setItem('testList',  JSON.stringify(testList));
+                      setStateTestList(testList);
                   });
               }
           }
@@ -413,38 +204,36 @@ function setPatientsInStore(patient_type) {
           let myAllPatientList = allPatientList;
           shuffle(myAllPatientList);
 
-          // (currently 35 patients, but may increase)
+          // (currently 48 patients, but may increase)
           let numAllPatients = myAllPatientList.length;
           let diff = numAllPatients - 15;
-          //diff += numAllRequiredPatients;
 
           // reduce number of patients (currently 35 patients)
           myAllPatientList.splice(0, diff);
-
           allRequiredPatients = JSON.parse(localStorage.getItem('allRequiredPatients'));
-
-          // add the required patients, reduce list if necessary
-          //  myAllPatientList.concat(allRequiredPatients);
-          //  myAllPatientList = _.uniq(myAllPatientList);
 
           for(let requiredPatient in allRequiredPatients){
               if(allRequiredPatients.hasOwnProperty(requiredPatient)){
-                 if(myAllPatientList.some(myAllPatientList => myAllPatientList.id !== allRequiredPatients[requiredPatient].id)){
-                   myAllPatientList.push(allRequiredPatients[requiredPatient]);
-                 }
+                  if(myAllPatientList.some(myAllPatientList => myAllPatientList.id === allRequiredPatients[requiredPatient].id)){
+                      // do nothing
+                  }
+                  else {
+                      myAllPatientList.push(allRequiredPatients[requiredPatient]);
+                      // remove a patient
+                      myAllPatientList.shift();
+                  }
               }
           }
 
           for(let index in myAllPatientList){
               if(myAllPatientList.hasOwnProperty(index)){
-                let id = myAllPatientList[index].id;
-                getPatientTests(id).then(data => {
-                  tempList = data;
-                  for(let i = 0; i < tempList.length; i++){
-                    testList.push(tempList[i]);
-                  }
-                  store.dispatch('setTestList', { testList});
-                  localStorage.setItem('testList',  JSON.stringify(testList));
+                  let id = myAllPatientList[index].id;
+                  getPatientTests(id).then(data => {
+                      tempList = data;
+                      for(let i = 0; i < tempList.length; i++){
+                        testList.push(tempList[i]);
+                      }
+                      setStateTestList(testList);
                 });
               }
           }
@@ -463,6 +252,7 @@ function setPatientsInStore(patient_type) {
           patientList = myAllPatientList;
       }
       store.dispatch('setPatientList', { patientList });
+
   });
 }
 
@@ -496,8 +286,9 @@ function setPatientsInStoreFromIds() {
                   }
                   // remove any duplicates
                   testList = _.uniq(testList);
-                  store.dispatch('setTestList', { testList });
-                  localStorage.setItem('testList',  JSON.stringify(testList));
+                  setStateTestList(testList);
+                 // store.dispatch('setTestList', { testList });
+                 // localStorage.setItem('testList',  JSON.stringify(testList));
               });
 
               getPatientById(id).then(patient => {
@@ -843,26 +634,32 @@ function formatComorbidity(comorbidity) {
   return comorbidityArray;
 }
 
-
-
 function formatTestList(testList){
 
-  let test = {
-    id: testList['id'],
-    code : testList['patient'].code,
-    prescription_id : testList['prescription_id'],
-    category_name : testList['indicator'].category['categoryName'],
-    in_use : testList['indicator'].category['in_use2020'],
-    description : testList['indicator'].description,
-    risk_level : testList['risk_level'],
-    drug_name : testList['drug_name'],
-    drug_dose : testList['drug_dose'],
-    route: testList['route'],
-    duration: testList['duration'],
-    drug_frequency: testList['drug_frequency']
-  };
-  return test;
+    let test = {
+        id: testList['id'],
+        code : testList['patient'].code,
+        prescription_id : testList['prescription_id'],
+        category_name : testList['indicator'].category['categoryName'],
+        in_use : testList['indicator'].category['in_use2020'],
+        description : testList['indicator'].description,
+        risk_level : testList['risk_level'],
+        drug_name : testList['drug_name'],
+        drug_dose : testList['drug_dose'],
+        route: testList['route'],
+        duration: testList['duration'],
+        drug_frequency: testList['drug_frequency']
+    };
+    return test;
 
+}
+
+// sets the test List in Vuex state and number of tests in local storage
+
+function setStateTestList(testList){
+    store.dispatch('setTestList', { testList});
+    localStorage.setItem('testList',  JSON.stringify(testList));
+    localStorage.setItem('numPrescriptions', testList.length);
 }
 
 // store getters

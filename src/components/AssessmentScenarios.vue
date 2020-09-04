@@ -43,7 +43,7 @@
                     isPrescriptionTest: true,
                     isConfigErrorTest: false
                 },
-                numPrescriptions: settings.numPrescriptions + settings.numConfigError
+                numPrescriptions: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
             }
         },
         beforeUpdate: function() {

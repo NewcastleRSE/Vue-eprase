@@ -262,7 +262,7 @@
                   }
 
                   // calculate number of valid tests, ignoring null results
-                  this.totalValidTests = settings.numPrescriptions - this.totalNulls;
+                  this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;
                   this.getInterventionTypeResult();
                   this.saveMitigationResult(id);
 
@@ -581,11 +581,13 @@
 
               // calculate as % of all tests
               saveMitigationResult(id) {
-                this.goodMitigation = this.calcPerCategory(this.totalGood, settings.numPrescriptions);
-                this.someMitigation = this.calcPerCategory(this.totalSome, settings.numPrescriptions);
-                this.notMitigated = this.calcPerCategory(this.totalNot, settings.numPrescriptions);
-                this.overMitigated = this.calcPerCategory(this.totalOver, settings.numPrescriptions);
-                this.percentageNulls = this.calcPerCategory(this.totalNulls, settings.numPrescriptions);
+
+                let numTests = parseInt(localStorage.getItem('numPrescriptions'));
+                this.goodMitigation = this.calcPerCategory(this.totalGood, numTests);
+                this.someMitigation = this.calcPerCategory(this.totalSome, numTests);
+                this.notMitigated = this.calcPerCategory(this.totalNot, numTests);
+                this.overMitigated = this.calcPerCategory(this.totalOver, numTests);
+                this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests);
 
                 // const variables for sending to storage
                 const goodPercentage = this.goodMitigation;

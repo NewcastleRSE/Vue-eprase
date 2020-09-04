@@ -6,11 +6,11 @@ export const settings = {
   intervention: -10,
   orderPrevented : -20,
   notAvailable : 0,
-  numPrescriptions: 30,
+  //numPrescriptions: 30,
   numConfigError : 2,
   testLimit : 45,
   //baseUrl : 'http://localhost:6001/',
   numRequiredChildPatients : 1,
-  numRequiredAdultPatients : 1,
-  numAllRequiredPatients : 2
+  numRequiredAdultPatients : 2,
+  numAllRequiredPatients : 3
 };
