@@ -152,7 +152,7 @@
               this.countCategories(this.categoryData);
 
               // calculate number of valid tests, ignoring null results
-              this.totalValidTests = settings.numPrescriptions - this.totalNulls;
+              this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;
             });
           },
           formatData(item) {

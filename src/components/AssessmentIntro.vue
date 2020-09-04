@@ -110,6 +110,32 @@
                      this.$router.push({ path: './assessmentsystem' });
                 }
             },
+            getRequiredPatients() {
+
+                let requiredAdultPatients = [];
+                let requiredChildPatients = [];
+                let allRequiredPatients = [];
+
+                patientService.getRequiredTests().then(data => {
+                    let tests = data;
+                    for(let test in tests) {
+                      if (tests.hasOwnProperty(test)) {
+                        let requiredPatient = tests[test].patient;
+                        requiredPatient = patientService.formatPatientData(requiredPatient);
+                        if(requiredPatient.age >= 18){
+                          requiredAdultPatients.push(requiredPatient);
+                        }
+                        else {
+                          requiredChildPatients.push(requiredPatient);
+                        }
+                        allRequiredPatients.push(requiredPatient);
+                      }
+                    }
+                    localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients));
+                    localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients));
+                    localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients));
+                });
+            },
             getAllReports() {
               this.$router.push({ path: './assessmentreports' });
             }
@@ -118,6 +144,7 @@
             this.checkIsAdminUser();
             this.checkAssessmentComplete();
             this.getAssessmentStatus();
+            this.getRequiredPatients();
             dataService.audit('View assessment intro', '/assessmentintro');
         }
 

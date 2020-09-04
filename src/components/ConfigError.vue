@@ -70,7 +70,7 @@
                 },
                 startTime: '',
                 index: '',
-                numTests : settings.numPrescriptions + settings.numConfigError,
+                numTests : parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError,
                 nextEnabled: true
             }
         },
