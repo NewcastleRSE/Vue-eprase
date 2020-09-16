@@ -147,7 +147,6 @@
             this.getRequiredPatients();
             dataService.audit('View assessment intro', '/assessmentintro');
         }
-
     }
 </script>
 

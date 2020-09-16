@@ -169,6 +169,7 @@
     import  TabHeader from './TabHeader';
     import AppLogo from "./AppLogo";
     import ExitModal from "./ExitModal";
+    import _ from 'lodash';
 
     export default {
         name: "AssessmentPatientDetails",
@@ -259,14 +260,6 @@
             },
             updateAssessmentStatus() {
               dataService.updateInstitutionAssessment();
-            },
-          // checks if an object is empty
-            isEmpty(obj) {
-              for(var key in obj) {
-                if(obj.hasOwnProperty(key))
-                  return false;
-              }
-              return true;
             }
         },
         created : function() {
@@ -281,7 +274,7 @@
         },
         mounted() {
             setTimeout(() => {
-               if(this.isEmpty(this.myPatientList)){
+               if(_.isEmpty(this.myPatientList)){
                  patientService.setPatientsInStoreFromIds();
                }
             }, 1000);

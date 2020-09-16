@@ -84,6 +84,7 @@
   import Vue from 'vue'
   import {settings} from "../settings";
   import AppLogo from "./AppLogo";
+  import _ from 'lodash';
 
   Vue.use(VueAxios, axios);
 
@@ -133,6 +134,7 @@
                   drugFrequency : { good : 0, some : 0, not : 0, over : 0,  count : 0 },
                   interventionTypeResult: '',
                   totalConfigTests : settings.numConfigError,
+                  numPrescriptions : 0,
                   assessment_id : '',
                   institution_id: '',
                   institution: '',
@@ -599,7 +601,7 @@
                 if(id) {
                   dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
                 }
-                console.log('Assessment ID is ' + id);
+
                 dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
               },
               getInterventionTypeResult(){
@@ -657,15 +659,14 @@
               }
               },
               created() {
-                // get the assessment id from the url or local storage if it isn't there
-                this.assessment_id  = this.$route.query.ID;
-                if(typeof(this.assessment_id) === 'undefined'){
-                  this.assessment_id = localStorage.getItem('assessmentId');
-                }
-                else {
-                  localStorage.setItem('assessmentId', this.assessment_id);
-                }
-                console.log(this.assessment_id);
+                  // get the assessment id from the url or local storage if it isn't there
+                  this.assessment_id  = this.$route.query.ID;
+                  if(typeof(this.assessment_id) === 'undefined'){
+                    this.assessment_id = localStorage.getItem('assessmentId');
+                  }
+                  else {
+                    localStorage.setItem('assessmentId', this.assessment_id);
+                  }
 
                   dataService.getCategories(this.assessment_id).then(data => {
                     this.categories = data;
