@@ -57,7 +57,6 @@
     import AppFooter from "./AppFooter";
     import AppLogo from "./AppLogo";
     import {userService} from "../services/user.service";
-    import _ from "lodash";
 
     export default {
         name: "AssessmentIntro",

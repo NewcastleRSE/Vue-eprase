@@ -28,8 +28,7 @@ export const dataService = {
   failedLoginAudit,
   audit,
   logout,
-  updateInstitutionAssessment,
-  isEmpty
+  updateInstitutionAssessment
 };
 
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
@@ -502,14 +501,6 @@ function handleResponse(response) {
     }
     return data;
   });
-}
-
-function isEmpty(obj) {
-  for(var key in obj) {
-    if(obj.hasOwnProperty(key))
-      return false;
-  }
-  return true;
 }
 
 //------- local storage functions
