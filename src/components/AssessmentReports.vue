@@ -38,6 +38,8 @@
     import AppFooter from "./AppFooter";
     import TabHeader from "./TabHeader";
     import AppLogo from "./AppLogo";
+    import _ from "lodash";
+    import {settings} from "../settings";
 
     export default {
         name: "AssessmentReports",
@@ -48,7 +50,8 @@
         },
         data() {
             return {
-              reports: []
+              reports: [],
+              numPrescriptions: 0
             }
         },
         methods: {
@@ -76,6 +79,12 @@
         },
        created() {
          this.getReports();
+         // if this hasn't been set already, get it from the settings
+         this.numPrescriptions = localStorage.getItem('numPrescriptions');
+
+         if(_.isEmpty(this.numPrescriptions)){
+           localStorage.setItem('numPrescriptions', parseInt(settings.numPrescriptions));
+         }
        }
     }
 </script>
