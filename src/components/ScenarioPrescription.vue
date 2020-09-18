@@ -303,7 +303,7 @@
                 // audit
                 const user_id =  this.user.user_id;
                 dataService.audit('Completed scenarios', '/assessmentscenarios');
-                this.$router.push('/assessmentresults/'+ id);
+                this.$router.push('/assessmentresults?ID='+ id);
             },
             clearCheckBoxes() {
                 for (let index in this.checkBoxList) {
