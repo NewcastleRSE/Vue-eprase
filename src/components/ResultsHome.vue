@@ -66,10 +66,11 @@
         },
         methods: {
 
-          getReport(){
+          getReports(){
             dataService.getReportByInstitutionId().then(data => {
-              this.assessment = data;
+              this.assessment = data[0];
 
+              // TODO test this further
               // empty array if assessment not started
               if(this.assessment){
 
@@ -80,13 +81,13 @@
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 this.time_created = date;
 
-                //his.id = localStorage.getItem('assessmentId');
+
               }
             });
           }
         },
         created() {
-            this.getReport();
+            this.getReports();
         }
     }
 </script>

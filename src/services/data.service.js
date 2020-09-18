@@ -359,6 +359,8 @@ function getConfigErrorByCode(code){
     });
 }
 
+
+//TODO  expand this function to deal with multiple results over more than one year
 function getAssessmentStatus(institution_id) {
 
   let token = getToken();
