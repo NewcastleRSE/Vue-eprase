@@ -75,9 +75,11 @@
             <td>{{ calc(drugFrequency.some, drugFrequency.count)  }}</td>
             <td>{{ calc(drugFrequency.not, drugFrequency.count) }}</td>
             <td>{{ calc(drugFrequency.over, drugFrequency.count) }}</td></tr>
-          <tr><th>All Categories</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}% <td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
+          <tr><th>All Categories *</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}% <td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
         </table>
       </div>
+
+      <div class="note">* All categories (Good/Some/Not/Over) calculated as a percentage of the <strong>total valid tests</strong>, not an average of the previous columns</div>
 
       <button class="reportbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
 
@@ -584,6 +586,9 @@
     margin: 25px 50px;
   }
 
-
+  .note{
+    padding: 20px;
+    font-size: 0.8em;
+  }
 
 </style>
