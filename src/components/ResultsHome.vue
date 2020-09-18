@@ -16,8 +16,12 @@
         <p>You currently have no reports available.</p>
       </div>
 
+      <div v-show="assessment_id > 0 && completed === false">
+        <p>Your report for {{ year }} is <em>in progress</em>, please complete all sections of the application.</p>
+      </div>
+
       <div class="list-group">
-          <div v-if="assessment_id > 0">
+          <div v-if="assessment_id > 0 && completed !== false">
           <router-link v-bind:to="{ name: 'assessmentresults'}" class="list-group-item list-group-item-action flex-column align-items-start">
             <p><strong>{{ institution }}</strong></p>
             <p>{{ ep_service }}</p>
@@ -62,6 +66,8 @@
                 ep_service : '',
                 institution : '',
                 time_created : '',
+                completed : false,
+                year : settings.year
             }
         },
         methods: {
@@ -81,6 +87,9 @@
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 this.time_created = date;
 
+                if(this.assessment.prescriptionList.length !== 0 ){
+                  this.completed = true;
+                }
 
               }
             });
