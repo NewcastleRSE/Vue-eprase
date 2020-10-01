@@ -29,7 +29,7 @@
 
         <div v-if="extremeRiskFails.length > 0">
 
-          <div class="table-header">Extreme risk scenarios with no mitigation</div>
+          <div class="table-header-warning">Extreme risk scenarios with no mitigation</div>
           <table class="table table-striped extreme-risk-table">
             <thead>
             <tr><th width="20%">Drug name</th><th>Scenario description</th></tr>
@@ -794,6 +794,11 @@
   }
 
   .table-header {
+    padding: 20px 0;
+    color:  #07818e;
+  }
+
+  .table-header-warning {
     padding: 20px 0;
     color: red;
   }
