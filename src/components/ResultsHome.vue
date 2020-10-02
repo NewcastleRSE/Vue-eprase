@@ -50,6 +50,7 @@
     import Vue from 'vue'
     import AppLogo from "./AppLogo";
     import {dataService} from "../services/data.service";
+    import _ from "lodash";
 
     Vue.use(VueAxios, axios);
 
@@ -72,28 +73,30 @@
         },
         methods: {
 
-          getReports(){
-            dataService.getReportByInstitutionId().then(data => {
-              this.assessment = data[0];
+            getReports(){
+                dataService.getReportByInstitutionId().then(data => {
 
-              // TODO test this further
-              // empty array if assessment not started
-              if(this.assessment){
+                    if(!_.isEmpty(data)){
 
-                this.assessment_id = this.assessment.assessmentId;
-                this.ep_service = this.assessment.system.ep_service;
-                this.institution = this.assessment.institution['orgName'];
-                let timestamp = this.assessment.system.time_created;
-                var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
-                this.time_created = date;
+                        this.assessment = data[0];
+                        // TODO test this further
+                        // empty array if assessment not started
+                        if(this.assessment){
 
-                if(this.assessment.prescriptionList.length !== 0 ){
-                  this.completed = true;
-                }
+                            this.assessment_id = this.assessment.assessmentId;
+                            this.ep_service = this.assessment.system.ep_service;
+                            this.institution = this.assessment.institution['orgName'];
+                            let timestamp = this.assessment.system.time_created;
+                            var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
+                            this.time_created = date;
 
-              }
-            });
-          }
+                            if(this.assessment.prescriptionList.length !== 0 ){
+                              this.completed = true;
+                            }
+                        }
+                    }
+                });
+            }
         },
         created() {
             this.getReports();

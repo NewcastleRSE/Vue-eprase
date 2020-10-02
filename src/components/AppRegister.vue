@@ -48,6 +48,9 @@
           </div>
         </form>
 
+        <div v-if="serverError === 'too-many-users'" class="warning">Sorry, there is a problem with registration, there is a limit of 4 users per institution</div>
+        <div v-if="serverError === 'email-taken'" class="warning">This email has already been registered against an institution</div>
+
       </div>
     </div>
   </div>
@@ -81,7 +84,8 @@
             confirmPassword: '',
           },
           submitted: false,
-          institutions: []
+          institutions: [],
+          serverError: '',
         }
       },
       methods: {
@@ -91,6 +95,7 @@
         resetForm: function() {
           this.$data.user = {};
           this.errors.clear();
+          this.serverError = '';
         },
         handleSubmit() {
           this.submitted = true;
@@ -111,7 +116,7 @@
                 .then(response => {
                     this.$router.push({path: './login'})
                 })
-                .catch(error => this.errors = error.response.data)
+                .catch(error => this.serverError = error.response.data)
             }
           });
         },
@@ -226,6 +231,10 @@
   .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
     background: none;
     background-color: #fff;
+  }
+
+  .warning{
+    color: red;
   }
 
 </style>

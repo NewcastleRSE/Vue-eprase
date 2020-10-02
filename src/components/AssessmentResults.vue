@@ -8,7 +8,9 @@
 
       <div class="text">
         <strong>Institution:</strong> {{ institution}} <br />
-        <strong>EP System:</strong> {{ ep_service }}<br />
+        <strong>EP System:</strong>
+        <span v-if="ep_service !=='Other'">{{ ep_service}} </span>
+        <span v-if="other_ep_system">{{ other_ep_system}}</span><br />
       </div>
 
       <section>
@@ -22,14 +24,14 @@
             <tr><th>Category</th><th>Outcome</th></tr>
             <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenarios. Out of these, {{ extremeRiskFails.length  }} were not mitigated. </td></tr>
             <tr><td>High risk scenarios</td><td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{ highRiskFails.length  }} were not mitigated. </td></tr>
-            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
+            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
             <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
         </div>
 
         <div v-if="extremeRiskFails.length > 0">
 
-          <div class="table-header">Extreme risk scenarios with no mitigation</div>
+          <div class="table-header-warning">Extreme risk scenarios with no mitigation</div>
           <table class="table table-striped extreme-risk-table">
             <thead>
             <tr><th width="20%">Drug name</th><th>Scenario description</th></tr>
@@ -138,7 +140,8 @@
                   assessment_id : '',
                   institution_id: '',
                   institution: '',
-                  ep_service: ''
+                  ep_service: '',
+                  other_ep_system: ''
               }
           },
           computed: {
@@ -263,8 +266,15 @@
                     dispatch('storeStackedChartData', { stackedChartData });
                   }
 
+                  // if numPrescriptions isn't in local storage, get it from the settings
+                  let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
+                  if(!numPrescriptions){
+                      numPrescriptions = settings.numPrescriptions;
+                      localStorage.setItem('numPrescriptions', numPrescriptions);
+                  }
+
                   // calculate number of valid tests, ignoring null results
-                  this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;
+                  this.totalValidTests = numPrescriptions - this.totalNulls;
                   this.getInterventionTypeResult();
                   this.saveMitigationResult(id);
 
@@ -674,7 +684,7 @@
 
                   dataService.getAssessmentById(this.assessment_id).then(data => {
 
-                      let configErrorList = data.configErrorDataList;
+                    let configErrorList = data.configErrorDataList;
 
                       for(let index in configErrorList){
                           if(configErrorList.hasOwnProperty(index)){
@@ -713,6 +723,7 @@
                       }
 
                       this.ep_service = data.system.ep_service;
+                      this.other_ep_system = data.system.other_ep_system;
                       this.institution = data.institution.orgName;
 
                       // audit
@@ -794,6 +805,11 @@
   }
 
   .table-header {
+    padding: 20px 0;
+    color:  #07818e;
+  }
+
+  .table-header-warning {
     padding: 20px 0;
     color: red;
   }

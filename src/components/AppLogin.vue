@@ -216,7 +216,7 @@
   }
 
   .text-error {
-    color: #214667;
+    color: red;
   }
 
 

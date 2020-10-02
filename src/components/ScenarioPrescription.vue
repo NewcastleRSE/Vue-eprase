@@ -111,7 +111,7 @@
       </div>
     </div>  <!-- end box -->
 
-    <div v-show="doneEnabled" class="text">Congratulations, you have reached the end of the scenarios.</div>
+    <div v-show="doneEnabled" class="text">Congratulations, you have reached the end of the scenarios!</div>
 
 
     <div class="form-group footer" align="center">
