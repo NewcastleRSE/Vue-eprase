@@ -16,13 +16,13 @@
         <div class="list-group">
           <div v-if="reports.length > 0">
 
-            <div v-for="report in reports">
-              <div class="section" @click="onReportClick(report.assessmentId)">
+            <div v-for="report in reports" class="report">
+              <div @click="onReportClick(report.assessmentId)" class="list-group-item list-group-item-action flex-column align-items-start">
                 <p><strong>{{ report.institution.orgName }}</strong></p>
-                <p>{{ report.system.ep_service }}</p>
+                <p>  <span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
+                  <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></p>
                 <p>{{ report.system.time_created }}</p>
               </div>
-
             </div>
           </div>
         </div>
@@ -58,7 +58,6 @@
             getReports() {
               dataService.getAllReports().then(data => {
                 this.reports = data;
-
                 for(let index in this.reports){
                   if(this.reports.hasOwnProperty(index)){
                     let temptime = this.reports[index].system.time_created;
@@ -110,13 +109,12 @@
     padding: 40px;
   }
 
-  .section {
-    background-color: #eeeeee;
-    border: 1px solid #ced4da;
-    padding: 20px;
-    margin: 5px;
+ .report {
+   padding: 5px 0;
+ }
+
+  .report:hover {
+    cursor: pointer;
   }
-
-
 
 </style>

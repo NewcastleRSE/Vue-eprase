@@ -8,7 +8,9 @@
 
       <div class="text">
         <strong>Institution:</strong> {{ institution}} <br />
-        <strong>EP System:</strong> {{ ep_service }}<br />
+        <strong>EP System:</strong>
+        <span v-if="ep_service !=='Other'">{{ ep_service}} </span>
+        <span v-if="other_ep_system">{{ other_ep_system}}</span><br />
       </div>
 
       <section>
@@ -138,7 +140,8 @@
                   assessment_id : '',
                   institution_id: '',
                   institution: '',
-                  ep_service: ''
+                  ep_service: '',
+                  other_ep_system: ''
               }
           },
           computed: {
@@ -720,15 +723,13 @@
                       }
 
                       this.ep_service = data.system.ep_service;
+                      this.other_ep_system = data.system.other_ep_system;
                       this.institution = data.institution.orgName;
 
                       // audit
                       dataService.audit('View report', '/assessmentresults');
 
                       dataService.getMitigationResults(this.assessment_id).then(data => {
-
-                        console.log(data);
-
                           this.goodMitigation = data.goodMitigation;
                           this.someMitigation = data.someMitigation;
                           this.notMitigated = data.notMitigated;
