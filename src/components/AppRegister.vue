@@ -48,8 +48,8 @@
           </div>
         </form>
 
-        <div v-if="serverError !== ''" class="warning">Sorry, there is a problem with registration, there is a limit of 4 users per institution.
-        </div>
+        <div v-if="serverError === 'too-many-users'" class="warning">Sorry, there is a problem with registration, there is a limit of 4 users per institution</div>
+        <div v-if="serverError === 'email-taken'" class="warning">This email has already been registered against an institution</div>
 
       </div>
     </div>

@@ -22,7 +22,7 @@
             <tr><th>Category</th><th>Outcome</th></tr>
             <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenarios. Out of these, {{ extremeRiskFails.length  }} were not mitigated. </td></tr>
             <tr><td>High risk scenarios</td><td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{ highRiskFails.length  }} were not mitigated. </td></tr>
-            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
+            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
             <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
         </div>
@@ -263,8 +263,15 @@
                     dispatch('storeStackedChartData', { stackedChartData });
                   }
 
+                  // if numPrescriptions isn't in local storage, get it from the settings
+                  let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
+                  if(!numPrescriptions){
+                      numPrescriptions = settings.numPrescriptions;
+                      localStorage.setItem('numPrescriptions', numPrescriptions);
+                  }
+
                   // calculate number of valid tests, ignoring null results
-                  this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;
+                  this.totalValidTests = numPrescriptions - this.totalNulls;
                   this.getInterventionTypeResult();
                   this.saveMitigationResult(id);
 
@@ -674,7 +681,7 @@
 
                   dataService.getAssessmentById(this.assessment_id).then(data => {
 
-                      let configErrorList = data.configErrorDataList;
+                    let configErrorList = data.configErrorDataList;
 
                       for(let index in configErrorList){
                           if(configErrorList.hasOwnProperty(index)){
@@ -719,6 +726,9 @@
                       dataService.audit('View report', '/assessmentresults');
 
                       dataService.getMitigationResults(this.assessment_id).then(data => {
+
+                        console.log(data);
+
                           this.goodMitigation = data.goodMitigation;
                           this.someMitigation = data.someMitigation;
                           this.notMitigated = data.notMitigated;
