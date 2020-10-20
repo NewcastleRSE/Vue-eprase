@@ -18,6 +18,7 @@ import AppCharts from "./components/AppCharts";
 import ResetPassword from "./components/ResetPassword";
 import RequestPassword from "./components/RequestPassword";
 import SetPatients from "./components/SetPatients";
+import AdminHome from "./components/AdminHome";
 
 Vue.use(Router);
 
@@ -94,6 +95,10 @@ export const router = new Router({
     {
       path: '/requestpassword',
       component: RequestPassword
+    },
+    {
+      path: '/adminhome',
+      component: AdminHome
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
