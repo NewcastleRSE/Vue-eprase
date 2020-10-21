@@ -14,7 +14,7 @@
 
       <div class="menu-bar-buttons">
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
-        <button @click=""><a href="#">Mititgation Comparison</a></button>
+        <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
         <button @click=""><a href="#">EPMA Statistics</a></button>
         <button @click="">Data input</button>
       </div>
@@ -35,13 +35,11 @@
 
 <script>
 
-  import AppFooter from "./AppFooter";
   import AppLogo from "./AppLogo";
 
   export default {
       name: "AdminHome",
       components: {
-        AppFooter,
         AppLogo
       },
       data() {
@@ -49,17 +47,20 @@
             userIsAdmin: true
           }
       },
-    methods: {
-        getAllReports() {
-          this.$router.push({ path: './assessmentreports' });
-        },
-        onExitClick() {
-          this.$router.push('/logout');
-        },
-        onHomeClick() {
-          this.$router.push('/assessmentintro');
-        },
-    }
+      methods: {
+          getAllReports() {
+            this.$router.push({ path: './assessmentreports' });
+            },
+          mitigationComparison() {
+             this.$router.push('/mitigationcomparison');
+          },
+          onExitClick() {
+            this.$router.push('/logout');
+          },
+          onHomeClick() {
+            this.$router.push('/assessmentintro');
+          },
+      }
   }
 
 </script>

@@ -39,7 +39,7 @@
     </div>
 
     <div class="added-content" v-show="userIsAdmin === 'true'">
-      <button id="reports" @click="getAllReports()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View all reports</button>
+      <button @click="adminHome()">Admin Home</button>
     </div>
 
     <AppFooter />
@@ -136,8 +136,8 @@
                     localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients));
                 });
             },
-            getAllReports() {
-              this.$router.push({ path: './assessmentreports' });
+            adminHome() {
+              this.$router.push({ path: './adminhome' });
             }
         },
         created : function() {
@@ -162,10 +162,6 @@
   }
   .level {
     height: 80px;
-  }
-
-  #reports {
-    width: 170px;
   }
 
   button {
