@@ -21,7 +21,7 @@
     <div>
       <p id="logo-bar">
         <span class="logos"><img id="di-logo" src="../assets/Digital_Institute.jpg" alt="Digital Institute" ></span>
-        <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hosptials NHS Foundation Trust"></span>
+        <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hospitals NHS Foundation Trust"></span>
         <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span></p>
     </div>
   </div>
@@ -42,7 +42,6 @@
         },
         created() {
          localStorage.clear();
-          console.log(process.env.BASE_URL);
         }
     }
 

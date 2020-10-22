@@ -28,7 +28,8 @@ export const dataService = {
   failedLoginAudit,
   audit,
   logout,
-  updateInstitutionAssessment
+  updateInstitutionAssessment,
+  getMitigationResultByInstitutionId
 };
 
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
@@ -69,7 +70,6 @@ function saveCreatePatients(time_taken){
   return fetch(baseURL + 'createpatients?ID=' + assessmentId, requestOptions)
     .then(handleResponse)
     .then(response => {
-      //dataService.setAssessmentPart(3);
     })
     .catch(function() {
       console.log('Error returning from saveCreatePatientData');
@@ -488,6 +488,24 @@ function updateInstitutionAssessment(){
 
 }
 
+function getMitigationResultByInstitutionId(institution_id) {
+
+    let token = getToken();
+    const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+    };
+
+    return fetch(baseURL + 'getMitigationResultsByInstitutionId?INSTITUTION_ID=' + institution_id, requestOptions)
+      .then(handleResponse)
+      .then(response => {
+        return response;
+      })
+      .catch(function () {
+      });
+
+}
+
 
 function handleResponse(response) {
   return response.text().then(text => {
@@ -504,6 +522,7 @@ function handleResponse(response) {
     return data;
   });
 }
+
 
 //------- local storage functions
 

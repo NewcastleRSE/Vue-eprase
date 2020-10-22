@@ -82,11 +82,12 @@
                     const { dispatch } = this.$store;
                     if (username && password) {
                         dispatch('authentication/login', { username, password })
-                          .then(()=> {
-                            this.serverError = true;
-                            this.$router.push('/login')
-                            .catch(err => {});
-                      })
+
+                        .then(()=> {
+                          this.serverError = true;
+                          this.$router.push('/login')
+                          .catch(err => {});
+                        })
                     }
                 }
             });
