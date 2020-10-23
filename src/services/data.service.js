@@ -22,14 +22,14 @@ export const dataService = {
   savePrescriptionData,
   saveMitigationResults,
   getMitigationResults,
+  getAllMitigationResults,
   saveConfigError,
   getConfigErrors,
   getConfigErrorByCode,
   failedLoginAudit,
   audit,
   logout,
-  updateInstitutionAssessment,
-  getMitigationResultByInstitutionId
+  updateInstitutionAssessment
 };
 
 function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
@@ -140,7 +140,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
 
 
 // should only save if result doesn't already exist
-function saveMitigationResults(assessmentId, goodMitigation, someMitigation, notMitigated, overMitigated){
+function saveMitigationResults(assessmentId, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests){
 
   let token = getToken();
   let institutionId = getInstitutionId();
@@ -148,7 +148,7 @@ function saveMitigationResults(assessmentId, goodMitigation, someMitigation, not
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated })
+    body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests})
   };
 
   return fetch(baseURL + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, requestOptions)
@@ -301,7 +301,7 @@ function getCategoryData(id) {
     });
 }
 
-// assessment id supplied
+// institution assessment id supplied
 function getMitigationResults(id) {
 
   let token = getToken();
@@ -318,6 +318,26 @@ function getMitigationResults(id) {
     })
     .catch(function() {
       console.log('Error returning from getMitigationResults');
+    });
+}
+
+// institution assessment id supplied
+function getAllMitigationResults() {
+
+  let token = getToken();
+
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+  };
+
+  return fetch(baseURL + 'getAllMitigationResults', requestOptions)
+    .then(handleResponse)
+    .then(response => {
+      return response;
+    })
+    .catch(function() {
+      console.log('Error returning from getAllMitigationResults');
     });
 }
 
@@ -487,25 +507,6 @@ function updateInstitutionAssessment(){
     });
 
 }
-
-function getMitigationResultByInstitutionId(institution_id) {
-
-    let token = getToken();
-    const requestOptions = {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
-    };
-
-    return fetch(baseURL + 'getMitigationResultsByInstitutionId?INSTITUTION_ID=' + institution_id, requestOptions)
-      .then(handleResponse)
-      .then(response => {
-        return response;
-      })
-      .catch(function () {
-      });
-
-}
-
 
 function handleResponse(response) {
   return response.text().then(text => {

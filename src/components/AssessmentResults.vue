@@ -612,7 +612,7 @@
                   dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
                 }
 
-                dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated);
+                dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
               },
               getInterventionTypeResult(){
                   let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
