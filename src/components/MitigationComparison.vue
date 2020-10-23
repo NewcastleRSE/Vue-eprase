@@ -75,20 +75,20 @@
       },
       methods: {
           getInstitutionMitResult() {
-              dataService.getInstitutions().then(data => {
-                  for (let index in data){
-                      if(data.hasOwnProperty(index)){
-                        let ins = this.formatInstitutions(data[index]);
-                        dataService.getMitigationResultByInstitutionId(data[index].id).then(mitdata => {
+              dataService.getAllMitigationResults().then(data => {
 
-                          if(mitdata !== ''){
-                            let values = Object.values(mitdata);
-                            values.pop();
-                            values.shift();
-                            values.unshift(ins.name);
-                            this.chartData.push(values);
-                          }
-                        })
+              for (let index in data){
+                  if(data.hasOwnProperty(index)){
+
+                      let values = [
+                                  data[index].institution.orgName,
+                                  data[index].goodMitigation,
+                                  data[index].someMitigation,
+                                  data[index].notMitigated,
+                                  data[index].overMitigated,
+                                  data[index].invalidTests ]
+
+                      this.chartData.push(values);
                       }
                   }
               })
@@ -99,12 +99,8 @@
           onAdminHomeClick() {
               this.$router.push('/adminhome');
           },
-          formatInstitutions(ins){
-              let institution = {
-                id: ins.id,
-                name : ins.orgName,
-              };
-              return institution;
+          formatData(data){
+
           },
           onChartReady(chart, google) {
             // now we have google lib loaded. Let's create data table based using it.
@@ -124,6 +120,8 @@
               let rows = [];
 
               for(let index in this.chartData){
+
+                  console.log(this.chartData[index]);
 
                   if(this.chartData.hasOwnProperty(index)){
                     rows[index] = [];
@@ -174,7 +172,7 @@
   }
 
   .results-btn {
-    background-color: #02dddc;
+    background-color: #07818e;
     border : 0;
     height: 40px;
     width: 100px;
