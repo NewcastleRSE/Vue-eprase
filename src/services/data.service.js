@@ -508,24 +508,6 @@ function updateInstitutionAssessment(){
 
 }
 
-function getMitigationResultByInstitutionId(institution_id) {
-
-    let token = getToken();
-    const requestOptions = {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
-    };
-
-    return fetch(baseURL + 'getMitigationResultsByInstitutionId?INSTITUTION_ID=' + institution_id, requestOptions)
-      .then(handleResponse)
-      .then(response => {
-        return response;
-      })
-      .catch(function () {
-      });
-}
-
-
 function handleResponse(response) {
   return response.text().then(text => {
     const data = text && JSON.parse(text);
