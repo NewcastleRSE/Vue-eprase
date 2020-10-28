@@ -35,15 +35,23 @@ function setConfigErrors() {
     }
   }
 
+  console.log('insert point start ' + insertPoints[0]);
+  console.log('insert point end ' + insertPoints[insertPoints.length-1]);
+
+
   // fix to prevent config errors following on one after another (this causes an error in the testList increment)
-  let ipDiff = function (a, b) { return Math.abs(a - b); }
+  let ipDiff = calcDiff(insertPoints[0], insertPoints[insertPoints.length-1]);
+    console.log(ipDiff);
   if (ipDiff === 1){
 
-        let ipvalue = insertPoints[1];
+        let ipvalue = insertPoints[-1];
         // add enough to push it a little ahead
         ipvalue += 3;
-        insertPoints[1] = ipvalue;
+        insertPoints[-1] = ipvalue;
   }
+
+   console.log('insert point start ' + insertPoints[0]);
+   console.log('insert point end ' + insertPoints[insertPoints.length-1]);
 
   // get all the config errors (another promise)
   dataService.getConfigErrors().then(data => {
@@ -652,6 +660,11 @@ function formatTestList(testList){
     };
     return test;
 
+}
+
+
+function calcDiff(a, b){
+   return Math.abs(a - b);
 }
 
 // sets the test List in Vuex state and number of tests in local storage
