@@ -13,7 +13,7 @@ export const dataService = {
   getAssessmentStatus,
   getInstitutions,
   getCategories,
-  getCategoryData,
+  getPrescriptionTestData,
   setAssessmentPart,
   saveSystemData,
   saveCreatePatients,
@@ -259,7 +259,7 @@ function getInstitutions() {
     });
 }
 
-
+// returns a  list of all categories
 function getCategories() {
 
   let token = getToken();
@@ -280,8 +280,8 @@ function getCategories() {
     });
 }
 
-
-function getCategoryData(id) {
+// returns all the prescription test results for an institution by assessment id
+function getPrescriptionTestData(id) {
 
   let token = getToken();
 
@@ -293,7 +293,7 @@ function getCategoryData(id) {
   return fetch(baseURL + 'resultCategories?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
-     // console.log(response);
+      //console.log(response);
       return response;
     })
     .catch(function() {

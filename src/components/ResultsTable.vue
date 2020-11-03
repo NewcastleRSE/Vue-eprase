@@ -111,7 +111,7 @@
       },
         data() {
             return {
-                categoryData : [],
+               // categoryData : [],
                 totalGood : 0,
                 totalSome : 0,
                 totalNot : 0,
@@ -119,6 +119,7 @@
                 totalAlerts : 0,
                 totalValidTests : 0,
                 totalNulls : 0,
+                totalInterventions : 0,
                 drugAge : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugDose : { good : 0, some : 0, not : 0, over : 0, count : 0 },
                 drugInteraction : { good : 0, some : 0, not : 0, over : 0, count : 0 },
@@ -150,8 +151,10 @@
                   formattedData.push(tempResult);
                 }
               }
-              this.categoryData = formattedData;
-              this.countCategories(this.categoryData);
+             /* this.categoryData = formattedData;
+              this.countCategories(this.categoryData); */
+
+              this.countCategories(formattedData);
 
               // calculate number of valid tests, ignoring null results
               this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;

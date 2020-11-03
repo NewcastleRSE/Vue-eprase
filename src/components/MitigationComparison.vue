@@ -44,6 +44,7 @@
   import AppLogo from "./AppLogo";
   import {dataService} from "../services/data.service";
   import { GChart } from "vue-google-charts";
+  import _ from "lodash";
 
   export default {
       name: "MitigationComparison",
@@ -91,7 +92,13 @@
                       this.chartData.push(values);
                       }
                   }
+                  // have we got anything set already?
+                  let mydata = JSON.parse(localStorage.getItem('chartdata'));
+                  if(_.isEmpty(mydata)){
+                      localStorage.setItem('chartdata', JSON.stringify(this.chartData));
+                  }
               })
+
           },
           onExitClick() {
               this.$router.push('/logout');
@@ -118,6 +125,8 @@
               data.addColumn('number', 'Invalid');
 
               let rows = [];
+
+              this.chartData = JSON.parse(localStorage.getItem('chartdata'));
 
               for(let index in this.chartData){
 
