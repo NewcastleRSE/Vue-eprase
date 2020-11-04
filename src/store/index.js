@@ -61,6 +61,9 @@ export const store = new Vuex.Store({
     },
     storeStackedChartData({commit}, { stackedChartData }){
       commit('setStackedChartData', { stackedChartData })
+    },
+    storeMitigationChartData({commit}, { mitigationChartData} ){
+      commit('setMitigationChartData', { mitigationChartData })
     }
   },
   mutations: {
@@ -102,7 +105,10 @@ export const store = new Vuex.Store({
       state.mitigationData[4] = percentageNulls;
     },
     setStackedChartData(state, stackedChartData){
-        state.stackedChartData = stackedChartData
+      state.stackedChartData = stackedChartData
+    },
+    setMitigationChartData(state, mitigationChartData){
+      state.mitigationChartData = mitigationChartData
     }
   }
 });

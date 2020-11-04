@@ -36,6 +36,8 @@
 <script>
 
   import AppLogo from "./AppLogo";
+  import {dataService} from "../services/data.service";
+  import _ from "lodash";
 
   export default {
       name: "AdminHome",
@@ -44,7 +46,8 @@
       },
       data() {
           return {
-            userIsAdmin: true
+            userIsAdmin: true,
+            chartData: []
           }
       },
       methods: {
@@ -60,7 +63,37 @@
           onHomeClick() {
             this.$router.push('/assessmentintro');
           },
-      }
+          getInstitutionMitResult() {
+            dataService.getAllMitigationResults().then(data => {
+
+              for (let index in data){
+                if(data.hasOwnProperty(index)){
+
+                  let values = [
+                    data[index].institution.orgName,
+                    data[index].goodMitigation,
+                    data[index].someMitigation,
+                    data[index].notMitigated,
+                    data[index].overMitigated,
+                    data[index].invalidTests ]
+
+                  this.chartData.push(values);
+                }
+              }
+
+              // const variable for sending to storage
+              const mitigationChartData = this.chartData;
+              const {dispatch} = this.$store;
+              if(this.chartData) {
+                dispatch('storeMitigationChartData', { mitigationChartData });
+              }
+            })
+
+          }
+      },
+    created() {
+        this.getInstitutionMitResult();
+    }
   }
 
 </script>
