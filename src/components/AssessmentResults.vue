@@ -189,9 +189,6 @@
               },
               createStackedChartData(jsonData){
                  this.chartCategoryData = stackedChartService.createStackedChartData(jsonData);
-
-                 console.log(this.chartCategoryData);
-
               },
               getInterventionTypeResult(){
                 let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
