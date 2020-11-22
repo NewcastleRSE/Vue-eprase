@@ -13,17 +13,27 @@
           <p>You currently have no reports available.</p>
         </div>
 
-        <div class="list-group">
+        <div class="report-list">
           <div v-if="reports.length > 0">
 
-            <div v-for="report in reports" class="report">
-              <div @click="onReportClick(report.assessmentId)" class="list-group-item list-group-item-action flex-column align-items-start">
-                <p><strong>{{ report.institution.orgName }}</strong></p>
-                <p>  <span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
-                  <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></p>
-                <p>{{ report.system.time_created }}</p>
-              </div>
-            </div>
+            <table class="table striped">
+              <tr>
+                <th>Name</th><th>Ep system</th><th>Version</th><th>Patient Type</th><th>Created</th>
+              </tr>
+              <tr v-for="report in reports" class="report">
+
+
+                    <td @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>
+                    <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
+                      <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
+                    <td>{{ report.system.ep_version }}</td>
+                    <td>{{ report.system.patient_type }}</td>
+                    <td>{{ report.system.time_created }}</td>
+                </tr>
+            </table>
+
+
+
           </div>
         </div>
       </div>
@@ -115,6 +125,10 @@
 
   .report:hover {
     cursor: pointer;
+  }
+
+  .report-list {
+    padding: 40px 0;
   }
 
 </style>
