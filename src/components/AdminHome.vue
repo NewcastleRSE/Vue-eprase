@@ -17,9 +17,6 @@
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
         <button @click=""><a href="#">EPMA Statistics</a></button>
         <button @click="">Data Input</button>
-      </div>
-
-      <div class="footer-bar-buttons">
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 

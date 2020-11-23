@@ -22,7 +22,6 @@
                 <th>Name</th><th>Ep system</th><th>Version</th><th>Lab Results</th><th>Medical History</th><th>Patient Type</th><th>Created</th>
               </tr>
               <tr v-for="report in reports" id="report">
-
                     <td class="org_name" @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>
                     <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                       <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
@@ -31,9 +30,6 @@
                     <td>{{ report.system.med_history? 'Y' : 'N' }}</td>
                     <td>{{ report.system.patient_type }}</td>
                     <td>{{ report.system.time_created }}</td>
-
-                {{ report.system }}
-
                 </tr>
               </tbody>
             </table>
