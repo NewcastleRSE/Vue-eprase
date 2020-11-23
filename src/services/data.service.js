@@ -14,7 +14,6 @@ export const dataService = {
   getInstitutions,
   getCategories,
   getPrescriptionTestData,
-  setAssessmentPart,
   saveSystemData,
   saveCreatePatients,
   savePatientData,

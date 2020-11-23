@@ -6,7 +6,7 @@
 
     <div class="content">
 
-      <h1>Admin functions</h1>
+      <h1>Admin Home</h1>
 
         <p>The following reports are designed to give insight into the comparative performance of different institutions and their EPMA systems.</p>
 
@@ -16,14 +16,11 @@
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
         <button @click=""><a href="#">EPMA Statistics</a></button>
-        <button @click="">Data input</button>
+        <button @click="">Data Input</button>
       </div>
 
-      <div align="center">
-        <div class="buttons">
-          <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>
-        </div>
+      <div class="footer-bar-buttons">
+        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 
     </div>
@@ -124,18 +121,16 @@
     width: 280px;
   }
 
-  .results-btn {
-    background-color: #02dddc;
-    border : 0;
-    height: 40px;
-    width: 100px;
-    margin: 25px 50px;
-    font-size: 1.2em;
-  }
-
   button a {
     padding: 3px;
   }
+
+  .footer-bar-buttons {
+    padding-left: 40px;
+    padding-bottom: 20px;
+    border-width: 1px;
+  }
+
 
   #page {
     text-align: left;

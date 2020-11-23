@@ -13,30 +13,40 @@
           <p>You currently have no reports available.</p>
         </div>
 
-        <div class="report-list">
+        <div id="report-list">
           <div v-if="reports.length > 0">
 
             <table class="table striped">
+              <tbody>
               <tr>
-                <th>Name</th><th>Ep system</th><th>Version</th><th>Patient Type</th><th>Created</th>
+                <th>Name</th><th>Ep system</th><th>Version</th><th>Lab Results</th><th>Medical History</th><th>Patient Type</th><th>Created</th>
               </tr>
-              <tr v-for="report in reports" class="report">
+              <tr v-for="report in reports" id="report">
 
-
-                    <td @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>
+                    <td class="org_name" @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>
                     <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                       <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
                     <td>{{ report.system.ep_version }}</td>
+                    <td><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results}}</span></td>
+                    <td>{{ report.system.med_history? 'Y' : 'N' }}</td>
                     <td>{{ report.system.patient_type }}</td>
                     <td>{{ report.system.time_created }}</td>
+
+                {{ report.system }}
+
                 </tr>
+              </tbody>
             </table>
 
           </div>
         </div>
       </div>
 
-    <AppFooter />
+      <div class="footer-bar-buttons">
+        <button><font-awesome-icon icon="home"></font-awesome-icon><span class="headerLink"><router-link to="/adminhome">Admin Home</router-link></span></button>
+        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+      </div>
+
     <AppLogo></AppLogo>
   </div>
 </template>
@@ -117,16 +127,38 @@
     padding: 40px;
   }
 
- .report {
-   padding: 5px 0;
- }
+   #report {
+     padding: 5px 0;
+   }
 
-  .report:hover {
+  #report:hover {
+    background-color: #e9e9e9;
+  }
+
+  #report .org_name {
     cursor: pointer;
   }
 
-  .report-list {
+  #report-list {
     padding: 40px 0;
+  }
+
+  button {
+    height: 40px;
+    width: 170px;
+    margin: 10px 0px;
+    font-size: 1em;
+    border-width: 1px;
+  }
+
+  button a {
+    padding: 3px;
+  }
+
+  .footer-bar-buttons {
+    padding-left: 40px;
+    padding-bottom: 20px;
+    border-width: 1px;
   }
 
 </style>
