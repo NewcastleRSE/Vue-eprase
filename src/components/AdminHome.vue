@@ -15,7 +15,7 @@
       <div class="menu-bar-buttons">
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
-        <button @click=""><a href="#">EPMA Statistics</a></button>
+        <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
         <button @click="">Data Input</button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
@@ -50,6 +50,9 @@
             },
           mitigationComparison() {
              this.$router.push('/mitigationcomparison');
+          },
+          epmaStatistics() {
+              this.$router.push('/epmastatistics');
           },
           onExitClick() {
             this.$router.push('/logout');

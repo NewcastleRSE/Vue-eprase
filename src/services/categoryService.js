@@ -141,8 +141,6 @@ function countCategories(data){
   let outcome = '';
   let selected_type = '';
 
-  console.log(data);
-
   for(let index in data){
       if(data.hasOwnProperty(index)){
         name = data[index].categoryName;
