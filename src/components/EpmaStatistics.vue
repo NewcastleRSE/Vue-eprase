@@ -18,7 +18,7 @@
           <table class="table striped">
             <tbody>
             <tr>
-              <th>Name</th><th>Ep system</th><th>Version</th><th>EP Usage</th><th>Lab Results (manual entry)</th><th>Medical History (manual entry)</th><th>High Risk Meds Coverage</th><th>Clinical Areas Coverage</th>
+              <th>Name</th><th>Ep System</th><th>Version</th><th>EP Usage</th><th>Additional EP System</th><th>Lab Results (manual entry)</th><th>Medical History (manual entry)</th><th>High Risk Meds Coverage</th><th>Clinical Areas Coverage</th>
             </tr>
             <tr v-for="report in reports" id="report">
               <td>{{ report.institution.orgName }}</td>
@@ -26,6 +26,7 @@
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
               <td>{{ report.system.ep_version }}</td>
               <td>{{ report.system.ep_usage }}%</td>
+              <td>{{ report.system.add_ep_system }}</td>
               <td><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(Y)' : '(N)' }}</span></td>
               <td>{{ report.system.med_history ? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(Y)' : '(N)' }}</td>
               <td>{{ report.system.high_risk_meds }}% </td>
