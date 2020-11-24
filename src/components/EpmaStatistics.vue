@@ -18,20 +18,18 @@
           <table class="table striped">
             <tbody>
             <tr>
-              <th>Name</th><th>Ep system</th><th>Version</th><th>EP Usage</th><th>Lab Results (manual entry)</th><th>Medical History (manual entry)</th><th>High Risk Meds</th><th>Clinical Areas</th>
+              <th>Name</th><th>Ep system</th><th>Version</th><th>EP Usage</th><th>Lab Results (manual entry)</th><th>Medical History (manual entry)</th><th>High Risk Meds Coverage</th><th>Clinical Areas Coverage</th>
             </tr>
             <tr v-for="report in reports" id="report">
-              <td>{{ report.institution.orgName }} <span class="smaller">{{ report.system.time_created }}</span></td>
+              <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
               <td>{{ report.system.ep_version }}</td>
               <td>{{ report.system.ep_usage }}%</td>
-              <td><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(y)' : '(N)'}}</span></td>
-              <td>{{ report.system.med_history? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(y)' : '(N)'}}</td>
-              <td><span v-for="med in high_risk_meds">&bull; {{ med }}<br></span></td>
-              <td><span v-for="area in clinical_areas">&bull; {{ area }}<br></span></td>
-
-
+              <td><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(Y)' : '(N)' }}</span></td>
+              <td>{{ report.system.med_history ? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(Y)' : '(N)' }}</td>
+              <td>{{ report.system.high_risk_meds }}% </td>
+              <td>{{ report.system.clinical_areas }}%</td>
             </tr>
             </tbody>
           </table>
@@ -64,7 +62,7 @@
             return {
                 reports: [],
                 high_risk_meds: [],
-                clinical_areas: []
+                clinical_areas: [],
             }
         },
         methods: {
@@ -75,8 +73,8 @@
                         if(this.reports.hasOwnProperty(index)){
                             let temptime = this.reports[index].system.time_created;
                             this.reports[index].system.time_created = this.getFormattedDate(temptime);
-                            this.formatMeds(this.reports[index].system.high_risk_meds);
-                            this.formatAreas(this.reports[index].system.clinical_areas);
+                            this.reports[index].system.high_risk_meds = this.calcMeds(this.reports[index].system.high_risk_meds);
+                            this.reports[index].system.clinical_areas = this.calcAreas(this.reports[index].system.clinical_areas);
                         }
                     }
                 });
@@ -86,11 +84,13 @@
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 return date;
             },
-            formatMeds(meds){
+            calcMeds(meds){
                 this.high_risk_meds = meds.split(',');
+                return this.high_risk_meds.length/10 * 100;
             },
-            formatAreas(clinical_areas){
+            calcAreas(clinical_areas){
                 this.clinical_areas = clinical_areas.split(',');
+                return Math.round(this.clinical_areas.length/9 * 100);
             }
         },
         created() {

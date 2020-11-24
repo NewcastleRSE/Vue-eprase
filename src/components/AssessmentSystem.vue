@@ -30,15 +30,15 @@
             </div>
 
             <div v-show="results.ep_service === 'Other'" class="form-group">
-              <label for="other-service"> Other eP service?</label>
-              <input type="text" name="other" id="other-service" class="form-control" v-model="results.other_service" minlength="3" maxlength="50" placeholder="Enter service...">
-              <div v-if="submitted && errors.has('other_service')" class="invalid-feedback alert alert-danger">{{ errors.first('other_service') }}</div>
+              <label for="other-ep-system"> Other eP service?</label>
+              <input type="text" name="other" id="other-ep-system" class="form-control" v-model="results.other_ep_system" minlength="3" maxlength="50" placeholder="Enter service...">
+              <div v-if="submitted && errors.has('other_ep_system')" class="invalid-feedback alert alert-danger">{{ errors.first('other_ep_system') }}</div>
             </div>
 
             <div class="form-group">
               <label for="ep-version">What version of the service are you currently using?</label>
               <span id="version"><input id="ep-version" name="ep-version" type="text" class="form-control" v-model="results.ep_version" v-validate="{required: true, min: 1, max: 50}" placeholder="Enter version..."></span>
-              <div v-if="submitted && errors.has('ep-version')" class="invalid-feedback alert alert-danger">{{ errors.first('ep-version') }}</div>
+              <div v-if="submitted && errors.has('ep_version')" class="invalid-feedback alert alert-danger">{{ errors.first('ep_version') }}</div>
             </div>
 
             <div class="question form-group" id="question-1">
@@ -63,9 +63,9 @@
             </div>
 
             <div class="form-group">
-              <label for="other-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please provide their names.</label>
-              <input type="text" name="other-ep-system" id="other-ep-system" class="form-control" v-model="results.other_ep_system" minlength="3" maxlength="50" placeholder="Other...">
-              <div v-if="submitted && errors.has('other_ep_system')" class="invalid-feedback alert alert-danger">{{ errors.first('other_ep_system') }}</div>
+              <label for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please provide their names.</label>
+              <input type="text" name="add-ep-system" id="add-ep-system" class="form-control" v-model="results.add_ep_system" minlength="3" maxlength="50" placeholder="Other...">
+              <div v-if="submitted && errors.has('add_ep_system')" class="invalid-feedback alert alert-danger">{{ errors.first('add_ep_system') }}</div>
             </div>
 
             <div id="radio-button-group">
@@ -194,9 +194,9 @@
                 results: {
                     ep_service: null,
                     ep_version: '',
-                    other_service : '',
                     ep_usage: null,
                     other_ep_system: null,
+                    add_ep_system: null,
                     patient_type: null,
                     lab_results: '',
                     med_history: '',
@@ -255,9 +255,9 @@
 
                         const ep_service  = this.results.ep_service;
                         const ep_version = this.results.ep_version;
-                        const other_service = this.results.other_service;
-                        const ep_usage = this.results.ep_usage;
                         const other_ep_system = this.results.other_ep_system;
+                        const ep_usage = this.results.ep_usage;
+                        const add_ep_system = this.results.add_ep_system;
                         const patient_type = this.results.patient_type;
                         const lab_results = this.results.lab_results;
                         const man_results = this.results.man_results;
@@ -268,7 +268,7 @@
                         const clinical_areas = this.results.clinical_areas.toString();
                         const { dispatch } = this.$store;
                         if (time_taken){
-                            dispatch('saveSystemData', { ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken });
+                            dispatch('saveSystemData', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken });
                         }
                         // audit
                         dataService.audit('Save system data', '/assessmentSystem');
