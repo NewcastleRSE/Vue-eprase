@@ -45,8 +45,10 @@ function setConfigErrors() {
   if (ipDiff === 1){
 
         let ipvalue = insertPoints[-1];
+        console.log('Before nudge' + ipvalue);
         // add enough to push it a little ahead
         ipvalue += 3;
+        console.log('After nudge' + ipvalue)
         insertPoints[-1] = ipvalue;
   }
 
@@ -64,7 +66,6 @@ function setConfigErrors() {
       testList.splice(insertPoints[i], 0, configErrors[i]);
     }
 
-    console.log('Updating test list with config errors!');
     // update the test list
     store.dispatch('setTestList', { testList });
   });
