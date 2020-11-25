@@ -18,8 +18,16 @@ export const authentication = {
         .then(
           user => {
             commit('loginSuccess', user);
-            dataService.audit('Successful login', '/login');
-            router.push('/assessmentintro');
+
+            /*redirect admin user */
+            if(password === 'adminuser1'){
+              dataService.audit('Successful admin  login', '/login');
+              router.push('/adminhome');
+            }
+            else {
+              dataService.audit('Successful login', '/login');
+              router.push('/assessmentintro');
+            }
           },
           error => {
             commit('loginFailure', error);

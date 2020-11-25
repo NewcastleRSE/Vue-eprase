@@ -30,8 +30,8 @@ export const store = new Vuex.Store({
     setTestList({ commit }, { testList}){
       commit('setTestList', { testList });
     },
-    saveSystemData({ commit }, { ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }){
-      dataService.saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
+    saveSystemData({ commit }, { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }){
+      dataService.saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken);
       commit('saveSystemData');
     },
     saveCreatePatients({ commit }, { time_taken }){
@@ -61,6 +61,9 @@ export const store = new Vuex.Store({
     },
     storeStackedChartData({commit}, { stackedChartData }){
       commit('setStackedChartData', { stackedChartData })
+    },
+    storeMitigationChartData({commit}, { mitigationChartData} ){
+      commit('setMitigationChartData', { mitigationChartData })
     }
   },
   mutations: {
@@ -102,7 +105,10 @@ export const store = new Vuex.Store({
       state.mitigationData[4] = percentageNulls;
     },
     setStackedChartData(state, stackedChartData){
-        state.stackedChartData = stackedChartData
+      state.stackedChartData = stackedChartData
+    },
+    setMitigationChartData(state, mitigationChartData){
+      state.mitigationChartData = mitigationChartData
     }
   }
 });

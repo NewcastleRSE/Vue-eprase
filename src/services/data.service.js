@@ -13,8 +13,7 @@ export const dataService = {
   getAssessmentStatus,
   getInstitutions,
   getCategories,
-  getCategoryData,
-  setAssessmentPart,
+  getPrescriptionTestData,
   saveSystemData,
   saveCreatePatients,
   savePatientData,
@@ -32,14 +31,14 @@ export const dataService = {
   updateInstitutionAssessment
 };
 
-function saveSystemData(ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
+function saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken){
 
   let token = getToken();
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ ep_service, other_service, ep_version, ep_usage, other_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
+    body: JSON.stringify({ ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
   };
 
   return fetch(baseURL + 'system', requestOptions)
@@ -259,7 +258,7 @@ function getInstitutions() {
     });
 }
 
-
+// returns a  list of all categories
 function getCategories() {
 
   let token = getToken();
@@ -280,8 +279,8 @@ function getCategories() {
     });
 }
 
-
-function getCategoryData(id) {
+// returns all the prescription test results for an institution by assessment id
+function getPrescriptionTestData(id) {
 
   let token = getToken();
 
@@ -293,7 +292,7 @@ function getCategoryData(id) {
   return fetch(baseURL + 'resultCategories?ID=' + id, requestOptions)
     .then(handleResponse)
     .then(response => {
-     // console.log(response);
+      //console.log(response);
       return response;
     })
     .catch(function() {
@@ -481,6 +480,7 @@ function getAllReports() {
   return fetch(baseURL + 'results', requestOptions)
     .then(handleResponse)
     .then(response => {
+      console.log(response);
       return response;
     })
     .catch(function () {
