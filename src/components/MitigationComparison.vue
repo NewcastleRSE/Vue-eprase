@@ -12,13 +12,11 @@
 
       <MitigationComparisonChart :mydata="mitigationChartData"></MitigationComparisonChart>
 
-      <div align="center">
-        <div class="buttons">
-          <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button type="button" class="results-btn btn btn-primary" @click="onAdminHomeClick()">Admin Home</button>
-        </div>
-      </div>
+    </div>
 
+    <div class="footer-bar-buttons">
+      <button><font-awesome-icon icon="home"></font-awesome-icon><span class="headerLink"><router-link to="/adminhome">Admin Home</router-link></span></button>
+      <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
     </div>
 
     <AppLogo></AppLogo>
@@ -67,28 +65,20 @@
 
   button {
     height: 40px;
-    width: 250px;
-    margin: 10px 0;
+    width: 170px;
+    margin: 10px 0px;
     font-size: 1em;
     border-width: 1px;
   }
 
-  .menu-bar-buttons {
-    padding: 20px 0;
-    width: 280px;
-  }
-
-  .results-btn {
-    background-color: #07818e;
-    border : 0;
-    height: 40px;
-    width: 100px;
-    margin: 25px 50px;
-    font-size: 1.2em;
-  }
-
   button a {
     padding: 3px;
+  }
+
+  .footer-bar-buttons {
+    padding-left: 40px;
+    padding-bottom: 20px;
+    border-width: 1px;
   }
 
   #page {

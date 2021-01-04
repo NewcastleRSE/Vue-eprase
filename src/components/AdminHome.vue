@@ -15,15 +15,9 @@
       <div class="menu-bar-buttons">
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
-        <button @click=""><a href="#">EPMA Statistics</a></button>
-        <button @click="">Data input</button>
-      </div>
-
-      <div align="center">
-        <div class="buttons">
-          <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>
-        </div>
+        <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
+        <button @click="">Data Input</button>
+        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 
     </div>
@@ -56,6 +50,9 @@
             },
           mitigationComparison() {
              this.$router.push('/mitigationcomparison');
+          },
+          epmaStatistics() {
+              this.$router.push('/epmastatistics');
           },
           onExitClick() {
             this.$router.push('/logout');
@@ -124,18 +121,16 @@
     width: 280px;
   }
 
-  .results-btn {
-    background-color: #02dddc;
-    border : 0;
-    height: 40px;
-    width: 100px;
-    margin: 25px 50px;
-    font-size: 1.2em;
-  }
-
   button a {
     padding: 3px;
   }
+
+  .footer-bar-buttons {
+    padding-left: 40px;
+    padding-bottom: 20px;
+    border-width: 1px;
+  }
+
 
   #page {
     text-align: left;
