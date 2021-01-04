@@ -1,8 +1,10 @@
-# eprase
+# vue-eprase
 
 > The Vue version of the eprase client.
 
-## Build Setup
+## Local Development Build Setup 
+
+Pull down the copy of the repo, then cd into the directory and use npm to install the required dependencies
 
 ``` bash
 # install dependencies
@@ -10,9 +12,13 @@ npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
+```
 
-# build for production with minification
+### build for production with minification
+
+Running the build command creates a build folder called 'dist'. This contains all the images and a build.js file of minified code
+
+```
 npm run build
 ```
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
