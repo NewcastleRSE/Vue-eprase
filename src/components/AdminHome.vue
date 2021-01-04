@@ -6,7 +6,7 @@
 
     <div class="content">
 
-      <h1>Admin functions</h1>
+      <h1>Admin Home</h1>
 
         <p>The following reports are designed to give insight into the comparative performance of different institutions and their EPMA systems.</p>
 
@@ -52,7 +52,7 @@
       },
       methods: {
           getAllReports() {
-            this.$router.push({ path: './assessmentreports' });
+            this.$router.push({ path: './allassessmentreports' });
             },
           mitigationComparison() {
              this.$router.push('/mitigationcomparison');

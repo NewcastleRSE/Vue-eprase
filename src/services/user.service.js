@@ -76,6 +76,7 @@ function logout() {
   localStorage.clear();
 }
 
+// returns boolean
 function checkIsAdminUser(user_id){
 
   let token = localStorage.getItem('token');

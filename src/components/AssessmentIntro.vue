@@ -76,10 +76,13 @@
         },
         methods: {
             checkIsAdminUser() {
-              let user_id = localStorage.getItem('userId');
-              userService.checkIsAdminUser(user_id).then(data => {
-                this.userIsAdmin = data;
-              });
+                let user_id = localStorage.getItem('userId');
+                userService.checkIsAdminUser(user_id).then(data => {
+                    this.userIsAdmin = data;
+                    if(this.userIsAdmin){
+                      this.$router.push({ path: './adminhome' });
+                    }
+                });
             },
             checkAssessmentComplete() {
                 dataService.getAssessmentStatus().then(data => {

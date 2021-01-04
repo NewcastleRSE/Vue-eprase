@@ -20,6 +20,7 @@ import RequestPassword from "./components/RequestPassword";
 import SetPatients from "./components/SetPatients";
 import AdminHome from "./components/AdminHome";
 import MitigationComparison from "./components/MitigationComparison";
+import AllAssessmentReports from "./components/AllAssessmentReports";
 
 Vue.use(Router);
 
@@ -104,6 +105,10 @@ export const router = new Router({
     {
       path: '/mitigationcomparison',
       component: MitigationComparison
+    },
+    {
+      path: '/allassessmentreports',
+      component: AllAssessmentReports
     },
     // otherwise redirect to welcome
     { path: '*', redirect: '/' }
