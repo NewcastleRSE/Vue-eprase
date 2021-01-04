@@ -14,7 +14,7 @@ npm install
 npm run dev
 ```
 
-### build for production with minification
+### Build for production with minification
 
 Running the build command creates a build folder called 'dist'. This contains all the images and a build.js file of minified code
 
