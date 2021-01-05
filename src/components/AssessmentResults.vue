@@ -89,6 +89,7 @@
   import {settings} from "../settings";
   import AppLogo from "./AppLogo";
   import _ from 'lodash';
+  import {userService} from "../services/user.service";
 
   Vue.use(VueAxios, axios);
 
@@ -129,7 +130,8 @@
                   institution_id: '',
                   institution: '',
                   ep_service: '',
-                  other_ep_system: ''
+                  other_ep_system: '',
+                  userIsAdmin : false
               }
           },
           computed: {
@@ -140,132 +142,138 @@
           methods : {
               createResults(id) {
 
-                let tempData = [];
-                let formattedData = [];
-                let tempResult =[];
+                  let tempData = [];
+                  let formattedData = [];
+                  let tempResult =[];
 
-                dataService.getPrescriptionTestData(id).then(data => {
-                  tempData = data;
-                  for(let index in tempData){
-                    if(tempData.hasOwnProperty(index)){
-                      tempResult = this.formatData(tempData[index]);
-                      formattedData.push(tempResult);
+                  dataService.getPrescriptionTestData(id).then(data => {
+                      tempData = data;
+                      for(let index in tempData){
+                          if(tempData.hasOwnProperty(index)){
+                            tempResult = this.formatData(tempData[index]);
+                            formattedData.push(tempResult);
+                          }
+                      }
+                      this.countCategories(formattedData);
+
+                      // const variable for sending to storage
+                      const stackedChartData = this.chartCategoryData;
+                      const {dispatch} = this.$store;
+                      if(id) {
+                        dispatch('storeStackedChartData', { stackedChartData });
+                      }
+
+                      // if numPrescriptions isn't in local storage, get it from the settings
+                      let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
+                      if(!numPrescriptions){
+                          numPrescriptions = settings.numPrescriptions;
+                          localStorage.setItem('numPrescriptions', numPrescriptions);
+                      }
+
+                      // calculate number of valid tests, ignoring null results
+                      this.totalValidTests = numPrescriptions - this.totalNulls;
+                      this.getInterventionTypeResult();
+                      this.saveMitigationResult(id);
+
+                  });
+                  },
+                  countCategories(data){
+                    let jsonData = categoryService.countCategories(data);
+                    this.totalGood = jsonData.totals.totalGood;
+                    this.totalSome = jsonData.totals.totalSome;
+                    this.totalOver = jsonData.totals.totalOver;
+                    this.totalNot = jsonData.totals.totalNot;
+                    this.totalNulls = jsonData.totals.totalNulls;
+                    this.totalInterventions = jsonData.totals.totalInterventions;
+
+                    this.createStackedChartData(jsonData);
+                  },
+                  createStackedChartData(jsonData){
+                     this.chartCategoryData = stackedChartService.createStackedChartData(jsonData);
+                  },
+                  getInterventionTypeResult(){
+                    let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
+                    interventionType = interventionType.slice(0, -1);
+                    interventionType = parseInt(interventionType);
+                    if(interventionType >= 70){
+                      return this.interventionTypeResult = 'high level of alerts';
                     }
-                  }
+                    else if (interventionType < 70 && interventionType >= 35) {
+                      return this.interventionTypeResult = 'medium level of alerts';
+                    }
+                    else {
+                      return this.interventionTypeResult = 'low level of alerts';
+                    }
+                  },
+                  // calculate as % of all tests
+                  saveMitigationResult(id) {
 
-                  this.countCategories(formattedData);
+                    let numTests = parseInt(localStorage.getItem('numPrescriptions'));
+                    this.goodMitigation = this.calcPerCategory(this.totalGood, numTests);
+                    this.someMitigation = this.calcPerCategory(this.totalSome, numTests);
+                    this.notMitigated = this.calcPerCategory(this.totalNot, numTests);
+                    this.overMitigated = this.calcPerCategory(this.totalOver, numTests);
+                    this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests);
 
-                  // const variable for sending to storage
-                  const stackedChartData = this.chartCategoryData;
-                  const {dispatch} = this.$store;
-                  if(id) {
-                    dispatch('storeStackedChartData', { stackedChartData });
-                  }
+                    // const variables for sending to storage
+                    const goodPercentage = this.goodMitigation;
+                    const somePercentage = this.someMitigation;
+                    const notPercentage = this.notMitigated;
+                    const overPercentage = this.overMitigated;
+                    const percentageNulls = this.percentageNulls;
+                    const {dispatch} = this.$store;
+                    if(id) {
+                      dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
+                    }
 
-                  // if numPrescriptions isn't in local storage, get it from the settings
-                  let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
-                  if(!numPrescriptions){
-                      numPrescriptions = settings.numPrescriptions;
-                      localStorage.setItem('numPrescriptions', numPrescriptions);
-                  }
-
-                  // calculate number of valid tests, ignoring null results
-                  this.totalValidTests = numPrescriptions - this.totalNulls;
-                  this.getInterventionTypeResult();
-                  this.saveMitigationResult(id);
-
-                });
-              },
-              countCategories(data){
-                let jsonData = categoryService.countCategories(data);
-                this.totalGood = jsonData.totals.totalGood;
-                this.totalSome = jsonData.totals.totalSome;
-                this.totalOver = jsonData.totals.totalOver;
-                this.totalNot = jsonData.totals.totalNot;
-                this.totalNulls = jsonData.totals.totalNulls;
-                this.totalInterventions = jsonData.totals.totalInterventions;
-
-                this.createStackedChartData(jsonData);
-              },
-              createStackedChartData(jsonData){
-                 this.chartCategoryData = stackedChartService.createStackedChartData(jsonData);
-              },
-              getInterventionTypeResult(){
-                let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
-                interventionType = interventionType.slice(0, -1);
-                interventionType = parseInt(interventionType);
-                if(interventionType >= 70){
-                  return this.interventionTypeResult = 'high level of alerts';
-                }
-                else if (interventionType < 70 && interventionType >= 35) {
-                  return this.interventionTypeResult = 'medium level of alerts';
-                }
-                else {
-                  return this.interventionTypeResult = 'low level of alerts';
-                }
-              },
-              // calculate as % of all tests
-              saveMitigationResult(id) {
-
-                let numTests = parseInt(localStorage.getItem('numPrescriptions'));
-                this.goodMitigation = this.calcPerCategory(this.totalGood, numTests);
-                this.someMitigation = this.calcPerCategory(this.totalSome, numTests);
-                this.notMitigated = this.calcPerCategory(this.totalNot, numTests);
-                this.overMitigated = this.calcPerCategory(this.totalOver, numTests);
-                this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests);
-
-                // const variables for sending to storage
-                const goodPercentage = this.goodMitigation;
-                const somePercentage = this.someMitigation;
-                const notPercentage = this.notMitigated;
-                const overPercentage = this.overMitigated;
-                const percentageNulls = this.percentageNulls;
-                const {dispatch} = this.$store;
-                if(id) {
-                  dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
-                }
-
-                dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
-              },
-              formatData(item) {
-                return {
-                  categoryName: item.prescription.indicator.category['categoryName'],
-                  mitigation: item.result,
-                  outcome: item.outcome,
-                  selected_type: item.selected_type
-                };
-              },
-              calc(num,total){
-                if(total !== 0) {
-                  return ((num/total) *100).toFixed(1) + '%';
-                }
-                return 'n/a';
-              },
-              calcPerCategory(num, total){
-                if(total !== 0) {
-                  return ((num/total) *100).toFixed(1);
-                }
-                return 0;
-              },
-              calcNum(num, total) {
-                if(total !== 0) {
-                  let tempnum = ((num/total) *100).toFixed(1);
-                  return parseInt(tempnum);
-                }
-                return 0;
-              },
-              onExitClick() {
-                  this.$router.push('/logout');
-              },
-              onHomeClick() {
-                  this.$router.push('/assessmentintro');
-              },
-              onTableClick() {
-                  this.$router.push('/resultstable');
-                },
-              onChartClick() {
-                this.$router.push('/charts');
-              }
+                    dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
+                  },
+                  formatData(item) {
+                    return {
+                      categoryName: item.prescription.indicator.category['categoryName'],
+                      mitigation: item.result,
+                      outcome: item.outcome,
+                      selected_type: item.selected_type
+                    };
+                  },
+                  calc(num,total){
+                    if(total !== 0) {
+                      return ((num/total) *100).toFixed(1) + '%';
+                    }
+                    return 'n/a';
+                  },
+                  calcPerCategory(num, total){
+                    if(total !== 0) {
+                      return ((num/total) *100).toFixed(1);
+                    }
+                    return 0;
+                  },
+                  calcNum(num, total) {
+                    if(total !== 0) {
+                      let tempnum = ((num/total) *100).toFixed(1);
+                      return parseInt(tempnum);
+                    }
+                    return 0;
+                  },
+                  onExitClick() {
+                      this.$router.push('/logout');
+                  },
+                  onHomeClick() {
+                      this.userIsAdmin = localStorage.getItem('userIsAdmin');
+                      // string value since its been in local storage
+                      if(this.userIsAdmin === 'true'){
+                          this.$router.push('/adminhome');
+                      }
+                      else {
+                          this.$router.push('/assessmentintro');
+                      }
+                  },
+                  onTableClick() {
+                      this.$router.push('/resultstable');
+                    },
+                  onChartClick() {
+                    this.$router.push('/charts');
+                   }
               },
               created() {
                   // get the assessment id from the url or local storage if it isn't there
@@ -276,7 +284,6 @@
                   else {
                     localStorage.setItem('assessmentId', this.assessment_id);
                   }
-
                   dataService.getCategories(this.assessment_id).then(data => {
                     this.categories = data;
                   });

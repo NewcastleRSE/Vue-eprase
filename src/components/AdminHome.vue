@@ -90,6 +90,7 @@
       },
     created() {
         this.getInstitutionMitResult();
+        localStorage.setItem('userIsAdmin', true);
     }
   }
 

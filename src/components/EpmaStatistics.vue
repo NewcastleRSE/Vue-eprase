@@ -21,6 +21,8 @@
               <th> Institution Name</th><th>Ep System</th><th class="ep-usage">EP Usage</th><th>Additional EP System</th><th>Lab Results<br><span class="smaller">(manually enter lab results)</span></th><th>Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th><th>High Risk Meds Coverage</th><th>High Risk Areas</th><th>Patient Records Open?</th><th>Insulin in ML?</th>
             </tr>
             <tr v-for="report in reports" id="report">
+
+              {{ report.system }}
               <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
@@ -72,6 +74,9 @@
             getReports() {
                 dataService.getAllReports().then(data => {
                     this.reports = data;
+
+                    console.log(this.reports);
+
                     for(let index in this.reports){
                         if(this.reports.hasOwnProperty(index)){
                             let temptime = this.reports[index].system.time_created;

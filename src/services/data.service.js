@@ -480,7 +480,6 @@ function getAllReports() {
   return fetch(baseURL + 'results', requestOptions)
     .then(handleResponse)
     .then(response => {
-      console.log(response);
       return response;
     })
     .catch(function () {
