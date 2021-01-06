@@ -12,29 +12,60 @@
         <p>You currently have no reports available.</p>
       </div>
 
-      <div id="report-list">
+      <div id="report-list-one">
         <div v-if="reports.length > 0">
 
           <table class="table striped">
             <tbody>
             <tr>
-              <th> Institution Name</th><th>Ep System</th><th class="ep-usage">EP Usage</th><th>Additional EP System</th><th>Lab Results<br><span class="smaller">(manually enter lab results)</span></th><th>Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th><th>High Risk Meds Coverage</th><th>High Risk Areas</th><th>Patient Records Open?</th><th>Insulin in ML?</th>
+              <th> Institution Name</th>
+              <th>Ep System</th>
+              <th class="ep-usage align-content-center">EP Usage</th>
+              <th class="align-content-center">Additional EP System</th>
+              <th class="align-content-center">Lab Results<br><span class="smaller">(manually enter lab results)</span></th>
+              <th class="align-content-center">Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th>
+              <th class="align-content-center">High Risk Meds Coverage</th>
+              <th class="align-content-center">High Risk Areas</th>
             </tr>
-            <tr v-for="report in reports" id="report">
+            <tr v-for="report in reports" id="report-one">
 
-              {{ report.system }}
               <td>{{ report.institution.orgName }}</td>
-              <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
+              <td class="align-content-center"><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-              <td>{{ report.system.ep_usage }}%</td>
-              <td>{{ report.system.add_ep_system }}</td>
-              <td><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(Y)' : '(N)' }}</span></td>
-              <td>{{ report.system.med_history ? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(Y)' : '(N)' }}</td>
-              <td>{{ report.system.high_risk_meds }}% </td>
-              <td><span v-for="area in report.system.clinical_areas">&bull; {{ area }} <br></span></td>
-              <td>{{report.configErrorDataList[0].result ? 'Y' : 'N'}}</td>
-              <td>{{report.configErrorDataList[1].result ? 'Y' : 'N'}}</td>
+              <td class="align-content-center">{{ report.system.ep_usage }}%</td>
+              <td class="align-content-center">{{ report.system.add_ep_system }}</td>
+              <td class="align-content-center"><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(Y)' : '(N)' }}</span></td>
+              <td class="align-content-center">{{ report.system.med_history ? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(Y)' : '(N)' }}</td>
+              <td class="align-content-center">{{ report.system.high_risk_meds }}% </td>
+              <td class="align-content-center"><span v-for="area in report.system.clinical_areas">&bull; {{ area }} <br></span></td>
+            </tr>
+            </tbody>
+          </table>
 
+        </div>
+      </div>
+
+      <h4>Configuration error results</h4>
+
+      <div id="report-list-two">
+        <div v-if="reports.length > 0">
+
+          <table class="table striped">
+            <tbody>
+            <tr>
+              <th> Institution Name</th>
+              <th class="align-content-center">Ep System</th>
+              <th class="align-content-center">Patient Records Open?</th>
+              <th class="align-content-center">Insulin in ML?</th>
+            </tr>
+            <tr v-for="report in reports" id="report-two">
+
+              <td>{{ report.institution.orgName }}</td>
+              <td class="align-content-center"><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
+                <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
+
+              <td class="align-content-center"><img v-show="report.configErrorDataList[0].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[0].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+              <td class="align-content-center"><img v-show="report.configErrorDataList[1].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[1].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
             </tr>
             </tbody>
           </table>
@@ -56,7 +87,6 @@
 
     import {dataService} from "../services/data.service";
     import AppLogo from "./AppLogo";
-    import {settings} from "../settings";
 
     export default {
         name: "EpmaStatistics",
@@ -68,6 +98,7 @@
                 reports: [],
                 high_risk_meds: [],
                 clinical_areas: []
+
             }
         },
         methods: {
@@ -152,11 +183,11 @@
     padding: 40px;
   }
 
-  #report {
+  #report-one, #report-two {
     padding: 5px 0;
   }
 
-  #report-list {
+  #report-list-one {
     padding: 40px 0;
   }
   .smaller {
@@ -166,6 +197,15 @@
 
   .ep-usage {
     min-width: 100px;
+  }
+
+  .align-content-center{
+    text-align: center;
+  }
+
+  .smallimg {
+    height : 25px;
+    width : auto;
   }
 
 </style>
