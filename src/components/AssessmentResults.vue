@@ -176,104 +176,104 @@
                       this.saveMitigationResult(id);
 
                   });
-                  },
-                  countCategories(data){
-                    let jsonData = categoryService.countCategories(data);
-                    this.totalGood = jsonData.totals.totalGood;
-                    this.totalSome = jsonData.totals.totalSome;
-                    this.totalOver = jsonData.totals.totalOver;
-                    this.totalNot = jsonData.totals.totalNot;
-                    this.totalNulls = jsonData.totals.totalNulls;
-                    this.totalInterventions = jsonData.totals.totalInterventions;
+              },
+              countCategories(data){
+                let jsonData = categoryService.countCategories(data);
+                this.totalGood = jsonData.totals.totalGood;
+                this.totalSome = jsonData.totals.totalSome;
+                this.totalOver = jsonData.totals.totalOver;
+                this.totalNot = jsonData.totals.totalNot;
+                this.totalNulls = jsonData.totals.totalNulls;
+                this.totalInterventions = jsonData.totals.totalInterventions;
 
-                    this.createStackedChartData(jsonData);
-                  },
-                  createStackedChartData(jsonData){
-                     this.chartCategoryData = stackedChartService.createStackedChartData(jsonData);
-                  },
-                  getInterventionTypeResult(){
-                    let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
-                    interventionType = interventionType.slice(0, -1);
-                    interventionType = parseInt(interventionType);
-                    if(interventionType >= 70){
-                      return this.interventionTypeResult = 'high level of alerts';
-                    }
-                    else if (interventionType < 70 && interventionType >= 35) {
-                      return this.interventionTypeResult = 'medium level of alerts';
-                    }
-                    else {
-                      return this.interventionTypeResult = 'low level of alerts';
-                    }
-                  },
-                  // calculate as % of all tests
-                  saveMitigationResult(id) {
+                this.createStackedChartData(jsonData);
+              },
+              createStackedChartData(jsonData){
+                 this.chartCategoryData = stackedChartService.createStackedChartData(jsonData);
+              },
+              getInterventionTypeResult(){
+                let interventionType = this.calc(this.totalAlerts, this.totalInterventions);
+                interventionType = interventionType.slice(0, -1);
+                interventionType = parseInt(interventionType);
+                if(interventionType >= 70){
+                  return this.interventionTypeResult = 'high level of alerts';
+                }
+                else if (interventionType < 70 && interventionType >= 35) {
+                  return this.interventionTypeResult = 'medium level of alerts';
+                }
+                else {
+                  return this.interventionTypeResult = 'low level of alerts';
+                }
+              },
+              // calculate as % of all tests
+              saveMitigationResult(id) {
 
-                    let numTests = parseInt(localStorage.getItem('numPrescriptions'));
-                    this.goodMitigation = this.calcPerCategory(this.totalGood, numTests);
-                    this.someMitigation = this.calcPerCategory(this.totalSome, numTests);
-                    this.notMitigated = this.calcPerCategory(this.totalNot, numTests);
-                    this.overMitigated = this.calcPerCategory(this.totalOver, numTests);
-                    this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests);
+                let numTests = parseInt(localStorage.getItem('numPrescriptions'));
+                this.goodMitigation = this.calcPerCategory(this.totalGood, numTests);
+                this.someMitigation = this.calcPerCategory(this.totalSome, numTests);
+                this.notMitigated = this.calcPerCategory(this.totalNot, numTests);
+                this.overMitigated = this.calcPerCategory(this.totalOver, numTests);
+                this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests);
 
-                    // const variables for sending to storage
-                    const goodPercentage = this.goodMitigation;
-                    const somePercentage = this.someMitigation;
-                    const notPercentage = this.notMitigated;
-                    const overPercentage = this.overMitigated;
-                    const percentageNulls = this.percentageNulls;
-                    const {dispatch} = this.$store;
-                    if(id) {
-                      dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
-                    }
+                // const variables for sending to storage
+                const goodPercentage = this.goodMitigation;
+                const somePercentage = this.someMitigation;
+                const notPercentage = this.notMitigated;
+                const overPercentage = this.overMitigated;
+                const percentageNulls = this.percentageNulls;
+                const {dispatch} = this.$store;
+                if(id) {
+                  dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
+                }
 
-                    dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
-                  },
-                  formatData(item) {
-                    return {
-                      categoryName: item.prescription.indicator.category['categoryName'],
-                      mitigation: item.result,
-                      outcome: item.outcome,
-                      selected_type: item.selected_type
-                    };
-                  },
-                  calc(num,total){
-                    if(total !== 0) {
-                      return ((num/total) *100).toFixed(1) + '%';
-                    }
-                    return 'n/a';
-                  },
-                  calcPerCategory(num, total){
-                    if(total !== 0) {
-                      return ((num/total) *100).toFixed(1);
-                    }
-                    return 0;
-                  },
-                  calcNum(num, total) {
-                    if(total !== 0) {
-                      let tempnum = ((num/total) *100).toFixed(1);
-                      return parseInt(tempnum);
-                    }
-                    return 0;
-                  },
-                  onExitClick() {
-                      this.$router.push('/logout');
-                  },
-                  onHomeClick() {
-                      this.userIsAdmin = localStorage.getItem('userIsAdmin');
-                      // string value since its been in local storage
-                      if(this.userIsAdmin === 'true'){
-                          this.$router.push('/adminhome');
-                      }
-                      else {
-                          this.$router.push('/assessmentintro');
-                      }
-                  },
-                  onTableClick() {
-                      this.$router.push('/resultstable');
-                    },
-                  onChartClick() {
-                    this.$router.push('/charts');
-                   }
+                dataService.saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
+              },
+              formatData(item) {
+                return {
+                  categoryName: item.prescription.indicator.category['categoryName'],
+                  mitigation: item.result,
+                  outcome: item.outcome,
+                  selected_type: item.selected_type
+                };
+              },
+              calc(num,total){
+                if(total !== 0) {
+                  return ((num/total) *100).toFixed(1) + '%';
+                }
+                return 'n/a';
+              },
+              calcPerCategory(num, total){
+                if(total !== 0) {
+                  return ((num/total) *100).toFixed(1);
+                }
+                return 0;
+              },
+              calcNum(num, total) {
+                if(total !== 0) {
+                  let tempnum = ((num/total) *100).toFixed(1);
+                  return parseInt(tempnum);
+                }
+                return 0;
+              },
+              onExitClick() {
+                  this.$router.push('/logout');
+              },
+              onHomeClick() {
+                  this.userIsAdmin = localStorage.getItem('userIsAdmin');
+                  // string value since its been in local storage
+                  if(this.userIsAdmin === 'true'){
+                      this.$router.push('/adminhome');
+                  }
+                  else {
+                      this.$router.push('/assessmentintro');
+                  }
+              },
+              onTableClick() {
+                  this.$router.push('/resultstable');
+                },
+              onChartClick() {
+                this.$router.push('/charts');
+               }
               },
               created() {
                   // get the assessment id from the url or local storage if it isn't there

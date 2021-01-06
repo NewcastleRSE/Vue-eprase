@@ -72,7 +72,8 @@
                     data[index].someMitigation,
                     data[index].notMitigated,
                     data[index].overMitigated,
-                    data[index].invalidTests ]
+                    data[index].invalidTests,
+                    data[index].epSystem]
 
                   this.chartData.push(values);
                 }
