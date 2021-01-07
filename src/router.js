@@ -22,6 +22,7 @@ import AdminHome from "./components/AdminHome";
 import MitigationComparison from "./components/MitigationComparison";
 import EpmaStatistics from "./components/EpmaStatistics";
 import AllAssessmentReports from "./components/AllAssessmentReports";
+import ConfigErrorResults from "./components/ConfigErrorResults";
 
 Vue.use(Router);
 
@@ -110,6 +111,10 @@ export const router = new Router({
     {
       path: '/epmastatistics',
       component: EpmaStatistics
+    },
+    {
+      path: '/configerrorresults',
+      component: ConfigErrorResults
     },
     {
       path: '/allassessmentreports',

@@ -6,45 +6,37 @@
 
     <div class="content">
 
-      <h2>EPMA Statistics</h2>
+      <h2>Configuration Error Results</h2>
 
       <div v-show="reports.length === 0">
         <p>You currently have no reports available.</p>
       </div>
 
-      <div id="report-list-one">
+      <div id="report-list-two">
         <div v-if="reports.length > 0">
 
           <table class="table striped">
             <tbody>
             <tr>
               <th> Institution Name</th>
-              <th>Ep System</th>
-              <th class="ep-usage align-content-center">EP Usage</th>
-              <th class="align-content-center">Additional EP System</th>
-              <th class="align-content-center">Lab Results<br><span class="smaller">(manually enter lab results)</span></th>
-              <th class="align-content-center">Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th>
-              <th class="align-content-center">High Risk Meds Coverage</th>
-              <th class="align-content-center">High Risk Areas</th>
+              <th class="align-content-center">Ep System</th>
+              <th class="align-content-center">Are previous patient records open?</th>
+              <th class="align-content-center">Can insulin be prescribed in ML?</th>
             </tr>
-            <tr v-for="report in reports" id="report-one">
+            <tr v-for="report in reports" id="report-two">
 
               <td>{{ report.institution.orgName }}</td>
               <td class="align-content-center"><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-              <td class="align-content-center">{{ report.system.ep_usage }}%</td>
-              <td class="align-content-center">{{ report.system.add_ep_system }}</td>
-              <td class="align-content-center"><span>{{ report.system.lab_results ? 'Y' : 'N' }} {{ report.system.man_results ? '(Y)' : '(N)' }}</span></td>
-              <td class="align-content-center">{{ report.system.med_history ? 'Y' : 'N' }}  {{ report.system.diagnosis_results ? '(Y)' : '(N)' }}</td>
-              <td class="align-content-center">{{ report.system.high_risk_meds }}% </td>
-              <td class="align-content-center"><span v-for="area in report.system.clinical_areas">&bull; {{ area }} <br></span></td>
+
+              <td class="align-content-center"><img v-show="report.configErrorDataList[0].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[0].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+              <td class="align-content-center"><img v-show="report.configErrorDataList[1].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[1].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
             </tr>
             </tbody>
           </table>
 
         </div>
       </div>
-
     </div>
 
     <div class="footer-bar-buttons">
@@ -62,16 +54,13 @@
     import AppLogo from "./AppLogo";
 
     export default {
-        name: "EpmaStatistics",
+        name: "ConfigErrorResults",
         components : {
             AppLogo
         },
         data() {
             return {
-                reports: [],
-                high_risk_meds: [],
-                clinical_areas: []
-
+                reports: []
             }
         },
         methods: {
@@ -92,20 +81,6 @@
                 let timestamp = time;
                 var date = new Date(timestamp * 1000).toLocaleDateString("en-GB");
                 return date;
-            },
-            calcMeds(meds){
-                this.high_risk_meds = meds.split(',');
-                return this.high_risk_meds.length/10 * 100;
-            },
-            findHighRiskAreas(clinical_areas){
-                let high_risk_areas = [];
-                this.clinical_areas = clinical_areas.split(',');
-                for(let index in this.clinical_areas){
-                    if((this.clinical_areas[index] === 'ACC')||(this.clinical_areas[index] === 'PCC')||(this.clinical_areas[index] === 'A&E')){
-                        high_risk_areas.push(this.clinical_areas[index]);
-                    }
-                }
-                return high_risk_areas;
             }
         },
         created() {
@@ -123,6 +98,11 @@
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
   }
+
+  #report-list-two {
+    margin-top: 40px;
+  }
+
   .level {
     height: 80px;
   }
@@ -153,25 +133,17 @@
     padding: 40px;
   }
 
-  #report-one {
+  #report-two {
     padding: 5px 0;
-  }
-
-  #report-list-one {
-    padding: 40px 0;
-  }
-  .smaller {
-    font-size: 0.8em;
-    font-style: italic;
-  }
-
-  .ep-usage {
-    min-width: 100px;
   }
 
   .align-content-center{
     text-align: center;
   }
 
+  .smallimg {
+    height : 25px;
+    width : auto;
+  }
 
 </style>

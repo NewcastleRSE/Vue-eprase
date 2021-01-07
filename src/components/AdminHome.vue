@@ -16,7 +16,7 @@
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
         <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
-        <button @click="">Data Input</button>
+        <button @click="configErrorResults()"><a href="#">Configuration Error Results</a></button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 
@@ -54,39 +54,40 @@
           epmaStatistics() {
               this.$router.push('/epmastatistics');
           },
+          configErrorResults() {
+            this.$router.push('/configerrorresults');
+          },
           onExitClick() {
-            this.$router.push('/logout');
+              this.$router.push('/logout');
           },
           onHomeClick() {
-            this.$router.push('/assessmentintro');
+              this.$router.push('/assessmentintro');
           },
           getInstitutionMitResult() {
-            dataService.getAllMitigationResults().then(data => {
+              dataService.getAllMitigationResults().then(data => {
 
-              for (let index in data){
-                if(data.hasOwnProperty(index)){
+                  for (let index in data){
+                      if(data.hasOwnProperty(index)){
 
-                  let values = [
-                    data[index].institution.orgName,
-                    data[index].goodMitigation,
-                    data[index].someMitigation,
-                    data[index].notMitigated,
-                    data[index].overMitigated,
-                    data[index].invalidTests,
-                    data[index].epSystem]
+                          let values = [
+                          data[index].institution.orgName,
+                          data[index].goodMitigation,
+                          data[index].someMitigation,
+                          data[index].notMitigated,
+                          data[index].overMitigated,
+                          data[index].invalidTests,
+                          data[index].epSystem]
+                          this.chartData.push(values);
+                      }
+                  }
 
-                  this.chartData.push(values);
-                }
-              }
-
-              // const variable for sending to storage
-              const mitigationChartData = this.chartData;
-              const {dispatch} = this.$store;
-              if(this.chartData) {
-                dispatch('storeMitigationChartData', { mitigationChartData });
-              }
-            })
-
+                  // const variable for sending to storage
+                  const mitigationChartData = this.chartData;
+                  const {dispatch} = this.$store;
+                  if(this.chartData) {
+                    dispatch('storeMitigationChartData', { mitigationChartData });
+                  }
+              })
           }
       },
     created() {
