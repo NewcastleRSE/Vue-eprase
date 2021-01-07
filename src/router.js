@@ -23,6 +23,7 @@ import MitigationComparison from "./components/MitigationComparison";
 import EpmaStatistics from "./components/EpmaStatistics";
 import AllAssessmentReports from "./components/AllAssessmentReports";
 import ConfigErrorResults from "./components/ConfigErrorResults";
+import EpSystemComparison from "./components/EpSystemComparison";
 
 Vue.use(Router);
 
@@ -107,6 +108,10 @@ export const router = new Router({
     {
       path: '/mitigationcomparison',
       component: MitigationComparison
+    },
+    {
+      path: '/epsystemcomparison',
+      component: EpSystemComparison
     },
     {
       path: '/epmastatistics',

@@ -15,6 +15,7 @@
       <div class="menu-bar-buttons">
         <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
         <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
+        <button @click="epsystemComparison()"><a href="#">Ep System Comparison</a></button>
         <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
         <button @click="configErrorResults()"><a href="#">Configuration Error Results</a></button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
@@ -50,6 +51,9 @@
             },
           mitigationComparison() {
              this.$router.push('/mitigationcomparison');
+          },
+          epsystemComparison() {
+            this.$router.push('/epsystemcomparison');
           },
           epmaStatistics() {
               this.$router.push('/epmastatistics');
