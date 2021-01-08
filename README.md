@@ -21,3 +21,4 @@ Running the build command creates a build folder called 'dist'. This contains al
 ```
 npm run build
 ```
+
