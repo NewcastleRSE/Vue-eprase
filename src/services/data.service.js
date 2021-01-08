@@ -139,7 +139,7 @@ function savePrescriptionData(prescription, outcome, other, intervention_type, s
 
 
 // should only save if result doesn't already exist
-function saveMitigationResults(assessmentId, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests){
+function saveMitigationResults(assessmentId, epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests){
 
   let token = getToken();
   let institutionId = getInstitutionId();
@@ -147,7 +147,7 @@ function saveMitigationResults(assessmentId, goodMitigation, someMitigation, not
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests})
+    body: JSON.stringify({ epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests})
   };
 
   return fetch(baseURL + 'saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, requestOptions)
@@ -320,7 +320,7 @@ function getMitigationResults(id) {
     });
 }
 
-// institution assessment id supplied
+
 function getAllMitigationResults() {
 
   let token = getToken();
@@ -480,7 +480,6 @@ function getAllReports() {
   return fetch(baseURL + 'results', requestOptions)
     .then(handleResponse)
     .then(response => {
-      console.log(response);
       return response;
     })
     .catch(function () {

@@ -184,7 +184,14 @@
             this.$router.push('/logout');
           },
           onHomeClick() {
-            this.$router.push('/assessmentintro');
+            this.userIsAdmin = localStorage.getItem('userIsAdmin');
+            // string value since its been in local storage
+            if(this.userIsAdmin === 'true'){
+              this.$router.push('/adminhome');
+            }
+            else {
+              this.$router.push('/assessmentintro');
+            }
           }
         },
         created() {

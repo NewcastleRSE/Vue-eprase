@@ -89,6 +89,7 @@
   import {settings} from "../settings";
   import AppLogo from "./AppLogo";
   import _ from 'lodash';
+  import {userService} from "../services/user.service";
 
   Vue.use(VueAxios, axios);
 
@@ -129,7 +130,8 @@
                   institution_id: '',
                   institution: '',
                   ep_service: '',
-                  other_ep_system: ''
+                  other_ep_system: '',
+                  userIsAdmin : false
               }
           },
           computed: {
@@ -140,41 +142,40 @@
           methods : {
               createResults(id) {
 
-                let tempData = [];
-                let formattedData = [];
-                let tempResult =[];
+                  let tempData = [];
+                  let formattedData = [];
+                  let tempResult =[];
 
-                dataService.getPrescriptionTestData(id).then(data => {
-                  tempData = data;
-                  for(let index in tempData){
-                    if(tempData.hasOwnProperty(index)){
-                      tempResult = this.formatData(tempData[index]);
-                      formattedData.push(tempResult);
-                    }
-                  }
+                  dataService.getPrescriptionTestData(id).then(data => {
+                      tempData = data;
+                      for(let index in tempData){
+                          if(tempData.hasOwnProperty(index)){
+                            tempResult = this.formatData(tempData[index]);
+                            formattedData.push(tempResult);
+                          }
+                      }
+                      this.countCategories(formattedData);
 
-                  this.countCategories(formattedData);
+                      // const variable for sending to storage
+                      const stackedChartData = this.chartCategoryData;
+                      const {dispatch} = this.$store;
+                      if(id) {
+                        dispatch('storeStackedChartData', { stackedChartData });
+                      }
 
-                  // const variable for sending to storage
-                  const stackedChartData = this.chartCategoryData;
-                  const {dispatch} = this.$store;
-                  if(id) {
-                    dispatch('storeStackedChartData', { stackedChartData });
-                  }
+                      // if numPrescriptions isn't in local storage, get it from the settings
+                      let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
+                      if(!numPrescriptions){
+                          numPrescriptions = settings.numPrescriptions;
+                          localStorage.setItem('numPrescriptions', numPrescriptions);
+                      }
 
-                  // if numPrescriptions isn't in local storage, get it from the settings
-                  let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'));
-                  if(!numPrescriptions){
-                      numPrescriptions = settings.numPrescriptions;
-                      localStorage.setItem('numPrescriptions', numPrescriptions);
-                  }
+                      // calculate number of valid tests, ignoring null results
+                      this.totalValidTests = numPrescriptions - this.totalNulls;
+                      this.getInterventionTypeResult();
+                      this.saveMitigationResult(id);
 
-                  // calculate number of valid tests, ignoring null results
-                  this.totalValidTests = numPrescriptions - this.totalNulls;
-                  this.getInterventionTypeResult();
-                  this.saveMitigationResult(id);
-
-                });
+                  });
               },
               countCategories(data){
                 let jsonData = categoryService.countCategories(data);
@@ -225,7 +226,7 @@
                   dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls });
                 }
 
-                dataService.saveMitigationResults(id, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
+                dataService.saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls);
               },
               formatData(item) {
                 return {
@@ -258,14 +259,21 @@
                   this.$router.push('/logout');
               },
               onHomeClick() {
-                  this.$router.push('/assessmentintro');
+                  this.userIsAdmin = localStorage.getItem('userIsAdmin');
+                  // string value since its been in local storage
+                  if(this.userIsAdmin === 'true'){
+                      this.$router.push('/adminhome');
+                  }
+                  else {
+                      this.$router.push('/assessmentintro');
+                  }
               },
               onTableClick() {
                   this.$router.push('/resultstable');
                 },
               onChartClick() {
                 this.$router.push('/charts');
-              }
+               }
               },
               created() {
                   // get the assessment id from the url or local storage if it isn't there
@@ -276,7 +284,6 @@
                   else {
                     localStorage.setItem('assessmentId', this.assessment_id);
                   }
-
                   dataService.getCategories(this.assessment_id).then(data => {
                     this.categories = data;
                   });

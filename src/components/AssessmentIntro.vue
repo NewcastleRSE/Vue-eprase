@@ -38,10 +38,6 @@
       </div>
     </div>
 
-    <div class="added-content" v-show="userIsAdmin === 'true'">
-      <button @click="adminHome()">Admin Home</button>
-    </div>
-
     <AppFooter />
     <AppLogo></AppLogo>
   </div>
@@ -76,10 +72,14 @@
         },
         methods: {
             checkIsAdminUser() {
-              let user_id = localStorage.getItem('userId');
-              userService.checkIsAdminUser(user_id).then(data => {
-                this.userIsAdmin = data;
-              });
+                let user_id = localStorage.getItem('userId');
+                userService.checkIsAdminUser(user_id).then(data => {
+                    this.userIsAdmin = data;
+                    // boolean value
+                    if(this.userIsAdmin === true){
+                      this.$router.push({ path: './adminhome' });
+                    }
+                });
             },
             checkAssessmentComplete() {
                 dataService.getAssessmentStatus().then(data => {
@@ -119,17 +119,17 @@
                 patientService.getRequiredTests().then(data => {
                     let tests = data;
                     for(let test in tests) {
-                      if (tests.hasOwnProperty(test)) {
-                        let requiredPatient = tests[test].patient;
-                        requiredPatient = patientService.formatPatientData(requiredPatient);
-                        if(requiredPatient.age >= 18){
-                          requiredAdultPatients.push(requiredPatient);
+                        if (tests.hasOwnProperty(test)) {
+                            let requiredPatient = tests[test].patient;
+                            requiredPatient = patientService.formatPatientData(requiredPatient);
+                            if(requiredPatient.age >= 18){
+                              requiredAdultPatients.push(requiredPatient);
+                            }
+                            else {
+                              requiredChildPatients.push(requiredPatient);
+                            }
+                            allRequiredPatients.push(requiredPatient);
                         }
-                        else {
-                          requiredChildPatients.push(requiredPatient);
-                        }
-                        allRequiredPatients.push(requiredPatient);
-                      }
                     }
                     localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients));
                     localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients));
@@ -141,12 +141,12 @@
             }
         },
         created : function() {
-            this.checkIsAdminUser();
-            this.checkAssessmentComplete();
-            this.getAssessmentStatus();
-            this.getRequiredPatients();
-            dataService.audit('View assessment intro', '/assessmentintro');
-        }
+              this.checkIsAdminUser();
+              this.checkAssessmentComplete();
+              this.getAssessmentStatus();
+              this.getRequiredPatients();
+              dataService.audit('View assessment intro', '/assessmentintro');
+          }
     }
 </script>
 
@@ -188,10 +188,6 @@
 
   .content {
     padding: 40px;
-  }
-
-  .added-content {
-    padding: 0 0 30px 40px;
   }
 
   .btn-primary {

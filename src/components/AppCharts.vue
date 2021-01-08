@@ -45,39 +45,46 @@
             }
         },
         computed: {
-          good() {
-              return this.$store.state.mitigationData[0].goodPercentage;
-          },
-          some() {
-             return this.$store.state.mitigationData[0].somePercentage;
-          },
-          not() {
-            return this.$store.state.mitigationData[0].notPercentage;
-          },
-          over() {
-            return this.$store.state.mitigationData[0].overPercentage;
-          },
-          nullTests(){
-            return this.$store.state.mitigationData[0].percentageNulls;
-          },
-          chartCategoryData() {
-            return this.$store.state.stackedChartData.stackedChartData;
-          }
+            good() {
+                return this.$store.state.mitigationData[0].goodPercentage;
+            },
+            some() {
+               return this.$store.state.mitigationData[0].somePercentage;
+            },
+            not() {
+              return this.$store.state.mitigationData[0].notPercentage;
+            },
+            over() {
+              return this.$store.state.mitigationData[0].overPercentage;
+            },
+            nullTests(){
+              return this.$store.state.mitigationData[0].percentageNulls;
+            },
+            chartCategoryData() {
+              return this.$store.state.stackedChartData.stackedChartData;
+            }
         },
         methods: {
-          onExitClick() {
-            this.$router.push('/logout');
-          },
-          onHomeClick() {
-            this.$router.push('/assessmentintro');
-          },
-          onReportClick() {
-            this.$router.push('/assessmentresults');
-          },
-          created() {
-            // get the system id from the url
-            this.assessment_id  = localStorage.getItem('assessmentId');
-          }
+            onExitClick() {
+                this.$router.push('/logout');
+            },
+            onHomeClick() {
+                this.userIsAdmin = localStorage.getItem('userIsAdmin');
+                // string value since its been in local storage
+                if(this.userIsAdmin === 'true'){
+                  this.$router.push('/adminhome');
+                }
+                else {
+                  this.$router.push('/assessmentintro');
+                }
+            },
+            onReportClick() {
+                this.$router.push('/assessmentresults');
+            },
+            created() {
+                 // get the system id from the url
+                this.assessment_id  = localStorage.getItem('assessmentId');
+            }
         }
     }
 

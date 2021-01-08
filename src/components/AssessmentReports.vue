@@ -19,7 +19,7 @@
             <table class="table striped">
               <tbody>
               <tr>
-                <th>Name</th><th>Ep System</th><th>Version</th><th>Patient Type</th><th>Created</th>
+                <th>Institution Name</th><th>Ep System</th><th>Version</th><th>Patient Type</th><th>Created</th>
               </tr>
               <tr v-for="report in reports" id="report">
                     <td class="org_name" @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>

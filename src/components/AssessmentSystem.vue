@@ -304,7 +304,7 @@
     width: 100%;
   }
 
-  #version, #other-service, #other-ep-system {
+  #version, #other-ep-system, #other-ep-system, #add-ep-system {
     float: right;
   }
 

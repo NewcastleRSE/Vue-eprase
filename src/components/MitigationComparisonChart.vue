@@ -44,12 +44,16 @@
               vAxis: {
                 title: 'Percentage Mitigation Response',
                 minValue: 0,
-                maxValue: 100
+                maxValue: 120
               },
               isStacked: true,
               colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a', '#808080'],
               width: 900,
-              height: 500
+              height: 500,
+              annotations: {
+                style: 'point',
+                alwaysOutside: true
+              },
             },
           }
         },
@@ -68,6 +72,7 @@
           data.addColumn('number', 'Not mitigated');
           data.addColumn('number', 'Over mitigated');
           data.addColumn('number', 'Invalid');
+          data.addColumn({type: 'string', role: 'annotation'});
 
           let rows = [];
 
@@ -81,6 +86,7 @@
               rows[index][3] = this.chartData[index][3];
               rows[index][4] = this.chartData[index][4];
               rows[index][5] = this.chartData[index][5];
+              rows[index][6] = this.chartData[index][6];
             }
           }
           data.addRows(rows);
