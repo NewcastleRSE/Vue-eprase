@@ -24,14 +24,21 @@
         <span class="logos"><img id="nuth-logo" src="../assets/NUTHlogo.png" alt="The Newcastle upon Tyne Hospitals NHS Foundation Trust"></span>
         <span class="logos"><img id="pharm-logo" src="../assets/pharmacy.png" alt="School of Pharmacy" ></span></p>
     </div>
+    <div id="version">Version {{ version }}</div>
   </div>
 
 </template>
 
 <script>
+    import { settings } from '../settings';
 
     export default {
         name: "AppWelcome",
+        data() {
+             return{
+              version : settings.version
+          }
+        },
         methods: {
           login() {
             window.location.href = './login'
@@ -51,6 +58,12 @@
 
   #page {
     text-align: center;
+  }
+
+  #version {
+      padding-bottom: 20px;
+      font-size: 0.8em;
+      color: #07818e;
   }
 
   .eprase-logo {

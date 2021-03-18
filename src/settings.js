@@ -12,5 +12,6 @@ export const settings = {
   //baseUrl : 'http://localhost:6001/',
   numRequiredChildPatients : 1,
   numRequiredAdultPatients : 2,
-  numAllRequiredPatients : 3
+  numAllRequiredPatients : 3,
+  version : '2.2'
 };
