@@ -46,19 +46,12 @@ export default {
                 vAxis: {
                     title: 'Percentage Mitigation Response',
                     minValue: 0,
-                    maxValue: 100,
-                    viewWindow: {
-                      max: 120
-                    }
+                    maxValue: 100
                 },
                 isStacked: true,
                 colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a', '#808080'],
                 width: 900,
-                height: 500,
-                annotations: {
-                    style: 'point',
-                    alwaysOutside: true
-                },
+                height: 500
             },
         }
     },
