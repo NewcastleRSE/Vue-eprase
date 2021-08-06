@@ -11,8 +11,9 @@ function countCategories(data){
         "totalSome": 0,
         "totalNot": 0,
         "totalOver": 0,
-        "totalAlerts": 0,
         "totalNulls": 0,
+        "totalAlerts": 0,
+        "totalAdvisory": 0,
         "totalInterventions": 0
       },
     "categories": [
@@ -151,8 +152,11 @@ function countCategories(data){
           dataToReturn['totals'].totalInterventions++;
         }
         selected_type = data[index].selected_type;
-        if(selected_type === 'alert'){
+        if(selected_type === 'alert' || selected_type === 'both'){
           dataToReturn['totals'].totalAlerts++;
+        }
+        else if(selected_type === 'advisory'){
+           dataToReturn['totals'].totalAdvisory++;
         }
         if(mitigation === 'Null'){
           dataToReturn['totals'].totalNulls++;

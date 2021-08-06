@@ -5,7 +5,7 @@
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="welcome-text">
-        <h1>Welcome to ePRaSE 2020</h1>
+        <h1>Welcome to ePRaSE 2021</h1>
         <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
           in order to determine their effectiveness and to encourage the correct use of these systems
           and deliver improved patient outcomes. </p>

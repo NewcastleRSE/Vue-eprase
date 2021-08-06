@@ -24,7 +24,7 @@
             <tr><th>Category</th><th>Outcome</th></tr>
             <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenarios. Out of these, {{ extremeRiskFails.length  }} were not mitigated. </td></tr>
             <tr><td>High risk scenarios</td><td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{ highRiskFails.length  }} were not mitigated. </td></tr>
-            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalInterventions }} advisory interventions, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
+            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of  {{ totalInterventions }} interventions, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalInterventions) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
             <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
         </div>
@@ -119,8 +119,9 @@
                   totalSome : 0,
                   totalNot : 0,
                   totalOver : 0,
-                  totalAlerts : 0,
                   totalValidTests : 0,
+                  totalAlerts : 0,
+                  totalAdvisory: 0,
                   totalNulls : 0,
                   totalInterventions: 0,
                   interventionTypeResult: '',
@@ -185,7 +186,8 @@
                 this.totalNot = jsonData.totals.totalNot;
                 this.totalNulls = jsonData.totals.totalNulls;
                 this.totalInterventions = jsonData.totals.totalInterventions;
-
+                this.totalAlerts = jsonData.totals.totalAlerts;
+                this.totalAdvisory = jsonData.totals.totalAdvisory;
                 this.createStackedChartData(jsonData);
               },
               createStackedChartData(jsonData){
