@@ -15,18 +15,21 @@
       <div id="report-list-one">
         <div v-if="reports.length > 0">
 
-          <table class="table striped">
+          <table class="table table-striped">
+            <caption>Statistics per institution</caption>
+            <thead>
+                <tr>
+                  <th> Institution Name</th>
+                  <th>Ep System</th>
+                  <th class="ep-usage align-content-center">EP Usage</th>
+                  <th class="align-content-center">Additional EP System</th>
+                  <th class="align-content-center">Lab Results<br><span class="smaller">(manually enter lab results)</span></th>
+                  <th class="align-content-center">Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th>
+                  <th class="align-content-center">High Risk Meds Coverage</th>
+                  <th class="align-content-center">High Risk Areas</th>
+                </tr>
+            </thead>
             <tbody>
-            <tr>
-              <th> Institution Name</th>
-              <th>Ep System</th>
-              <th class="ep-usage align-content-center">EP Usage</th>
-              <th class="align-content-center">Additional EP System</th>
-              <th class="align-content-center">Lab Results<br><span class="smaller">(manually enter lab results)</span></th>
-              <th class="align-content-center">Medical History<br><span class="smaller">(enter diagnosis or comorbidities)</span></th>
-              <th class="align-content-center">High Risk Meds Coverage</th>
-              <th class="align-content-center">High Risk Areas</th>
-            </tr>
             <tr v-for="report in reports" id="report-one">
 
               <td>{{ report.institution.orgName }}</td>
@@ -135,14 +138,24 @@
     border-width: 1px;
   }
 
+   button:hover {
+      background-color: #daffde;
+  }
+
   button a {
     padding: 3px;
+    text-decoration: none;
   }
 
   .footer-bar-buttons {
     padding-left: 40px;
     padding-bottom: 20px;
     border-width: 1px;
+  }
+
+  caption {
+      font-style: italic;
+      color: #07818e;
   }
 
   #page {
@@ -172,6 +185,7 @@
   .align-content-center{
     text-align: center;
   }
+
 
 
 </style>

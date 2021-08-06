@@ -111,6 +111,11 @@
 
   button a {
     padding: 3px;
+    text-decoration: none;
+  }
+
+   button:hover {
+      background-color: #daffde;
   }
 
   .footer-bar-buttons {

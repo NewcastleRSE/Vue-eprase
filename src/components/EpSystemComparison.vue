@@ -106,9 +106,15 @@
     border-width: 1px;
   }
 
-  button a {
+   button a {
     padding: 3px;
+    text-decoration: none;
   }
+
+   button:hover {
+      background-color: #daffde;
+  }
+
 
   .footer-bar-buttons {
     padding-left: 40px;

@@ -6,7 +6,7 @@
 
     <div class="content">
 
-      <h2>Configuration Error Results</h2>
+      <h2>High Risk Comparison Results</h2>
 
       <div v-show="reports.length === 0">
         <p>You currently have no reports available.</p>
@@ -15,31 +15,25 @@
       <div id="report-list-two">
         <div v-if="reports.length > 0">
 
-          <table class="table">
+
+          <table class="table striped">
             <thead>
-            <tr>
-              <th> Institution Name</th>
-              <th>Ep System</th>
-              <th class="align-content-center">Are previous patient records open?</th>
-              <th class="align-content-center">Pass</th>
-              <th class="align-content-center">Can insulin be prescribed in ML?</th>
-              <th class="align-content-center">Pass</th>
-            </tr>
+                <tr>
+                  <th> Institution Name</th>
+                  <th> Ep System</th>
+                  <th class="align-content-center">Scenario</th>
+                  <th class="align-content-center">Drug</th>
+                  <th class="align-content-center">Pass</th>
+                </tr>
             </thead>
             <tbody>
             <tr v-for="report in reports" id="report-two">
-
               <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-
-              <td class="align-content-center"><span v-text="report.configErrorDataList[0].result===0 ? 'N' : 'Y' "></span></td>
-
-              <td class="align-content-center"><img v-show="report.configErrorDataList[0].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[0].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
-
-              <td class="align-content-center"><span v-text="report.configErrorDataList[1].result===0 ? 'N' : 'Y' "></span></td>
-
-              <td class="align-content-center"><img v-show="report.configErrorDataList[1].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[1].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+              <td class="align-content-center"></td>
+              <td class="align-content-center"><span v-if="">{{   }}</span></td>
+              <td class="align-content-center">{{}}</td>
             </tr>
             </tbody>
           </table>
@@ -63,20 +57,39 @@
     import AppLogo from "./AppLogo";
 
     export default {
-        name: "ConfigErrorResults",
+        name: "HighRiskComparison",
         components : {
             AppLogo
         },
         data() {
             return {
-                reports: []
+                reports: [],
+                scenarios: []
             }
         },
         methods: {
             getReports() {
                 dataService.getAllReports().then(data => {
                     this.reports = data;
+                    this.getAllRiskScenarios(data);
                 });
+            },
+            getAllRiskScenarios(data){
+                for(let index in data){
+                    if(data.hasOwnProperty(index)){
+                        let prescriptionList = data[index].prescriptionList;
+                        this.getExtremeRiskScenarios(prescriptionList);
+                    }
+                }
+            },
+            getExtremeRiskScenarios(prescriptionList){
+                for(let scenario in prescriptionList){
+                if(prescriptionList.hasOwnProperty(scenario)){
+                        if(prescriptionList[scenario].risk_level === 'Extreme' && prescriptionList[scenario].result === 'Good Mitigation/Pass'){
+                            this.scenarios.push(prescriptionList[scenario]);
+                        }
+                    }
+                }
             },
             getFormattedDate(time){
                 let timestamp = time;

@@ -18,6 +18,7 @@
         <button @click="epsystemComparison()"><a href="#">Ep System Comparison</a></button>
         <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
         <button @click="configErrorResults()"><a href="#">Configuration Error Results</a></button>
+        <button @click="highRiskComparison()"><a href="#">High Risk Comparison</a></button>
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 
@@ -47,19 +48,22 @@
       },
       methods: {
           getAllReports() {
-            this.$router.push({ path: './allassessmentreports' });
-            },
+             this.$router.push({ path: './allassessmentreports' });
+          },
           mitigationComparison() {
              this.$router.push('/mitigationcomparison');
           },
           epsystemComparison() {
-            this.$router.push('/epsystemcomparison');
+              this.$router.push('/epsystemcomparison');
           },
           epmaStatistics() {
               this.$router.push('/epmastatistics');
           },
           configErrorResults() {
-            this.$router.push('/configerrorresults');
+              this.$router.push('/configerrorresults');
+          },
+          highRiskComparison() {
+              this.$router.push('/highriskcomparison');
           },
           onExitClick() {
               this.$router.push('/logout');
@@ -115,6 +119,11 @@
     height: 80px;
   }
 
+  .menu-bar-buttons {
+    padding: 20px 0;
+    width: 280px;
+  }
+
   button {
     height: 40px;
     width: 250px;
@@ -123,21 +132,14 @@
     border-width: 1px;
   }
 
-  .menu-bar-buttons {
-    padding: 20px 0;
-    width: 280px;
+  button:hover {
+      background-color: #daffde;
   }
 
   button a {
     padding: 3px;
+    text-decoration: none;
   }
-
-  .footer-bar-buttons {
-    padding-left: 40px;
-    padding-bottom: 20px;
-    border-width: 1px;
-  }
-
 
   #page {
     text-align: left;
