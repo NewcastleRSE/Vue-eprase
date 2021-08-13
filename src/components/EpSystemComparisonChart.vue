@@ -97,8 +97,6 @@ export default {
                     }
                 }
             }
-
-            //console.log(rows);
             data.addRows(rows);
 
             var view = new google.visualization.DataView(data);
