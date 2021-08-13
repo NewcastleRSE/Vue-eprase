@@ -10,7 +10,7 @@
 
       <form id="ep-system-form" @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label for="ep-system-selector"><strong>Choose an EP System to filter results</strong> </label>
+          <label for="ep-system-selector"><strong>Please choose an EP System to filter results</strong> </label>
           <select name="ep-service" id="ep-system-selector" class="form-control" v-model="searchField" @change="forceRerender()">
             <option :value="null">Select System...</option>
             <option value="Cerner"> Cerner </option>
@@ -114,7 +114,6 @@
    button:hover {
       background-color: #daffde;
   }
-
 
   .footer-bar-buttons {
     padding-left: 40px;
