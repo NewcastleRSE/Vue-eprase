@@ -18,7 +18,7 @@
         <button @click="epsystemComparison()"><a href="#">Ep System Comparison</a></button>
         <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
         <button @click="configErrorResults()"><a href="#">Configuration Error Results</a></button>
-        <button @click="highRiskComparison()"><a href="#">High Risk Comparison</a></button>
+       <!-- <button @click="highRiskComparison()"><a href="#">High Risk Comparison</a></button> -->
         <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
       </div>
 
@@ -62,9 +62,9 @@
           configErrorResults() {
               this.$router.push('/configerrorresults');
           },
-          highRiskComparison() {
+       /*   highRiskComparison() {
               this.$router.push('/highriskcomparison');
-          },
+          }, */
           onExitClick() {
               this.$router.push('/logout');
           },
