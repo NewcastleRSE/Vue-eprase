@@ -74,6 +74,8 @@
           getInstitutionMitResult() {
               dataService.getAllMitigationResults().then(data => {
 
+                  console.log(data);
+
                   for (let index in data){
                       if(data.hasOwnProperty(index)){
 
