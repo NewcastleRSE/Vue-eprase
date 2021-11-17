@@ -31,7 +31,7 @@
         </table>
 
         <table id="justification" v-if="prescription.justification">
-          <tr><th >Antibiotic rationale</th><td>{{ prescription.justification}}</td></tr>
+          <tr><th>Indication</th><td>{{ prescription.justification }}</td></tr>
         </table>
       </div>
       <div>
@@ -73,17 +73,17 @@
 
             <table id="drug-table" class="table-striped">
               <tbody>
-              <tr><td><input type="checkbox" value="drug-age" id="drug-age" v-model="response.intervention_type"></td><td><label for="drug-age">Drug and patient age</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-dose" id="drug-dose" v-model="response.intervention_type"></td><td><label for="drug-dose">Drug dose level</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-interaction" id="drug-interaction" v-model="response.intervention_type"></td><td> <label for="drug-interaction">Drug interaction</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-allergies" id="drug-allergies" v-model="response.intervention_type"></td><td> <label for="drug-allergies">Drug allergies</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label for="drug-duplication">Drug duplication</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label for="drug-disease">Drug disease</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label for="drug-ommissions">Drug omissions</label></td></tr>
-              <tr><td><input type="checkbox" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label for="theraputic_duplication">Theraputic duplication</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label for="drug-lab">Lab results/monitoring/TDM</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label for="drug-route">Drug brand</label></td></tr>
-              <tr><td><input type="checkbox" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label for="drug-route">Incorrect route</label></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-age" id="drug-age" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-age">Drug and patient age</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-dose" id="drug-dose" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-dose">Drug dose level</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-interaction" id="drug-interaction" v-model="response.intervention_type"></td><td> <label class="category-label" for="drug-interaction">Drug interaction</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-allergies" id="drug-allergies" v-model="response.intervention_type"></td><td> <label class="category-label" for="drug-allergies">Drug allergies</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-duplication">Drug duplication</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-disease">Drug disease</label></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-ommissions">Drug omissions</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label class="category-label" for="theraputic_duplication">Theraputic duplication</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-lab">Lab results/monitoring/TDM</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-route">Drug brand</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-route">Incorrect route</label> <b-button v-b-tooltip.hover.right title="Tip: " variant="primary" class="category-tip">i</b-button></td></tr>
               </tbody>
             </table>
 
@@ -425,6 +425,10 @@
     font-size: 14px;
   }
 
+  #drug-table tr td:first-child {
+      width: 50px;
+  }
+
   .question table {
     width: 100%;
   }
@@ -546,5 +550,27 @@
       border-color: #ced4da;
   }
 
+  .category-tip {
+      background-color: #07818e;
+      color: #fff;
+      font-size: 0.8em;
+  }
+
+  .category-label {
+      margin-top: 5px;
+      font-size: 1.2em;
+  }
+
+  .custom-checkbox {
+      transform: scale(1.5);
+      -webkit-transform: scale(1.5);
+      margin-left: 10px;
+  }
+
+  input[type=radio] {
+       transform: scale(1.5);
+      -webkit-transform: scale(1.5);
+      margin-left: 10px;
+  }
 
 </style>

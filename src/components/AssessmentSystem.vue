@@ -52,7 +52,8 @@
               </select>
             </div>
 
-            <div class="question form-group" id="question-2">
+            <!-- remove until Paediatrics scenarios are supported -->
+            <!--  <div class="question form-group" id="question-2">
               <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
               <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select an Option...</option>
@@ -60,7 +61,7 @@
                 <option value="Paediatrics">Paediatrics</option>
                 <option value="Both">Both</option>
               </select>
-            </div>
+            </div> -->
 
             <div class="form-group">
               <label for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please provide their names.</label>
@@ -258,7 +259,7 @@
                         const other_ep_system = this.results.other_ep_system;
                         const ep_usage = this.results.ep_usage;
                         const add_ep_system = this.results.add_ep_system;
-                        const patient_type = this.results.patient_type;
+                        const patient_type = 'Adults';
                         const lab_results = this.results.lab_results;
                         const man_results = this.results.man_results;
                         const diagnosis_results = this.results.diagnosis_results;
