@@ -14,7 +14,7 @@
       </div>
 
       <section>
-        <div>Total valid tests: {{ totalValidTests }}</div>
+        <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
         <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
       </section>
 
