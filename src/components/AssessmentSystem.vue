@@ -221,6 +221,7 @@
                     area_options: [
                       { text: 'Adult Critical Care', value: 'ACC'},
                       { text: 'Paediatric Critical Care', value: 'PCC'},
+                      { text: 'Paediatric Wards', value: 'Paediatric Wards'},
                       { text: 'A & E', value: 'A&E'},
                       { text: 'Chemotherapy', value: 'Chemotherapy'},
                       { text: 'Outpatients', value: 'Outpatients'},
