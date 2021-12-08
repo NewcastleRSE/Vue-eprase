@@ -15,14 +15,12 @@
       <div id="report-list-two">
         <div v-if="reports.length > 0">
 
-
           <table class="table striped">
             <thead>
                 <tr>
                   <th> Institution Name</th>
                   <th> Ep System</th>
-                  <th class="align-content-center">Scenario</th>
-                  <th class="align-content-center">Drug</th>
+                  <th class="align-content-center">Scenarios</th>
                   <th class="align-content-center">Pass</th>
                 </tr>
             </thead>
@@ -31,9 +29,8 @@
               <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-              <td class="align-content-center"></td>
-              <td class="align-content-center"><span v-if="">{{   }}</span></td>
-              <td class="align-content-center">{{}}</td>
+              <td colspan="2"> {{ report.description[0] }}<br>{{ report.description[1] }}</td>
+
             </tr>
             </tbody>
           </table>
@@ -63,8 +60,7 @@
         },
         data() {
             return {
-                reports: [],
-                scenarios: []
+                reports: []
             }
         },
         methods: {
@@ -78,16 +74,31 @@
                 for(let index in data){
                     if(data.hasOwnProperty(index)){
                         let prescriptionList = data[index].prescriptionList;
-                        this.getExtremeRiskScenarios(prescriptionList);
+                        // pass the reports index so we know which report we're using
+                        this.getExtremeRiskScenarios(prescriptionList, index);
                     }
                 }
             },
-            getExtremeRiskScenarios(prescriptionList){
+            getExtremeRiskScenarios(prescriptionList, index){
+                const scenarios = [];
                 for(let scenario in prescriptionList){
                 if(prescriptionList.hasOwnProperty(scenario)){
-                        if(prescriptionList[scenario].risk_level === 'Extreme' && prescriptionList[scenario].result === 'Good Mitigation/Pass'){
-                            this.scenarios.push(prescriptionList[scenario]);
+                        if(prescriptionList[scenario].risk_level === 'Extreme'){
+                            scenarios.push(prescriptionList[scenario]);
                         }
+                    }
+                }
+                this.getScenarioDescription(scenarios, index);
+            },
+            getScenarioDescription(scenarios, index){
+                // create a new field in the report for the scenario description
+                this.reports[index].description = [];
+                for(let scenario in scenarios){
+                if(scenarios.hasOwnProperty(scenario)){
+
+                     console.log(scenarios[scenario]);
+                       let valuePair = scenarios[scenario].prescription.indicator.description + ' | ' + scenarios[scenario].result;
+                       this.reports[index].description.push(valuePair);
                     }
                 }
             },

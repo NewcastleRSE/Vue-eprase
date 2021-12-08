@@ -11,7 +11,7 @@
         <div>
           <form id="ep-system-form" @submit.prevent="handleSubmit">
             <div class="form-group">
-              <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? </label>
+              <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? *</label>
               <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select System...</option>
                 <option value="Cerner"> Cerner </option>
@@ -36,13 +36,13 @@
             </div>
 
             <div class="form-group">
-              <label for="ep-version">What version of the service are you currently using?</label>
+              <label for="ep-version">What version of the service are you currently using? *</label>
               <span id="version"><input id="ep-version" name="ep-version" type="text" class="form-control" v-model="results.ep_version" v-validate="{required: true, min: 1, max: 50}" placeholder="Enter version..."></span>
               <div v-if="submitted && errors.has('ep_version')" class="invalid-feedback alert alert-danger">{{ errors.first('ep_version') }}</div>
             </div>
 
             <div class="question form-group" id="question-1">
-              <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?</label>
+              <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation? *</label>
               <select name="ep-usage" id="usage-selector" class="form-control" v-model="results.ep_usage" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select Percentage...</option>
                 <option value="76-100">76-100%</option>
@@ -52,7 +52,8 @@
               </select>
             </div>
 
-            <div class="question form-group" id="question-2">
+            <!-- remove until Paediatrics scenarios are supported -->
+            <!--  <div class="question form-group" id="question-2">
               <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
               <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" v-validate="{required: true, min: 1 }" >
                 <option :value="null">Select an Option...</option>
@@ -60,7 +61,7 @@
                 <option value="Paediatrics">Paediatrics</option>
                 <option value="Both">Both</option>
               </select>
-            </div>
+            </div> -->
 
             <div class="form-group">
               <label for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please provide their names.</label>
@@ -71,7 +72,7 @@
             <div id="radio-button-group">
 
               <div class="question form-group" id="question-4">
-                <p class="results-label"> Is your hospital laboratory results system fully integrated with your e-prescribing system?</p>
+                <p class="results-label"> Is your hospital laboratory results system fully integrated with your e-prescribing system? *</p>
                 <span class="radio-buttons">
                 <label for="lab-results-yes">Yes</label>
                 <input type="radio" value=true class="radio-yes" name="lab-results" id="lab-results-yes"  v-model="results.lab_results" v-validate="'required'">
@@ -94,7 +95,7 @@
               </div>
 
               <div class="question form-group" id="question-6">
-                <p class="results-label">Are you able to manually enter diagnosis and medical history into your test system?</p>
+                <p class="results-label">Are you able to manually enter diagnosis and medical history into your test system? *</p>
                 <span class="radio-buttons">
                   <label for="med-history-yes">Yes</label>
                   <input type="radio" value=true class="radio-yes" name="med-history" id="med-history-yes" v-model="results.med_history" v-validate="'required'">
@@ -149,6 +150,7 @@
 
             <div class="form-group footer">
               <div class="buttons">
+                <p id="required-text"> * required fields</p>
                 <p>When you have answered all of the questions, click <strong>Next</strong>.</p>
                 <button type="button" class="exit-btn btn btn-primary" id="exit-button" @click="onExitClick()">Exit</button>
                 <button type="button" class="next-btn btn btn-primary" id="next-button" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
@@ -183,6 +185,7 @@
         },
         computed: {
             isFormInvalid() {
+                console.log(this.fields);
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
             },
             user() {
@@ -220,6 +223,7 @@
                     area_options: [
                       { text: 'Adult Critical Care', value: 'ACC'},
                       { text: 'Paediatric Critical Care', value: 'PCC'},
+                      { text: 'Paediatric Wards', value: 'Paediatric Wards'},
                       { text: 'A & E', value: 'A&E'},
                       { text: 'Chemotherapy', value: 'Chemotherapy'},
                       { text: 'Outpatients', value: 'Outpatients'},
@@ -258,7 +262,7 @@
                         const other_ep_system = this.results.other_ep_system;
                         const ep_usage = this.results.ep_usage;
                         const add_ep_system = this.results.add_ep_system;
-                        const patient_type = this.results.patient_type;
+                        const patient_type = 'Adults';
                         const lab_results = this.results.lab_results;
                         const man_results = this.results.man_results;
                         const diagnosis_results = this.results.diagnosis_results;
@@ -323,7 +327,7 @@
 
   .results-label{
     font-weight: 700;
-    max-width: 650px;
+    max-width: 655px;
     display: inline-block;
   }
 
@@ -425,6 +429,14 @@
 
   #radio-button-group {
     padding: 20px 0;
+  }
+
+   #required-text {
+    color: #07818e;
+    background-color: #fff;
+    font-size: 0.9em;
+    height: 30px;
+    line-height: 30px;
   }
 
 

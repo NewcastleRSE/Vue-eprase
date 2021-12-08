@@ -8,6 +8,8 @@
 
       <h2>Configuration Error Results</h2>
 
+        {{ reports.length }}
+
       <div v-show="reports.length === 0">
         <p>You currently have no reports available.</p>
       </div>
@@ -76,6 +78,7 @@
             getReports() {
                 dataService.getAllReports().then(data => {
                     this.reports = data;
+
                 });
             },
             getFormattedDate(time){
