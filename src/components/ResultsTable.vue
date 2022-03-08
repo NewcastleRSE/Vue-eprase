@@ -245,7 +245,7 @@
   }
 
   td.over {
-    background-color: #cd0a2a;
+    background-color: #66b4ea;
   }
 
 

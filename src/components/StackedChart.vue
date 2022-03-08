@@ -47,7 +47,7 @@
                         maxValue: 100
                       },
                       isStacked: true,
-                      colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a'],
+                      colors: [ '#35d635','#FFBF00', '#ff3b33','#66b4ea'],
                       width: 900,
                       height: 500
                   },
