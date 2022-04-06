@@ -40,7 +40,7 @@
                 chartOptions: {
                   title: 'EPMA Risk Mitigation',
                   is3D : false,
-                  colors: [ '#35d635','#FFBF00', '#ff3b33','#cd0a2a', '#808080'],
+                  colors: [ '#35d635','#FFBF00', '#ff3b33','#66b4ea', '#808080'],
                   width: 900,
                   height: 500
                   }

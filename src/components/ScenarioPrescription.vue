@@ -3,11 +3,27 @@
   <div>
     <div id="test-scenario">
 
+        <div class="patient-details">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"> {{  getCurrentPatient }}
+                        <span class="icon" v-if="getCurrentPatientGender === 'female'">
+                       <img src="../assets/anon-female.png" height="50px" width="50px" alt="Gender icon female">
+                      </span>
+                        <span class="icon"  v-if="getCurrentPatientGender === 'male'">
+                       <img src="../assets/anon-male.png" height="50px" width="50px" alt="Gender icon male">
+                      </span></h5>
+                    <p class="card-text" >DOB: {{ getCurrentPatientAge }}</p>
+                </div>
+            </div>
+        </div>
+
       <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_level}} ></p>
 
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
-        <p><strong>Patient:</strong> {{ getCurrentPatient }} </p>
+
+        <p><strong>Patient:</strong> {{  getCurrentPatient }}</p>
 
         <table id="test-patient">
           <thead>
@@ -132,6 +148,7 @@
 
     import { dataService } from '../services/data.service';
     import { settings } from '../settings'
+    import {patientService} from "../services/patient.service";
 
     export default {
         name: "ScenarioPrescription",
@@ -148,6 +165,13 @@
             getCurrentPatient() {
                 let testPatientId = this.prescription['patient'].code;
                 return localStorage.getItem(testPatientId);
+            },
+            getCurrentPatientGender() {
+                return this.prescription['patient'].gender;
+            },
+            getCurrentPatientAge() {
+                let patient_dob = patientService.getDOB(this.prescription['patient']);
+                return patient_dob;
             },
             isFormInvalid() {
 
@@ -575,5 +599,24 @@
       -webkit-transform: scale(1.5);
       margin-left: 10px;
   }
+  .patient-details {
+      float:right;
+      margin-left: 25px;
+      margin-bottom: 25px;
+  }
+
+  .card {
+      width: 16rem;
+      background-color: #f5f5f5;
+  }
+
+  .card-body {
+      padding: 1.05rem;
+  }
+
+  .card-title .icon img{
+      margin: 10px;
+  }
+
 
 </style>

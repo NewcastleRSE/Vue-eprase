@@ -203,9 +203,13 @@
   .progress {
     color: #07818e;
     background-color: #fff;
-    font-size: 0.9em;
+    font-size: 1.1em;
     height: 30px;
     line-height: 30px;
+  }
+
+  .buttons {
+     padding-top: 20px;
   }
 
 </style>

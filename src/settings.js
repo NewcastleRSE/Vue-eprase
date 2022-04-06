@@ -1,5 +1,5 @@
 export const settings = {
-  year: '2021',
+  year: '2022',
   skipButton: false,
   noIntervention : 0,
   orderSetNotFollowed: -10,
