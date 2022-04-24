@@ -13,7 +13,8 @@
                         <span class="icon"  v-if="getCurrentPatientGender === 'male'">
                        <img src="../assets/anon-male.png" height="50px" width="50px" alt="Gender icon male">
                       </span></h5>
-                    <p class="card-text" >DOB: {{ getCurrentPatientAge }}</p>
+                    <p class="card-text" >Age: {{ prescription.patient.age }}</p>
+                 <!--   <p class="card-text" >DOB: {{ getCurrentPatientDOB }}</p> -->
                 </div>
             </div>
         </div>
@@ -23,7 +24,7 @@
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
 
-        <p><strong>Patient:</strong> {{  getCurrentPatient }}</p>
+        <p id="p-name"><strong>Patient:</strong> {{  getCurrentPatient }}</p>
 
         <table id="test-patient">
           <thead>
@@ -169,7 +170,7 @@
             getCurrentPatientGender() {
                 return this.prescription['patient'].gender;
             },
-            getCurrentPatientAge() {
+            getCurrentPatientDOB() {
                 let patient_dob = patientService.getDOB(this.prescription['patient']);
                 return patient_dob;
             },
@@ -193,7 +194,7 @@
         data() {
             return {
                 assessment: {
-                    debugMode: true,
+                    debugMode: false,
                     isConfigErrorTest: false,
                 },
                 response: {
@@ -618,5 +619,12 @@
       margin: 10px;
   }
 
+  .card-text {
+      font-size: 1.2em;
+  }
+
+  #p-name {
+      margin-top: 40px;
+  }
 
 </style>

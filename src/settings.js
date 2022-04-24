@@ -10,7 +10,7 @@ export const settings = {
   numConfigError : 2,
   testLimit : 45,
   numRequiredChildPatients : 1,
-  numRequiredAdultPatients : 2,
+  numRequiredAdultPatients : 3,
   numAllRequiredPatients : 3,
   version : '2.2'
 };
