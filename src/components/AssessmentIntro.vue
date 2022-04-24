@@ -16,7 +16,10 @@
       <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions system and then
         to prescribe a series of medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
 
-      <div class="alert alert-warning" role="alert">Disclaimer: these patients have been designed to support the test tool and may not necessarily resemble real life.  Please enter all information exactly as presented.  </div>
+      <div class="alert alert-warning" role="alert">
+          <p><strong>Disclaimer:</strong> these patients have been designed to support the test tool and may not necessarily resemble real life.  Please enter all information exactly as presented.</p>
+          <p><strong>Warning - please do not click the back button during the assessment!</strong></p>
+      </div>
 
       <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br/>To take part in the current ePRaSE assessment, click the button below.</p>
