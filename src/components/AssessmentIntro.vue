@@ -18,7 +18,7 @@
 
       <div class="alert alert-warning" role="alert">
           <p><strong>Disclaimer:</strong> these patients have been designed to support the test tool and may not necessarily resemble real life.  Please enter all information exactly as presented.</p>
-          <p><strong>Warning - please do not click the back button during the assessment!</strong></p>
+          <p><strong>Warning - please do not attempt to click the back button during the assessment! This action has been disabled due to the risk of data loss.</strong></p>
       </div>
 
       <h3>{{ year }} ePRaSE Assessment</h3>
@@ -151,7 +151,13 @@
               this.getAssessmentStatus();
               this.getRequiredPatients();
               dataService.audit('View assessment intro', '/assessmentintro');
-          }
+        },
+        mounted : function() {
+          history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
+        }
     }
 </script>
 

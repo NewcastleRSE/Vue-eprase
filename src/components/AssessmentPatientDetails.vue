@@ -10,7 +10,7 @@
       <p>When you are done, click <strong>Next</strong> to continue.</p>
       <br/>
 
-      <div v-for="patient in myPatientList">
+      <div v-for="patient in myPatientList" v-bind:key="patient.id">
 
         <div align="center" class="card" v-if="patient">
           <div class="card-header">
@@ -56,7 +56,7 @@
                <div align="left" v-if="patient[getCurrentPatient].allergy.length !== 0">
                   <h5 class="card-title">Allergies</h5>
                   <table>
-                    <tr v-for="allergy in patient[getCurrentPatient].allergy">
+                    <tr v-for="allergy in patient[getCurrentPatient].allergy" v-bind:key="allergy">
                       <td>{{allergy}}</td>
                     </tr>
                   </table>
@@ -82,7 +82,7 @@
                       <td><strong>Form</strong></td>
                       <td><strong>Frequency</strong></td>
                     </tr>
-                    <tr v-for="history in patient[getCurrentPatient].medication_histories">
+                    <tr v-for="history in patient[getCurrentPatient].medication_histories" v-bind:key="history">
                       <td>{{history.name}}</td>
                       <td>{{history.dose}} {{history.units}}</td>
                       <td>{{history.route}}</td>
@@ -105,7 +105,7 @@
                     <td><strong>Value</strong></td>
                     <td><strong>Unit</strong></td>
                   </tr>
-                  <tr v-for="clinical in patient[getCurrentPatient].clinical_data">
+                  <tr v-for="clinical in patient[getCurrentPatient].clinical_data" v-bind:key="clinical">
                     <td>{{clinical.investigation}}</td>
                     <td>{{clinical.value}}</td>
                     <td>{{ clinical.unit }}</td>
@@ -116,7 +116,7 @@
               <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
                 <h5 class="card-title">Presenting Complaint</h5>
                 <table>
-                  <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis">
+                  <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis" v-bind:key="diagnosis">
                     <td>{{diagnosis}}</td>
                   </tr>
                 </table>
@@ -125,7 +125,7 @@
               <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
                 <h5 class="card-title">Comorbidities</h5>
                 <table>
-                  <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity">
+                  <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity" v-bind:key="comorbidity">
                     <td>{{comorbidity}}</td>
                   </tr>
                 </table>
@@ -281,6 +281,11 @@
 
             this.numPatients = 15;
            // this.numPatients = localStorage.getItem('numPatients');
+
+           history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
         }
     }
 </script>

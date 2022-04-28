@@ -5,7 +5,11 @@
       <h3>Patient data section completed</h3>
         <div id="timer">
           <p>You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
-          <p><strong>Once you have entered this section, you will need to complete it fully, so please make sure you have enough time set aside to complete the scenarios.</strong></p>
+           <div class="alert alert-warning" role="alert">
+                <p><strong>Once you have entered this section, you will need to complete it fully, so please make sure you have enough time set aside to complete the scenarios.</strong></p>
+                <p><strong>Reminder: the BACK button has been disabled. Attempts to leave or go back to previous scenarios will lead to your work being lost!</strong></p>
+           </div>
+
           <p v-if="counter > 0">You can continue on to the next phase of the assessment in: <strong>{{getTimeRemaining()}}</strong></p>
         </div>
 
@@ -107,6 +111,12 @@
                     }, 1000);
                 }
             }
+        },
+        mounted : function() {
+          history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
         }
     }
 </script>

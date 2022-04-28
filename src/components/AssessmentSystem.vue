@@ -185,7 +185,6 @@
         },
         computed: {
             isFormInvalid() {
-                console.log(this.fields);
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);
             },
             user() {
@@ -283,6 +282,12 @@
         },
         created : function() {
             this.startTime = new Date();
+        },
+        mounted : function() {
+          history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
         }
     }
 </script>
