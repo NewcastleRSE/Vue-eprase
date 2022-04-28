@@ -22,7 +22,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="patient in patients.patientList">
+            <tr v-for="patient in patients.patientList" v-bind:key="patient.id">
               <td>
                 {{patient.first_name}} {{patient.surname}}
               </td>
@@ -143,11 +143,15 @@
             this.startTime = new Date();
         },
         mounted() {
+            // TODO make this conditional
+            setTimeout(() => {
+                this.savePatientIds();
+            }, 1000),
 
-          // TODO make this conditional
-          setTimeout(() => {
-              this.savePatientIds();
-          }, 1000)
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1);
+            };
         }
     }
 </script>
