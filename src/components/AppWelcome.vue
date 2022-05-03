@@ -11,10 +11,13 @@
           and deliver improved patient outcomes. </p>
 
         <br/>
-        <div align="center">
+        <div align="center" v-if="appOpen">
           <div class="buttons" >
             <button type="button" class="start-btn btn btn-primary" @click=login()>Start</button>
           </div>
+        </div>
+        <div v-if="!appOpen">
+            <strong>This application is currently closed</strong>
         </div>
       </div>
     </div>
@@ -36,7 +39,8 @@
         name: "AppWelcome",
         data() {
              return{
-              version : settings.version
+              version : settings.version,
+              appOpen : settings.appOpen
           }
         },
         methods: {

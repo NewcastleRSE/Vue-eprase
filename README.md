@@ -2,7 +2,7 @@
 
 > The Vue version of the eprase client.
 
-## Local Development Build Setup 
+## Local Development Build Setup
 
 Pull down the copy of the repo, then cd into the directory and use npm to install the required dependencies
 
@@ -21,4 +21,13 @@ Running the build command creates a build folder called 'dist'. This contains al
 ```
 npm run build
 ```
+
+### Control of version number shown
+
+Adjust the value of the version variable in the settings.js file
+
+
+### Open/close the application to users, while keeping it open to admin
+
+Adjust the value of the appOpen variable in the settings.js file
 

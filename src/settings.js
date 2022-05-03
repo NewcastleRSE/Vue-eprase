@@ -12,5 +12,6 @@ export const settings = {
   numRequiredChildPatients : 1,
   numRequiredAdultPatients : 3,
   numAllRequiredPatients : 3,
-  version : '2.2'
+  version : '2.3',
+  appOpen : true
 };
