@@ -28,6 +28,9 @@
         </div>
       </form>
 
+
+      <div id="system-header">{{ searchField }} </div>
+
       <div v-if="computedSearchField"><EpSystemComparisonChart :mydata="mitigationChartData" :searchfield="computedSearchField" :key="componentKey"></EpSystemComparisonChart></div>
 
     </div>
@@ -88,6 +91,12 @@
     background-repeat: no-repeat;
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
+  }
+
+  #system-header {
+      font-weight: 600;
+      font-size: 2em;
+      margin-top: 25px;
   }
 
   #ep-system-form{
