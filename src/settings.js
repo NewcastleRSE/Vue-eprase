@@ -13,5 +13,6 @@ export const settings = {
   numRequiredAdultPatients : 3,
   numAllRequiredPatients : 3,
   version : '2.3',
-  appOpen : true
+  appOpen : true,
+  debugMode : true
 };
