@@ -52,6 +52,8 @@
         },
         methods : {
 
+            /* time in seconds - 1800 is 30 mins, 3600 is 60 mins */
+
             getTimeRemaining() {
                 const h = Math.floor(this.counter / 3600);
                 const m = Math.floor(this.counter % 3600 / 60);
