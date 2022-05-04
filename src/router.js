@@ -25,6 +25,7 @@ import AllAssessmentReports from "./components/AllAssessmentReports";
 import ConfigErrorResults from "./components/ConfigErrorResults";
 import EpSystemComparison from "./components/EpSystemComparison";
 import HighRiskComparison from "./components/HighRiskComparison";
+import CategoryComparison from "./components/CategoryComparison";
 
 Vue.use(Router);
 
@@ -117,6 +118,10 @@ export const router = new Router({
     {
       path: '/highriskcomparison',
       component: HighRiskComparison
+    },
+    {
+      path: '/categorycomparison',
+      component: CategoryComparison
     },
     {
       path: '/epmastatistics',
