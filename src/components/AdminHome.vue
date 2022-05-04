@@ -8,21 +8,31 @@
 
       <h1>Admin Home</h1>
 
-        <p>The following reports are designed to give insight into the comparative performance of different institutions and their EPMA systems.</p>
+        <p id="intro">The following reports are designed to give insight into the comparative performance of different institutions and their EPMA systems.</p>
 
         <p></p>
 
-      <div class="menu-bar-buttons">
-        <button @click=getAllReports()><a href="#">All Institution Reports</a></button>
-        <button @click="mitigationComparison()"><a href="#">Mititgation Comparison</a></button>
-        <button @click="epsystemComparison()"><a href="#">Ep System Comparison</a></button>
-        <button @click="epmaStatistics()"><a href="#">EPMA Statistics</a></button>
-        <button @click="configErrorResults()"><a href="#">Configuration Error Results</a></button>
-        <button @click="highRiskComparison()"><a href="#">High Risk Comparison</a></button>
-        <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
-      </div>
+        <b-container class="bv-example-row">
+            <b-row>
+                <b-col cols="4" class="menu-bar-buttons">
+                    <button @click=getAllReports() @mouseover="guidanceText = 'Access all available institution reports.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'" ><a href="#" >All Institution Reports</a></button>
+                    <button @click="mitigationComparison()" @mouseover="guidanceText = 'Compare overall mitigation results.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="#">Mititgation Comparison</a></button>
+                    <button @click="epsystemComparison()" @mouseover="guidanceText = 'Compare mitigation results across institutions.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="#">Ep System Comparison</a></button>
+                    <button @click="categoryComparison()" @mouseover="guidanceText = 'Compare drug category results across institutions.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="">Test Category Comparsion</a></button>
+                    <button @click="epmaStatistics()" @mouseover="guidanceText = 'View EPMA data for institutions.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="#">EPMA Statistics</a></button>
+                    <button @click="configErrorResults()" @mouseover="guidanceText = 'View config error results for institutions.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="#">Configuration Error Results</a></button>
+                    <button @click="highRiskComparison()" @mouseover="guidanceText = 'View extreme risk results for institutions.' " @mouseleave="guidanceText = 'Hover over a button to see more information.'"><a href="#">Extreme Risk Comparison</a></button>
+                    <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+                </b-col>
+                <b-col cols="8">
+                    <div id="guidance">{{ guidanceText }}</div>
+                </b-col>
+
+            </b-row>
+        </b-container>
 
     </div>
+
 
     <AppLogo></AppLogo>
   </div>
@@ -43,7 +53,8 @@
       data() {
           return {
             userIsAdmin: true,
-            chartData: []
+            chartData: [],
+            guidanceText: ''
           }
       },
       methods: {
@@ -58,6 +69,9 @@
           },
           epmaStatistics() {
               this.$router.push('/epmastatistics');
+          },
+          categoryComparison() {
+              this.$router.push('/categorycomparison');
           },
           configErrorResults() {
               this.$router.push('/configerrorresults');
@@ -101,6 +115,7 @@
     created() {
         this.getInstitutionMitResult();
         localStorage.setItem('userIsAdmin', true);
+        this.guidanceText="Hover over a button to see more information.";
     }
   }
 
@@ -115,6 +130,17 @@
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
   }
+
+  #guidance {
+    font-size: 1.4em;
+    margin-top: 30px;
+  }
+
+  #intro {
+      margin-top: 20px;
+      font-size: 1.2em;
+  }
+
   .level {
     height: 80px;
   }
@@ -148,6 +174,5 @@
   .content {
     padding: 40px;
   }
-
 
 </style>
