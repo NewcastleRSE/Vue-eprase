@@ -6,7 +6,7 @@
 
     <div class="content">
 
-      <h2>High Risk Comparison Results</h2>
+      <h2>Extreme Risk Comparison Results</h2>
 
       <div v-show="reports.length === 0">
         <p>You currently have no reports available.</p>
@@ -18,9 +18,9 @@
           <table class="table striped">
             <thead>
                 <tr>
-                  <th> Institution Name</th>
-                  <th> Ep System</th>
-                  <th class="align-content-center">Scenarios</th>
+                  <th>Institution Name</th>
+                  <th>Ep System</th>
+                  <th>Drug name</th>
                   <th class="align-content-center">Pass</th>
                 </tr>
             </thead>
@@ -29,8 +29,11 @@
               <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-              <td colspan="2"> {{ report.description[0] }}<br>{{ report.description[1] }}</td>
-
+                <td> {{ report.description[0] }}<br></td>
+                <td>{{ report.description[1] }} &nbsp; &nbsp;
+                    <img v-show="report.description[1] === 'Good Mitigation/Pass'" src="../assets/green-tick.png" alt="tick" class="smallimg">
+                    <img v-show="report.description[1] === 'Some Mitigation'" src="../assets/cross.png" alt="cross" class="smallimg">
+                    <img v-show="report.description[1] === 'No Mitigation/Fail'" src="../assets/cross.png" alt="cross" class="smallimg"></td>
             </tr>
             </tbody>
           </table>
@@ -97,8 +100,9 @@
                 if(scenarios.hasOwnProperty(scenario)){
 
                      console.log(scenarios[scenario]);
-                       let valuePair = scenarios[scenario].prescription.indicator.description + ' | ' + scenarios[scenario].result;
-                       this.reports[index].description.push(valuePair);
+                       let valueString = scenarios[scenario].prescription.drug_name + ' | ' + scenarios[scenario].result;
+                       this.reports[index].description.push(scenarios[scenario].prescription.drug_name);
+                       this.reports[index].description.push(scenarios[scenario].result);
                     }
                 }
             },
