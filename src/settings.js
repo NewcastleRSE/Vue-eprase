@@ -1,6 +1,5 @@
 export const settings = {
   year: '2022',
-  skipButton: false,
   noIntervention : 0,
   orderSetNotFollowed: -10,
   intervention: -10,
@@ -8,11 +7,12 @@ export const settings = {
   notAvailable : 0,
   numPrescriptions: 45,
   numConfigError : 2,
-  testLimit : 45,
-  numRequiredChildPatients : 1,
+  // testLimit : 45,
+  // numRequiredChildPatients : 1,
   numRequiredAdultPatients : 3,
   numAllRequiredPatients : 3,
   version : '2.3',
   appOpen : true,
-  debugMode : true
+  debugMode : true,
+  skipButton: true,
 };
