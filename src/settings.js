@@ -11,8 +11,8 @@ export const settings = {
   // numRequiredChildPatients : 1,
   numRequiredAdultPatients : 3,
   numAllRequiredPatients : 3,
-  version : '2.3',
+  version : '2.3.1',
   appOpen : true,
   debugMode : false,
-  skipButton: false,
+  skipButton: true
 };
