@@ -13,6 +13,6 @@ export const settings = {
   numAllRequiredPatients : 3,
   version : '2.3',
   appOpen : true,
-  debugMode : true,
-  skipButton: true,
+  debugMode : false,
+  skipButton: false,
 };
