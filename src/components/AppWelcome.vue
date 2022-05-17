@@ -1,10 +1,10 @@
 <template>
   <div id="page">
-    <div class="welcome">
+    <div id="welcome">
       <div align="center">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
-      <div class="welcome-text">
+      <div id="welcome-text">
         <h1>Welcome to ePRaSE 2022</h1>
         <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
           in order to determine their effectiveness and to encourage the correct use of these systems
@@ -84,7 +84,7 @@
     background-color: #07818e;
   }
 
-  .welcome {
+  #welcome {
     margin: auto;
     margin-top: 7%;
     width: 600px;
@@ -92,10 +92,7 @@
     align-items:center;
   }
 
-  .welcome-text {
-    #display:flex;
-    #justify-content:center;
-    #align-items:center;
+  #welcome-text {
     max-width: 600px;
   }
 
