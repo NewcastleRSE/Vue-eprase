@@ -15,7 +15,7 @@
       <div class="list-group">
         <div v-if="reports.length > 0">
 
-          <div v-for="report in reports">
+          <div v-for="report in reports" v-bind:key="report">
             <div @click="onReportClick(report.assessmentId)" class="list-group-item list-group-item-action flex-column align-items-start">
               <strong>{{ report.institution.orgName }} -  {{ report.system.time_created }}</strong>
             </div>

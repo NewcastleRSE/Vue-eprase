@@ -14,12 +14,12 @@
                        <img src="../assets/anon-male.png" height="50px" width="50px" alt="Gender icon male">
                       </span></h5>
                     <p class="card-text" >Age: {{ prescription.patient.age }}</p>
-                 <!--   <p class="card-text" >DOB: {{ getCurrentPatientDOB }}</p> -->
+
                 </div>
             </div>
         </div>
 
-      <p class="subtitle" v-if="assessment.debugMode"><{{prescription.id}} - Risk: {{prescription.risk_level}} ></p>
+      <p class="subtitle" v-if="assessment.debugMode"> {{prescription.id}} - Risk: {{prescription.risk_level}} </p>
 
       <div class="prescription-info">
         <p>Prescribe the following medication to the specified patient using your normal prescribing practice, then answer the questions below.<br/></p>
@@ -194,7 +194,7 @@
         data() {
             return {
                 assessment: {
-                    debugMode: false,
+                    debugMode: settings.debugMode,
                     isConfigErrorTest: false,
                 },
                 response: {

@@ -144,6 +144,7 @@
               this.countCategories(formattedData);
 
               // calculate number of valid tests, ignoring null results
+              // TODO - this number needs to be stored in the DB
               this.totalValidTests = parseInt(localStorage.getItem('numPrescriptions')) - this.totalNulls;
             });
           },

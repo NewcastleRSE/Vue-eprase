@@ -22,7 +22,7 @@
             <div v-show="submitted & errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
           </div>
         </form>
-        <p v-if="serverError === true" class="text-error">User not recognised, have you remembered to register?<br/><br/></p>
+        <p v-show="serverError === true" class="text-error">Please be patient while your credentials are verified. If access fails, please check that your email and password are correct.<br/><br/></p>
         <p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>
 
         <p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>
@@ -217,7 +217,8 @@
   }
 
   .text-error {
-    color: red;
+    font-weight: bold;
+    color: #1c3f37;
   }
 
 
