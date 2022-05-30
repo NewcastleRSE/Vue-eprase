@@ -10,7 +10,7 @@ RUN npm run build --prod
 
 # target environment
 FROM nginx
-ARG target
+ARG TARGET
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx/nginx.${target}.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.${TARGET}.conf /etc/nginx/nginx.conf
 
