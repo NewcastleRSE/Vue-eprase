@@ -21,7 +21,7 @@
               <tr>
                 <th>Institution Name</th><th>Ep System</th><th>Version</th><th>Patient Type</th><th>Created</th>
               </tr>
-              <tr v-for="report in reports" id="report">
+              <tr v-for="report in reports" id="report" v-bind:key="report" >
                     <td class="org_name" @click="onReportClick(report.assessmentId)">{{ report.institution.orgName }}</td>
                     <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                       <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
