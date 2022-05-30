@@ -8,8 +8,9 @@ RUN npm install @vue/cli@4.2.2 -g
 COPY . /app
 RUN npm run build --prod
 
-# production environment
+# target environment
 FROM nginx
+ARG target
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.${target}.conf /etc/nginx/nginx.conf
 
