@@ -108,13 +108,16 @@
             </table>
 
             <div id="selected-type">
+              <label id="select-label" for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
+
               <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
                 <option value="alert">Alert</option>
                 <option value="advisory">Advisory</option>
                 <option value="alert">Both</option>
               </select>
 
-              <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
+              <p><em><strong>Advisory:</strong> Information is provided which does not interrupt workflow or require action.</em></p>
+              <p><em><strong>Alert:</strong> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</em></p>
             </div>
 
 
@@ -536,9 +539,13 @@
     padding: 30px 0;
   }
 
-  select {
+  #intervention-select {
+    float: none;
     width: 220px;
-    float: right;
+  }
+
+  #select-label {
+    padding-left: 0;
   }
 
   #response-other {
