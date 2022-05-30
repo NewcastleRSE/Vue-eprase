@@ -18,7 +18,7 @@
           </div>
           <div class="form-group">
             <label>Password: </label>
-            <input type="text" v-model="user.password" v-validate="{ required: true, min: 6 }" class="form-control" name="password" maxlength="50" :class="{ 'is-invalid': submitted & errors.has('password') }"/>
+            <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" class="form-control" name="password" maxlength="50" :class="{ 'is-invalid': submitted & errors.has('password') }"/>
             <div v-show="submitted & errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
           </div>
         </form>
