@@ -1,4 +1,4 @@
-name: Build & Deploy
+name: Build & Deploy Staging
 on:
   push:
     branches:
@@ -27,7 +27,8 @@ jobs:
       - name: Update CLIENT_VERSION
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=${{ github.event.release.tag_name }}/' .env
+          # command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=${{ github.event.release.tag_name }}/' .env
+          command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=latest/' .env
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.PRIVATE_KEY}}
