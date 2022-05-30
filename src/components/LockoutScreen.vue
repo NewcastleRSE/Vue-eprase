@@ -14,7 +14,7 @@
       <div class="form-group footer" style="{text-align: center}">
         <div class="buttons">
           <button type="button" class="lock-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Next</button>
+          <button type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Next</button>
         </div>
       </div>
     </div>
