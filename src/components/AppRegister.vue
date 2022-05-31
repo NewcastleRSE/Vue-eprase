@@ -38,13 +38,13 @@
             <p>Choose a password.</p>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="text" v-model="user.password" v-validate="{ required: true, min: 6 }" id="password" name="password" class="form-control" :class="{ 'is-invalid': errors.has('password') }" ref="password" />
+                <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" id="password" name="password" class="form-control" :class="{ 'is-invalid': errors.has('password') }" ref="password" />
                 <div v-show="submitted && errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">Re-enter Password: </label>
-                <input type="text" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword" class="form-control"  v-validate="'required|confirmed:password'"  data-vv-as="password" >
+                <input type="password" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword" class="form-control"  v-validate="'required|confirmed:password'"  data-vv-as="password" >
                 <div v-show="submitted && errors.has('confirmPassword')" class="invalid-feedback alert alert-danger">{{ errors.first('confirmPassword') }}</div>
             </div>
 

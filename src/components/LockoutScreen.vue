@@ -9,15 +9,12 @@
                 <p><strong>Once you have entered this section, you will need to complete it fully, so please make sure you have enough time set aside to complete the scenarios.</strong></p>
                 <p><strong>Reminder: the BACK button has been disabled. Attempts to leave or go back to previous scenarios will lead to your work being lost!</strong></p>
            </div>
-
-          <p v-if="counter > 0">You can continue on to the next phase of the assessment in: <strong>{{getTimeRemaining()}}</strong></p>
         </div>
 
       <div class="form-group footer" style="{text-align: center}">
         <div class="buttons">
           <button type="button" class="lock-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button v-show="nextEnabled" id="next-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()" :disabled="disabled">Next</button>
-          <button v-show="skipEnabled" id="skip-button" type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Skip</button>
+          <button type="button" class="lock-btn btn btn-primary" @click="onNextClick()">Next</button>
         </div>
       </div>
     </div>
@@ -40,35 +37,10 @@
         },
         data() {
             return {
-                counter : 0,
-                currentTime : null,
-                unlockTime : null,
-                timeDiff : null,
-                nextEnabled: true,
-                skipEnabled : settings.skipButton,
                 patientscompleted : false,
-                disabled : true
             }
         },
         methods : {
-
-            /* time in seconds - 1800 is 30 mins, 3600 is 60 mins */
-
-            getTimeRemaining() {
-                const h = Math.floor(this.counter / 3600);
-                const m = Math.floor(this.counter % 3600 / 60);
-                const s = Math.floor(this.counter % 3600 % 60);
-
-                let hour = h.toString();
-                let mins = m.toString();
-                let secs = s.toString();
-
-                if (h < 10) { hour = '0' + hour; }
-                if (m < 10) { mins = '0' + mins; }
-                if (s < 10) { secs = '0' + secs; }
-
-                return hour + ':' + mins + ':' + secs;
-            },
             onNextClick()  {
                 if(this.patientscompleted){
                     patientService.setConfigErrors();
@@ -88,30 +60,6 @@
                 this.nextEnabled = true;
                 this.disabled = false;
                 patientService.setPatientsInStoreFromIds();
-            }
-            else {
-                this.currentTime = new Date();
-                this.unlockTime = new Date(localStorage.getItem('assessmentUnlockTime'));
-
-                const timeDiff = this.unlockTime.getTime() - this.currentTime.getTime();
-
-                if (timeDiff <= 0) {
-                    this.counter = 0;
-                    this.nextEnabled = false;
-                }
-                else {
-                    this.counter = timeDiff / 1000;
-
-                    const intervalId = setInterval(() => {
-                        this.counter = this.counter - 1;
-                        if (this.counter === 0) {
-                          clearInterval(intervalId);
-                          this.nextEnabled = true;
-                          this.disabled = false;
-                        }
-
-                    }, 1000);
-                }
             }
         },
         mounted : function() {

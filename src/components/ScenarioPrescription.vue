@@ -98,7 +98,7 @@
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-duplication" id="drug-duplication" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-duplication">Drug duplication</label> <b-button v-b-tooltip.hover.right title="Tip: Specified drug prescribed more than once for the same patient" variant="primary" class="category-tip">i</b-button></td></tr>
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-disease" id="drug-disease" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-disease">Drug disease</label><b-button v-b-tooltip.hover.right title="Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities" variant="primary" class="category-tip">i</b-button></td></tr>
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-ommissions" id="drug-ommissions" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-ommissions">Drug omissions</label> <b-button v-b-tooltip.hover.right title="Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication" variant="primary" class="category-tip">i</b-button></td></tr>
-              <tr><td><input type="checkbox" class="custom-checkbox" value="theraputic_duplication" id="theraputic_duplication" v-model="response.intervention_type"></td><td><label class="category-label" for="theraputic_duplication">Theraputic duplication</label> <b-button v-b-tooltip.hover.right title="Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims" variant="primary" class="category-tip">i</b-button></td></tr>
+              <tr><td><input type="checkbox" class="custom-checkbox" value="therapeutic_duplication" id="therapeutic_duplication" v-model="response.intervention_type"></td><td><label class="category-label" for="therapeutic_duplication">Therapeutic duplication </label> <b-button v-b-tooltip.hover.right title="Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims" variant="primary" class="category-tip">i</b-button></td></tr>
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-lab" id="drug-lab" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-lab">Lab results/monitoring/TDM</label> <b-button v-b-tooltip.hover.right title="Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)" variant="primary" class="category-tip">i</b-button></td></tr>
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-brand" id="drug-brand" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-route">Drug brand</label> <b-button v-b-tooltip.hover.right title="Tip: Drug that must be prescribed by BRAND rather than using generic name" variant="primary" class="category-tip">i</b-button></td></tr>
               <tr><td><input type="checkbox" class="custom-checkbox" value="drug-route" id="drug-route" v-model="response.intervention_type"></td><td><label class="category-label" for="drug-route">Incorrect route</label> <b-button v-b-tooltip.hover.right title="Tip: Specified route is contraindicated for drug and/ or  dose prescribed" variant="primary" class="category-tip">i</b-button></td></tr>
@@ -108,13 +108,16 @@
             </table>
 
             <div id="selected-type">
+              <label id="select-label" for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
+
               <select id="intervention-select"  class="form-control" v-model="response.selected_type" >
                 <option value="alert">Alert</option>
                 <option value="advisory">Advisory</option>
                 <option value="alert">Both</option>
               </select>
 
-              <label for="intervention-select"><strong>Please indicate whether intervention was an alert or advisory:</strong> </label>
+              <p><em><strong>Advisory:</strong> Information is provided which does not interrupt workflow or require action.</em></p>
+              <p><em><strong>Alert:</strong> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</em></p>
             </div>
 
 
@@ -536,9 +539,13 @@
     padding: 30px 0;
   }
 
-  select {
+  #intervention-select {
+    float: none;
     width: 220px;
-    float: right;
+  }
+
+  #select-label {
+    padding-left: 0;
   }
 
   #response-other {
