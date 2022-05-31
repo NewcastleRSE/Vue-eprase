@@ -71,6 +71,21 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === 'production') {
+  module.exports.devtool = '#source-map'
+  // http://vue-loader.vuejs.org/en/workflow/production.html
+  module.exports.plugins = (module.exports.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"',
+        BASE_URL : '"https://eprase.nhs.uk"'
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  ])
+}
+else if (process.env.NODE_ENV === 'staging') {
 
   module.exports.devtool = '#source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
@@ -87,7 +102,6 @@ if (process.env.NODE_ENV === 'production') {
   ])
 }
 else {   // development
-
   module.exports.devtool = '#source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
@@ -101,5 +115,4 @@ else {   // development
       minimize: true
     })
   ])
-
 }
