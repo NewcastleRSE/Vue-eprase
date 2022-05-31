@@ -58,6 +58,11 @@ Adjust the value of the version variable in the settings.js file
 
 Adjust the value of the appOpen variable in the settings.js file
 
+## Staging Deployment
+
+### Cache
+
+The staging version runs under the `ncldata.dev` domain, meaning cache may need to be purged after a new deployment. 
 
 ## Production Deployment
 
@@ -104,5 +109,3 @@ If any services are down, start debugging by viewing the logs for that service.
 ```bash
 docker-compose logs <service-name>
 ```
-
-
