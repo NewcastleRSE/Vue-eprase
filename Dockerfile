@@ -8,7 +8,7 @@ RUN npm install @vue/cli@4.2.2 -g
 COPY . /app
 RUN npm run build --prod
 
-# target environment
+# target environment, the minified application is copied into the nginx/html folder
 FROM nginx
 ARG TARGET
 COPY --from=build /app/dist /usr/share/nginx/html
