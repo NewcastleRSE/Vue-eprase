@@ -58,6 +58,10 @@ Adjust the value of the version variable in the settings.js file
 
 Adjust the value of the appOpen variable in the settings.js file
 
+## Deployment Overview
+
+![deployent-diagram](eprase-deployment.png)
+
 
 ## Production Deployment
 
