@@ -43,6 +43,8 @@ npm run dev
 
 ### Build for production with minification
 
+(This is done automatically in this codebase by the Dockerfile with a --prod switch)
+
 Running the build command creates a build folder called 'dist'. This contains all the images and a build.js file of minified code
 
 ```
@@ -56,7 +58,26 @@ Adjust the value of the version variable in the settings.js file
 
 ### Open/close the application to users, while keeping it open to admin
 
-Adjust the value of the appOpen variable in the settings.js file
+Adjust the value of the appOpen variable in the settings.js file. e.g. `appOpen : false`. It should be possible to update this setting without affecting the overall application or database by manually bringing down the client only with the docker commands:
+
+`$ docker-compose stop <service_name>`
+`$ docker-compose build <service_name>`
+`$ docker-compose up <service_name>`
+
+A new client image would need to be made first locally and pulled onto the VM before the container can be rebuilt. (Mark Turner to check this).
+
+
+## Deployment Overview
+
+![deployent-diagram](eprase-deployment.png)
+
+## Staging Deployment
+
+The QA version of eprase is hosted at: https://eprase.ncldata.dev/. This staging version of the application is designed for testing and will be automatically updated and deployed by a push to the `main` branch. This could be done manually, or by merging a Pull Request from `dev` branch to `main`.
+
+Access to the staging VM:
+
+`ssh -i <path-to-your-private-key> adminuser@51.140.36.254`
 
 ## Staging Deployment
 
@@ -74,7 +95,7 @@ ssh <username>@192.168.241.18
 
 This will prompt for your password, again provided by SCC. Immediately switch to sudo mode using `sudo -i`, which will prompt for your password again. Then change directory to `/eprase`.
 
-To deploy a new version of the app alter the version numbers in the `.env` file to match as needed. Run `source .env` to apply the change. You can check this has worked with `echo $CLIENT_VERSION` and it will print the value you just set. Then bring down any running services including the data volvumes with
+To deploy a new version of the app alter the version numbers in the `.env` file to match as needed. Run `source .env` to apply the change. You can check this has worked with `echo $CLIENT_VERSION` and it will print the value you just set. Then bring down any running services including the data volumes with
 
 ```bash
 docker-compose down -v
