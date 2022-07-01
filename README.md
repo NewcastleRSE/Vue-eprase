@@ -61,10 +61,8 @@ Adjust the value of the version variable in the settings.js file
 Adjust the value of the appOpen variable in the settings.js file. e.g. `appOpen : false`. It should be possible to update this setting without affecting the overall application or database by manually bringing down the client only with the docker commands:
 
 `$ docker-compose stop <service_name>`
-`$ docker-compose build <service_name>`
-`$ docker-compose up <service_name>`
-
-A new client image would need to be made first locally and pulled onto the VM before the container can be rebuilt. (Mark Turner to check this).
+`$ docker-compose pull <service_name>`
+`$ docker-compose up -d <service_name>`
 
 
 ## Deployment Overview
@@ -78,6 +76,19 @@ The QA version of eprase is hosted at: https://eprase.ncldata.dev/. This staging
 Access to the staging VM:
 
 `ssh -i <path-to-your-private-key> adminuser@51.140.36.254`
+
+### Manual updates
+
+On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). This may need to be removed before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
+
+`$ sudo docker image ls`
+
+Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker-compose pull client:latest`. Bring the clinet serv cie bck up with the docker-compose command 'up -d'.
+
+`$ sudo docker-compose stop <service_name>`
+`$ sudo docker-compose pull <service_name>`
+`$ sudo docker-compose up -d <service_name>`
+
 
 
 ## Production Deployment
