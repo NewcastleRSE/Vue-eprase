@@ -89,7 +89,9 @@ Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with
 `$ sudo docker-compose pull <service_name>`
 `$ sudo docker-compose up -d <service_name>`
 
+### Cache
 
+The staging version runs under the `ncldata.dev` domain, meaning cache may need to be purged after a new deployment.
 
 ## Production Deployment
 
@@ -136,5 +138,3 @@ If any services are down, start debugging by viewing the logs for that service.
 ```bash
 docker-compose logs <service-name>
 ```
-
-
