@@ -38,6 +38,13 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.PRIVATE_KEY}}
+      - name: Compose Pull
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sudo docker-compose pull
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.PRIVATE_KEY}}
       - name: Compose Up
         uses: garygrossgarten/github-action-ssh@release
         with:
