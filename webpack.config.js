@@ -77,7 +77,7 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"',
-        BASE_URL : '"https://eprase.nhs.uk"'
+        BASE_URL : '"https://eprase.nhs.uk/api/"'
       }
     }),
     new webpack.LoaderOptionsPlugin({
