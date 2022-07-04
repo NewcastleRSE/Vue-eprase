@@ -13,12 +13,13 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
           TARGET: staging
+          VERSION: ${{ github.sha }}
         with:
           registry: epraseregistry.azurecr.io
           name: epraseregistry.azurecr.io/eprase-client
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-          buildargs: TARGET
+          buildargs: TARGET,VERSION
   release:
     needs: build
     runs-on: ubuntu-latest
