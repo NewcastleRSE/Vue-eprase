@@ -92,7 +92,7 @@ else if (process.env.NODE_ENV === 'staging') {
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: '"production"',
+        NODE_ENV: '"staging"',
         BASE_URL : '"https://eprase.ncldata.dev/api/"'
       }
     }),
