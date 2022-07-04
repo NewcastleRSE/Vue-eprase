@@ -83,7 +83,7 @@ On the staging server, the eprase-client image is tagged as `latest`.  (The dock
 
 `$ sudo docker image ls`
 
-Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker-compose pull client:latest`. Bring the clinet serv cie bck up with the docker-compose command 'up -d'.
+Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker-compose pull client:latest`. Bring the client service back up with the docker-compose command 'up -d'.
 
 `$ sudo docker-compose stop <service_name>`
 `$ sudo docker-compose pull <service_name>`
