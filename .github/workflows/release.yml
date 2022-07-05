@@ -11,7 +11,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@2.20
         env:
-          TARGET: staging
+          TARGET: production
         with:
           registry: epraseregistry.azurecr.io
           name: epraseregistry.azurecr.io/eprase-client
