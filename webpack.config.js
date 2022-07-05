@@ -71,21 +71,17 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"',
-        BASE_URL : '"https://eprase.nhs.uk/api/"'
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
-}
-else if (process.env.NODE_ENV === 'staging') {
+
+  console.log(process.env.TARGET)
+
+  let baseURL = '"http://localhost:6001/api/"'
+
+  if (process.env.TARGET === 'staging') {
+    baseURL = '"https://eprase.ncldata.dev/api/"'
+  }
+  else if (process.env.TARGET === 'production') {
+    baseURL = '"https://eprase.nhs.uk/api/"'
+  }
 
   module.exports.devtool = '#source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
@@ -93,7 +89,7 @@ else if (process.env.NODE_ENV === 'staging') {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"',
-        BASE_URL : '"https://eprase.ncldata.dev/api/"'
+        BASE_URL : baseURL
       }
     }),
     new webpack.LoaderOptionsPlugin({
