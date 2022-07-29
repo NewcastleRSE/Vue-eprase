@@ -72,8 +72,6 @@ module.exports = {
 
 if (process.env.NODE_ENV === 'production') {
 
-  console.log(process.env.TARGET)
-
   let baseURL = '"http://localhost:6001/api/"'
 
   if (process.env.TARGET === 'staging') {
