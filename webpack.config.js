@@ -73,12 +73,15 @@ module.exports = {
 if (process.env.NODE_ENV === 'production') {
 
   let baseURL = '"http://localhost:6001/api/"'
+  let sentryENV = 'development'
 
   if (process.env.TARGET === 'staging') {
     baseURL = '"https://eprase.ncldata.dev/api/"'
+    sentryENV = 'staging'
   }
   else if (process.env.TARGET === 'production') {
     baseURL = '"https://eprase.nhs.uk/api/"'
+    sentryENV = 'production'
   }
 
   module.exports.devtool = '#source-map'
