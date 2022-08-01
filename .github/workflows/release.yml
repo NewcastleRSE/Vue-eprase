@@ -17,5 +17,6 @@ jobs:
           name: epraseregistry.azurecr.io/eprase-client
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+          # tags need the format: 1.2.1 to work correctly
           tag_semver: true
           buildargs: TARGET
