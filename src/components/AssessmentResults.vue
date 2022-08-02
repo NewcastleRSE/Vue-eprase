@@ -24,7 +24,7 @@
             <tr><th>Category</th><th>Outcome</th></tr>
             <tr><td>Extreme risk scenarios</td><td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenario(s). Out of these, {{ extremeRiskMitigations  }} was(were) mitigated. </td></tr>
             <tr><td>High risk scenarios</td><td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{ highRiskMitigations }} were mitigated. </td></tr>
-            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of  {{ totalValidTests }} interventions, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
+            <tr><td>Alerts/Advisory interventions</td><td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of  {{ totalValidTests }} total valid tests, where a system/user intervention was selected. This would be considered a {{  interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) }}). A high level of alerts can indicate an over-reliance on alerting within a system.</td></tr>
             <tr><td>Config Errors</td><td>You were questioned about {{ totalConfigTests }} configuration errors.</td></tr>
           </table>
         </div>
