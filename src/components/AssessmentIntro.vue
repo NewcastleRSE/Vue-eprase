@@ -137,7 +137,7 @@
                         }
                     }
                     localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients));
-                    localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients));
+                  /* localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients)); */
                     localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients));
                 });
             },
