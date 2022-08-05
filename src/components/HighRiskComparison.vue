@@ -20,20 +20,20 @@
                 <tr>
                   <th>Institution Name</th>
                   <th>Ep System</th>
-                  <th>Drug name</th>
-                  <th class="align-content-center">Pass</th>
+                  <th>Drug mitigation results</th>
                 </tr>
             </thead>
             <tbody>
-            <tr v-for="report in reports" id="report-two">
+            <tr v-for="report in reports" id="report-two" v-bind:key="report" >
               <td>{{ report.institution.orgName }}</td>
               <td><span v-if="report.system.ep_service !=='Other'">{{ report.system.ep_service}} </span>
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
-                <td> {{ report.description[0] }}<br></td>
-                <td>{{ report.description[1] }} &nbsp; &nbsp;
-                    <img v-show="report.description[1] === 'Good Mitigation/Pass'" src="../assets/green-tick.png" alt="tick" class="smallimg">
-                    <img v-show="report.description[1] === 'Some Mitigation'" src="../assets/cross.png" alt="cross" class="smallimg">
-                    <img v-show="report.description[1] === 'No Mitigation/Fail'" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+                <td>  {{report.description }}</td>
+
+               <!--   <span><img v-show="report.description[1] === 'Good Mitigation/Pass'" src="../assets/green-tick.png" alt="tick" class="smallimg"></span>
+                  <span> <img v-show="report.description[1] === 'Some Mitigation'" src="../assets/cross.png" alt="cross" class="smallimg"></span>
+                  <span><img v-show="report.description[1] === 'No Mitigation/Fail'" src="../assets/cross.png" alt="cross" class="smallimg"></span> -->
+
             </tr>
             </tbody>
           </table>
@@ -98,8 +98,6 @@
                 this.reports[index].description = [];
                 for(let scenario in scenarios){
                 if(scenarios.hasOwnProperty(scenario)){
-
-                     console.log(scenarios[scenario]);
                        let valueString = scenarios[scenario].prescription.drug_name + ' | ' + scenarios[scenario].result;
                        this.reports[index].description.push(scenarios[scenario].prescription.drug_name);
                        this.reports[index].description.push(scenarios[scenario].result);
