@@ -35,10 +35,6 @@ function setConfigErrors() {
     }
   }
 
-  console.log('insert point start ' + insertPoints[0]);
-  console.log('insert point end ' + insertPoints[insertPoints.length-1]);
-
-
   // fix to prevent config errors following on one after another (this causes an error in the testList increment)
   let ipDiff = calcDiff(insertPoints[0], insertPoints[insertPoints.length-1]);
     console.log('Diff ' + ipDiff);
@@ -51,9 +47,6 @@ function setConfigErrors() {
         console.log('After nudge ' + ipvalue)
         insertPoints[insertPoints.length-1] = ipvalue;
   }
-
-   console.log('insert point start ' + insertPoints[0]);
-   console.log('insert point end ' + insertPoints[insertPoints.length-1]);
 
   // get all the config errors (another promise)
   dataService.getConfigErrors().then(data => {

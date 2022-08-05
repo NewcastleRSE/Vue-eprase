@@ -98,8 +98,6 @@
                 this.reports[index].description = [];
                 for(let scenario in scenarios){
                 if(scenarios.hasOwnProperty(scenario)){
-
-                     console.log(scenarios[scenario]);
                        let valueString = scenarios[scenario].prescription.drug_name + ' | ' + scenarios[scenario].result;
                        this.reports[index].description.push(scenarios[scenario].prescription.drug_name);
                        this.reports[index].description.push(scenarios[scenario].result);
