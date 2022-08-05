@@ -23,9 +23,11 @@
           </div>
         </form>
         <p v-show="serverError === true" class="text-error">Please be patient while your credentials are verified. If access fails, please check that your email and password are correct.<br/><br/></p>
-        <p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>
 
-        <p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>
+        <p id="email-link">If you have forgotten your password, please contact the RSE team at: <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a></p>
+
+        <!--<p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>-->
+        <!--<p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>-->
 
         <div align="center">
           <div class="buttons form-group" align="center">
@@ -207,7 +209,7 @@
   }
 
   #email-link {
-    padding-bottom: 20px;
+    padding: 30px 15px;
     font-size: 0.9em;
   }
 
