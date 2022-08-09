@@ -50,9 +50,9 @@ Adjust the value of the `version` variable in the settings.js file to match any 
 
 Adjust the value of the `appOpen` variable in the settings.js file. e.g. `appOpen : false`.
 
- This variable controls whether the 'start' button is shown on the application welcome page. Users will still be able to navigate directly to the login page (as this needs to be kept open for admin access). However, the server-side environment variable APP_OPEN should be set to 'false' in this case, this will ensure that only users with admin roles wull be able to log into the application.
+ This variable controls whether the 'start' button is shown on the application welcome page. Users will still be able to navigate directly to the login page (as this needs to be kept open for admin access). However, the server-side environment variable APP_OPEN should be set to 'false' in this case, this will ensure that only users with admin roles will be able to log into the application.
 
-It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only with the docker commands:
+It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only and pulling an updated image with the docker commands:
 
 * `$ docker-compose stop <service_name>`
 * `$ docker-compose pull <service_name>`
@@ -76,7 +76,7 @@ Containers can be explored using the following command,  `sudo docker ls -a` wil
 
 `sudo docker exec -it <container-id> /bin/bash`
 
-On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). If the application is redusing to update, the current 'latest' image may need to be removed manully before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
+On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). If the application is refusing to update, the current 'latest' image may need to be removed manully before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
 
 `$ sudo docker image ls`
 
@@ -108,7 +108,7 @@ To deploy a new version of the app, alter the version numbers in the `.env` file
 * APP_OPEN is used to limit access to the application to admin users only, when the site is offically closed to other NHS users.
 * ENV_BUILD is used to prevent loss of data when the application is offcially open.
 
-If it is set to `test`, then the data for the app can be cleared using `docker-compose down -v`. Then `docker-compose up -d` will bring up a clean database, but with all the pre-required data created. This is the application being used in a testing mode.
+If ENV_BUILD is set to `test`, then the data for the app can be cleared using `docker-compose down -v`. Then `docker-compose up -d` will bring up a clean database, but with all the pre-required data created. This is the application being used in a testing mode.
 
 If the application is in production mode (as in open to use by NHS users) and one of the containers has gone down, the site needs to be restored without data loss. At the beginning of an 'open' period, the ENV_BUILD variable value should be set to 'prod'. This will allow containers to be brought down and back up without the server code trying to rebuild pre-required data (which causes a build error).
 

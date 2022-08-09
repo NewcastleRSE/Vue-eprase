@@ -126,8 +126,8 @@
 
           <div id="discontinue">Please discontinue the prescription order before proceeding to the next scenario.</div>
 
+          <!-- TODO look for a solution to the direct assignment -->
           <input type="hidden" id="test_id" v-model="response.prescription=prescription.id" />
-         <!--<input type="hidden" id="result_score" v-model="response.result_score=getResult" />-->
           <input type="hidden" id="risk_level" v-model="response.risk_level=prescription.risk_level" />
 
         </div>
