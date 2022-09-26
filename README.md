@@ -180,13 +180,13 @@ Once the wizard has been updated with the file contents, you must specify how to
 
 Email: dnsteam@nhs.net
 
-Email them and ask them to add the code snippwet to the DNS records for eprase.nhs.uk. The hash has the following format:
+Email them and ask them to add the code snippet to the DNS records for eprase.nhs.uk. The hash has the following format:
 
 
 xxxxxxxxxxxxxxxxxxx.eprase.nhs.uk
 CNAME
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-Once this is done, you should be sent a certificate via an email with an attached zip from Sectigo Certification Authority. The .crt file within the zip archive is your cert. You may get emailed an intermediate and full certificate. SSL2buy have an exellent online chat line if you hit difficulties with this process. They will liase with Sectigo.
+Once this is done, you should be sent a certificate via an email with an attached zip from Sectigo Certification Authority. The .crt file within the zip archive is your cert. You may get emailed an intermediate and full certificate. SSL2buy have an excellent online chat line if you hit difficulties with this process. They will liaise with Sectigo.
 
-Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. From there, rename it from eprase_nhs_uk.crt to eprase.nhs.uk-new.crt. Then move it into the nginx/certs directory. Rename the existing cert file to old befere renaming your new file to the correct name ie. `eprase.nhs.uk.crt`
+Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. From there, rename it from eprase_nhs_uk.crt to eprase.nhs.uk-new.crt. Then move it into the nginx/certs directory. Rename the existing cert file to old before renaming your new file to the correct name ie. `eprase.nhs.uk.crt`
