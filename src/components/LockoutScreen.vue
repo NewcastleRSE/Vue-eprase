@@ -7,7 +7,7 @@
           <p>You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
            <div class="alert alert-warning" role="alert">
                 <p><strong>Once you have entered this section, you will need to complete it fully, so please make sure you have enough time set aside to complete the scenarios.</strong></p>
-                <p><strong>Reminder: the BACK button has been disabled. Attempts to leave or go back to previous scenarios will lead to your work being lost!</strong></p>
+                <p><strong>Reminder: the browser BACK button has been disabled. Attempts to leave or go back to previous scenarios will lead to your work being lost!</strong></p>
            </div>
         </div>
 

@@ -631,6 +631,9 @@
   }
 
   #p-name {
+      font-size: 1.4em;
+      font-weight: 500;
+      padding-bottom: 25px;
       margin-top: 40px;
   }
 
