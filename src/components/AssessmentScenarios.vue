@@ -5,7 +5,7 @@
      <h3>Assessment Scenarios</h3>
      <p>Please follow the instructions for each scenario.<br/></p>
      <div align="center">
-       <h4>Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</h4>
+       <div id="test-header">Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</div>
 
        <ScenarioPrescription v-if="assessment.isPrescriptionTest"></ScenarioPrescription>
        <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError>
@@ -74,6 +74,12 @@
 
 <style scoped>
 
+ #test-header {
+    font-size: 1.8em;
+    font-weight: 700;
+    padding-bottom: 25px;
+ }
+
   #page {
     text-align: left;
   }
@@ -81,5 +87,7 @@
   #content {
     padding: 40px;
   }
+
+
 
 </style>

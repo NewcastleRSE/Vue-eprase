@@ -18,7 +18,7 @@
 
       <div class="alert alert-warning" role="alert">
           <p><strong>Disclaimer:</strong> these patients have been designed to support the test tool and may not necessarily resemble real life.  Please enter all information exactly as presented.</p>
-          <p><strong>Warning - please do not attempt to click the back button during the assessment! This action has been disabled due to the risk of data loss.</strong></p>
+          <p><strong>Warning - please do not attempt to click the BROWSER back button during the assessment! This action has been disabled due to the risk of data loss.</strong></p>
       </div>
 
       <h3>{{ year }} ePRaSE Assessment</h3>

@@ -131,7 +131,7 @@
                 </table>
               </div>
 
-              <input type="hidden" id="patient_id" v-model="assessment.patient_code=patient[getCurrentPatient].code" />
+              <input type="hidden" id="patient_id" :value="patient[getCurrentPatient].code" />
             </div>
 
           </div>
@@ -193,7 +193,6 @@
             return {
                 submitted: false,
                 assessment: {
-                    patient_code : '',
                     qualitative_data : '',
                     time_taken: ''
                 },
@@ -245,7 +244,7 @@
                         let elapsedTime = endTime.getTime() - this.startTime.getTime();
                         this.assessment.time_taken = elapsedTime / 1000;
                         const qualitative_data = this.assessment.qualitative_data;
-                        const code = this.assessment.patient_code;
+                        const code = document.getElementById("patient_id").value;
                         const time_taken = this.assessment.time_taken;
                         const completed = this.completed;
 
