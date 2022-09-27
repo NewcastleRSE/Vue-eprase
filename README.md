@@ -161,7 +161,7 @@ docker-compose logs <service-name>
 
 ## SSL cert renewal
 
-SSL certificates are bought through [https://www.ssl2buy.com/](https://www.ssl2buy.com/) and need to be renewed at regular intervals. When a certificate expires Ssl2buy will send an email with a link incorporating a unique pin. This can be used to login to the SSL wizard.
+SSL certificates are bought through [https://www.ssl2buy.com/](https://www.ssl2buy.com/) and need to be renewed at regular intervals. When a certificate expires SSL2buy will send an email with a link incorporating a unique pin. This can be used to login to the SSL wizard.
 
 Firstly a Certificate Signing Request (CSR) file must be created on the server to paste into the SSL wizard. This requires using the Pulse Secure login and then running a command at login root.
 
@@ -189,4 +189,6 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 Once this is done, you should be sent a certificate via an email with an attached zip from Sectigo Certification Authority. The .crt file within the zip archive is your cert. You may get emailed an intermediate and full certificate. SSL2buy have an excellent online chat line if you hit difficulties with this process. They will liaise with Sectigo.
 
-Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. From there, rename it from eprase_nhs_uk.crt to eprase.nhs.uk-new.crt. Then move it into the nginx/certs directory. Rename the existing cert file to old before renaming your new file to the correct name ie. `eprase.nhs.uk.crt`
+Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. From there, rename it from eprase_nhs_uk.crt to eprase.nhs.uk-new.crt. Then move it into the ./client/certs directory. Rename the existing cert file to old before renaming your new file to the correct name ie. `eprase.nhs.uk.crt`.
+
+The certificate path is coded in the docker-compose.yml file.
