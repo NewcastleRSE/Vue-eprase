@@ -89,10 +89,12 @@ On the staging server, the eprase-client and eprase-server images are tagged as 
 
 Then remove the image with `$ sudo docker rmi <image_id>`. You should see output similar to that below.
 
-```Untagged: epraseregistry.azurecr.io/eprase-server:latest```
-```Untagged: epraseregistry.azurecr.io/eprase-server@sha256:xxxxx```
-```Deleted: sha256:xxxxx```
-```Deleted: sha256:xxxxx```
+``` bash
+Untagged: epraseregistry.azurecr.io/eprase-server:latest
+Untagged: epraseregistry.azurecr.io/eprase-server@sha256:xxxxx
+Deleted: sha256:xxxxx
+Deleted: sha256:xxxxx
+```
 
 Then a new Pull Request will pull down the new image from Docker and bring the containers back up.
 
