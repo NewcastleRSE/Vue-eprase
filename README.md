@@ -70,7 +70,7 @@ Access to the staging VM:
 
 `ssh -i <path-to-your-private-key> adminuser@51.140.36.254`
 
-Containers can be explored using the following command,  `sudo docker ls -a` will list all the container ids.
+Containers can be explored using the following command,  `sudo docker ps` will list all the container ids.
 
 `sudo docker exec -it <container-id> /bin/bash`
 
@@ -82,16 +82,16 @@ To see all tables: `\dt`
 
 To select data: `select * from users`
 
-Quite the database: `exit`
+Quite the database: `\q`
 
 On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). If the application is refusing to update, the current 'latest' image may need to be removed manully before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
 
 `$ sudo docker image ls`
 
-Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker-compose pull client:latest`. Bring the client service back up with the docker-compose command 'up -d'.
+Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker pull client:latest`. Bring the client service back up with the docker-compose command 'up -d'.
 
 * `$ sudo docker-compose stop <service_name>`
-* `$ sudo docker-compose pull <service_name>:latest`
+* `$ sudo docker pull <service_name>:latest`
 * `$ sudo docker-compose up -d <service_name>`
 
 
