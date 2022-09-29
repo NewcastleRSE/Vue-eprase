@@ -48,9 +48,7 @@ Adjust the value of the `version` variable in the settings.js file to match any 
 
 ### Open/close the application to users, while keeping it open to admin
 
-Adjust the value of the `appOpen` variable in the settings.js file. e.g. `appOpen : false`.
-
- This variable controls whether the 'start' button is shown on the application welcome page. Users will still be able to navigate directly to the login page (as this needs to be kept open for admin access). However, the server-side environment variable APP_OPEN should be set to 'false' in this case, this will ensure that only users with admin roles will be able to log into the application.
+Two variables are used to control user access. One is a boolean JS variable in the client code base (`appOpen`), the other is an environment variable in the .env file (`APP_OPEN`). To close the application to standard users but keep it open to admin, adjust the value of the `appOpen` variable in the settings.js file. e.g. `appOpen : false`. This variable controls whether the 'start' button is shown on the application welcome page. Users will still be able to navigate directly to the login page (as this needs to be kept open for admin access). However, the environment variable APP_OPEN should be set to 'false' in this case, this will ensure that only users with admin roles will be able to log into the application.
 
 It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only and pulling an updated image with the docker commands:
 
@@ -76,6 +74,16 @@ Containers can be explored using the following command,  `sudo docker ls -a` wil
 
 `sudo docker exec -it <container-id> /bin/bash`
 
+To see the state of data in the database use:
+
+`sudo docker exec -it <container-name> psql -U eprase eprase` It will open a connection that allows you to use SQL queries.
+
+To see all tables: `\dt`
+
+To select data: `select * from users`
+
+Quite the database: `exit`
+
 On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). If the application is refusing to update, the current 'latest' image may need to be removed manully before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
 
 `$ sudo docker image ls`
@@ -85,6 +93,9 @@ Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with
 * `$ sudo docker-compose stop <service_name>`
 * `$ sudo docker-compose pull <service_name>:latest`
 * `$ sudo docker-compose up -d <service_name>`
+
+
+When updating the staging server, check that the environment variables in the .env file match the variables set in the docker-compose.yml file.
 
 
 ### Cache
@@ -110,9 +121,11 @@ To deploy a new version of the app, alter the version numbers in the `.env` file
 
 If ENV_BUILD is set to `test`, then the data for the app can be cleared using `docker-compose down -v`. Then `docker-compose up -d` will bring up a clean database, but with all the pre-required data created. This is the application being used in a testing mode.
 
-If the application is in production mode (as in open to use by NHS users) and one of the containers has gone down, the site needs to be restored without data loss. At the beginning of an 'open' period, the ENV_BUILD variable value should be set to 'prod'. This will allow containers to be brought down and back up without the server code trying to rebuild pre-required data (which causes a build error).
+If the application is in production mode (as in open to use by NHS users) and one of the containers has gone down, the site needs to be restored without data loss. At the beginning of an 'open' period, the ENV_BUILD variable value should be set to 'prod'. This will allow containers to be brought down and back up without the server code trying to rebuild pre-required data in its runner files (which causes a build error).
 
  Run `source .env` to apply any changes. You can check this has worked with `echo <ENV_VAR>` and it will print the value you just set.
+
+ When updating the production server, check that the environment variables in the .env file match the variables set in the docker-compose.yml file.
 
  ### Docker commands
 
