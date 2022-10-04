@@ -53,10 +53,9 @@ Two variables are used to control user access. One is a boolean JS variable in t
 It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only and pulling an updated image with the docker commands:
 
 * `$ docker-compose stop <service_name>`
-* `$ docker-compose pull <service_name>`
+* `$ docker pull <service_name>`
 * `$ docker-compose up -d <service_name>`
 
-The service_name in the docker-compose file is currently set to 'client'.
 
 ## Deployment Overview
 
@@ -84,14 +83,32 @@ To select data: `select * from users`
 
 Quite the database: `\q`
 
-On the staging server, the eprase-client image is tagged as `latest`.  (The docker service name is 'client'). If the application is refusing to update, the current 'latest' image may need to be removed manully before doing a `docker-compose pull client` command. Find the existing eprase-client image id with:
+On the staging server, the eprase-client and eprase-server images are tagged as `latest`.  If the application is refusing to update, either of the current 'latest' image may need to be removed manully before doing another Pull Request to main.
 
 `$ sudo docker image ls`
 
-Then remove the image with `$ sudo docker rmi <image_id>`. Pull a new image with `$ sudo docker pull client:latest`. Bring the client service back up with the docker-compose command 'up -d'.
+Then remove the image with `$ sudo docker rmi <image_id>`. You should see output similar to that below.
+
+``` bash
+Untagged: epraseregistry.azurecr.io/eprase-server:latest
+Untagged: epraseregistry.azurecr.io/eprase-server@sha256:xxxxx
+Deleted: sha256:xxxxx
+Deleted: sha256:xxxxx
+```
+
+Then a new Pull Request will pull down the new image from Docker and bring the containers back up.
+
+### Pull an image manually
+
+Pull a new image with `$ sudo docker pull client:latest`. You may be asked to log into Docker. The password to do this is available from the eprase registry on Azure.
+
+`sudo docker login epraseregistry.azurecr.io -u epraseregistry --password-stdin`
+
+?????
+
+Bring the client service back up with the docker-compose command 'up -d'.
 
 * `$ sudo docker-compose stop <service_name>`
-* `$ sudo docker pull <service_name>:latest`
 * `$ sudo docker-compose up -d <service_name>`
 
 
