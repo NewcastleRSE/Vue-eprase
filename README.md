@@ -21,9 +21,9 @@ Becky Osselton/Mark Turner, RSE Team, Newcastle University
 
 ### Built With
 
-* [Vue.js](https://vuejs.org/)
-* [Java - Spring Boot Framework](https://spring.io/projects/spring-boot)
-* [Postgres](https://www.postgresql.org/)
+* Client - [Vue.js](https://vuejs.org/)
+* Server - [Java - Spring Boot Framework](https://spring.io/projects/spring-boot)
+* Database - [Postgres](https://www.postgresql.org/)
 
 ### Prerequisites
 
@@ -41,6 +41,8 @@ npm install
 npm run dev
 ```
 
+There is no .env file required to run the client code locally.
+
 ### Control of version number shown
 
 Adjust the value of the `version` variable in the settings.js file to match any major version updates. This is shown in small print on the welcome page of the application.
@@ -52,9 +54,9 @@ Two variables are used to control user access. One is a boolean JS variable in t
 
 It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only and pulling an updated image with the docker commands:
 
-* `$ docker-compose stop <service_name>`
-* `$ docker pull <service_name>`
-* `$ docker-compose up -d <service_name>`
+* `$ sudo docker-compose stop client`
+* `$ sudo docker-compose pull client`
+* `$ sudo docker-compose start client`
 
 
 ## Deployment Overview
@@ -98,20 +100,6 @@ Deleted: sha256:xxxxx
 
 Then a new Pull Request will pull down the new image from Docker and bring the containers back up.
 
-### Pull an image manually
-
-Pull a new image with `$ sudo docker pull client:latest`. You may be asked to log into Docker. The password to do this is available from the eprase registry on Azure.
-
-`sudo docker login epraseregistry.azurecr.io -u epraseregistry --password-stdin`
-
-?????
-
-Bring the client service back up with the docker-compose command 'up -d'.
-
-* `$ sudo docker-compose stop <service_name>`
-* `$ sudo docker-compose up -d <service_name>`
-
-
 When updating the staging server, check that the environment variables in the .env file match the variables set in the docker-compose.yml file.
 
 
@@ -140,7 +128,7 @@ If ENV_BUILD is set to `test`, then the data for the app can be cleared using `d
 
 If the application is in production mode (as in open to use by NHS users) and one of the containers has gone down, the site needs to be restored without data loss. At the beginning of an 'open' period, the ENV_BUILD variable value should be set to 'prod'. This will allow containers to be brought down and back up without the server code trying to rebuild pre-required data in its runner files (which causes a build error).
 
- Run `source .env` to apply any changes. You can check this has worked with `echo <ENV_VAR>` and it will print the value you just set.
+ Run `source .env` to apply any changes. You can check this has worked with `echo <ENV_VAR>` and it will print the value you just set. Output .env contents with `cat .env`.
 
  When updating the production server, check that the environment variables in the .env file match the variables set in the docker-compose.yml file.
 
@@ -188,6 +176,29 @@ If any services are down, start debugging by viewing the logs for that service.
 ```bash
 docker-compose logs <service-name>
 ```
+
+
+## Preparing for a tool launch (production)
+
+| Server      | Environment variables | Comments     |
+| :---        |    :----:   |          ---: |
+| Step 1 - #sudo docker-compose down -v     | ENV_BUILD=test, APP_OPEN=true       | Start with a clean build  |
+| Step 2 - Change ENV_BUILD to prod   | ENV_BUILD=prod, APP_OPEN=true         | Set tool to live 'open' mode      |
+| Step 3 - Tool open for reports | ENV_BUILD=prod, APP_OPEN=true | Tool in open mode |
+| Step 4 - Change APP_OPEN to false, run #source .env | ENV_BUILD=prod, APP_OPEN=false | Tool closed to all except admin users |
+| Step 5 - Update settings.js file in the client, change appOpen=false (on dev branch) | ENV_BUILD=prod, APP_OPEN=false | |
+| Step 6 - Create a PR for dev -> master | | Master branch needs to be updated via dev branch changes |
+| Step 7 - Create a tagged version for the new client | | Follow format x.x.x |
+| Step 8 - Change the CLIENT_VERSION to match the new the tagged version, run #source.env | ENV_BUILD=prod, APP_OPEN=false, CLIENT_VERSION=x.x.x | Applies the .env changes to the shell |
+| Step 9 - #sudo docker-compose stop client | |  Stops the client container |
+| Step 10 - #sudo docker-compose pull client | | Pulls a new client image |
+| Step 11 - #sudo docker-compose start client | | Starts the client with the closed message showing on the home page |
+| Step 12 - #sudo docker-compose down | | Brings all the containers down (but not the data volume) |
+| Step 13 - #sudo docker-compose up -d | | Brings all the containers back up. |
+
+
+This last action rebuilds the app with the environment variable APP_OPEN=false. This needed to ensure that the server code will only allow admin users to access the application through the login page.
+
 
 ## SSL cert renewal
 

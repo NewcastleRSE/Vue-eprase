@@ -9,7 +9,7 @@ export const settings = {
   numConfigError : 2,
   // testLimit : 45,
   version : '2.5',
-  appOpen : false,
+  appOpen : true,
   debugMode : false,
   skipButton: true
 };
