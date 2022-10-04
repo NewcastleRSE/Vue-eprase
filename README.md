@@ -52,9 +52,9 @@ Two variables are used to control user access. One is a boolean JS variable in t
 
 It should be possible to update the appOpen variable without affecting the overall application (and database) by manually bringing down the client only and pulling an updated image with the docker commands:
 
-* `$ docker-compose stop <service_name>`
-* `$ docker pull <service_name>`
-* `$ docker-compose up -d <service_name>`
+* `$ sudo docker-compose stop client`
+* `$ sudo docker-compose pull client`
+* `$ sudo docker-compose start client`
 
 
 ## Deployment Overview
@@ -97,20 +97,6 @@ Deleted: sha256:xxxxx
 ```
 
 Then a new Pull Request will pull down the new image from Docker and bring the containers back up.
-
-### Pull an image manually
-
-Pull a new image with `$ sudo docker pull client:latest`. You may be asked to log into Docker. The password to do this is available from the eprase registry on Azure.
-
-`sudo docker login epraseregistry.azurecr.io -u epraseregistry --password-stdin`
-
-?????
-
-Bring the client service back up with the docker-compose command 'up -d'.
-
-* `$ sudo docker-compose stop <service_name>`
-* `$ sudo docker-compose up -d <service_name>`
-
 
 When updating the staging server, check that the environment variables in the .env file match the variables set in the docker-compose.yml file.
 
