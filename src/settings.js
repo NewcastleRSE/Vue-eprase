@@ -8,7 +8,7 @@ export const settings = {
   numPrescriptions: 45,
   numConfigError : 2,
   // testLimit : 45,
-  version : '2.5.0',
+  version : '2.5.1',
   appOpen : true,
   debugMode : false,
   skipButton: true

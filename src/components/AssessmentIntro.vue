@@ -16,6 +16,15 @@
       <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions system and then
         to prescribe a series of medications to those patients. You will then be asked to provide feedback about any advice or intervention from the system.</p>
 
+      <p>The patient build has 2 parts which <span class="text-danger">must be completed in the same session, by a single user</span> - this may take up to an hour depending on your system.</p>
+
+      <div id="part-list">
+        <ul class="list-group">
+            <li class="list-group-item">Part 1 - creating patients with name, date of birth and gender</li>
+            <li class="list-group-item">Part 2 – adding clinical information for each patient</li>
+        </ul>
+      </div>
+
       <div class="alert alert-warning" role="alert">
           <p><strong>Disclaimer:</strong> these patients have been designed to support the test tool and may not necessarily resemble real life.  Please enter all information exactly as presented.</p>
           <p><strong>Warning - please do not attempt to click the BROWSER back button during the assessment! This action has been disabled due to the risk of data loss.</strong></p>
@@ -163,6 +172,9 @@
 
 <style scoped>
 
+  #part-list {
+    padding-bottom: 25px;
+  }
 
   #header {
     background-image: url("../assets/pills-bw.png");
@@ -220,5 +232,6 @@
   .buttons {
      padding-top: 20px;
   }
+
 
 </style>
