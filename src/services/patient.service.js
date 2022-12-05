@@ -268,6 +268,8 @@ function setPatientsInStoreFromIds() {
 
   getPatientIds().then(data => {
 
+    if(data){
+
       let ids = data.split(',');
       ids.forEach(function(obj){
         patient_ids.push(parseInt(obj));
@@ -307,6 +309,11 @@ function setPatientsInStoreFromIds() {
       }
       localStorage.setItem('numPatients', patient_ids.length);
       store.dispatch('setPatientList', { patientList });
+
+    }
+    else {
+      console.log('No data returned from getPatientIds');
+    }   
   })
 }
 
