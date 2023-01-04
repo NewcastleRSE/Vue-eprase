@@ -105,7 +105,7 @@ function handleResponse(response) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
         logout();
-        router.push({ path: './login' }).catch(err => {});
+        router.push({ path: './failedlogin' }).catch(err => {});
       }
 
       const error = (data && data.message) || response.statusText;

@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import AppWelcome from './components/AppWelcome.vue';
 import AppLogin from './components/AppLogin.vue';
+import AppFailedLogin from './components/AppFailedLogin';
 import AppRegister from './components/AppRegister.vue';
 import AssessmentIntro from "./components/AssessmentIntro";
 import AssessmentSystem from './components/AssessmentSystem';
@@ -37,6 +38,11 @@ export const router = new Router({
       path: '/login',
       name: 'login',
       component: AppLogin
+    },
+    {
+      path: '/failedlogin',
+      name: 'failedlogin',
+      component: AppFailedLogin
     },
     {
       path: '/register',
@@ -155,7 +161,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // list public pages
-  const publicPages = ['/','/login','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
+  const publicPages = ['/','/login','/failedlogin','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
