@@ -4,7 +4,7 @@
 
 ## About
 
-Eprase is a tool to test electronic prescribing systems used by NHS Trusts in England. It has a Vue based client (front-end) and Java Spring Boot server based back-end that interacts with a Postgres database. This repo contains the client code base.
+Eprase is a tool to test electronic prescribing systems used by NHS Trusts in England. It has a Vue based client (front-end) and Java Spring Boot server based back-end that interacts with a Postgres database. This repo contains the client code base. It does not need to be run in Docker when in local development mode.
 
 ### Project Team
 
@@ -28,6 +28,8 @@ Becky Osselton/Mark Turner, RSE Team, Newcastle University
 ### Prerequisites
 
 Node.js, Git
+
+This repository currently requires Node 16. Using NVM can help with this.
 
 ## Local Development Build Setup
 
