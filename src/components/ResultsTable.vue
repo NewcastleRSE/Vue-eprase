@@ -75,7 +75,7 @@
             <td>{{ calc(tableData['categories'][12].drugFrequency.some, tableData['categories'][12].drugFrequency.count) }} <span class="someCol">({{ tableData['categories'][12].drugFrequency.some }}/{{ tableData['categories'][12].drugFrequency.count }})</span></td>
             <td>{{ calc(tableData['categories'][12].drugFrequency.not, tableData['categories'][12].drugFrequency.count) }} <span class="notCol">({{ tableData['categories'][12].drugFrequency.not }}/{{ tableData['categories'][12].drugFrequency.count }})</span></td>
             <td>{{ calc(tableData['categories'][12].drugFrequency.over, tableData['categories'][12].drugFrequency.count) }} <span class="overCol">({{ tableData['categories'][12].drugFrequency.over }}/{{ tableData['categories'][12].drugFrequency.count }})</span></td></tr>
-          <tr><th>All Categories *</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}% <td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
+          <tr><th>All Categories *</th><td class="good">Total : {{ calcPerCategory(totalGood, totalValidTests)  }}%</td><td class="some">Total : {{ calcPerCategory(totalSome, totalValidTests) }}%</td><td class="not">Total :  {{ calcPerCategory(totalNot, totalValidTests) }}% </td><td class="over">Total : {{ calcPerCategory(totalOver, totalValidTests) }}% </td></tr>
         </table>
       </div>
 

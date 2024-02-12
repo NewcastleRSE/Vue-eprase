@@ -67,7 +67,7 @@
 
 <script>
 
-    import {HTTP} from '../http-constants';
+    import { HTTP } from '../http-constants';
     //import json from '../json/institutions.json'
     import { dataService } from '../services/data.service';
     import { settings } from '../settings';
@@ -234,9 +234,9 @@
   }
 
   .register-text {
-    #display:flex;
+    /* #display:flex;
     #justify-content:center;
-    #align-items:center;
+    #align-items:center; */
     max-width: 600px;
   }
 

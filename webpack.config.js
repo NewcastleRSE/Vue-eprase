@@ -1,22 +1,27 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+const { VueLoaderPlugin } = require('vue-loader')
 
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackRootPlugin = require('html-webpack-root-plugin');
+//const HtmlWebpackRootPlugin = require('html-webpack-root-plugin'); Last modified in 2018...
 
 
 module.exports = {
-  mode: 'production',
-  // mode: 'development',
+  mode: 'development',
+  // mode: 'production',
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: 'build.js'
+    filename: 'build.js',
   },
   plugins: [
     new HtmlWebpackPlugin({title: 'ePRaSE', favicon: 'favicon.ico'}),
-    new HtmlWebpackRootPlugin('app'),
+    new VueLoaderPlugin(),
+    // to remove warn in browser console: runtime-core.esm-bundler.js:3607 Feature flags __VUE_OPTIONS_API__, __VUE_PROD_DEVTOOLS__ etc are not explicitly defined...
+    // See https://github.com/vuejs/core/tree/main/packages/vue#bundler-build-feature-flags
+    new webpack.DefinePlugin({ __VUE_OPTIONS_API__: true, __VUE_PROD_DEVTOOLS__: true, __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true }), 
+    //new HtmlWebpackRootPlugin('app'),
   ],
   optimization: {
     minimize: true,
@@ -55,19 +60,21 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue': '@vue/runtime-dom'
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true,
-    overlay: true
+    //noInfo: true,
+    client: {
+      overlay: true
+    }    
   },
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map'
+  devtool: 'eval-source-map'
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -84,7 +91,7 @@ if (process.env.NODE_ENV === 'production') {
     sentryENV = 'production'
   }
 
-  module.exports.devtool = '#source-map'
+  module.exports.devtool = 'source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -99,7 +106,7 @@ if (process.env.NODE_ENV === 'production') {
   ])
 }
 else {   // development
-  module.exports.devtool = '#source-map'
+  module.exports.devtool = 'source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({

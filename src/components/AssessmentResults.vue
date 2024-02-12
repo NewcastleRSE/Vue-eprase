@@ -82,16 +82,9 @@
   import {categoryService} from "../services/categoryService";
   import {stackedChartService} from "../services/stackedChartService";
   import TabHeader from './TabHeader';
-
-  import axios from 'axios'
-  import VueAxios from 'vue-axios'
-  import Vue from 'vue'
   import {settings} from "../settings";
   import AppLogo from "./AppLogo";
   import _ from 'lodash';
-  import {userService} from "../services/user.service";
-
-  Vue.use(VueAxios, axios);
 
       export default {
           name: "AssessmentResults",

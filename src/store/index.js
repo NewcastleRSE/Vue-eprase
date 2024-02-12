@@ -1,12 +1,8 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
 import { authentication } from './authentication.module';
 import {dataService} from "../services/data.service";
+import { createPinia } from 'pinia';
 
-Vue.use(Vuex);
-
-export const store = new Vuex.Store({
+export const store = createPinia({
   modules: {
     authentication
   },

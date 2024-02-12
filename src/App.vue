@@ -1,14 +1,12 @@
 <template>
-  <div id="app">
-   <!-- <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div> -->
-    <router-view></router-view>
-  </div>
+  <!-- <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div> -->
+  <RouterView />
 </template>
 
 <script>
 
 import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import { RouterView } from 'vue-router'
 
 export default {
   name: 'app',
@@ -86,10 +84,7 @@ button {
   align-items:center;
 }
 
-.welcome-text {
-  #display:flex;
-  #justify-content:center;
-  #align-items:center;
+.welcome-text { 
   max-width: 600px;
 }
 

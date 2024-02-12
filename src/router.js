@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Router from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import AppWelcome from './components/AppWelcome.vue';
 import AppLogin from './components/AppLogin.vue';
@@ -28,11 +27,8 @@ import EpSystemComparison from "./components/EpSystemComparison";
 import HighRiskComparison from "./components/HighRiskComparison";
 import CategoryComparison from "./components/CategoryComparison";
 
-Vue.use(Router);
-
-export const router = new Router({
-
-  mode: 'history',
+export const router = createRouter({
+  history: createWebHistory(),
   routes: [
     {
       path: '/login',
@@ -141,8 +137,8 @@ export const router = new Router({
       path: '/allassessmentreports',
       component: AllAssessmentReports
     },
-    // otherwise redirect to welcome
-    { path: '*', redirect: '/' }
+    // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
+    { path: '/:pathMatch(.*)*', redirect: '/' }
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
@@ -156,17 +152,17 @@ export const router = new Router({
 
 })
 
+// TODO - assuming user in localStorage, and isn't particularly secure anyway - David Herbert 12/02/2024
+// router.beforeEach((to, from, next) => {
+//   // redirect to login page if not logged in and trying to access a restricted page
 
-router.beforeEach((to, from, next) => {
-  // redirect to login page if not logged in and trying to access a restricted page
+//   // list public pages
+//   const publicPages = ['/','/login','/failedlogin','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
+//   const authRequired = !publicPages.includes(to.path);
+//   const loggedIn = localStorage.getItem('user');
 
-  // list public pages
-  const publicPages = ['/','/login','/failedlogin','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
-  const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
-
-  if (authRequired && !loggedIn) {
-    return next('/login');
-  }
-  next();
-});
+//   if (authRequired && !loggedIn) {
+//     return next('/login');
+//   }
+//   next();
+// });

@@ -46,14 +46,9 @@
 
     import { settings } from '../settings';
     import TabHeader from './TabHeader';
-    import axios from 'axios'
-    import VueAxios from 'vue-axios'
-    import Vue from 'vue'
     import AppLogo from "./AppLogo";
     import {dataService} from "../services/data.service";
     import _ from "lodash";
-
-    Vue.use(VueAxios, axios);
 
     export default {
         name: "ResultsHome",

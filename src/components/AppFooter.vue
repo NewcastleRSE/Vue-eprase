@@ -26,11 +26,7 @@
     import AboutModal from './AboutModal';
     import ContactModal from './ContactModal';
 
-    import axios from 'axios'
-    import VueAxios from 'vue-axios'
-    import Vue from 'vue'
-
-    Vue.use(VueAxios, axios);
+    import { HTTP } from '../http-constants'
 
     export default {
         name: "AppFooter",
@@ -68,8 +64,7 @@
                 this.$router.push({ path: './resultshome' });
             },
             downloadFile() {
-              axios({
-                    url: './Eprase2022UserGuide.pdf',
+              HTTP.get('./Eprase2022UserGuide.pdf', {                    
                     method: 'GET',
                     responseType: 'blob',
                 }).then((res) => {
