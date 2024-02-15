@@ -1,91 +1,100 @@
 <template>
-  <!-- <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div> -->
-  <RouterView />
+    <!-- <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div> -->
+    <RouterView />
 </template>
 
 <script>
-
-import 'bootstrap/dist/css/bootstrap.css'
-import { RouterView } from 'vue-router'
+//import "bootstrap/dist/css/bootstrap.css";
+import { RouterView } from "vue-router";
 
 export default {
-  name: 'app',
-  components: {
-  },
-  computed: {
-      /*alert () {
+    name: "app",
+    components: {},
+    computed: {
+        /*alert () {
           return this.$store.state.alert
       } */
-  },
-  watch:{
-      $route (to, from){
-          // clear alert on location change
-         // this.$store.dispatch('alert/clear');
-      }
-  }
-}
+    },
+    watch: {
+        $route(to, from) {
+            // clear alert on location change
+            // this.$store.dispatch('alert/clear');
+        },
+    },
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
 }
 
 body {
 }
 
 #page {
-  border: 1px solid #c4c4c4;
-  border-radius: 25px;
-  margin: 50px;
-  background-color: #fff;
+    border: 1px solid #c4c4c4;
+    border-radius: 25px;
+    margin: 50px;
+    background-color: #fff;
 }
 
-h1, h2 {
-  font-weight: normal;
+h1,
+h2 {
+    font-weight: normal;
 }
 
 ul {
-  list-style-type: none;
-  padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 li {
-  display: inline-block;
-  margin: 0 10px;
+    display: inline-block;
+    margin: 0 10px;
 }
 
 a {
-  color: #2C3E50;
+    color: #2c3e50;
 }
 
 .eprase-logo {
-  height: 85px;
+    height: 85px;
 }
 
 button {
-  width: 120px;
-  height: 40px;
-  font-size: 1.2em;
+    width: 120px;
+    height: 40px;
+    font-size: 1.2em;
 }
 
 #infoLink {
-  padding-top: 10px;
+    padding-top: 10px;
 }
 
 .welcome {
-  margin: auto;
-  margin-top: 7%;
-  width: 600px;
-  justify-content:center;
-  align-items:center;
+    margin: auto;
+    margin-top: 7%;
+    width: 600px;
+    justify-content: center;
+    align-items: center;
 }
 
-.welcome-text { 
-  max-width: 600px;
+.welcome-text {
+    max-width: 600px;
 }
 
+.form-control:invalid {
+    background: none;
+    background-color: #fff;
+    border-color: #f00000;
+    border-width: 2px;
+}
+
+.error-text {
+    color: #f00000;
+}
 </style>
