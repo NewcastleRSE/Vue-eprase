@@ -7,7 +7,7 @@
           {{ configError.description }}
         </p>
       </div>
-      <div align="center">
+      <div class="mx-auto">
         <div class="questionnaire">
           <form>
               <span class="radio-buttons">
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <div class="form-group footer" align="center">
+      <div class="form-group footer mx-auto">
         <div class="buttons">
           <button v-show='nextEnabled' id="next-button" type="button" class="scenario-btn btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
         </div>

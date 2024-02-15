@@ -137,7 +137,7 @@
     <div v-show="doneEnabled" class="text">Congratulations, you have reached the end of the scenarios!</div>
 
 
-    <div class="form-group footer" align="center">
+    <div class="form-group footer mx-auto">
       <div class="buttons">
         <button v-show='nextEnabled' id="next-button" type="button" class="scenario-btn btn btn-primary" @click="onNextClick()" :disabled="isFormInvalid">Next</button>
         <button v-show='doneEnabled' id="done-button" type="button" class="scenario-btn btn btn-primary" @click="onDoneClick()">Done</button>

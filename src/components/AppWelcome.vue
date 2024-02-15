@@ -1,17 +1,17 @@
 <template>
   <div id="page">
     <div id="welcome">
-      <div align="center">
+      <div class="mx-auto">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div id="welcome-text">
-        <h1>Welcome to ePRaSE 2022</h1>
+        <h1>Welcome to ePRaSE 2024</h1>
         <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
           in order to determine their effectiveness and to encourage the correct use of these systems
           and deliver improved patient outcomes. </p>
 
         <br/>
-        <div align="center" v-if="appOpen">
+        <div class="mx-auto" v-if="appOpen">
           <div class="buttons" >
             <button type="button" class="start-btn btn btn-primary" @click=login()>Start</button>
           </div>

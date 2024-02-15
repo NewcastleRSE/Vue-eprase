@@ -3,7 +3,7 @@
 
     <div class="register">
 
-      <div id="logo" align="center">
+      <div id="logo" class="mx-auto">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="register-text">
@@ -48,7 +48,7 @@
                 <div v-show="submitted && errors.has('confirmPassword')" class="invalid-feedback alert alert-danger">{{ errors.first('confirmPassword') }}</div>
             </div>
 
-            <div id="buttons" class="form-group" align="center">
+            <div id="buttons" class="form-group mx-auto">
                 <button type="submit" class="reg-btn btn btn-primary" :disabled="isFormInvalid">Register</button>
                 <button type="button" class="reg-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
             <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>

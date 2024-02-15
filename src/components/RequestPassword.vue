@@ -3,7 +3,7 @@
 
     <div class="loginpage">
 
-      <div id="logo" align="center">
+      <div id="logo" class="mx-auto">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
 
@@ -16,8 +16,8 @@
           <input type="email" v-model="user.email" v-validate="{ required: true, regex:/^[a-zA-Z0-9.]+@([a-z]+.|)nhs.(uk|net)+$/ }" id="email" name="email" class="form-control" :class="{ 'is-invalid':  submitted && errors.has('email') }" />
           <div v-show="submitted && errors.has('email')" class="invalid-feedback alert alert-danger">{{ errors.first('email') }}</div>
         </div>
-        <div align="center">
-          <div class="buttons form-group" align="center">
+        <div class="mx-auto">
+          <div class="buttons form-group mx-auto">
             <button type="button" id="login" class="login-btn btn btn-primary" @click="onRequestClick()" :disabled="isFormInvalid">Submit</button>
           </div>
         </div>

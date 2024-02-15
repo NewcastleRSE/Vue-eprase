@@ -12,7 +12,7 @@
 
       <div v-for="patient in myPatientList" v-bind:key="patient.id">
 
-        <div align="center" class="card" v-if="patient">
+        <div class="mx-auto card" v-if="patient">
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
             <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'male' && patient[getCurrentPatient].is_adult === true">
@@ -139,14 +139,14 @@
 
       <div class="assessment">
         <p></p>
-        <div align="center">
+        <div class="mx-auto">
           <div class="alert alert-warning" role="alert">
             To optimise the use of this tool please record ALL types of guidance that appears on your system screen
           </div>
           <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Please note any interventions from the system..." maxlength="500"></textarea>
         </div>
       </div>
-      <div class="form-group footer" align="center">
+      <div class="form-group footer mx-auto">
         <div class="buttons">
           <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
           <p v-show='doneEnabled'><strong>Please ensure you click the Done button to save your progress</strong></p>

@@ -2,7 +2,7 @@
 
   <div> {{ patientData }} {{ quote }}</div>
 
-<!--- <div align="center" class="card" v-if="myPatient">
+<!--- <div class="mx-auto card" v-if="myPatient">
   <div class="card-header">
     <h4>{{patient.first_name}} {{patient.surname}}</h4>
     <span class="patient-image" v-if="patient.gender === 'male' && patient.is_adult === true">

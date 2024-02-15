@@ -4,7 +4,7 @@
    <div id="content">
      <h3>Assessment Scenarios</h3>
      <p>Please follow the instructions for each scenario.<br/></p>
-     <div align="center">
+     <div class="mx-auto">
        <div id="test-header">Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</div>
 
        <ScenarioPrescription v-if="assessment.isPrescriptionTest"></ScenarioPrescription>

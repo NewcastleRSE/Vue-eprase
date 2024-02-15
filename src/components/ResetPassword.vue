@@ -3,7 +3,7 @@
 
     <div class="loginpage">
 
-      <div id="logo" align="center">
+      <div id="logo" class="mx-auto">
         <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
 
@@ -25,8 +25,8 @@
 
         <p v-if="serverError" class="text-error">Token not found<br/><br/></p>
 
-        <div align="center">
-          <div class="buttons form-group" align="center">
+        <div class="mx-auto">
+          <div class="buttons form-group mx-auto">
             <button type="button" id="login" class="login-btn btn btn-primary" @click="onResetClick()">Submit</button>
             <button type="button" id="reset" class="login-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
           </div>

@@ -3,7 +3,7 @@
   
       <div class="loginpage">
   
-        <div id="logo" align="center">
+        <div id="logo" class="mx-auto">
           <img src="logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
         </div>
   
@@ -23,8 +23,8 @@
             </div>
           </form>  
          
-          <div align="center">
-            <div class="buttons form-group" align="center">
+          <div class="mx-auto">
+            <div class="buttons form-group mx-auto">
               <button type=" button" id="login" class="login-btn btn btn-primary" @click="onLoginClick()">Login</button>
               <button type="button" id="reset" class="login-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
               <button type="button" id="register" class="btn btn-primary" @click="onRegisterClick()">Register</button>

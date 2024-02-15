@@ -83,7 +83,7 @@
 
       <button class="reportbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
 
-      <div align="center">
+      <div class="mx-auto">
         <div class="buttons">
           <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>

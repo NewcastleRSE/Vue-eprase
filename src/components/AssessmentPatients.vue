@@ -6,7 +6,7 @@
   <div id="content">
     <h3>Assessment Patient Preparation</h3>
     <p>In preparation for the assessment, please complete the following tasks:</p>
-    <div align="center">
+    <div class="mx-auto">
       <div class="patient-info">
         <h4>Patient Data</h4>
         <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="form-group footer" align="center">
+    <div class="form-group footer mx-auto">
       <div class="buttons">
         <p>When all of the patients have been admitted to your ePrescription System, click <strong>Done</strong>.</p>
 

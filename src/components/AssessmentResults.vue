@@ -65,7 +65,7 @@
         <button class="chartbutton" @click="onChartClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
 
       </div>
-      <div align="center">
+      <div class="mx-auto">
         <div class="buttons">
           <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
           <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>
