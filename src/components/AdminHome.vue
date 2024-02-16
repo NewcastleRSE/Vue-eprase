@@ -124,7 +124,7 @@
 <style scoped>
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("../assets/images/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

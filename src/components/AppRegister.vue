@@ -4,7 +4,7 @@
     <div class="register">
 
       <div id="logo" class="mx-auto">
-        <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
       <div class="register-text">
         <h1>Register</h1>

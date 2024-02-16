@@ -6,15 +6,15 @@
   <div class="card-header">
     <h4>{{patient.first_name}} {{patient.surname}}</h4>
     <span class="patient-image" v-if="patient.gender === 'male' && patient.is_adult === true">
-      <img src="../assets/anon-male.png" height="80px" />
+      <img src="../assets/images/anon-male.png" height="80px" />
     </span>
 
     <span class="patient-image" v-if="patient.gender === 'female' && patient.is_adult === true">
-      <img src="../assets/anon-female.png" height="80px" />
+      <img src="../assets/images/anon-female.png" height="80px" />
     </span>
 
     <span class="patient-image" v-if="!patient.is_adult">
-      <img src="../assets/child.png" height="80px" />
+      <img src="../assets/images/child.png" height="80px" />
     </span>
     <p class="subtitle">(Patient 0 +1 of {{ myNumPatients }})</p>
   </div>

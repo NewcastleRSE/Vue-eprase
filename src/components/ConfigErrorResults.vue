@@ -35,11 +35,11 @@
 
               <td class="align-content-center"><span v-text="report.configErrorDataList[0].result===0 ? 'N' : 'Y' "></span></td>
 
-              <td class="align-content-center"><img v-show="report.configErrorDataList[0].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[0].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+              <td class="align-content-center"><img v-show="report.configErrorDataList[0].result === 0" src="../assets/images/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[0].result === 1" src="../assets/images/cross.png" alt="cross" class="smallimg"></td>
 
               <td class="align-content-center"><span v-text="report.configErrorDataList[1].result===0 ? 'N' : 'Y' "></span></td>
 
-              <td class="align-content-center"><img v-show="report.configErrorDataList[1].result === 0" src="../assets/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[1].result === 1" src="../assets/cross.png" alt="cross" class="smallimg"></td>
+              <td class="align-content-center"><img v-show="report.configErrorDataList[1].result === 0" src="../assets/images/green-tick.png" alt="tick" class="smallimg"><img v-show="report.configErrorDataList[1].result === 1" src="../assets/images/cross.png" alt="cross" class="smallimg"></td>
             </tr>
             </tbody>
           </table>
@@ -94,7 +94,7 @@
 <style scoped>
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("../assets/images/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

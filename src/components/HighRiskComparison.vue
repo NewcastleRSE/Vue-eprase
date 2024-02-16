@@ -30,9 +30,9 @@
                 <span v-if="report.system.other_ep_system">{{ report.system.other_ep_system}}</span></td>
                 <td>  {{report.description }}</td>
 
-               <!--   <span><img v-show="report.description[1] === 'Good Mitigation/Pass'" src="../assets/green-tick.png" alt="tick" class="smallimg"></span>
-                  <span> <img v-show="report.description[1] === 'Some Mitigation'" src="../assets/cross.png" alt="cross" class="smallimg"></span>
-                  <span><img v-show="report.description[1] === 'No Mitigation/Fail'" src="../assets/cross.png" alt="cross" class="smallimg"></span> -->
+               <!--   <span><img v-show="report.description[1] === 'Good Mitigation/Pass'" src="../assets/images/green-tick.png" alt="tick" class="smallimg"></span>
+                  <span> <img v-show="report.description[1] === 'Some Mitigation'" src="../assets/images/cross.png" alt="cross" class="smallimg"></span>
+                  <span><img v-show="report.description[1] === 'No Mitigation/Fail'" src="../assets/images/cross.png" alt="cross" class="smallimg"></span> -->
 
             </tr>
             </tbody>
@@ -119,7 +119,7 @@
 <style scoped>
 
   #header {
-    background-image: url("../assets/pills-bw.png");
+    background-image: url("../assets/images/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

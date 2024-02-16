@@ -8,10 +8,10 @@
                 <div class="card-body">
                     <h5 class="card-title"> {{  getCurrentPatient }}
                         <span class="icon" v-if="getCurrentPatientGender === 'female'">
-                       <img src="../assets/anon-female.png" height="50px" width="50px" alt="Gender icon female">
+                       <img src="../assets/images/anon-female.png" height="50px" width="50px" alt="Gender icon female">
                       </span>
                         <span class="icon"  v-if="getCurrentPatientGender === 'male'">
-                       <img src="../assets/anon-male.png" height="50px" width="50px" alt="Gender icon male">
+                       <img src="../assets/images/anon-male.png" height="50px" width="50px" alt="Gender icon male">
                       </span></h5>
                     <p class="card-text" >Age: {{ prescription.patient.age }}</p>
 

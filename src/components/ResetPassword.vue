@@ -4,7 +4,7 @@
     <div class="loginpage">
 
       <div id="logo" class="mx-auto">
-        <img src="../assets/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
+        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
       </div>
 
       <h1>Reset Password</h1>

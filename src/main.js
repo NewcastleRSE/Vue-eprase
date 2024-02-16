@@ -1,7 +1,11 @@
+import "./assets/scss/custom.scss";
+import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css";
 import { createApp } from 'vue'
 import App from './App.vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import { configure } from 'vee-validate'
 import VueGoogleCharts from 'vue-google-charts'
 import { router } from './router'
 import { store } from './store'
@@ -14,6 +18,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faHome, faInfoCircle, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt, faCaretRight, faEnvelope )
 
 const app = createApp(App)
+
+configure({
+  validateOnBlur: false,
+  validateOnChange: true,
+  validateOnInput: true,
+  validateOnModelUpdate: true
+})
 
 app.use(VueAxios, axios)
 app.use(VueGoogleCharts)

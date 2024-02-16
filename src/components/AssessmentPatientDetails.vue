@@ -16,15 +16,15 @@
           <div class="card-header">
             <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
             <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'male' && patient[getCurrentPatient].is_adult === true">
-              <img src="../assets/anon-male.png" height="80px" />
+              <img src="../assets/images/anon-male.png" height="80px" />
             </span>
 
             <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'female' && patient[getCurrentPatient].is_adult === true">
-              <img src="../assets/anon-female.png" height="80px" />
+              <img src="../assets/images/anon-female.png" height="80px" />
             </span>
 
             <span class="patient-image" v-if="!patient[getCurrentPatient].is_adult">
-              <img src="../assets/child.png" height="80px" />
+              <img src="../assets/images/child.png" height="80px" />
             </span>
             <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
           </div>
