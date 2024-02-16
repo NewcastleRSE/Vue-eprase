@@ -1,44 +1,65 @@
-import "./assets/scss/custom.scss";
+import "./assets/scss/custom.scss"
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css";
-import { createApp } from 'vue'
-import App from './App.vue'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
-import { configure } from 'vee-validate'
-import VueGoogleCharts from 'vue-google-charts'
-import { router } from './router'
-import { store } from './store'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHome, faInfoCircle, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt, faCaretRight, faEnvelope} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
+import { createApp } from "vue"
+import { createPinia } from "pinia"
+import App from "./App.vue"
+import axios from "axios"
+import { appSettingsStore } from "./stores/appSettings"
+import VueAxios from "vue-axios"
+import { configure } from "vee-validate"
+import VueGoogleCharts from "vue-google-charts"
+import { router } from "./router"
+import { store } from "./store"
+import { library } from "@fortawesome/fontawesome-svg-core"
+import {
+  faHome,
+  faInfoCircle,
+  faList,
+  faClipboard,
+  faChartBar,
+  faQuestionCircle,
+  faSignOutAlt,
+  faCaretRight,
+  faEnvelope,
+} from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 // import * as Sentry from "@sentry/vue"
 // import { BrowserTracing } from "@sentry/tracing"
 
-library.add(faHome, faInfoCircle, faList, faClipboard, faChartBar, faQuestionCircle, faSignOutAlt, faCaretRight, faEnvelope )
+library.add(
+  faHome,
+  faInfoCircle,
+  faList,
+  faClipboard,
+  faChartBar,
+  faQuestionCircle,
+  faSignOutAlt,
+  faCaretRight,
+  faEnvelope,
+)
 
 const app = createApp(App)
+const pinia = createPinia()
 
 configure({
   validateOnBlur: false,
   validateOnChange: true,
   validateOnInput: true,
-  validateOnModelUpdate: true
+  validateOnModelUpdate: true,
 })
 
-app.use(VueAxios, axios)
-app.use(VueGoogleCharts)
-app.use(router)
-app.use(store)
+app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router).use(store)
+
 app.component(library)
-app.component('font-awesome-icon', FontAwesomeIcon);
+app.component("font-awesome-icon", FontAwesomeIcon)
 
 // hides default console message
 app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
-app.config.errorHandler = function(err, vm, info) {
+app.config.errorHandler = function (err, vm, info) {
   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
 }
 
@@ -59,4 +80,4 @@ app.config.errorHandler = function(err, vm, info) {
 //     environment: "development"
 //   });
 
-app.mount('#app')
+app.mount("#app")

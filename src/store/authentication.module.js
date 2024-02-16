@@ -1,8 +1,8 @@
-import { userService } from '../services/user.service';
-import { router } from '../router';
-import {dataService} from "../services/data.service";
+import { userService } from "../services/user.service";
+import { router } from "../router";
+import { dataService } from "../services/data.service";
 
-const user = localStorage.getItem('user');
+const user = localStorage.getItem("user");
 const initialState = user
   ? { status: { loggedIn: true }, user }
   : { status: {}, user: null };
@@ -12,65 +12,69 @@ export const authentication = {
   state: initialState,
   actions: {
     login({ dispatch, commit }, { username, password }) {
-      commit('loginRequest', { username });
+      commit("loginRequest", { username });
 
-      userService.login(username, password)
+      userService
+        .login(username, password)
         .then(
-          user => {
-            commit('loginSuccess', user);
+          (user) => {
+            commit("loginSuccess", user);
 
             /*redirect admin user */
-            if(password === 'adminuser1'){
-              dataService.audit('Successful admin  login', '/login');
-              router.push('/adminhome');
-            }
-            else {
-              dataService.audit('Successful login', '/login');
-              router.push('/assessmentintro');
+            if (password === "adminuser1") {
+              dataService.audit("Successful admin  login", "/login");
+              router.push("/adminhome");
+            } else {
+              dataService.audit("Successful login", "/login");
+              router.push("/assessmentintro");
             }
           },
-          error => {
-            commit('loginFailure', error);
-            dataService.failedLoginAudit('Failed login', '/login');
-            return Promise.reject(new Error('failed'));
-          }
-        ).catch((err => {}));
+          (error) => {
+            commit("loginFailure", error);
+            dataService.failedLoginAudit("Failed login", "/login");
+            return Promise.reject(new Error("failed"));
+          },
+        )
+        .catch((err) => {});
     },
     logout({ commit }) {
       userService.logout();
-      commit('logout');
+      commit("logout");
     },
     requestNewPassword({ dispatch, commit }, { email }) {
-      commit('newPasswordRequest', { email });
+      commit("newPasswordRequest", { email });
 
-      userService.newPasswordRequest(email)
+      userService
+        .newPasswordRequest(email)
         .then(
-          user => {
-            commit('newPasswordSuccess', user);
-            router.push('/assessmentintro');
+          (user) => {
+            commit("newPasswordSuccess", user);
+            router.push("/assessmentintro");
           },
-          error => {
-            commit('newPasswordFailure', error);
-            return Promise.reject(new Error('failed'));
-          }
-        ).catch((err => {}));
-
+          (error) => {
+            commit("newPasswordFailure", error);
+            return Promise.reject(new Error("failed"));
+          },
+        )
+        .catch((err) => {});
     },
     resetPassword({ dispatch, commit }, { password, token }) {
-      commit('resetPassword');
+      commit("resetPassword");
 
-      userService.resetPassword(password, token)
+      userService
+        .resetPassword(password, token)
         .then(
-          user => {
-            commit('passwordResetSuccess', user);
-            router.push('/login');
+          (user) => {
+            commit("passwordResetSuccess", user);
+            router.push("/login");
           },
-          error => {
-            commit('passwordResetFailure', error);
-            return Promise.reject(new Error('reset failed'));
-          }
-        ).catch((err => {}));
-    }
+          (error) => {
+            commit("passwordResetFailure", error);
+            return Promise.reject(new Error("reset failed"));
+          },
+        )
+        .catch((err) => {});
+    },
   },
   mutations: {
     loginRequest(state, user) {
@@ -89,29 +93,29 @@ export const authentication = {
       state.status = {};
       state.user = null;
     },
-    newPasswordRequest(state){
+    newPasswordRequest(state) {
       state.status = {};
       state.user = null;
     },
-    newPasswordSuccess(state){
+    newPasswordSuccess(state) {
       state.status = {};
       state.user = null;
     },
-    newPasswordFailure(state){
+    newPasswordFailure(state) {
       state.status = {};
       state.user = null;
     },
-    passwordResetSuccess(state){
+    passwordResetSuccess(state) {
       state.status = {};
       state.user = null;
     },
-    passwordResetFailure(state){
+    passwordResetFailure(state) {
       state.status = {};
       state.user = null;
     },
-    resetPassword(state){
+    resetPassword(state) {
       state.status = {};
       state.user = null;
     },
-  }
-}
+  },
+};

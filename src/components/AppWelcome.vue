@@ -1,11 +1,7 @@
 <template>
   <main>
     <div class="pb-3">
-      <img
-        src="../assets/images/logo-full.png"
-        alt="Welcome to the ePRaSE Tool"
-        class="eprase-logo"
-      />
+      <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo" />
     </div>
     <div class="pb-3">
       <h1>Welcome to ePRaSE 2024</h1>
@@ -26,25 +22,14 @@
     </div>
     <div class="row w-75 mx-auto">
       <div class="col p-1">
-        <img
-          id="di-logo"
-          src="../assets/images/Digital_Institute.jpg"
-          alt="Digital Institute"
-        />
+        <img id="di-logo" src="../assets/images/Digital_Institute.jpg" alt="Digital Institute" />
       </div>
       <div class="col p-1">
-        <img
-          id="nuth-logo"
-          src="../assets/images/NUTHlogo.png"
-          alt="The Newcastle upon Tyne Hospitals NHS Foundation Trust"
-        />
+        <img id="nuth-logo" src="../assets/images/NUTHlogo.png"
+          alt="The Newcastle upon Tyne Hospitals NHS Foundation Trust" />
       </div>
       <div class="col p-1">
-        <img
-          id="pharm-logo"
-          src="../assets/images/pharmacy.png"
-          alt="School of Pharmacy"
-        />
+        <img id="pharm-logo" src="../assets/images/pharmacy.png" alt="School of Pharmacy" />
       </div>
     </div>
     <div id="version">Version {{ version }}</div>
@@ -52,25 +37,28 @@
 </template>
 
 <script>
-import { settings } from "../settings";
+
+import { appSettingsStore } from '../stores/appSettings'
+
+const appSettings = appSettingsStore()
 
 export default {
   name: "AppWelcome",
   data() {
     return {
-      version: settings.version,
-      appOpen: settings.appOpen,
-    };
+      version: appSettings.version,
+      appOpen: appSettings.appOpen,
+    }
   },
   methods: {
     login() {
-      this.$router.push("/login");
+      this.$router.push("/login")
     },
     about() {
-      this.$router.push("/about");
+      this.$router.push("/about")
     },
   },
-};
+}
 </script>
 
 <style scoped>

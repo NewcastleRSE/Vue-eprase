@@ -38,7 +38,7 @@ h2 {
 
 ul {
     list-style-type: none;
-    padding: 0;
+    padding: 0;    
 }
 
 li {
@@ -59,4 +59,9 @@ a {
   background-color: #fff;
   border-color: $danger;
   border-width: 2px;
+}
+
+.text-error {
+  color: #1c3f37;
+  font-weight: bold;
 }
