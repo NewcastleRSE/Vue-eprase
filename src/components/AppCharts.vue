@@ -12,7 +12,7 @@
        <StackedChart :mydata="chartCategoryData" ></StackedChart>
       </div>
 
-    <button class="chartbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
+    <button class="chartbutton" @click="onReportClick()"><i class="bi bi-bar-chart"></i> View Report</button>
 
     <div class="mx-auto">
       <div class="buttons">

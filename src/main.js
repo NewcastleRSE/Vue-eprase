@@ -5,39 +5,12 @@ import { createApp } from "vue"
 import { createPinia } from "pinia"
 import App from "./App.vue"
 import axios from "axios"
-import { appSettingsStore } from "./stores/appSettings"
 import VueAxios from "vue-axios"
 import { configure } from "vee-validate"
 import VueGoogleCharts from "vue-google-charts"
 import { router } from "./router"
-import { store } from "./store"
-import { library } from "@fortawesome/fontawesome-svg-core"
-import {
-  faHome,
-  faInfoCircle,
-  faList,
-  faClipboard,
-  faChartBar,
-  faQuestionCircle,
-  faSignOutAlt,
-  faCaretRight,
-  faEnvelope,
-} from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 // import * as Sentry from "@sentry/vue"
 // import { BrowserTracing } from "@sentry/tracing"
-
-library.add(
-  faHome,
-  faInfoCircle,
-  faList,
-  faClipboard,
-  faChartBar,
-  faQuestionCircle,
-  faSignOutAlt,
-  faCaretRight,
-  faEnvelope,
-)
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -49,10 +22,7 @@ configure({
   validateOnModelUpdate: true,
 })
 
-app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router).use(store)
-
-app.component(library)
-app.component("font-awesome-icon", FontAwesomeIcon)
+app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router)
 
 // hides default console message
 app.config.productionTip = false

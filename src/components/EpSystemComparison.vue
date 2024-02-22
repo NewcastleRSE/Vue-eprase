@@ -36,8 +36,8 @@
     </div>
 
     <div class="footer-bar-buttons">
-      <button><font-awesome-icon icon="home"></font-awesome-icon><span class="headerLink"><router-link to="/adminhome">Admin Home</router-link></span></button>
-      <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+      <button><i class="bi bi-house-gear"></i><span class="headerLink"><router-link to="/adminhome">Admin Home</router-link></span></button>
+      <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
     </div>
 
     <AppLogo></AppLogo>

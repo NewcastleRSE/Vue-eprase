@@ -84,7 +84,7 @@
 
 
               <div v-show="results.lab_results === 'true'"  class="question form-group" id="question-5">
-                <p class="add_results_label"><font-awesome-icon icon="caret-right"></font-awesome-icon> Are you able to manually enter laboratory results into your patient admin and/ or e-prescribing test system that you are using to do this assessments?</p>
+                <p class="add_results_label"><i class="bi bi-caret-right"></i> Are you able to manually enter laboratory results into your patient admin and/ or e-prescribing test system that you are using to do this assessments?</p>
                 <span class="radio-buttons">
                   <label for="man-results-yes">Yes</label>
                   <input type="radio" value=true class="radio-yes" name="man-results" id="man-results-yes"  v-model="results.man_results">
@@ -105,7 +105,7 @@
               </div>
 
               <div v-if="results.med_history === 'true'"  class="question form-group" id="question-7">
-                <p class="add_results_label"><font-awesome-icon icon="caret-right"></font-awesome-icon> Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessments?</p>
+                <p class="add_results_label"><i class="bi bi-caret-right"></i> Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessments?</p>
                 <span class="radio-buttons">
                 <label for="diagnosis-results-yes">Yes</label>
                 <input type="radio" value=true class="radio-yes" name="diagnosis-results" id="diagnosis-results-yes"  v-model="results.diagnosis_results">

@@ -32,7 +32,7 @@
         <img id="pharm-logo" src="../assets/images/pharmacy.png" alt="School of Pharmacy" />
       </div>
     </div>
-    <div id="version">Version {{ version }}</div>
+    <div class="pt-3">Version {{ version }}</div>
   </main>
 </template>
 
@@ -40,14 +40,12 @@
 
 import { appSettingsStore } from '../stores/appSettings'
 
-const appSettings = appSettingsStore()
-
 export default {
   name: "AppWelcome",
   data() {
     return {
-      version: appSettings.version,
-      appOpen: appSettings.appOpen,
+      version: null,
+      appOpen: null,
     }
   },
   methods: {
@@ -58,6 +56,11 @@ export default {
       this.$router.push("/about")
     },
   },
+  mounted() {
+    const appSettings = appSettingsStore()
+    this.version = appSettings.version
+    this.appOpen = appSettings.appOpen
+  }
 }
 </script>
 

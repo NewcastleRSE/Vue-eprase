@@ -61,8 +61,8 @@
           </table>
         </div>
 
-        <button class="chartbutton" @click="onTableClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Percentages</button>
-        <button class="chartbutton" @click="onChartClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Charts</button>
+        <button class="chartbutton" @click="onTableClick()"><i class="bi bi-percent"></i> View Percentages</button>
+        <button class="chartbutton" @click="onChartClick()"><i class="bi bi-bar-chart"></i> View Charts</button>
 
       </div>
       <div class="mx-auto">

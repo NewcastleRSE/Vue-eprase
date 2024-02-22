@@ -13,15 +13,15 @@
 
           <b-list-group>
             <b-list-group-item class="d-flex justify-content-between align-items-center">
-              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              <i class="bi bi-envelope"></i>
               rseteam@newcastle.ac.uk
             </b-list-group-item>
             <b-list-group-item class="d-flex justify-content-between align-items-center">
-              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              <i class="bi bi-envelope"></i>
               stephanie.klein@nhs.net
             </b-list-group-item>
             <b-list-group-item class="d-flex justify-content-between align-items-center">
-              <font-awesome-icon icon="envelope"></font-awesome-icon>
+              <i class="bi bi-envelope"></i>
               jude.heed@newcastle.ac.uk
             </b-list-group-item>
 

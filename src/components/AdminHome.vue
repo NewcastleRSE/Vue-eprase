@@ -22,7 +22,7 @@
                     <button @click="epmaStatistics()" @mouseover="guidanceText = 'View EPMA data for institutions.' " @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">EPMA Statistics</a></button>
                     <button @click="configErrorResults()" @mouseover="guidanceText = 'View config error results for institutions.' " @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">Configuration Error Results</a></button>
                     <button @click="highRiskComparison()" @mouseover="guidanceText = 'View extreme risk results for institutions.' " @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">Extreme Risk Comparison</a></button>
-                    <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+                    <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
                 </b-col>
                 <b-col cols="8">
                     <div id="guidance">{{ guidanceText }}</div>

@@ -3,13 +3,12 @@
   <div class="footer-content">
 
     <div class="footer-bar-buttons">
-      <button @click="showAboutModal = true"><font-awesome-icon icon="info-circle"></font-awesome-icon><a href="#">About</a></button>
-      <button @click="showModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Instructions</a></button>
-      <button @click=reports()><font-awesome-icon icon="chart-bar"></font-awesome-icon><a href="#">Reports</a></button>
-    <!-- <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF"  @click="downloadFile()">User Guide</a></button> -->
-      <button><font-awesome-icon icon="question-circle"></font-awesome-icon><a id="downloadPDF" href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank">User Guide</a></button>
-      <button @click="showContactModal = true"><font-awesome-icon icon="clipboard"></font-awesome-icon><a href="#">Contact</a></button>
-      <button><font-awesome-icon icon="sign-out-alt"></font-awesome-icon><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+      <button @click="showAboutModal = true"><i class="bi bi-info-circle"></i><a href="#">About</a></button>
+      <button @click="showModal = true"><i class="bi bi-clipboard"></i><a href="#">Instructions</a></button>
+      <button @click=reports()><i class="bi bi-bar-chart"></i><a href="#">Reports</a></button>
+      <button><i class="bi bi-question-circle"></i><a id="downloadPDF" href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank">User Guide</a></button>
+      <button @click="showContactModal = true"><i class="bi bi-person-circle"></i><a href="#">Contact</a></button>
+      <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
     </div>
 
     <AboutModal v-if="showAboutModal" :aboutModalData='aboutCustomData' :user-id="user.user_id" @close="showAboutModal = false"  />

@@ -81,7 +81,7 @@
 
       <div class="note">* All categories (Good/Some/Not/Over) calculated as a percentage of the <strong>total valid tests</strong>, not an average of the previous columns</div>
 
-      <button class="reportbutton" @click="onReportClick()"><font-awesome-icon icon="chart-bar"></font-awesome-icon> View Report</button>
+      <button class="reportbutton" @click="onReportClick()"><i class="bi bi-bar-chart"></i> View Report</button>
 
       <div class="mx-auto">
         <div class="buttons">

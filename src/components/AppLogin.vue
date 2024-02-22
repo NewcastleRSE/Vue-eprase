@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { Form, Field, ErrorMessage, resetForm } from "vee-validate";
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 export default {
   name: "AppLogin",
