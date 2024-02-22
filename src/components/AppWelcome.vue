@@ -38,15 +38,13 @@
 
 <script>
 
+import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
-  name: "AppWelcome",
-  data() {
-    return {
-      version: null,
-      appOpen: null,
-    }
+  name: "AppWelcome",  
+  computed: {
+    ...mapState(appSettingsStore, ['version', 'appOpen'])
   },
   methods: {
     login() {
@@ -55,11 +53,6 @@ export default {
     about() {
       this.$router.push("/about")
     },
-  },
-  mounted() {
-    const appSettings = appSettingsStore()
-    this.version = appSettings.version
-    this.appOpen = appSettings.appOpen
   }
 }
 </script>
