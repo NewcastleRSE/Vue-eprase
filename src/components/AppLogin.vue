@@ -62,7 +62,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia'
 import { Form, Field, ErrorMessage } from "vee-validate"
+import { authenticationStore } from "../stores/authentication"
 
 export default {
   name: "AppLogin",
@@ -72,12 +74,7 @@ export default {
     ErrorMessage,
   },
   computed: {
-    isFormInvalid() {
-      return Object.keys(this.fields).some((key) => this.fields[key].invalid)
-    },
-    loggingIn() {
-      return this.$store.state.authentication.status.loggingIn
-    },
+    ...mapStores(authenticationStore)
   },
   data() {
     return {
@@ -118,7 +115,6 @@ export default {
 
       console.group('onLoginClick()')
 
-      this.submitted = true
       this.user.username = this.user.email.split('@').shift()
       this.$refs.loginForm.validate().then((valid) => {
         console.log('Form submission valid', valid)
@@ -126,16 +122,17 @@ export default {
           const username = this.user.username
           const password = this.user.password
           console.debug('Username', username, 'password', password)
-          //TODO all the stores need converting from Vuex to Pinia - David Herbert 16/02/2024
-          console.log(this.$store)
-          if (username && password) {
-            dispatch('authentication/login', {
-              username,
-              password,
-            }).then(() => {
-              this.serverError = true
-              this.$router.push('/login').catch((err) => { })
+          try {
+            this.authenticationStore.login(username, password).then((response) => {
+              this.authenticationStore.checkIsAdminUser(userId)//HERE
             })
+            // if (this.authenticationStore.checkIsAdminUser(userId)) {
+            //   this.$router.push('/adminhome')
+            // } else {
+            //   this.$router.push('/assessmentintro')
+            // }
+          } catch (err) {
+            console.error(err)
           }
         }
       })

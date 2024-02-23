@@ -1,6 +1,6 @@
 import { dataService } from '../services/data.service'
-import { appSettingsStore } from './appSettings'
 import { defineStore } from 'pinia'
+import axios from "axios"
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
@@ -10,11 +10,11 @@ export const authenticationStore = defineStore('authentication', {
     token: localStorage.getItem('token')
   }),
   getters: {
-    isLoggedIn: () => state.token != null,
-    user: () => state.user,
-    userId: () => state.userId,
-    institutionId: () => state.institutionId,
-    token: () => state.token
+    isLoggedIn: (state) => state.token != null,
+    getUser: (state) => state.user,
+    getUserId: (state) => state.userId,
+    getInstitutionId: (state) => state.institutionId,
+    getToken: (state) => state.token
   },
   actions: {    
     async login(username, password) {
@@ -22,25 +22,20 @@ export const authenticationStore = defineStore('authentication', {
       console.group('login()')
       console.debug('Username', username, 'password', password)
 
-      const appSettings = appSettingsStore()
-      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: JSON.stringify({ username, password })})
-      console.debug('POST to /auth/signin with payload', requestOptions)
-
       try {
-        const user = await this.axios.post('auth/signin', requestOptions)
-        console.debug('Success, user', user)
-        dataService.audit('Successful login', '/login')
+        const user = await axios.post('auth/signin', { username, password }) 
+        //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
+
         console.groupEnd()
-        if (this.checkIsAdminUser(user.userId)) {
-          this.$router.push('/adminhome')
-        } else {
-          this.$router.push('/assessmentintro')
-        }        
-      } catch (err) {
+
+      } catch (err) {        
+        //dataService.failedLoginAudit('Failed login', '/login')
+
         console.error('authentication/login : the following error occurred', err)
-        dataService.failedLoginAudit('Failed login', '/login')
         console.groupEnd()
+
+        throw new Error(err)
       }
     },
     logout() {
@@ -49,16 +44,11 @@ export const authenticationStore = defineStore('authentication', {
     },
     async checkIsAdminUser(userId) {
 
-      console.group('isAdminUser()')
+      console.group('checkIsAdminUser()')
       console.debug('User ID', userId)
 
-      const appSettings = appSettingsStore()
-      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions)
-      requestOptions.headers['Authorization'] = 'Bearer ' + this.token
-      console.debug('POST to /auth/signin with payload', requestOptions)
-
       try {
-        const res = await this.axios.get('auth/userIsAdmin?USER_ID=' + userId, requestOptions)
+        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.getToken }})
         console.groupEnd()
         return res
       } catch(err) {
@@ -67,19 +57,31 @@ export const authenticationStore = defineStore('authentication', {
         return false
       }      
     },    
-    updateUser(res) {
-      console.debug('State before update', this.state)
-      this.$patch(res)
-      Object.keys(res).forEach((k) => {
-        localStorage.setItem(k, res[k])
+    updateUser(payload) {
+
+      console.group('updateUser()')
+      console.debug('Backend payload', payload)
+
+      const csPayload = {
+        user: payload.data.username,
+        userId: payload.data.user_id,
+        institutionId: payload.data.institution_id,
+        token: payload.data.jwt.accessToken
+      }
+
+      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.token)
+
+      this.$patch(csPayload)
+      Object.keys(csPayload).forEach((k) => {
+        localStorage.setItem(k, csPayload[k])
       })    
-      console.debug('State after update', this.state)
+
+      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.token)
+      console.groupEnd()
     },
-    async requestNewPassword(email) {
-      const appSettings = appSettingsStore()
-      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: email }) 
+    async requestNewPassword(email) {     
       try {
-        const res = await this.axios.post('auth/newPassword', requestOptions)
+        const res = await axios.post('auth/newPassword', { email })
         dataService.audit('Successful password reset request', '/requestpassword')
         console.error('Not implemented!')
       } catch (err) {
@@ -87,11 +89,9 @@ export const authenticationStore = defineStore('authentication', {
         dataService.failedLoginAudit('Failed password reset request', '/requestpassword')
       }
     },
-    async resetPassword(password, token) {
-      const appSettings = appSettingsStore()
-      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: password }) 
+    async resetPassword(password, token) {     
       try {
-        const res = await this.axios.post('auth/resetPassword?token=' + token, requestOptions)
+        const res = await axios.post('auth/resetPassword?token=' + token, { password })
         dataService.audit('Successful password reset', '/resetpassword')
         console.error('Not implemented!')
       } catch (err) {

@@ -22,6 +22,10 @@ configure({
   validateOnModelUpdate: true,
 })
 
+axios.defaults.baseURL = 'http://localhost:6001/api/',
+axios.defaults.headers.common['Content-Type'] = 'application/json'
+axios.defaults.mode = 'no-cors'
+
 app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router)
 
 // hides default console message

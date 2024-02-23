@@ -6,12 +6,7 @@ export const appSettingsStore = defineStore('appSettings', {
       version: '2.5.3',
       debugMode: false,
       appOpen: true,
-      year: new Date().getFullYear(),
-      axiosDefaultOptions: {
-        baseURL: 'http://localhost:6001/api/',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'no-cors'
-      },
+      year: new Date().getFullYear(),     
       passwordMinLength: 6,
       passwordMaxLength: 50,      
     }
