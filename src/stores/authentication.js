@@ -1,10 +1,8 @@
-import { userService } from "../services/user.service"
-import { router } from "../router"
-import { dataService } from "../services/data.service"
+import { dataService } from '../services/data.service'
+import { appSettingsStore } from './appSettings'
 import { defineStore } from 'pinia'
 
 export const authenticationStore = defineStore('authentication', {
-  namespaced: true,
   state: () => ({
     user: localStorage.getItem('user'),
     userId: localStorage.getItem('userId'),
@@ -13,114 +11,93 @@ export const authenticationStore = defineStore('authentication', {
   }),
   getters: {
     isLoggedIn: () => state.token != null,
-
+    user: () => state.user,
+    userId: () => state.userId,
+    institutionId: () => state.institutionId,
+    token: () => state.token
   },
-  actions: {
+  actions: {    
     async login(username, password) {
-      commit("loginRequest", { username })
 
-      userService
-        .login(username, password)
-        .then(
-          (user) => {
-            commit("loginSuccess", user)
+      console.group('login()')
+      console.debug('Username', username, 'password', password)
 
-            /*redirect admin user */
-            if (password === "adminuser1") {
-              dataService.audit("Successful admin  login", "/login")
-              router.push("/adminhome")
-            } else {
-              dataService.audit("Successful login", "/login")
-              router.push("/assessmentintro")
-            }
-          },
-          (error) => {
-            commit("loginFailure", error)
-            dataService.failedLoginAudit("Failed login", "/login")
-            return Promise.reject(new Error("failed"))
-          },
-        )
-        .catch((err) => { })
+      const appSettings = appSettingsStore()
+      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: JSON.stringify({ username, password })})
+      console.debug('POST to /auth/signin with payload', requestOptions)
+
+      try {
+        const user = await this.axios.post('auth/signin', requestOptions)
+        console.debug('Success, user', user)
+        dataService.audit('Successful login', '/login')
+        this.updateUser(user)
+        console.groupEnd()
+        if (this.checkIsAdminUser(user.userId)) {
+          this.$router.push('/adminhome')
+        } else {
+          this.$router.push('/assessmentintro')
+        }        
+      } catch (err) {
+        console.error('authentication/login : the following error occurred', err)
+        dataService.failedLoginAudit('Failed login', '/login')
+        console.groupEnd()
+      }
     },
     logout() {
       localStorage.clear()
       this.$reset()
     },
-    requestNewPassword({ dispatch, commit }, { email }) {
-      commit("newPasswordRequest", { email })
+    async checkIsAdminUser(userId) {
 
-      userService
-        .newPasswordRequest(email)
-        .then(
-          (user) => {
-            commit("newPasswordSuccess", user)
-            router.push("/assessmentintro")
-          },
-          (error) => {
-            commit("newPasswordFailure", error)
-            return Promise.reject(new Error("failed"))
-          },
-        )
-        .catch((err) => { })
-    },
-    resetPassword({ dispatch, commit }, { password, token }) {
-      commit("resetPassword")
+      console.group('isAdminUser()')
+      console.debug('User ID', userId)
 
-      userService
-        .resetPassword(password, token)
-        .then(
-          (user) => {
-            commit("passwordResetSuccess", user)
-            router.push("/login")
-          },
-          (error) => {
-            commit("passwordResetFailure", error)
-            return Promise.reject(new Error("reset failed"))
-          },
-        )
-        .catch((err) => { })
+      const appSettings = appSettingsStore()
+      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions)
+      requestOptions.headers['Authorization'] = 'Bearer ' + this.token
+      console.debug('POST to /auth/signin with payload', requestOptions)
+
+      try {
+        const res = await this.axios.get('auth/userIsAdmin?USER_ID=' + userId, requestOptions)
+        console.groupEnd()
+        return res
+      } catch(err) {
+        console.error('Error checking if user is admin:', err)
+        console.groupEnd()
+        return false
+      }      
+    },    
+    updateUser(res) {
+      console.debug('State before update', this.state)
+      this.$patch(res)
+      Object.keys(res).forEach((k) => {
+        localStorage.setItem(k, res[k])
+      })    
+      console.debug('State after update', this.state)
     },
-  },
-  mutations: {
-    loginRequest(state, user) {
-      state.status = { loggingIn: true }
-      state.user = user
+    async requestNewPassword(email) {
+      const appSettings = appSettingsStore()
+      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: email }) 
+      try {
+        const res = await this.axios.post('auth/newPassword', requestOptions)
+        dataService.audit('Successful password reset request', '/requestpassword')
+        console.error('Not implemented!')
+      } catch (err) {
+        console.error('authentication/requestNewPassword : the following error occurred', err)
+        dataService.failedLoginAudit('Failed password reset request', '/requestpassword')
+      }
     },
-    loginSuccess(state, user) {
-      state.status = { loggedIn: true }
-      state.user = user
-    },
-    loginFailure(state) {
-      state.status = {}
-      state.user = null
-    },
-    logout(state) {
-      state.status = {}
-      state.user = null
-    },
-    newPasswordRequest(state) {
-      state.status = {}
-      state.user = null
-    },
-    newPasswordSuccess(state) {
-      state.status = {}
-      state.user = null
-    },
-    newPasswordFailure(state) {
-      state.status = {}
-      state.user = null
-    },
-    passwordResetSuccess(state) {
-      state.status = {}
-      state.user = null
-    },
-    passwordResetFailure(state) {
-      state.status = {}
-      state.user = null
-    },
-    resetPassword(state) {
-      state.status = {}
-      state.user = null
-    },
-  },
+    async resetPassword(password, token) {
+      const appSettings = appSettingsStore()
+      const requestOptions = Object.assign({}, appSettings.axiosDefaultOptions, { body: password }) 
+      try {
+        const res = await this.axios.post('auth/resetPassword?token=' + token, requestOptions)
+        dataService.audit('Successful password reset', '/resetpassword')
+        console.error('Not implemented!')
+      } catch (err) {
+        console.error('authentication/requestNewPassword : the following error occurred', err)
+        dataService.failedLoginAudit('Failed password reset request', '/resetpassword')
+      }
+    }
+  }
 })

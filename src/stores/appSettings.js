@@ -8,7 +8,7 @@ export const appSettingsStore = defineStore('appSettings', {
       appOpen: true,
       year: new Date().getFullYear(),
       axiosDefaultOptions: {
-        baseURL: 'http://localhost:6001/api',
+        baseURL: 'http://localhost:6001/api/',
         headers: { 'Content-Type': 'application/json' },
         mode: 'no-cors'
       },
