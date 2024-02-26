@@ -1,110 +1,45 @@
 <template>
-
-  <div class="footer-content">
-
-    <div class="footer-bar-buttons">
-      <button @click="showAboutModal = true"><i class="bi bi-info-circle"></i><a href="#">About</a></button>
-      <button @click="showModal = true"><i class="bi bi-clipboard"></i><a href="#">Instructions</a></button>
-      <button @click=reports()><i class="bi bi-bar-chart"></i><a href="#">Reports</a></button>
-      <button><i class="bi bi-question-circle"></i><a id="downloadPDF" href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank">User Guide</a></button>
-      <button @click="showContactModal = true"><i class="bi bi-person-circle"></i><a href="#">Contact</a></button>
-      <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+  <div class="btn-toolbar" role="toolbar" aria-label="Control button toolbar">
+    <div class="btn-group me-2" role="group" aria-label="Control button group">
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aboutModal"><i
+          class="bi bi-info-circle pe-1"></i>About</button>
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#instructionsModal"><i
+          class="bi bi-clipboard pe-1"></i>Instructions</button>
+      <button type="button" class="btn btn-outline-primary"><i class="bi bi-bar-chart pe-1"></i><span><router-link
+            to="/resultshome">Reports</router-link></span></button>
+      <a href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank" type="button"
+        class="btn btn-outline-primary"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#contactModal"><i
+          class="bi bi-person-circle pe-1"></i>Contact</button>
+      <button class="btn btn-outline-primary"><i class="bi bi-box-arrow-right pe-1"></i><span><router-link
+            to="/login">Logout</router-link></span></button>
     </div>
-
-    <AboutModal v-if="showAboutModal" :aboutModalData='aboutCustomData' :user-id="user.user_id" @close="showAboutModal = false"  />
-    <InstructionsModal v-if="showModal" :modalData='customData' :user-id="user.user_id" @close="showModal = false"  />
-    <ContactModal v-if="showContactModal" :contactModalData='contactCustomData' :user-id="user.user_id" @close="showContactModal = false"  />
-
   </div>
-
+  <AboutModal />
+  <InstructionsModal />
+  <ContactModal />
 </template>
 
 <script>
 
-    import InstructionsModal from './InstructionsModal';
-    import AboutModal from './AboutModal';
-    import ContactModal from './ContactModal';
+import InstructionsModal from './InstructionsModal'
+import AboutModal from './AboutModal'
+import ContactModal from './ContactModal'
 
-    import { HTTP } from '../http-constants'
-
-    export default {
-        name: "AppFooter",
-        components: {
-            InstructionsModal,
-            AboutModal,
-            ContactModal
-        },
-        computed : {
-            user() {
-                return this.$store.state.authentication.user;
-            }
-        },
-        data() {
-            return {
-                showModal : false,
-                showAboutModal : false,
-                showContactModal : false,
-                customData : {
-                    title: 'ePRaSE Instructions',
-                    closeButtonText: 'Close'
-                },
-                aboutCustomData : {
-                    title: 'About ePRaSE',
-                        closeButtonText: 'Close'
-                },
-                contactCustomData : {
-                    title: 'Contacts for ePRaSE',
-                        closeButtonText: 'Close'
-                }
-            }
-        },
-        methods : {
-            reports() {
-                this.$router.push({ path: './resultshome' });
-            },
-            downloadFile() {
-              HTTP.get('./Eprase2022UserGuide.pdf', {                    
-                    method: 'GET',
-                    responseType: 'blob',
-                }).then((res) => {
-                    var FILE = window.URL.createObjectURL(new Blob([res.data]));
-
-                    // create an element 'x' which can be clicked
-                    const link = document.createElement('x');
-                    link.href = FILE;
-                    link.setAttribute('download', 'file.pdf');
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // clean up "x" element & remove ObjectURL
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(FILE);
-
-                });
-          }
-        }
+export default {
+  name: "AppFooter",
+  components: {
+    InstructionsModal,
+    AboutModal,
+    ContactModal
+  },
+  computed: {
+    user() {
+      //return this.$store.state.authentication.user;
     }
+  }
+}
 
 </script>
 
-<style scoped>
-
-  button {
-    height: 40px;
-    width: 170px;
-    margin: 10px 0px;
-    font-size: 1em;
-    border-width: 1px;
-  }
-
-  button a {
-    padding: 3px;
-  }
-
-  .footer-bar-buttons {
-    padding-left: 40px;
-    padding-bottom: 20px;
-    border-width: 1px;
-  }
-
-</style>
+<style scoped></style>

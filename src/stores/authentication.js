@@ -26,6 +26,7 @@ export const authenticationStore = defineStore('authentication', {
         const user = await axios.post('auth/signin', { username, password }) 
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
+        return this.userId
 
         console.groupEnd()
 
@@ -49,8 +50,9 @@ export const authenticationStore = defineStore('authentication', {
 
       try {
         const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.getToken }})
+        console.debug('Admin user', res.data)
         console.groupEnd()
-        return res
+        return res.data
       } catch(err) {
         console.error('Error checking if user is admin:', err)
         console.groupEnd()

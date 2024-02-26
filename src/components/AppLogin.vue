@@ -123,14 +123,15 @@ export default {
           const password = this.user.password
           console.debug('Username', username, 'password', password)
           try {
-            this.authenticationStore.login(username, password).then((response) => {
-              this.authenticationStore.checkIsAdminUser(userId)//HERE
+            this.authenticationStore.login(username, password).then((userId) => {
+              this.authenticationStore.checkIsAdminUser(userId).then((isAdmin) => {
+                if (isAdmin) {
+                  this.$router.push('/adminhome')
+                } else {
+                  this.$router.push('/assessmentintro')
+                }
+              })
             })
-            // if (this.authenticationStore.checkIsAdminUser(userId)) {
-            //   this.$router.push('/adminhome')
-            // } else {
-            //   this.$router.push('/assessmentintro')
-            // }
           } catch (err) {
             console.error(err)
           }
