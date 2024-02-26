@@ -22,6 +22,14 @@ main {
   max-width: 1200px;
 }
 
+main.leftalign {
+  border: none;
+  text-align: left;
+  justify-content: left;
+  align-items: left;
+  margin: 2rem auto auto auto;
+}
+
 body {
   color: $dark;
   padding: 2rem;
@@ -48,10 +56,20 @@ li {
 
 a {
     color: $dark;
+    text-decoration: none;
 }
 
 .eprase-logo {
   height: 85px;
+}
+
+.pills-banner {
+  background-image: url('../../assets/images/pills-bw.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  height: 80px;
 }
 
 .form-control:invalid {

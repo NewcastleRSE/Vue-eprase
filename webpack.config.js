@@ -1,10 +1,10 @@
-const path = require("path");
-const webpack = require("webpack");
-const { VueLoaderPlugin } = require("vue-loader");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const path = require("path")
+const webpack = require("webpack")
+const { VueLoaderPlugin } = require("vue-loader")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
-const TerserPlugin = require("terser-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 //const HtmlWebpackRootPlugin = require('html-webpack-root-plugin'); Last modified in 2018...
 
 module.exports = {
@@ -57,10 +57,15 @@ module.exports = {
               postcssOptions: {
                 // postcss plugins, can be exported to postcss.config.js
                 plugins: function () {
-                  return [require("autoprefixer")];
+                  return [require("autoprefixer")]
                 },
               },
             },
+          },
+          {
+            loader: "resolve-url-loader", options: {
+              sourceMap: true
+            }
           },
           { loader: "sass-loader" },
         ],
@@ -108,21 +113,21 @@ module.exports = {
     hints: false,
   },
   devtool: "eval-source-map",
-};
+}
 
 if (process.env.NODE_ENV === "production") {
-  let baseURL = '"http://localhost:6001/api/"';
-  let sentryENV = "development";
+  let baseURL = '"http://localhost:6001/api/"'
+  let sentryENV = "development"
 
   if (process.env.TARGET === "staging") {
-    baseURL = '"https://eprase.ncldata.dev/api/"';
-    sentryENV = "staging";
+    baseURL = '"https://eprase.ncldata.dev/api/"'
+    sentryENV = "staging"
   } else if (process.env.TARGET === "production") {
-    baseURL = '"https://eprase.nhs.uk/api/"';
-    sentryENV = "production";
+    baseURL = '"https://eprase.nhs.uk/api/"'
+    sentryENV = "production"
   }
 
-  module.exports.devtool = "source-map";
+  module.exports.devtool = "source-map"
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -134,10 +139,10 @@ if (process.env.NODE_ENV === "production") {
     new webpack.LoaderOptionsPlugin({
       minimize: true,
     }),
-  ]);
+  ])
 } else {
   // development
-  module.exports.devtool = "source-map";
+  module.exports.devtool = "source-map"
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -149,5 +154,5 @@ if (process.env.NODE_ENV === "production") {
     new webpack.LoaderOptionsPlugin({
       minimize: true,
     }),
-  ]);
+  ])
 }

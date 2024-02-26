@@ -25,10 +25,11 @@ export const authenticationStore = defineStore('authentication', {
       try {
         const user = await axios.post('auth/signin', { username, password }) 
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
-        this.updateUser(user)
-        return this.userId
+        this.updateUser(user)        
 
         console.groupEnd()
+
+        return this.userId
 
       } catch (err) {        
         //dataService.failedLoginAudit('Failed login', '/login')

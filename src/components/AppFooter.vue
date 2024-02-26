@@ -5,14 +5,13 @@
           class="bi bi-info-circle pe-1"></i>About</button>
       <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#instructionsModal"><i
           class="bi bi-clipboard pe-1"></i>Instructions</button>
-      <button type="button" class="btn btn-outline-primary"><i class="bi bi-bar-chart pe-1"></i><span><router-link
-            to="/resultshome">Reports</router-link></span></button>
+      <button type="button" class="btn btn-outline-primary" @click="reports()"><i
+          class="bi bi-bar-chart pe-1"></i>Reports</button>
       <a href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank" type="button"
         class="btn btn-outline-primary"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
       <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#contactModal"><i
           class="bi bi-person-circle pe-1"></i>Contact</button>
-      <button class="btn btn-outline-primary"><i class="bi bi-box-arrow-right pe-1"></i><span><router-link
-            to="/login">Logout</router-link></span></button>
+      <button class="btn btn-outline-primary"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
     </div>
   </div>
   <AboutModal />
@@ -22,6 +21,8 @@
 
 <script>
 
+import { mapState } from 'pinia'
+import { authenticationStore } from '../stores/authentication'
 import InstructionsModal from './InstructionsModal'
 import AboutModal from './AboutModal'
 import ContactModal from './ContactModal'
@@ -32,6 +33,18 @@ export default {
     InstructionsModal,
     AboutModal,
     ContactModal
+  },
+  computed: {
+    ...mapState(authenticationStore, ['logout'])
+  },
+  methods: {
+    reports() {
+      this.$router.push('/resultshome')
+    },
+    logout() {
+      this.logout()
+      this.$router.push('/login')
+    }
   },
   computed: {
     user() {

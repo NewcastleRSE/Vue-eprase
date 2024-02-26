@@ -1,48 +1,49 @@
 <template>
-  <div id="page">
+  <main class="leftalign">
 
-    <div id="header" class="level">
-    </div>
+    <div class="pills-banner"></div>
 
-    <div class="content" v-if="assessmentComplete !== true">
+    <div class="px-4" v-if="assessmentComplete !== true">
 
       <h1>Welcome to the ePRaSE Assessment</h1>
 
-      <p>The following assessment is designed to evaluate the performance of an e-prescription system against a range of
-        indicators.</p>
+      <p>
+        The following assessment is designed to evaluate the performance of an e-prescription system against a range of
+        indicators.
+      </p>
       <p>The ePRaSE assessment will be repeated annually.</p>
 
-      <p></p>
       <h4>Instructions</h4>
-      <p>The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions
-        system and then
-        to prescribe a series of medications to those patients. You will then be asked to provide feedback about any
-        advice or intervention from the system.</p>
+      <p>
+        The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions
+        system and then to prescribe a series of medications to those patients. You will then be asked to provide feedback
+        about any
+        advice or intervention from the system.
+      </p>
 
-      <p>The patient build has 2 parts which <span class="text-danger">must be completed in the same session, by a single
-          user</span> - this may take up to an hour depending on your system.</p>
+      <p>The patient build has 2 parts, which may take up to an hour depending on your system.</p>
 
-      <div id="part-list">
-        <ul class="list-group">
-          <li class="list-group-item">Part 1 - creating patients with name, date of birth and gender</li>
-          <li class="list-group-item">Part 2 – adding clinical information for each patient</li>
-        </ul>
-      </div>
+      <ul class="list-group">
+        <li class="list-group-item">Part 1 - creating patients with name, date of birth and gender</li>
+        <li class="list-group-item">Part 2 - adding clinical information for each patient</li>
+      </ul>
 
-      <div class="alert alert-warning" role="alert">
-        <p><strong>Disclaimer:</strong> these patients have been designed to support the test tool and may not necessarily
-          resemble real life. Please enter all information exactly as presented.</p>
-        <p><strong>Warning - please do not attempt to click the BROWSER back button during the assessment! This action has
-            been disabled due to the risk of data loss.</strong></p>
+      <div class="alert alert-warning mt-4" role="alert">
+        <p>
+          <span class="text-dark-emphasis">Disclaimer:</span> these patients have been designed to support the test tool
+          and may not necessarily
+          resemble real life. Please enter all information exactly as presented.
+        </p>
       </div>
 
       <h3>{{ year }} ePRaSE Assessment</h3>
       <p>The original ePRaSE assessment was released in July 2019. <br />To take part in the current ePRaSE assessment,
         click the button below.</p>
 
-      <div v-if="assessmentStatus" class="progress"> Your organisation ASSESSMENT STATUS is : {{ assessmentStatus }}</div>
+      <div v-if="assessmentStatus" class="text-secondary-emphasis"> Your organisation ASSESSMENT STATUS is : {{
+        assessmentStatus }}</div>
 
-      <div v-if="assessmentStatus" class="buttons">
+      <div v-if="assessmentStatus" class="pt-4">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'"
           @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
         <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'"
@@ -51,10 +52,10 @@
       <p></p>
     </div>
 
-    <div class="content" v-if="assessmentComplete === true">
+    <div class="px-4" v-if="assessmentComplete === true">
 
       <h2>Assessment Complete</h2>
-      <div class="divcontent">
+      <div class="pt-4">
         <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
         <p>To view the results of this assessment, click the 'Reports' button below.</p>
         <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.
@@ -62,23 +63,28 @@
       </div>
     </div>
 
-    <AppFooter />
-    <AppLogo></AppLogo>
-  </div>
+    <div class="px-4 mt-4">
+      <AppFooter />
+    </div>
+    <AppLogo />
+  </main>
 </template>
 
 <script>
-
-import { settings } from '../settings'
+''
+import { mapState } from 'pinia'
+import { appSettingsStore } from '../stores/appSettings'
 import { dataService } from '../services/data.service'
 import { patientService } from '../services/patient.service'
 import TabHeader from './TabHeader'
 import AppFooter from "./AppFooter"
 import AppLogo from "./AppLogo"
-import { userService } from "../services/user.service"
 
 export default {
   name: "AssessmentIntro",
+  computed: {
+    ...mapState(appSettingsStore, ['version', 'year'])
+  },
   components: {
     AppFooter,
     TabHeader,
@@ -89,21 +95,11 @@ export default {
       assessmentComplete: false,
       assessmentStatus: '',
       assessmentId: '',
-      year: settings.year,
-      userIsAdmin: false
+      userIsAdmin: false,
+      bannerImage: '../assets/images/pills-bw.png'
     }
   },
   methods: {
-    checkIsAdminUser() {
-      let user_id = localStorage.getItem('userId')
-      userService.checkIsAdminUser(user_id).then(data => {
-        this.userIsAdmin = data
-        // boolean value
-        if (this.userIsAdmin === true) {
-          this.$router.push({ path: './adminhome' })
-        }
-      })
-    },
     checkAssessmentComplete() {
       dataService.getAssessmentStatus().then(data => {
         this.assessmentComplete = data.status
@@ -116,21 +112,18 @@ export default {
         this.assessmentStatus = data.status
       })
     },
-    onResultsClick() {
-      this.$router.push({ path: './resultshome' })
-    },
     onStartAssessmentClick() {
       if (this.assessmentStatus === 'System Information Complete') {
-        this.$router.push({ path: './setpatients' })
+        this.$router.push('/setpatients')
       }
       else if (this.assessmentStatus === 'Create Patients in Progress') {
-        this.$router.push({ path: './assessmentpatientdetails' })
+        this.$router.push('/assessmentpatientdetails')
       }
       else if (this.assessmentStatus === 'Create Patients Complete') {
-        this.$router.push({ path: './lockoutscreen?patientscompleted=true' })
+        this.$router.push('/lockoutscreen?patientscompleted=true')
       }
       else {
-        this.$router.push({ path: './assessmentsystem' })
+        this.$router.push('/assessmentsystem')
       }
     },
     getRequiredPatients() {
@@ -154,23 +147,21 @@ export default {
             allRequiredPatients.push(requiredPatient)
           }
         }
+        //TODO - investigate LocalStorage usage here
         localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients))
         /* localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients)); */
         localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients))
       })
-    },
-    adminHome() {
-      this.$router.push({ path: './adminhome' })
     }
   },
   created: function () {
-    this.checkIsAdminUser()
     this.checkAssessmentComplete()
     this.getAssessmentStatus()
     this.getRequiredPatients()
     dataService.audit('View assessment intro', '/assessmentintro')
   },
   mounted: function () {
+    // Looks as though this disables the back button - do we still need this?
     history.pushState(null, null, location.href)
     window.onpopstate = function () {
       history.go(1)
@@ -180,64 +171,4 @@ export default {
 </script>
 
 <style scoped>
-#part-list {
-  padding-bottom: 25px;
-}
-
-#header {
-  background-image: url("../assets/images/pills-bw.png");
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
-}
-
-.level {
-  height: 80px;
-}
-
-button {
-  height: 40px;
-  width: 250px;
-  margin: 10px 0;
-  font-size: 1em;
-  border-width: 1px;
-  /*border-radius: 5px; */
-}
-
-.start-btn {
-  font-size: 1.2em;
-  width: 280px;
-}
-
-button a {
-  padding: 3px;
-}
-
-#page {
-  text-align: left;
-}
-
-.content {
-  padding: 40px;
-}
-
-.btn-primary {
-  background-color: #07818e;
-}
-
-.divcontent {
-  padding: 20px 0;
-}
-
-.progress {
-  color: #07818e;
-  background-color: #fff;
-  font-size: 1.1em;
-  height: 30px;
-  line-height: 30px;
-}
-
-.buttons {
-  padding-top: 20px;
-}</style>
+</style>

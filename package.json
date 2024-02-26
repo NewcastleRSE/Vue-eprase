@@ -54,6 +54,7 @@
     "minimist": "^1.2.8",
     "node-sass": "^9.0.0",
     "postcss-loader": "^8.1.0",
+    "resolve-url-loader": "^5.0.0",
     "sass-loader": "^14.1.0",
     "vue-loader": "^17.4.2",
     "vue-style-loader": "^4.1.3",
