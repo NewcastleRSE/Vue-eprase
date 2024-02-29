@@ -47,6 +47,9 @@ module.exports = {
           {
             // translates CSS into CommonJS modules
             loader: "css-loader",
+            options: {
+              url: false,
+            }
           },
           {
             // Run postcss actions

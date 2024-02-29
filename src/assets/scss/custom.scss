@@ -64,7 +64,7 @@ a {
 }
 
 .pills-banner {
-  background-image: url('../../assets/images/pills-bw.png');
+  background-image: url('/public/pills-bw.png');
   background-size: 100% auto;
   background-repeat: no-repeat;
   border-top-left-radius: 25px;
@@ -72,10 +72,23 @@ a {
   height: 80px;
 }
 
-.form-control:invalid {
+.version-text {
+  font-size: smaller;
+  color: $primary;
+}
+
+.form-control {
   background: none;
   background-color: #fff;
+}
+
+.form-control:invalid {
   border-color: $danger;
+  border-width: 2px;
+}
+
+.form-control:valid {
+  border-color: $success;
   border-width: 2px;
 }
 

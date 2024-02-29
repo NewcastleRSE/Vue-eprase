@@ -5,7 +5,7 @@
         <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo" />
       </div>
 
-      <h1>Log-in to ePRaSE</h1>
+      <h2 class="mt-4">Log-in to ePRaSE</h2>
       <p class="pb-2">
         Please enter your login details below, or click 'Register' to create a
         new user account. You will need a valid

@@ -5,14 +5,12 @@
     </div>
     <div class="pb-3">
       <h1>Welcome to ePRaSE 2024</h1>
-      <p>
-        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to
-        evaluate ePrescription services, in order to determine their
-        effectiveness and to encourage the correct use of these systems and
-        deliver improved patient outcomes.
-      </p>
-      <div class="pb-3" v-if="appOpen">
-        <button type="button" class="btn btn-primary" @click="login()">
+      <p class="service-description mx-auto">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
+        in order to determine their effectiveness and to encourage the correct use of these systems
+        and deliver improved patient outcomes.</p>
+      <div class="py-4" v-if="appOpen">
+        <button type="button" class="btn btn-lg btn-primary" @click="login()">
           Start
         </button>
       </div>
@@ -32,7 +30,7 @@
         <img id="pharm-logo" src="../assets/images/pharmacy.png" alt="School of Pharmacy" />
       </div>
     </div>
-    <div class="pt-3">Version {{ version }}</div>
+    <div class="version-text pt-5">Version {{ version }}</div>
   </main>
 </template>
 
@@ -42,7 +40,7 @@ import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
-  name: "AppWelcome",  
+  name: "AppWelcome",
   computed: {
     ...mapState(appSettingsStore, ['version', 'appOpen'])
   },
@@ -58,6 +56,10 @@ export default {
 </script>
 
 <style scoped>
+.service-description {
+  max-width: 600px;
+}
+
 #di-logo,
 #pharm-logo {
   height: 50px;

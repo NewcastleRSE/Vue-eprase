@@ -1,7 +1,7 @@
 <template>
   <div id="page">
 
-    <div id="header" class="level">
+    <div class="pills-banner">
     </div>
 
     <div class="content">
@@ -53,7 +53,6 @@
 <style scoped>
 
   #header {
-    background-image: url("../assets/images/pills-bw.png");
     background-size: 100% auto;
     background-repeat: no-repeat;
     border-top-left-radius: 25px;

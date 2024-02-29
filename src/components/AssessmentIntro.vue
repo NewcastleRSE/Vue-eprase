@@ -95,8 +95,7 @@ export default {
       assessmentComplete: false,
       assessmentStatus: '',
       assessmentId: '',
-      userIsAdmin: false,
-      bannerImage: '../assets/images/pills-bw.png'
+      userIsAdmin: false
     }
   },
   methods: {
