@@ -13,11 +13,11 @@
         register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" :validation-schema="validationSchema">
+      <Form ref="loginForm" :validation-schema="validationSchema" v-slot="{ meta }">
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
-            <Field type="email" v-model="user.email" id="email" name="email" class="form-control" />
+            <Field type="email" v-model="user.email" id="email" name="email" class="form-control" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"/>
           </div>
           <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
@@ -26,18 +26,13 @@
         <div class="mb-4 row">
           <label for="password" class="col-sm-4 form-label">Password:</label>
           <div class="col-sm-8">
-            <Field type="password" v-model="user.password" class="form-control" name="password" maxlength="50" />
+            <Field type="password" v-model="user.password" class="form-control" name="password" maxlength="50" v-slot="{ meta }" />
           </div>
           <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
           </ErrorMessage>
         </div>
-      </Form>
-      <p v-show="serverError === true" class="text-error">
-        Please be patient while your credentials are verified. If access fails,
-        please check that your email and password are correct.<br /><br />
-      </p>
-
+      </Form>      
       <p>
         If you have forgotten your password, please contact the RSE team at:
         <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a>
@@ -47,13 +42,13 @@
       <!--<p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>-->
 
       <div class="mb-4">
-        <button type="submit" class="btn btn-primary me-3" @click="onLoginClick">
+        <button type="submit" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
           Login
         </button>
-        <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
+        <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
           Cancel
         </button>
-        <button type="button" class="btn btn-primary" @click="onRegisterClick">
+        <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
           Register
         </button>
       </div>

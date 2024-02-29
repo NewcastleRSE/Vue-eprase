@@ -17,9 +17,9 @@ const pinia = createPinia()
 
 configure({
   validateOnBlur: false,
-  validateOnChange: true,
+  validateOnChange: false,
   validateOnInput: true,
-  validateOnModelUpdate: true,
+  validateOnModelUpdate: true
 })
 
 axios.defaults.baseURL = 'http://localhost:6001/api/',
