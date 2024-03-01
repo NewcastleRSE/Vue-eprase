@@ -16,22 +16,22 @@ export const authenticationStore = defineStore('authentication', {
     getInstitutionId: (state) => state.institutionId,
     getToken: (state) => state.token
   },
-  actions: {    
+  actions: {
     async login(username, password) {
 
       console.group('login()')
       console.debug('Username', username, 'password', password)
 
       try {
-        const user = await axios.post('auth/signin', { username, password }) 
+        const user = await axios.post('auth/signin', { username, password })
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
-        this.updateUser(user)        
+        this.updateUser(user)
 
         console.groupEnd()
 
         return this.userId
 
-      } catch (err) {        
+      } catch (err) {
         //dataService.failedLoginAudit('Failed login', '/login')
 
         console.error('authentication/login : the following error occurred', err)
@@ -49,22 +49,45 @@ export const authenticationStore = defineStore('authentication', {
 
       console.groupEnd()
     },
+    async signup(username, password) {
+
+      console.group('login()')
+      console.debug('Username', username, 'password', password)
+
+      try {
+        const user = await axios.post('auth/signin', { username, password })
+        //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
+        this.updateUser(user)
+
+        console.groupEnd()
+
+        return this.userId
+
+      } catch (err) {
+        //dataService.failedLoginAudit('Failed login', '/login')
+
+        console.error('authentication/login : the following error occurred', err)
+        console.groupEnd()
+
+        throw new Error(err)
+      }
+    },
     async checkIsAdminUser(userId) {
 
       console.group('checkIsAdminUser()')
       console.debug('User ID', userId)
 
       try {
-        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.getToken }})
+        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.getToken } })
         console.debug('Admin user', res.data)
         console.groupEnd()
         return res.data
-      } catch(err) {
+      } catch (err) {
         console.error('Error checking if user is admin:', err)
         console.groupEnd()
         return false
-      }      
-    },    
+      }
+    },
     updateUser(payload) {
 
       console.group('updateUser()')
@@ -82,12 +105,12 @@ export const authenticationStore = defineStore('authentication', {
       this.$patch(csPayload)
       Object.keys(csPayload).forEach((k) => {
         localStorage.setItem(k, csPayload[k])
-      })    
+      })
 
       console.debug('State after update : ', this.userId, this.user, this.institutionId, this.token)
       console.groupEnd()
-    },
-    async requestNewPassword(email) {     
+    },    
+    async requestNewPassword(email) {
       try {
         const res = await axios.post('auth/newPassword', { email })
         dataService.audit('Successful password reset request', '/requestpassword')
@@ -97,7 +120,7 @@ export const authenticationStore = defineStore('authentication', {
         dataService.failedLoginAudit('Failed password reset request', '/requestpassword')
       }
     },
-    async resetPassword(password, token) {     
+    async resetPassword(password, token) {
       try {
         const res = await axios.post('auth/resetPassword?token=' + token, { password })
         dataService.audit('Successful password reset', '/resetpassword')

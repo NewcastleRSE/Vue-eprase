@@ -3,9 +3,7 @@
   
       <div class="loginpage">
   
-        <div id="logo" class="mx-auto">
-          <img src="logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
-        </div>
+        <AppLogo cls="banner" />
   
           <h1>Login ePRaSE</h1>
           <p>Your login has failed, please check that you are using the correct email and address and password. If your login details continue to fail, please contact the RSE team at: <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a></p>
@@ -40,11 +38,13 @@
 
 
 import {router} from "../router";
+import AppLogo from "./AppLogo"
+
 
 export default {
   name: "AppLogin",
   components: {
-
+    AppLogo
   },
   computed: {
       isFormInvalid() {

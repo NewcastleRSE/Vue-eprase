@@ -66,7 +66,7 @@
     <div class="px-4 mt-4">
       <AppFooter />
     </div>
-    <AppLogo />
+    <AppLogo cls="bottomright"/>
   </main>
 </template>
 

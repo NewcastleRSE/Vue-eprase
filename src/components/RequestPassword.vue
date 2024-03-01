@@ -3,9 +3,7 @@
 
     <div class="loginpage">
 
-      <div id="logo" class="mx-auto">
-        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
-      </div>
+      <AppLogo cls="banner" />
 
       <h1>Request a new password</h1>
 
@@ -34,9 +32,13 @@
 
 <script>
     import {router} from "../router";
+    import AppLogo from "./AppLogo"
 
     export default {
         name: "RequestPassword",
+        components: {
+          AppLogo
+        },
         computed: {
             isFormInvalid() {
                 return Object.keys(this.fields).some(key => this.fields[key].invalid);

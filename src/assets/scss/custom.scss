@@ -59,11 +59,8 @@ a {
     text-decoration: none;
 }
 
-.eprase-logo {
-  height: 85px;
-}
-
 .pills-banner {
+  /* NOTE: this banner is in the 'public' folder at the top level - its being in 'src/assets' leads to huge webpack problems I can't resolve - David Herbert 01/03/2024 */
   background-image: url('/pills-bw.png');
   background-size: 100% auto;
   background-repeat: no-repeat;

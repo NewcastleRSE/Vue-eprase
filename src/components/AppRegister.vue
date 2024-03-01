@@ -1,252 +1,168 @@
 <template>
-  <div id="page">
+  <main>
 
-    <div class="register">
+    <div class="registerpage">
 
-      <div id="logo" class="mx-auto">
-        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
-      </div>
+      <AppLogo cls="banner" />
       <div class="register-text">
-        <h1>Register</h1>
+        <h2 class="mt-4">Register</h2>
 
-        <div id="appClosed" v-if="!appOpen">
-            <strong>This application is currently closed</strong>
+        <div v-if="!appOpen">
+          <strong>This application is currently closed</strong>
         </div>
 
         <div v-if="appOpen">
 
-            <p>To register with the ePRaSE system, please provide the following information.</p>
+          <p class="pb-2">To register with the ePRaSE system, please provide the following information.</p>
 
-            <form id="regForm" @submit.prevent="handleSubmit()">
+          <Form ref="regForm" :validation-schema="validationSchema" v-slot="{ meta, errors }">
 
-            <p>Please enter an "nhs.uk" or "nhs.net" email address.</p>
-            <div class="form-group">
-                <label for="email">E-mail Address:</label>
-                <input type="email" v-model="user.email" v-validate="{ required: true, regex:/^[a-zA-Z0-9.]+@([a-z]+.|)nhs.(uk|net)+$/ }" id="email" name="email" class="form-control" :class="{ 'is-invalid':  submitted && errors.has('email') }" />
-                <div v-show="submitted && errors.has('email')" class="invalid-feedback alert alert-danger">{{ errors.first('email') }}</div>
+            <div class="mb-4 row">
+              <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
+              <div class="col-sm-8">
+                <Field type="email" v-model="user.email" id="email" name="email" class="form-control"
+                  rules="required|nhsEmail" :class="meta.dirty ? (errors.email ? 'is-invalid' : 'is-valid') : ''" />
+              </div>
+              <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
 
-            <p>Select your NHS trust.</p>
-            <div class="form-group">
-                <label for="institution"> Select Institution: </label>
-                <select name="singleSelect" id ="institution" v-validate="'required'" v-model="user.institution" class="form-control" >
-                <option v-for="institution in institutions" v-bind:value="institution.id" v-bind:key="institution.id">{{institution.orgName}}</option>
-                <div v-show="submitted && errors.has('institution')" class="invalid-feedback alert alert-danger">{{ errors.first('institution') }}</div>
-                </select>
-
-            </div>
-            <p>Choose a password.</p>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" v-model="user.password" v-validate="{ required: true, min: 6 }" id="password" name="password" class="form-control" :class="{ 'is-invalid': errors.has('password') }" ref="password" />
-                <div v-show="submitted && errors.has('password')" class="invalid-feedback alert alert-danger">{{ errors.first('password') }}</div>
+            <div class="mb-4 row">
+              <label for="institution" class="col-sm-4 form-label">Your NHS Trust:</label>
+              <div class="col-sm-8">
+                <Field as="select" v-model="user.institution" id="institution" name="institution" class="form-select"
+                  rules="required" :class="meta.dirty ? (errors.institution ? 'is-invalid' : 'is-valid') : ''">
+                  <option value="" disabled>Please select...</option>
+                  <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
+                </Field>
+              </div>
+              <ErrorMessage name="institution" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Re-enter Password: </label>
-                <input type="password" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword" class="form-control"  v-validate="'required|confirmed:password'"  data-vv-as="password" >
-                <div v-show="submitted && errors.has('confirmPassword')" class="invalid-feedback alert alert-danger">{{ errors.first('confirmPassword') }}</div>
+            <div class="mb-4 row">
+              <label for="password" class="col-sm-4 form-label">Password:</label>
+              <div class="col-sm-8">
+                <Field type="password" v-model="user.password" class="form-control" name="password"
+                  rules="required|lengthBetween:6,50"
+                  :class="meta.dirty ? (errors.password ? 'is-invalid' : 'is-valid') : ''" />
+              </div>
+              <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
 
-            <div id="buttons" class="form-group mx-auto">
-                <button type="submit" class="reg-btn btn btn-primary" :disabled="isFormInvalid">Register</button>
-                <button type="button" class="reg-btn btn btn-primary" @click.prevent="resetForm">Cancel</button>
-            <button id="loginBtn" type="button" class="btn btn-primary" @click="onLoginClick">Login</button>
+            <div class="mb-4 row">
+              <label for="confirmPassword" class="col-sm-4 form-label">Confirm password:</label>
+              <div class="col-sm-8">
+                <Field type="password" v-model="user.confirmPassword" class="form-control" name="confirmPassword"
+                  rules="required|lengthBetween:6,50|passwordConfirmationEqual:@password"
+                  :class="meta.dirty ? (errors.confirmPassword ? 'is-invalid' : 'is-valid') : ''" />
+              </div>
+              <ErrorMessage name="confirmPassword" as="div" class="mt-2 text-danger text-center col-sm-12"
+                v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
-            </form>
 
-            <div v-if="serverError === 'too-many-users'" class="warning">Sorry, there is a problem with registration, there is a limit of 4 users per institution</div>
-            <div v-if="serverError === 'email-taken'" class="warning">This email has already been registered against an institution</div>
+            <div class="mb-4">
+              <button type="submit" :disabled="!meta.valid" class="btn btn-lg btn-primary me-3" @click="onRegisterClick">
+                Register
+              </button>
+              <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
+                Cancel
+              </button>
+            </div>
+          </Form>
+
+          <div v-if="serverError === 'too-many-users'" class="warning">Sorry, there is a problem with registration, there
+            is a limit of 4 users per institution</div>
+          <div v-if="serverError === 'email-taken'" class="warning">This email has already been registered against an
+            institution</div>
 
         </div>
 
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>
 
-    import { HTTP } from '../http-constants';
-    //import json from '../json/institutions.json'
-    import { dataService } from '../services/data.service';
-    import { settings } from '../settings';
+import AppLogo from './AppLogo'
+import { mapStores, mapState } from 'pinia'
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import { authenticationStore } from '../stores/authentication'
+import { appSettingsStore } from '../stores/appSettings'
+import { dataService } from '../services/data.service'
 
-    export default {
-      name: "AppRegister",
-      components: {
-
+export default {
+  name: "AppRegister",
+  components: {
+    AppLogo,
+    Form,
+    Field,
+    ErrorMessage,
+  },
+  computed: {
+    ...mapState(appSettingsStore, ['appOpen']),
+    ...mapStores(authenticationStore)
+  },
+  data() {
+    return {
+      user: {
+        username: '',
+        institution: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
       },
-      computed: {
-        isFormInvalid() {
-            return Object.keys(this.fields).some(key => this.fields[key].invalid);
-        }
-      },
-      data() {
-        return {
-          user: {
-            username: '',
-            institution: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-          },
-          submitted: false,
-          institutions: [],
-          serverError: '',
-          appOpen : settings.appOpen
-        }
-      },
-      methods: {
-        onLoginClick: function() {
-           this.$router.push({ path: './login' });
-        },
-        resetForm: function() {
-          this.$data.user = {};
-          this.errors.clear();
-          this.serverError = '';
-        },
-        handleSubmit() {
-          this.submitted = true;
-
-          this.user.username = this.getUsernameFromEmail(this.user.email);
-
-          this.$validator.validate().then(valid => {
-            if (valid) {
-
-              HTTP.post( '/auth/signup/user', {
-
-                username : this.user.username,
-                institution: this.user.institution,
-                email: this.user.email,
-                password: this.user.password,
-                role: ["user"]
-              })
-                .then(response => {
-                    this.$router.push({path: './login'})
-                })
-                .catch(error => this.serverError = error.response.data)
-            }
-          });
-        },
-        getUsernameFromEmail(email){
-          let parts =[];
-          parts = email.split('@');
-          return parts[0];
-        }
-      },
-      created() {
-          dataService.getInstitutions().then(data => {
-              this.institutions = data;
-          });
-      }
+      institutions: [],
+      serverError: false
     }
+  },
+  methods: {
+    onResetClick() {
+      this.$refs.regForm.resetForm()
+    },
+    onRegisterClick() {
+
+      console.group('onRegisterClick()')
+
+      this.user.username = this.user.email.split('@').shift()
+      this.$refs.regForm.validate().then((valid) => {
+        console.log('Form submission valid', valid)
+        if (valid) {
+          const username = this.user.username
+          const password = this.user.password
+          const institution = this.user.institution
+          console.debug('Username', username, 'password', password, 'institution', institution)
+          try {
+            this.authenticationStore.signup(username, password, institution).then((userId) => {
+              this.$router.push('/login?registered')
+            })
+          } catch (err) {
+            console.error(err)
+          }
+        }
+      })
+      console.groupEnd()
+    }
+  },
+  created() {
+    dataService.getInstitutions().then(data => {
+      this.institutions = data
+    })
+  }
+}
 
 </script>
 
 <style scoped>
-
-  #page {
-    text-align: center;
-  }
-
-  #logo {
-    padding-bottom: 40px;
-  }
-
-  #appClosed {
-      margin: 50px 0 100px 0;
-  }
-
-  .eprase-logo {
-    height: 75px;
-  }
-
-  h1 {
-    font-size: 30px;
-  }
-
-  #regForm {
-    margin-top: 40px;
-  }
-
-  #regForm label {
-    margin-bottom : 0px;
-    margin-left: -520px;
-  }
-
-  #regForm p {
-    text-align: left;
-    padding-left: 120px;
-  }
-
-  #buttons {
-    margin-left: 60px;
-  }
-
-  #loginBtn {
-    background-color: #07abb8;
-    border-color: #07818e;
-  }
-
-  .reg-btn {
-    background-color: #07818e;
-  }
-
-  .form-group {
-    margin-bottom : 25px;
-  }
-
-  .form-control {
-    width: 480px;
-    margin-left: 120px;
-    margin-top: -25px;
-  }
-
-  .alert {
-    margin-left: 120px;
-    height: 40px;
-    width: 480px;
-    padding: 10px;
-  }
-
-  input {
-    width: 500px;
-  }
-
-  select {
-    width: 480px;
-  }
-
-  button {
-    width: 120px;
-    height: 40px;
-    font-size: 1.2em;
-    margin-left: 50px;
-  }
-
-  .register {
-    margin: auto;
-    padding-top: 30px;
-    width: 600px;
-    justify-content:center;
-    align-items:center;
-  }
-
-  .register-text {
-    /* #display:flex;
-    #justify-content:center;
-    #align-items:center; */
-    max-width: 600px;
-  }
-
-  .form-control.is-invalid, .form-control:valid, .form-control.is-invalid,  .form-control:invalid {
-    background: none;
-    background-color: #fff;
-  }
-
-  .warning{
-    color: red;
-  }
-
+div.registerpage {
+  max-width: 60%;
+  margin: auto;
+}
 </style>

@@ -1,8 +1,6 @@
 <template>
   <main>
-    <div class="pb-3">
-      <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo" />
-    </div>
+    <AppLogo cls="banner" />
     <div class="pb-3">
       <h1>Welcome to ePRaSE 2024</h1>
       <p class="service-description mx-auto">
@@ -37,10 +35,14 @@
 <script>
 
 import { mapState } from 'pinia'
+import AppLogo from "./AppLogo"
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: "AppWelcome",
+  components: {
+    AppLogo
+  },
   computed: {
     ...mapState(appSettingsStore, ['version', 'appOpen'])
   },

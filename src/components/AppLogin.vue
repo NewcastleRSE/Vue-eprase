@@ -1,9 +1,7 @@
 <template>
   <main>
     <div class="loginpage">
-      <div>
-        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo" />
-      </div>
+      <AppLogo cls="banner" />
 
       <h2 class="mt-4">Log-in to ePRaSE</h2>
       <p class="pb-2">
@@ -13,12 +11,12 @@
         register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" :validation-schema="validationSchema" v-slot="{ meta }">
+      <Form ref="loginForm" v-slot="{ meta, errors }">
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
             <Field type="email" v-model="user.email" id="email" name="email" class="form-control"
-              :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+              rules="required|nhsEmail" :class="meta.dirty ? (errors.email ? 'is-invalid' : 'is-valid') : ''" />
           </div>
           <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
@@ -27,12 +25,24 @@
         <div class="mb-4 row">
           <label for="password" class="col-sm-4 form-label">Password:</label>
           <div class="col-sm-8">
-            <Field type="password" v-model="user.password" class="form-control" name="password" maxlength="50"
-              :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+            <Field type="password" v-model="user.password" class="form-control" name="password"
+              rules="required|lengthBetween:6,50"
+              :class="meta.dirty ? (errors.password ? 'is-invalid' : 'is-valid') : ''" />
           </div>
           <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
           </ErrorMessage>
+        </div>
+        <div class="mb-4">
+          <button type="submit" :disabled="!meta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
+            Login
+          </button>
+          <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
+            Register
+          </button>
         </div>
       </Form>
       <p>
@@ -43,29 +53,21 @@
       <!--<p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>-->
       <!--<p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>-->
 
-      <div class="mb-4">
-        <button type="submit" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
-          Login
-        </button>
-        <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
-          Cancel
-        </button>
-        <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
-          Register
-        </button>
-      </div>
     </div>
   </main>
 </template>
 
 <script>
+import { markRaw } from 'vue'
 import { mapStores } from 'pinia'
-import { Form, Field, ErrorMessage } from "vee-validate"
-import { authenticationStore } from "../stores/authentication"
+import AppLogo from "./AppLogo"
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: "AppLogin",
   components: {
+    AppLogo,
     Form,
     Field,
     ErrorMessage,
@@ -80,31 +82,7 @@ export default {
         username: '',
         password: '',
       },
-      submitted: false,
-      serverError: false,
-      validationSchema: {
-        email(value) {
-          console.log("Validate email", value)
-          if (
-            value &&
-            value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
-          ) {
-            console.log('Ok')
-            return true
-          } else {
-            return 'Must be a valid nhs.net or nhs.uk email address'
-          }
-        },
-        password(value) {
-          console.log("Validate password", value)
-          if (value && value.length > 6 && value.length < 50) {
-            console.log('Ok')
-            return true
-          } else {
-            return 'Password must be between 6 and 50 characters long'
-          }
-        },
-      },
+      serverError: false
     }
   },
   methods: {

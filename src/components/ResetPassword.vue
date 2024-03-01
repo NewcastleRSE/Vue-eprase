@@ -3,9 +3,7 @@
 
     <div class="loginpage">
 
-      <div id="logo" class="mx-auto">
-        <img src="../assets/images/logo-full.png" alt="Welcome to the ePRaSE Tool" class="eprase-logo">
-      </div>
+      <AppLogo cls="banner" />
 
       <h1>Reset Password</h1>
       <p>Please enter a new password</p>
@@ -44,6 +42,7 @@
 
 <script>
     import {router} from "../router";
+    import AppLogo from "./AppLogo"
 
     export default {
         name: "ResetPassword",
