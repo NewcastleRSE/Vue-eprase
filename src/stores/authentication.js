@@ -37,7 +37,7 @@ export const authenticationStore = defineStore('authentication', {
         console.error('authentication/login : the following error occurred', err)
         console.groupEnd()
 
-        throw new Error(err)
+        //throw new Error(err)
       }
     },
     logout() {
@@ -49,13 +49,14 @@ export const authenticationStore = defineStore('authentication', {
 
       console.groupEnd()
     },
-    async signup(username, password) {
+    async signup(username, password, institution) {
 
-      console.group('login()')
-      console.debug('Username', username, 'password', password)
+      console.group('signup()')
+      console.debug('Username', username, 'password', password, 'institution', institution)
 
       try {
-        const user = await axios.post('auth/signin', { username, password })
+        //TODO
+        const user = await axios.post('auth/user/signup', { username, password })
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
 

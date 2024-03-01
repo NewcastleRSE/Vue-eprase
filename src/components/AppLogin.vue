@@ -38,7 +38,7 @@
           </ErrorMessage>
         </div>
         <div class="mb-4">
-          <button type="submit" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
+          <button type="button" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
             Login
           </button>
           <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
@@ -62,10 +62,9 @@
 </template>
 
 <script>
-import { markRaw } from 'vue'
 import { mapStores } from 'pinia'
 import AppLogo from "./AppLogo"
-import { Form, Field, ErrorMessage } from 'vee-validate'
+import { Form, Field, ErrorMessage, useForm } from 'vee-validate'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
@@ -101,19 +100,19 @@ export default {
           const username = this.user.username
           const password = this.user.password
           console.debug('Username', username, 'password', password)
-          try {
-            this.authenticationStore.login(username, password).then((userId) => {
-              this.authenticationStore.checkIsAdminUser(userId).then((isAdmin) => {
-                if (isAdmin) {
-                  this.$router.push('/adminhome')
-                } else {
-                  this.$router.push('/assessmentintro')
-                }
-              })
+          this.authenticationStore.login(username, password).then((userId) => {
+            this.authenticationStore.checkIsAdminUser(userId).then((isAdmin) => {
+              if (isAdmin) {
+                this.$router.push('/adminhome')
+              } else {
+                this.$router.push('/assessmentintro')
+              }
             })
-          } catch (err) {
+          }).catch ((err) => {
             console.error(err)
-          }
+            const { setFieldError } = useForm()
+            setFieldError('email', err)
+          })
         }
       })
       console.groupEnd()
