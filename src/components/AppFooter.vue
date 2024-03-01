@@ -11,7 +11,7 @@
         class="btn btn-outline-primary"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
       <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#contactModal"><i
           class="bi bi-person-circle pe-1"></i>Contact</button>
-      <button class="btn btn-outline-primary"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
+      <button class="btn btn-outline-primary" @click="signout()"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
     </div>
   </div>
   <AboutModal />
@@ -21,7 +21,6 @@
 
 <script>
 
-import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
 import InstructionsModal from './InstructionsModal'
 import AboutModal from './AboutModal'
@@ -34,15 +33,13 @@ export default {
     AboutModal,
     ContactModal
   },
-  computed: {
-    ...mapState(authenticationStore, ['logout'])
-  },
   methods: {
     reports() {
       this.$router.push('/resultshome')
     },
-    logout() {
-      this.logout()
+    signout() {
+      const auth = authenticationStore()
+      auth.logout()
       this.$router.push('/login')
     }
   },

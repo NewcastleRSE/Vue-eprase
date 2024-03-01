@@ -64,12 +64,13 @@ a {
 }
 
 .pills-banner {
-  background-image: url('/public/pills-bw.png');
+  background-image: url('/pills-bw.png');
   background-size: 100% auto;
   background-repeat: no-repeat;
   border-top-left-radius: 25px;
   border-top-right-radius: 25px;
   height: 80px;
+  margin-bottom: 1rem;
 }
 
 .version-text {

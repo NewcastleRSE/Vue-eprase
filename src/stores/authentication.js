@@ -41,8 +41,13 @@ export const authenticationStore = defineStore('authentication', {
       }
     },
     logout() {
+
+      console.group('logout()')
+
       localStorage.clear()
       this.$reset()
+
+      console.groupEnd()
     },
     async checkIsAdminUser(userId) {
 
