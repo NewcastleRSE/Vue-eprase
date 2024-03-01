@@ -11,12 +11,14 @@
         register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" v-slot="{ meta, errors }">
+      <Form ref="loginForm" v-slot="{ meta: formMeta }">
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
-            <Field type="email" v-model="user.email" id="email" name="email" class="form-control"
-              rules="required|nhsEmail" :class="meta.dirty ? (errors.email ? 'is-invalid' : 'is-valid') : ''" />
+            <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email" rules="required|nhsEmail">
+              <input v-bind="field" type="email" class="form-control"
+                :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+            </Field>
           </div>
           <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
@@ -25,16 +27,18 @@
         <div class="mb-4 row">
           <label for="password" class="col-sm-4 form-label">Password:</label>
           <div class="col-sm-8">
-            <Field type="password" v-model="user.password" class="form-control" name="password"
-              rules="required|lengthBetween:6,50"
-              :class="meta.dirty ? (errors.password ? 'is-invalid' : 'is-valid') : ''" />
+            <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password"
+              rules="required|lengthBetween:6,50">
+              <input v-bind="field" type="password" class="form-control"
+                :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+            </Field>
           </div>
           <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
             {{ message }}
           </ErrorMessage>
         </div>
         <div class="mb-4">
-          <button type="submit" :disabled="!meta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
+          <button type="submit" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
             Login
           </button>
           <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">

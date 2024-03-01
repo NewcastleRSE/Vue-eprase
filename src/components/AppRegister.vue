@@ -15,13 +15,16 @@
 
           <p class="pb-2">To register with the ePRaSE system, please provide the following information.</p>
 
-          <Form ref="regForm" :validation-schema="validationSchema" v-slot="{ meta, errors }">
+          <Form ref="regForm" v-slot="{ meta: formMeta }">
 
             <div class="mb-4 row">
               <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
               <div class="col-sm-8">
-                <Field type="email" v-model="user.email" id="email" name="email" class="form-control"
-                  rules="required|nhsEmail" :class="meta.dirty ? (errors.email ? 'is-invalid' : 'is-valid') : ''" />
+                <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email"
+                  rules="required|nhsEmail">
+                  <input v-bind="field" type="email" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                </Field>
               </div>
               <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
                 {{ message }}
@@ -31,13 +34,16 @@
             <div class="mb-4 row">
               <label for="institution" class="col-sm-4 form-label">Your NHS Trust:</label>
               <div class="col-sm-8">
-                <Field as="select" v-model="user.institution" id="institution" name="institution" class="form-select"
-                  rules="required" :class="meta.dirty ? (errors.institution ? 'is-invalid' : 'is-valid') : ''">
-                  <option value="" disabled>Please select...</option>
-                  <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
+                <Field v-slot="{ field, meta }" v-model="user.institution" id="institution" name="institution" 
+                  rules="required">
+                  <select v-bind="field" class="form-select" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Please select...</option>
+                    <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
+                  </select>                  
                 </Field>
               </div>
-              <ErrorMessage name="institution" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
+              <ErrorMessage name="institution" as="div" class="mt-2 text-danger text-center col-sm-12"
+                v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -45,9 +51,11 @@
             <div class="mb-4 row">
               <label for="password" class="col-sm-4 form-label">Password:</label>
               <div class="col-sm-8">
-                <Field type="password" v-model="user.password" class="form-control" name="password"
-                  rules="required|lengthBetween:6,50"
-                  :class="meta.dirty ? (errors.password ? 'is-invalid' : 'is-valid') : ''" />
+                <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password"
+                  rules="required|lengthBetween:6,50">
+                  <input v-bind="field" type="password" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                </Field>
               </div>
               <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
                 {{ message }}
@@ -57,9 +65,11 @@
             <div class="mb-4 row">
               <label for="confirmPassword" class="col-sm-4 form-label">Confirm password:</label>
               <div class="col-sm-8">
-                <Field type="password" v-model="user.confirmPassword" class="form-control" name="confirmPassword"
-                  rules="required|lengthBetween:6,50|passwordConfirmationEqual:@password"
-                  :class="meta.dirty ? (errors.confirmPassword ? 'is-invalid' : 'is-valid') : ''" />
+                <Field v-slot="{ field, meta }" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword"
+                  rules="required|lengthBetween:6,50|passwordConfirmationEqual:@password">
+                  <input v-bind="field" type="password" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                </Field>
               </div>
               <ErrorMessage name="confirmPassword" as="div" class="mt-2 text-danger text-center col-sm-12"
                 v-slot="{ message }">
@@ -68,7 +78,8 @@
             </div>
 
             <div class="mb-4">
-              <button type="submit" :disabled="!meta.valid" class="btn btn-lg btn-primary me-3" @click="onRegisterClick">
+              <button type="submit" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
+                @click="onRegisterClick">
                 Register
               </button>
               <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
