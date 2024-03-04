@@ -54,7 +54,7 @@ defineRule('passwordConfirmationEqual', (value, [target]) => {
 })
 
 axios.defaults.baseURL = 'http://localhost:6001/api/',
-  axios.defaults.headers.common['Content-Type'] = 'application/json'
+axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 
 app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router)
@@ -64,9 +64,9 @@ app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
-// app.config.errorHandler = function (err, vm, info) {
-//   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
-// }
+app.config.errorHandler = function (err, vm, info) {
+  console.log(`Error: ${err.toString()}\nInfo: ${info}`)
+}
 
 // TODO - needs updating to get rid of deprecated calls - David Herbert 12/02/2024
 // Sentry.init({

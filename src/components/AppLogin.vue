@@ -12,6 +12,11 @@
       </p>
 
       <Form ref="loginForm" v-slot="{ meta: formMeta }">
+        <div v-if="serverError" class="mb-4 row">
+          <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
+            If your login details continue to fail, please contact the RSE team at: <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a>
+          </p>
+        </div>
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
@@ -64,7 +69,7 @@
 <script>
 import { mapStores } from 'pinia'
 import AppLogo from "./AppLogo"
-import { Form, Field, ErrorMessage, useForm, useSetFieldError } from 'vee-validate'
+import { Form, Field, ErrorMessage } from 'vee-validate'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
@@ -93,6 +98,8 @@ export default {
 
       console.group('onLoginClick()')
 
+      this.serverError = false
+
       this.user.username = this.user.email.split('@').shift()
       this.$refs.loginForm.validate().then(async (valid) => {
         console.log('Form submission valid', valid)
@@ -110,6 +117,7 @@ export default {
               this.$router.push('/assessmentintro')
             }     
           } else { 
+            this.serverError = true
             console.debug('Setting errors...')    
             this.$refs.loginForm.setFieldError('email', 'Unable to log you in - bad username or password')
           }              

@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import AppWelcome from "../components/AppWelcome.vue";
 import AppLogin from "../components/AppLogin.vue";
-import AppFailedLogin from "../components/AppFailedLogin";
 import AppRegister from "../components/AppRegister.vue";
 import AssessmentIntro from "../components/AssessmentIntro";
 import AssessmentSystem from "../components/AssessmentSystem";
@@ -34,12 +33,7 @@ export const router = createRouter({
       path: "/login",
       name: "login",
       component: AppLogin,
-    },
-    {
-      path: "/failedlogin",
-      name: "failedlogin",
-      component: AppFailedLogin,
-    },
+    },    
     {
       path: "/register",
       component: AppRegister,

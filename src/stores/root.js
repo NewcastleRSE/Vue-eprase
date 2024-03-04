@@ -1,4 +1,4 @@
-import { authentication } from './authentication'
+import { authenticationStore } from './authentication'
 import { dataService } from "../services/data.service"
 import { defineStore } from 'pinia'
 
@@ -17,6 +17,17 @@ export const rootStore = defineStore('root', {
     mitigationData: []
   }),
   actions: {
+    async apiCall(url, method = 'POST', body = null) {
+      let response = null
+      const config = { headers: { Authorization: `Bearer ${authenticationStore().getToken()}` }}
+      if (method == 'GET') {
+        response = await axios.get(url, config)
+      } else if (method == 'POST') {
+        response = await axios.get(url, JSON.stringify({ body }), config)
+      } else {
+        throw new Error(`API call using ${method} not implemented`)
+      }      
+    },
     setPatientList({ commit }, { patientList }) {
       commit('setPatientList', { patientList })
     },
