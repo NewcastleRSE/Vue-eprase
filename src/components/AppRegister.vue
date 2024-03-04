@@ -78,7 +78,7 @@
             </div>
 
             <div class="mb-4">
-              <button type="submit" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
+              <button :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
                 @click="onRegisterClick">
                 Register
               </button>
@@ -87,11 +87,6 @@
               </button>
             </div>
           </Form>
-
-          <div v-if="serverError === 'too-many-users'" class="warning">Sorry, there is a problem with registration, there
-            is a limit of 4 users per institution</div>
-          <div v-if="serverError === 'email-taken'" class="warning">This email has already been registered against an
-            institution</div>
 
         </div>
 
@@ -143,17 +138,24 @@ export default {
       console.group('onRegisterClick()')
 
       this.user.username = this.user.email.split('@').shift()
-      this.$refs.regForm.validate().then((valid) => {
+      this.$refs.regForm.validate().then(async (valid) => {
         console.log('Form submission valid', valid)
         if (valid) {
           const username = this.user.username
-          const password = this.user.password
           const institution = this.user.institution
-          console.debug('Username', username, 'password', password, 'institution', institution)
+          const email = this.user.email
+          const password = this.user.password
+          
+          console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
           try {
-            this.authenticationStore.signup(username, password, institution).then((userId) => {
-              this.$router.push('/login?registered')
-            })
+            const response = await this.authenticationStore.signup(username, institution, email, password)
+            if (response.status == 'ok') {
+              console.log(response)
+              //this.$router.push('/login')
+            } else {
+              console.debug('Setting errors...')    
+              this.$refs.regForm.setFieldError('email', response.message)
+            }
           } catch (err) {
             console.error(err)
           }

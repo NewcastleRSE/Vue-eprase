@@ -64,7 +64,7 @@
 <script>
 import { mapStores } from 'pinia'
 import AppLogo from "./AppLogo"
-import { Form, Field, ErrorMessage, useForm } from 'vee-validate'
+import { Form, Field, ErrorMessage, useForm, useSetFieldError } from 'vee-validate'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
@@ -94,25 +94,25 @@ export default {
       console.group('onLoginClick()')
 
       this.user.username = this.user.email.split('@').shift()
-      this.$refs.loginForm.validate().then((valid) => {
+      this.$refs.loginForm.validate().then(async (valid) => {
         console.log('Form submission valid', valid)
         if (valid) {
           const username = this.user.username
           const password = this.user.password
           console.debug('Username', username, 'password', password)
-          this.authenticationStore.login(username, password).then((userId) => {
-            this.authenticationStore.checkIsAdminUser(userId).then((isAdmin) => {
-              if (isAdmin) {
-                this.$router.push('/adminhome')
-              } else {
-                this.$router.push('/assessmentintro')
-              }
-            })
-          }).catch ((err) => {
-            console.error(err)
-            const { setFieldError } = useForm()
-            setFieldError('email', err)
-          })
+          const response = await this.authenticationStore.login(username, password)
+          if (response.status == 'ok') {
+            const userId = response.data
+            const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
+            if (isAdmin) {
+              this.$router.push('/adminhome')
+            } else {
+              this.$router.push('/assessmentintro')
+            }     
+          } else { 
+            console.debug('Setting errors...')    
+            this.$refs.loginForm.setFieldError('email', 'Unable to log you in - bad username or password')
+          }              
         }
       })
       console.groupEnd()

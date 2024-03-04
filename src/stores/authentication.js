@@ -19,26 +19,26 @@ export const authenticationStore = defineStore('authentication', {
   actions: {
     async login(username, password) {
 
+      let ret = {}
+
       console.group('login()')
       console.debug('Username', username, 'password', password)
 
       try {
         const user = await axios.post('auth/signin', { username, password })
+        console.debug('User', user)
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
-
-        console.groupEnd()
-
-        return this.userId
-
+        ret =  { status: 'ok', data: this.userId }        
       } catch (err) {
         //dataService.failedLoginAudit('Failed login', '/login')
-
-        console.error('authentication/login : the following error occurred', err)
-        console.groupEnd()
-
-        //throw new Error(err)
+        ret = this.triageError(err)      
       }
+
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
     },
     logout() {
 
@@ -49,29 +49,24 @@ export const authenticationStore = defineStore('authentication', {
 
       console.groupEnd()
     },
-    async signup(username, password, institution) {
+    async signup(username, institution, email, password) {
+
+      let ret = {}
 
       console.group('signup()')
-      console.debug('Username', username, 'password', password, 'institution', institution)
+      console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
 
       try {
-        //TODO
-        const user = await axios.post('auth/user/signup', { username, password })
-        //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
-        this.updateUser(user)
-
-        console.groupEnd()
-
-        return this.userId
-
+        await axios.post('auth/user/signup', { username, institution, email, password, role:['user'] })
+        ret = { status: 'ok', data: '' }
       } catch (err) {
-        //dataService.failedLoginAudit('Failed login', '/login')
-
-        console.error('authentication/login : the following error occurred', err)
-        console.groupEnd()
-
-        throw new Error(err)
+        ret = this.triageError(err)
       }
+
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
     },
     async checkIsAdminUser(userId) {
 
@@ -88,6 +83,32 @@ export const authenticationStore = defineStore('authentication', {
         console.groupEnd()
         return false
       }
+    },
+    triageError(err) {
+
+      console.group('triageError()')
+
+      let payload = {}
+
+      if (err.response) {
+        console.debug('err.response set')
+        console.debug(err.response.data);
+        console.debug(err.response.status);
+        payload = { status: 'error', message: err.response.data.message || err.response.data }
+      } else if (err.request) {
+        console.debug('err.request set')
+        console.debug(err.request)
+        payload = { status: 'error', message: err.request.message }
+      } else {
+        console.debug('Catch-all')
+        console.error(err)
+        payload =  { status: 'error', message: err }
+      }
+
+      console.debug('Payload', payload)
+      console.groupEnd()
+
+      return payload
     },
     updateUser(payload) {
 
