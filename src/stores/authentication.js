@@ -57,7 +57,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
 
       try {
-        await axios.post('auth/user/signup', { username, institution, email, password, role:['user'] })
+        await axios.post('auth/signup/user', { username, institution, email, password, role:['user'] })
         ret = { status: 'ok', data: '' }
       } catch (err) {
         ret = this.triageError(err)

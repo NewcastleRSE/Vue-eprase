@@ -78,7 +78,7 @@
             </div>
 
             <div class="mb-4">
-              <button :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
+              <button type="button" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
                 @click="onRegisterClick">
                 Register
               </button>
@@ -151,10 +151,11 @@ export default {
             const response = await this.authenticationStore.signup(username, institution, email, password)
             if (response.status == 'ok') {
               console.log(response)
-              //this.$router.push('/login')
+              this.$router.push('/login')
             } else {
-              console.debug('Setting errors...')    
-              this.$refs.regForm.setFieldError('email', response.message)
+              console.debug('Setting errors...')
+              const message = response.message == 'email-taken' ? 'This email address is already in use' : response.message
+              this.$refs.regForm.setFieldError('email', message)
             }
           } catch (err) {
             console.error(err)
