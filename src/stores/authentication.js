@@ -1,4 +1,3 @@
-import { dataService } from '../services/data.service'
 import { defineStore } from 'pinia'
 import axios from "axios"
 
@@ -27,11 +26,9 @@ export const authenticationStore = defineStore('authentication', {
       try {
         const user = await axios.post('auth/signin', { username, password })
         console.debug('User', user)
-        //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
         ret =  { status: 200, data: this.userId }        
-      } catch (err) {
-        //dataService.failedLoginAudit('Failed login', '/login')
+      } catch (err) {        
         ret = this.triageError(err)      
       }
 
@@ -135,21 +132,17 @@ export const authenticationStore = defineStore('authentication', {
     async requestNewPassword(email) {
       try {
         const res = await axios.post('auth/newPassword', { email })
-        dataService.audit('Successful password reset request', '/requestpassword')
         console.error('Not implemented!')
       } catch (err) {
         console.error('authentication/requestNewPassword : the following error occurred', err)
-        dataService.failedLoginAudit('Failed password reset request', '/requestpassword')
       }
     },
     async resetPassword(password, token) {
       try {
         const res = await axios.post('auth/resetPassword?token=' + token, { password })
-        dataService.audit('Successful password reset', '/resetpassword')
         console.error('Not implemented!')
       } catch (err) {
         console.error('authentication/requestNewPassword : the following error occurred', err)
-        dataService.failedLoginAudit('Failed password reset request', '/resetpassword')
       }
     }
   }
