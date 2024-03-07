@@ -29,7 +29,7 @@ export const authenticationStore = defineStore('authentication', {
         console.debug('User', user)
         //dataService.audit('Successful login', '/login') - TODO not working 23/02/2024 David Herbert
         this.updateUser(user)
-        ret =  { status: 'ok', data: this.userId }        
+        ret =  { status: 200, data: this.userId }        
       } catch (err) {
         //dataService.failedLoginAudit('Failed login', '/login')
         ret = this.triageError(err)      
@@ -94,15 +94,15 @@ export const authenticationStore = defineStore('authentication', {
         console.debug('err.response set')
         console.debug(err.response.data);
         console.debug(err.response.status);
-        payload = { status: 'error', message: err.response.data.message || err.response.data }
+        payload = { status: err.response.status, message: err.response.data.message || err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
         console.debug(err.request)
-        payload = { status: 'error', message: err.request.message }
+        payload = { status: err.request.status, message: err.request.message }
       } else {
         console.debug('Catch-all')
         console.error(err)
-        payload =  { status: 'error', message: err }
+        payload =  { status: 500, message: err }
       }
 
       console.debug('Payload', payload)

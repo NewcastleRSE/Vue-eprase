@@ -108,7 +108,7 @@ export default {
           const password = this.user.password
           console.debug('Username', username, 'password', password)
           const response = await this.authenticationStore.login(username, password)
-          if (response.status == 'ok') {
+          if (response.status == 200) {
             const userId = response.data
             const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
             if (isAdmin) {

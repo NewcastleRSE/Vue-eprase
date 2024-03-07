@@ -2,6 +2,8 @@ import { authenticationStore } from './authentication'
 import { dataService } from "../services/data.service"
 import { defineStore } from 'pinia'
 
+const API = process.env.BASE_URL
+
 export const rootStore = defineStore('root', {
   state: () => ({
     assessmentId: null,
@@ -18,45 +20,90 @@ export const rootStore = defineStore('root', {
   }),
   actions: {
     async apiCall(url, method = 'POST', body = null) {
-      let response = null
-      const config = { headers: { Authorization: `Bearer ${authenticationStore().getToken()}` }}
-      if (method == 'GET') {
-        response = await axios.get(url, config)
-      } else if (method == 'POST') {
-        response = await axios.get(url, JSON.stringify({ body }), config)
-      } else {
+
+      console.group('apiCall()')
+
+      if (!(method == 'GET' || method == 'POST')) {
         throw new Error(`API call using ${method} not implemented`)
-      }      
+      }
+
+      let response = null, ret = {}
+      const auth = authenticationStore()
+      const config = { headers: { Authorization: `Bearer ${auth.getToken()}` } }
+
+      try {
+        if (method == 'GET') {
+          console.debug('GET url', API + url, 'config', config)
+          response = await axios.get(API + url, config)
+        } else if (method == 'POST') {
+          console.debug('POST url', API + url, 'config', config, 'body', JSON.stringify({ body }))
+          response = await axios.get(API + url, JSON.stringify({ body }), config)
+        }
+        ret = { status: response.status, data: response.data}
+      } catch(err) {
+        ret = auth.triageError(err)
+      }
+
+      console.debug('API call response is', ret)
+      console.groupEnd()
+
+      return ret
+    },
+
+    async saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken) {
+      const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
+      if (response.status < 400) {
+        const assessmentId = JSON.stringify(response.data)
+        console.debug('Assessment ID', assessmentId, '*** TODO - need to save in backend')
+        //TODO - save this in backend, not localStorage
+        this.assessmentId = assessmentId
+        this.part1complete = true
+      }
+      return(response)
+    },
+    async saveCreatePatients(time_taken) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
+      if (response.status < 400)      {
+        this.part2complete = true
+      }
+      return(response)
+    },
+    async savePatientData(qualitative_data, code, time_taken, index, completed) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
+      if (response.status < 400) {
+        this.part3complete = completed
+        this.patientIndex = index + 1
+      }
+      return(response)
+    },
+    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
+      if (response.status < 400) {
+        this.part4complete = completed
+        this.testIndex = index + 1
+      }
+      return(response)
+    },
+    async saveConfigError(test_id, result, time_taken, index) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('config?ID=' + assessmentId, 'POST', { test_id, result, time_taken })   
+      if (response.status < 400) {
+        this.configErrorComplete = true
+        this.testIndex = index + 1
+      }
+      return(response)   
     },
     setPatientList({ commit }, { patientList }) {
       commit('setPatientList', { patientList })
     },
     setTestList({ commit }, { testList }) {
       commit('setTestList', { testList })
-    },
-    saveSystemData({ commit }, { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken }) {
-      dataService.saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
-      commit('saveSystemData')
-    },
-    saveCreatePatients({ commit }, { time_taken }) {
-      dataService.saveCreatePatients(time_taken)
-      commit('saveCreatePatients')
-    },
-    savePatientData({ commit }, { qualitative_data, code, time_taken, index, completed }) {
-      dataService.savePatientData(qualitative_data, code, time_taken)
-      commit('savePatientData', completed)
-      commit('updatePatientIndex', index)
-    },
-    savePrescriptionData({ commit }, { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed }) {
-      dataService.savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed)
-      commit('savePart4Data', completed)
-      commit('updateTestIndex', index)
-    },
-    saveConfigError({ commit }, { test_id, result, time_taken, index }) {
-      dataService.saveConfigError(test_id, result, time_taken)
-      commit('saveConfigError')
-      commit('updateTestIndex', index)
-    },
+    },            
+    
+    
     storeAssessmentId({ commit }, { id }) {
       commit('setAssessmentId', { id })
     },
