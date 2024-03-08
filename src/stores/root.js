@@ -86,12 +86,22 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + insId, 'GET')
       return response   
     },
-    
-    // getAssessmentLatestCompletedPart,
-    // getReportByInstitutionId,
-    // getAllReports,
-    // getAssessmentStatus,
-    // getPrescriptionTestData,
+    async getAssessmentLatestCompletedPart() {
+      const response = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + authenticationStore().institutionId, 'GET')
+      return response           
+    },
+    async getReportByInstitutionId() {
+      const response = await this.apiCall('resultByInstitutionId?ID=' + authenticationStore().institutionId, 'GET')
+      return response          
+    },
+    async getAssessmentIdByInstitutionId(institution_id) {
+      const response = await this.apiCall('assessmentIdByInstitutionId?ID=' + institution_id, 'GET')
+      return response
+    },
+    async getAllReports() {
+      const response = await this.apiCall('results' + code, 'GET')
+      return response        
+    },
     async saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken) {
       const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
       if (response.status < 400) {
