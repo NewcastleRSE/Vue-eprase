@@ -68,6 +68,8 @@ export const authenticationStore = defineStore('authentication', {
     async checkIsAdminUser(userId) {
 
       console.group('checkIsAdminUser()')
+
+      userId = userId || this.userId
       console.debug('User ID', userId)
 
       try {
@@ -89,13 +91,12 @@ export const authenticationStore = defineStore('authentication', {
 
       if (err.response) {
         console.debug('err.response set')
-        console.debug(err.response.data);
-        console.debug(err.response.status);
+        console.debug(err.response)
         payload = { status: err.response.status, message: err.response.data.message || err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
         console.debug(err.request)
-        payload = { status: err.request.status, message: err.request.message }
+        payload = { status: err.request.status, message: err.request.statusText }
       } else {
         console.debug('Catch-all')
         console.error(err)

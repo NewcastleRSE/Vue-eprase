@@ -7,14 +7,15 @@
       Newcastle University</p>
     <h4>Credits</h4>
     <p>The assessments were developed by Stephanie Klein and Jude Heed.</p>
-    <p>The ePRaSE tool was developed by Mike Simpson and Rebecca Osselton from the Research Software Engineering Team at Newcastle
-      University.</p>
+    <p>The ePRaSE tool was developed by Mike Simpson and Rebecca Osselton from the Research Software Engineering Team at
+      Newcastle University.</p>
   </GenericModal>
 </template>
 
 <script>
 
-import { dataService } from '../services/data.service'
+import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 import GenericModal from './GenericModal'
 
 export default {
@@ -22,10 +23,12 @@ export default {
   components: {
     GenericModal
   },
+  computed: {
+    ...mapStores(rootStore)
+  },
   methods: {
     close() {
-      //dataService.audit('View about', '/assessmentintro')
-      //this.$emit('close')
+      rootStore().audit('View about', '/assessmentintro')
     }
   }
 }

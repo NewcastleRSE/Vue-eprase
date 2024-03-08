@@ -111,7 +111,7 @@ export default {
           const response = await this.authenticationStore.login(username, password)
           if (response.status == 200) {
             const userId = response.data
-            this.rootStore.audit('Successful login', '/login')
+            rootStore().audit('Successful login', '/login')
             const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
             if (isAdmin) {
               this.$router.push('/adminhome')
@@ -120,7 +120,7 @@ export default {
             }     
           } else { 
             this.serverError = true
-            this.rootStore.failedLoginAudit('Failed login', '/login')
+            rootStore().failedLoginAudit('Failed login', '/login')
             console.debug('Setting errors...')    
             this.$refs.loginForm.setFieldError('email', 'Unable to log you in - bad username or password')
           }              

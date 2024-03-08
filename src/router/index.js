@@ -45,6 +45,9 @@ export const router = createRouter({
     {
       path: "/assessmentintro",
       component: AssessmentIntro,
+      // beforeEnter: (to, from, next) => {
+
+      // }
     },
     {
       path: "/assessmentSystem",
@@ -142,20 +145,22 @@ export const router = createRouter({
       return { selector: to.hash };
     }
     return { x: 0, y: 0 };
-  },
+  }
 });
 
-// TODO - assuming user in localStorage, and isn't particularly secure anyway - David Herbert 12/02/2024
-// router.beforeEach((to, from, next) => {
-//   // redirect to login page if not logged in and trying to access a restricted page
+//TODO - assuming user in localStorage, and isn't particularly secure anyway - David Herbert 12/02/2024
+// This is very insecure - just set localStorage 'user' key in debug tools and you're away.  Attempts to actually save anything will fail in the backend of course
+// Should, I think, check the user and access token match those from a backend query
+router.beforeEach((to, from, next) => {
+  // redirect to login page if not logged in and trying to access a restricted page
 
-//   // list public pages
-//   const publicPages = ['/','/login','/failedlogin','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
-//   const authRequired = !publicPages.includes(to.path);
-//   const loggedIn = localStorage.getItem('user');
+  // list public pages
+  const publicPages = ['/','/login','/failedlogin','/register','/requestpassword','/resetpassword','/instructions', '/assessmentcontent', '/categorytable'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('user');
 
-//   if (authRequired && !loggedIn) {
-//     return next('/login');
-//   }
-//   next();
-// });
+  if (authRequired && !loggedIn) {
+    return next('/login');
+  }
+  next();
+});

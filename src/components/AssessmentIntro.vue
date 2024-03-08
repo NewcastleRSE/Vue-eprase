@@ -16,7 +16,8 @@
       <h4>Instructions</h4>
       <p>
         The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions
-        system and then to prescribe a series of medications to those patients. You will then be asked to provide feedback
+        system and then to prescribe a series of medications to those patients. You will then be asked to provide
+        feedback
         about any
         advice or intervention from the system.
       </p>
@@ -41,12 +42,13 @@
         click the button below.</p>
 
       <div v-if="assessmentStatus" class="text-secondary-emphasis"> Your organisation ASSESSMENT STATUS is : {{
-        assessmentStatus }}</div>
+      assessmentStatus }}</div>
 
       <div v-if="assessmentStatus" class="pt-4">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'"
           @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
-        <button class="btn btn-primary" v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'"
+        <button class="btn btn-primary"
+          v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'"
           @click="onStartAssessmentClick()">Continue {{ year }} Assessment</button>
       </div>
       <p></p>
@@ -58,7 +60,8 @@
       <div class="pt-4">
         <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
         <p>To view the results of this assessment, click the 'Reports' button below.</p>
-        <p>This assessment will be repeated annually, you will be informed by email when the next assessment is available.
+        <p>This assessment will be repeated annually, you will be informed by email when the next assessment is
+          available.
         </p>
       </div>
     </div>
@@ -66,50 +69,61 @@
     <div class="px-4 mt-4">
       <AppFooter />
     </div>
-    <AppLogo cls="bottomright"/>
+    <AppLogo cls="bottomright" />
+    <ErrorAlertModal :errorText="errorModalText" />
   </main>
 </template>
 
 <script>
 ''
-import { mapState } from 'pinia'
+import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
-import { dataService } from '../services/data.service'
+import { rootStore } from '../stores/root'
 import { patientService } from '../services/patient.service'
 import TabHeader from './TabHeader'
 import AppFooter from "./AppFooter"
 import AppLogo from "./AppLogo"
+import ErrorAlertModal from "./ErrorAlertModal"
 
 export default {
   name: "AssessmentIntro",
   computed: {
-    ...mapState(appSettingsStore, ['version', 'year'])
+    ...mapState(appSettingsStore, ['version', 'year']),
+    ...mapStores(rootStore)
   },
   components: {
     AppFooter,
     TabHeader,
-    AppLogo
+    AppLogo,
+    ErrorAlertModal
   },
   data() {
     return {
       assessmentComplete: false,
       assessmentStatus: '',
       assessmentId: '',
-      userIsAdmin: false
+      userIsAdmin: false,
+      errorModalText: ''
     }
   },
   methods: {
-    checkAssessmentComplete() {
-      dataService.getAssessmentStatus().then(data => {
-        this.assessmentComplete = data.status
-        this.assessmentId = data.id
-        localStorage.setItem('assessmentId', this.assessmentId)
-      })
+    async checkAssessmentComplete() {
+      const response = await rootStore().getAssessmentStatus()
+      if (response.status < 400) {
+        this.assessmentComplete = response.data.status
+        this.assessmentId = response.data.id
+        localStorage.setItem('assessmentId', this.assessmentId) //TODO - is this ok?
+      } else {
+        this.errorModalText = response.message
+      }
     },
     getAssessmentStatus() {
-      dataService.getAssessmentLatestCompletedPart().then(data => {
+      const response = await rootStore().getAssessmentLatestCompletedPart() 
+      if (response.status < 400) {
         this.assessmentStatus = data.status
-      })
+      } else {
+        this.errorModalText = response.message
+      }
     },
     onStartAssessmentClick() {
       if (this.assessmentStatus === 'System Information Complete') {
@@ -157,7 +171,7 @@ export default {
     this.checkAssessmentComplete()
     this.getAssessmentStatus()
     this.getRequiredPatients()
-    dataService.audit('View assessment intro', '/assessmentintro')
+    rootStore().audit('View assessment intro', '/assessmentintro')
   },
   mounted: function () {
     // Looks as though this disables the back button - do we still need this?

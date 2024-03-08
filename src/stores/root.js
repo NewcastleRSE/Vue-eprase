@@ -36,8 +36,8 @@ export const rootStore = defineStore('root', {
           console.debug('GET url', API + url, 'config', config)
           response = await axios.get(API + url, config)
         } else if (method == 'POST') {
-          console.debug('POST url', API + url, 'config', config, 'body', JSON.stringify({ body }))
-          response = await axios.get(API + url, JSON.stringify({ body }), config)
+          console.debug('POST url', API + url, 'config', config, 'body', body)
+          response = await axios.post(API + url, body, config)
         }
         ret = { status: response.status, data: response.data}
       } catch(err) {
@@ -163,11 +163,15 @@ export const rootStore = defineStore('root', {
     },
     async audit(action, uri) {
       const response = await this.apiCall('audit', 'POST', { action, uri })
-      return response
+      if (response.status >= 400) {
+        console.error(response.message)
+      }
     },
     async failedLoginAudit(action, uri) {
       const response = await this.apiCall('failedLoginAudit', 'POST', { action, uri })
-      return response
+      if (response.status >= 400) {
+        console.error(response.message)
+      }
     },
     setPatientList(patientList) {
       this.patientList = patientList
