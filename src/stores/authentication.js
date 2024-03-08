@@ -71,7 +71,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('User ID', userId)
 
       try {
-        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.getToken } })
+        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.token } })
         console.debug('Admin user', res.data)
         console.groupEnd()
         return res.data

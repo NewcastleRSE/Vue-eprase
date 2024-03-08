@@ -1,5 +1,6 @@
 import { authenticationStore } from './authentication'
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
 const API = process.env.BASE_URL
 
@@ -28,7 +29,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = { headers: { Authorization: `Bearer ${auth.getToken()}` } }
+      const config = { headers: { Authorization: `Bearer ${auth.token}` } }
 
       try {
         if (method == 'GET') {
@@ -48,7 +49,49 @@ export const rootStore = defineStore('root', {
 
       return ret
     },
-
+    async getAssessmentById(assessment_id) {
+      const response = await this.apiCall('resultByAssessmentId?ID=' + assessment_id, 'GET')
+      return response
+    },
+    async getInstitutions() {
+      const response = await this.apiCall('auth/institutions', 'GET')
+      return response
+    },
+    async getCategories() {
+      const response = await this.apiCall('categories', 'GET')
+      return response      
+    },
+    async getPrescriptionTestData(id) {
+      const response = await this.apiCall('resultCategories?ID=' + id, 'GET')
+      return response            
+    },
+    async getMitigationResults(id) {
+      const response = await this.apiCall('getMitigationResults?ID=' + id + id, 'GET')
+      return response                
+    },
+    async getAllMitigationResults() {
+      const response = await this.apiCall('getAllMitigationResults' + id, 'GET')
+      return response       
+    },
+    async getConfigErrors() {
+      const response = await this.apiCall('configerrors' + id, 'GET')
+      return response      
+    },
+    async getConfigErrorByCode(code){
+      const response = await this.apiCall('configerrorbycode?CODE=' + code, 'GET')
+      return response     
+    },
+    async getAssessmentStatus(institution_id) {
+      const insId = institution_id || authenticationStore().institutionId;
+      const response = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + insId, 'GET')
+      return response   
+    },
+    
+    // getAssessmentLatestCompletedPart,
+    // getReportByInstitutionId,
+    // getAllReports,
+    // getAssessmentStatus,
+    // getPrescriptionTestData,
     async saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken) {
       const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
       if (response.status < 400) {

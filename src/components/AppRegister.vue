@@ -101,8 +101,8 @@ import AppLogo from './AppLogo'
 import { mapStores, mapState } from 'pinia'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { authenticationStore } from '../stores/authentication'
+import { rootStore } from '../stores/root'
 import { appSettingsStore } from '../stores/appSettings'
-import { dataService } from '../services/data.service'
 
 export default {
   name: "AppRegister",
@@ -114,7 +114,7 @@ export default {
   },
   computed: {
     ...mapState(appSettingsStore, ['appOpen']),
-    ...mapStores(authenticationStore)
+    ...mapStores(authenticationStore, rootStore)
   },
   data() {
     return {
@@ -163,12 +163,20 @@ export default {
         }
       })
       console.groupEnd()
+    },
+    async getInstitutions() {
+      console.log(this)
+      const response = await rootStore().getInstitutions()
+      if (response.status == 200) {
+        this.institutions = response.data
+      } else {
+        this.institutions = [response.message]
+        console.error(response.message)
+      }      
     }
   },
-  created() {
-    dataService.getInstitutions().then(data => {
-      this.institutions = data
-    })
+  mounted() {
+    this.getInstitutions()   
   }
 }
 
