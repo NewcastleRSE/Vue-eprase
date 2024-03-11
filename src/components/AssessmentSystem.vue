@@ -12,6 +12,8 @@
           <form id="ep-system-form" @submit.prevent="handleSubmit">
             <div class="form-group">
               <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? *</label>
+              <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector" 
+                  rules="required"><!-- HERE-->
               <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service"
                 v-validate="{ required: true, min: 1 }">
                 <option :value="null">Select System...</option>
@@ -28,6 +30,7 @@
                 <option value="Lorenzo">Lorenzo </option>
                 <option value="Other"> Other (Please Specify) </option>
               </select>
+              </Field>
             </div>
 
             <div v-show="results.ep_service === 'Other'" class="form-group">

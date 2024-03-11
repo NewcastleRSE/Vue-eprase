@@ -70,7 +70,7 @@
       <AppFooter />
     </div>
     <AppLogo cls="bottomright" />
-    <ErrorAlertModal :errorText="errorText" />
+    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" />
   </main>
 </template>
 
@@ -80,9 +80,9 @@ import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
-import AppFooter from "./AppFooter"
-import AppLogo from "./AppLogo"
-import ErrorAlertModal from "./ErrorAlertModal"
+import AppFooter from './AppFooter'
+import AppLogo from './AppLogo'
+import ErrorAlertModal from './ErrorAlertModal'
 
 export default {
   name: "AssessmentIntro",
