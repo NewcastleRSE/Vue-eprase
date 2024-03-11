@@ -615,31 +615,37 @@ function formatPatientData(patientarray){
 
 function formatAllergy(allergy){
   let allergyArray = [];
+  console.log('allergy', allergy)
   for(let index in allergy){
     if(allergy.hasOwnProperty(index)){
       allergyArray.push(allergy[index].allergy);
     }
   }
+  console.log('return array', allergyArray)
   return allergyArray;
 }
 
 function formatDiagnosis(diagnosis) {
   let diagnosisArray = [];
+  console.log('diagnosis', diagnosis)
   for (let index in diagnosis) {
     if (diagnosis.hasOwnProperty(index)) {
       diagnosisArray.push(diagnosis[index].diagnosis);
     }
   }
+  console.log('return array', diagnosisArray)
   return diagnosisArray;
 }
 
 function formatComorbidity(comorbidity) {
   let comorbidityArray = [];
+  console.log('comorbidity', comorbidity)
   for(let index in comorbidity){
     if(comorbidity.hasOwnProperty(index)){
       comorbidityArray.push(comorbidity[index].comorbidity);
     }
   }
+  console.log('return array', comorbidityArray)
   return comorbidityArray;
 }
 

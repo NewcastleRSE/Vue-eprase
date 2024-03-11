@@ -70,7 +70,7 @@
       <AppFooter />
     </div>
     <AppLogo cls="bottomright" />
-    <ErrorAlertModal :errorText="errorModalText" />
+    <ErrorAlertModal :errorText="errorText" />
   </main>
 </template>
 
@@ -79,8 +79,7 @@
 import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { rootStore } from '../stores/root'
-import { patientService } from '../services/patient.service'
-import TabHeader from './TabHeader'
+import { patientStore } from '../stores/patients'
 import AppFooter from "./AppFooter"
 import AppLogo from "./AppLogo"
 import ErrorAlertModal from "./ErrorAlertModal"
@@ -89,11 +88,10 @@ export default {
   name: "AssessmentIntro",
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapStores(rootStore)
+    ...mapStores(rootStore, patientStore)
   },
   components: {
     AppFooter,
-    TabHeader,
     AppLogo,
     ErrorAlertModal
   },
@@ -103,27 +101,43 @@ export default {
       assessmentStatus: '',
       assessmentId: '',
       userIsAdmin: false,
-      errorModalText: ''
+      errorText: ''
     }
   },
   methods: {
     async checkAssessmentComplete() {
+
+      console.group('checkAssessmentComplete()')
+
       const response = await rootStore().getAssessmentStatus()
       if (response.status < 400) {
-        this.assessmentComplete = response.data.status
-        this.assessmentId = response.data.id
-        localStorage.setItem('assessmentId', this.assessmentId) //TODO - is this ok?
+        // This call returns no data if no assessment is open for institution
+        this.assessmentComplete = (response.data && response.data.assessmentComplete) || false
+        this.assessmentId = (response.data && response.data.assessment_id) || 0
+
+        console.warn('Setting assessmentId in localStorage', this.assessmentId)
+        localStorage.setItem('assessmentId', this.assessmentId)
       } else {
-        this.errorModalText = response.message
+        this.errorText = response.message
       }
+
+      console.debug('Response', response)
+      console.groupEnd()
     },
-    getAssessmentStatus() {
-      const response = await rootStore().getAssessmentLatestCompletedPart() 
+    async getAssessmentStatus() {
+
+      console.group('getAssessmentStatus()')
+
+      const response = await rootStore().getAssessmentLatestCompletedPart()
       if (response.status < 400) {
-        this.assessmentStatus = data.status
+        // This call returns no data if no assessment is open for institution
+        this.assessmentStatus = response.data ? response.data.status : 'Not Started'
       } else {
-        this.errorModalText = response.message
+        this.errorText = response.message
       }
+
+      console.debug('Response', response)
+      console.groupEnd()
     },
     onStartAssessmentClick() {
       if (this.assessmentStatus === 'System Information Complete') {
@@ -139,32 +153,41 @@ export default {
         this.$router.push('/assessmentsystem')
       }
     },
-    getRequiredPatients() {
+    async getRequiredPatients() {
+
+      console.group('getRequiredPatients()')
 
       let requiredAdultPatients = []
       let requiredChildPatients = []
       let allRequiredPatients = []
 
-      patientService.getRequiredTests().then(data => {
-        let tests = data
-        for (let test in tests) {
-          if (tests.hasOwnProperty(test)) {
-            let requiredPatient = tests[test].patient
-            requiredPatient = patientService.formatPatientData(requiredPatient)
-            if (requiredPatient.age >= 18) {
-              requiredAdultPatients.push(requiredPatient)
-            }
-            else {
-              requiredChildPatients.push(requiredPatient)
-            }
-            allRequiredPatients.push(requiredPatient)
+      const patientService = patientStore()
+      const response = await patientService.getRequiredTests()
+      if (response.status < 400) {
+        response.data.forEach(test => {
+          let requiredPatient = patientService.formatPatientData(test.patient)
+          if (requiredPatient.age >= 18) {
+            requiredAdultPatients.push(requiredPatient)
+          } else {
+            requiredChildPatients.push(requiredPatient)
           }
-        }
-        //TODO - investigate LocalStorage usage here
-        localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients))
-        /* localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients)); */
-        localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients))
-      })
+          allRequiredPatients.push(requiredPatient)
+        })
+        console.debug('requiredAdultPatients', requiredAdultPatients)
+        console.debug('requiredChildPatients', requiredChildPatients)
+        console.debug('allRequiredPatients', allRequiredPatients)
+      } else {
+        this.errorText = response.message
+      }
+   
+      console.warn('Setting requiredAdultPatients in localStorage')
+      localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients))
+      //localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients))
+      console.warn('Setting allRequiredPatients in localStorage')
+      localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients))
+
+      console.debug('Response', response)
+      console.groupEnd()
     }
   },
   created: function () {
