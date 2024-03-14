@@ -9,140 +9,191 @@
 
       <div class="assessment-system">
         <div>
-          <form id="ep-system-form" @submit.prevent="handleSubmit">
-            <div class="form-group">
-              <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? *</label>
-              <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector" 
-                  rules="required"><!-- HERE-->
-              <select name="ep-service" id="ep-system-selector" class="form-control" v-model="results.ep_service"
-                v-validate="{ required: true, min: 1 }">
-                <option :value="null">Select System...</option>
-                <option value="Cerner"> Cerner </option>
-                <option value="All script"> All script </option>
-                <option value="Meditech"> Meditech </option>
-                <option value="JAC"> JAC </option>
-                <option value="Medway"> Medway </option>
-                <option value="EPIC"> EPIC </option>
-                <option value="Open EP"> Open EP </option>
-                <option value="PICS"> PICS </option>
-                <option value="Sunrise"> Sunrise </option>
-                <option value="MedChart">MedChart </option>
-                <option value="Lorenzo">Lorenzo </option>
-                <option value="Other"> Other (Please Specify) </option>
-              </select>
-              </Field>
+          <Form ref="ep-system-form" v-slot="{ meta: formMeta }">
+
+            <div class="row">
+              <div class="form-group">
+                <label for="ep-system-selector">Which electronic prescribing (eP) service are you using? *</label>
+                <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector"
+                  rules="required">
+                  <select v-bind="field" class="form-select"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Select system...</option>
+                    <option value="Cerner"> Cerner </option>
+                    <option value="All script"> All script </option>
+                    <option value="Meditech"> Meditech </option>
+                    <option value="JAC"> JAC </option>
+                    <option value="Medway"> Medway </option>
+                    <option value="EPIC"> EPIC </option>
+                    <option value="Open EP"> Open EP </option>
+                    <option value="PICS"> PICS </option>
+                    <option value="Sunrise"> Sunrise </option>
+                    <option value="MedChart">MedChart </option>
+                    <option value="Lorenzo">Lorenzo </option>
+                    <option value="Other"> Other (Please Specify)</option>
+                  </select>
+                </Field>
+                <ErrorMessage name="ep-service" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>
+              </div>
             </div>
 
-            <div v-show="results.ep_service === 'Other'" class="form-group">
-              <label for="other-ep-system"> Other eP service?</label>
-              <input type="text" name="other" id="other-ep-system" class="form-control"
-                v-model="results.other_ep_system" minlength="3" maxlength="50" placeholder="Enter service...">
-              <div v-if="submitted && errors.has('other_ep_system')" class="invalid-feedback alert alert-danger">{{
-            errors.first('other_ep_system') }}</div>
+            <div v-show="results.ep_service === 'Other'" class="row">
+              <div class="form-group">
+                <label for="other-ep-system">Other eP service?</label>
+                <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" id="other-ep-system">
+                  <input v-bind="field" type="text" class="form-control" minlength="3" maxlength="50"
+                    placeholder="Enter service...">
+                </Field>
+                <ErrorMessage name="other" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="ep-version">What version of the service are you currently using? *</label>
-              <span id="version"><input id="ep-version" name="ep-version" type="text" class="form-control"
-                  v-model="results.ep_version" v-validate="{ required: true, min: 1, max: 50 }"
-                  placeholder="Enter version..."></span>
-              <div v-if="submitted && errors.has('ep_version')" class="invalid-feedback alert alert-danger">{{
-            errors.first('ep_version') }}</div>
+            <div class="row">
+              <div class="form-group">
+                <label for="ep-version">What version of the service are you currently using? *</label>
+                <Field v-slot="{ field, meta }" v-model="results.ep_version" name="ep-version" id="ep-version"
+                  rules="required|lengthBetween:1,50">
+                  <input v-bind="field" type="text" class="form-control" placeholder="Enter version...">
+                </Field>
+                <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>
+              </div>
             </div>
 
-            <div class="question form-group" id="question-1">
-              <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed
+            <div class="row">
+              <div class="form-group">
+                <label for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed
                 through the eP system across your organisation? *</label>
-              <select name="ep-usage" id="usage-selector" class="form-control" v-model="results.ep_usage"
-                v-validate="{ required: true, min: 1 }">
-                <option :value="null">Select Percentage...</option>
-                <option value="76-100">76-100%</option>
-                <option value="51-75">51-75%</option>
-                <option value="26-50">26-50%</option>
-                <option value="0-25">0-25%</option>
-              </select>
+                <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector"
+                  rules="required">
+                  <select v-bind="field" class="form-select"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Select Percentage...</option>
+                    <option value="76-100">76-100%</option>
+                    <option value="51-75">51-75%</option>
+                    <option value="26-50">26-50%</option>
+                    <option value="0-25">0-25%</option>
+                  </select>
+                </Field>
+                <ErrorMessage name="ep-service" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>
+              </div>
             </div>
 
-            <!-- remove until Paediatrics scenarios are supported -->
-            <!--  <div class="question form-group" id="question-2">
-              <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
-              <select name="ep-usage" id="ep-patients" class="form-control"  v-model="results.patient_type" v-validate="{required: true, min: 1 }" >
-                <option :value="null">Select an Option...</option>
-                <option value="Adults">Adults</option>
-                <option value="Paediatrics">Paediatrics</option>
-                <option value="Both">Both</option>
-              </select>
+            <!-- <div class="row">
+              <div class="form-group">
+                <label for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
+                <Field v-slot="{ field, meta }" v-model="results.patient_type" name="ep-usage" id="ep-patients"
+                  rules="required">
+                  <select v-bind="field" class="form-select"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Select an option...</option>
+                    <option value="Adults">Adults</option>
+                    <option value="Paediatrics">Paediatrics</option>
+                    <option value="Both">Both</option>
+                  </select>
+                </Field>
+                <ErrorMessage name="ep-usage" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>
+              </div>
             </div> -->
 
-            <div class="form-group">
-              <label for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please
-                provide their names.</label>
-              <input type="text" name="add-ep-system" id="add-ep-system" class="form-control"
-                v-model="results.add_ep_system" minlength="3" maxlength="50" placeholder="Other...">
-              <div v-if="submitted && errors.has('add_ep_system')" class="invalid-feedback alert alert-danger">{{
-            errors.first('add_ep_system') }}</div>
+            <div class="row">
+              <div class="form-group">
+                <label for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so, please
+                  provide their names.</label>
+                <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system" 
+                  rules="required|lengthBetween:3,50">
+                  <input v-bind="field" type="text" class="form-control" placeholder="Other...">
+                </Field>
+                <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                  {{ message }}
+                </ErrorMessage>                
+              </div>
             </div>
 
-            <div id="radio-button-group">
-
-              <div class="question form-group" id="question-4">
-                <p class="results-label"> Is your hospital laboratory results system fully integrated with your
-                  e-prescribing system? *</p>
-                <span class="radio-buttons">
-                  <label for="lab-results-yes">Yes</label>
-                  <input type="radio" value=true class="radio-yes" name="lab-results" id="lab-results-yes"
-                    v-model="results.lab_results" v-validate="'required'">
-
-                  <label for="lab-results-no">No</label>
-                  <input type="radio" value=false class="radio-no" name="lab-results" id="lab-results-no"
-                    v-model="results.lab_results">
-                </span>
+            <div class="row">
+              <p>Is your hospital laboratory results system fully integrated with your e-prescribing system? *</p>
+              <div class="btn-group" role="group">
+                <Field v-model="results.lab_results" name="lab-results" id="lab-results-yes">
+                  <input type="radio" value="true" class="btn-check" autocomplete="off" checked>
+                </Field>
+                <label class="btn btn-outline-primary" for="lab-results-yes">Yes</label>
+                <Field v-model="results.lab_results" name="lab-results" id="lab-results-no">
+                  <input type="radio" value="false" class="btn-check" autocomplete="off">
+                </Field>                
+                <label class="btn btn-outline-primary" for="lab-results-no">No</label>
               </div>
-
-
-              <div v-show="results.lab_results === 'true'" class="question form-group" id="question-5">
-                <p class="add_results_label"><i class="bi bi-caret-right"></i> Are you able to manually enter laboratory
-                  results into your patient admin and/ or e-prescribing test system that you are using to do this
-                  assessments?</p>
-                <span class="radio-buttons">
-                  <label for="man-results-yes">Yes</label>
-                  <input type="radio" value=true class="radio-yes" name="man-results" id="man-results-yes"
-                    v-model="results.man_results">
-
-                  <label for="man-results-no">No</label>
-                  <input type="radio" value=false class="radio-no" name="man-results" id="man-results-no"
-                    v-model="results.man_results">
-                </span>
-              </div>
-
-              <div class="question form-group" id="question-6">
-                <p class="results-label">Are you able to manually enter diagnosis and medical history into your test
-                  system? *</p>
-                <span class="radio-buttons">
-                  <label for="med-history-yes">Yes</label>
-                  <input type="radio" value=true class="radio-yes" name="med-history" id="med-history-yes"
-                    v-model="results.med_history" v-validate="'required'">
-                  <label for="med-history-no">No</label>
-                  <input type="radio" value=false class="radio-no" name="med-history" id="med-history-no"
-                    v-model="results.med_history">
-                </span>
-              </div>
-
-              <div v-if="results.med_history === 'true'" class="question form-group" id="question-7">
-                <p class="add_results_label"><i class="bi bi-caret-right"></i> Are you able to enter diagnosis or
-                  comorbidities into your test system that you are using to do this assessments?</p>
-                <span class="radio-buttons">
-                  <label for="diagnosis-results-yes">Yes</label>
-                  <input type="radio" value=true class="radio-yes" name="diagnosis-results" id="diagnosis-results-yes"
-                    v-model="results.diagnosis_results">
-
-                  <label for="diagnosis-results-no">No</label>
-                  <input type="radio" value=false class="radio-no" name="diagnosis-results" id="diagnosis-results-no"
-                    v-model="results.diagnosis_results">
-                </span>
-              </div>
-
             </div>
+
+            <div class="row" v-show="results.lab_results === 'true'">
+              <p><i class="bi bi-caret-right"></i> Are you able to manually enter laboratory
+                results into your patient admin and/ or e-prescribing test system that you are using to do this
+                assessments?</p>
+              <div class="btn-group" role="group">
+                <Field v-model="results.man_results" name="man-results" id="man-results-yes">
+                  <input type="radio" value="true" class="btn-check" autocomplete="off" checked>
+                </Field>
+                <label class="btn btn-outline-primary" for="man-results-yes">Yes</label>
+                <Field v-model="results.man_results" name="man-results" id="man-results-no">
+                  <input type="radio" value="false" class="btn-check" autocomplete="off">
+                </Field>                
+                <label class="btn btn-outline-primary" for="man-results-no">No</label>
+              </div>              
+            </div>
+
+            <div class="row">
+              <p>Are you able to manually enter diagnosis and medical history into your test system? *</p>
+              <div class="btn-group" role="group">
+                <Field v-model="results.med_history" name="med-history" id="med-history-yes">
+                  <input type="radio" value="true" class="btn-check" autocomplete="off" checked>
+                </Field>
+                <label class="btn btn-outline-primary" for="med-history-yes">Yes</label>
+                <Field v-model="results.med_history" name="med-history" id="med-history-no">
+                  <input type="radio" value="false" class="btn-check" autocomplete="off">
+                </Field>                
+                <label class="btn btn-outline-primary" for="med-history-no">No</label>
+              </div>
+            </div>
+
+            <div v-if="results.med_history === 'true'" class="row">
+              <p><i class="bi bi-caret-right"></i>Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessments?</p>
+              <div class="btn-group" role="group">
+                <Field v-model="results.diagnosis_results" name="diagnosis-results" id="diagnosis-results-yes">
+                  <input type="radio" value="true" class="btn-check" autocomplete="off" checked>
+                </Field>
+                <label class="btn btn-outline-primary" for="diagnosis-results-yes">Yes</label>
+                <Field v-model="results.diagnosis_results" name="diagnosis-results" id="diagnosis-results-no">
+                  <input type="radio" value="false" class="btn-check" autocomplete="off">
+                </Field>                
+                <label class="btn btn-outline-primary" for="diagnosis-results-no">No</label>
+              </div>              
+            </div>
+
+            <div class="row">
+              <p>Is the e-prescribing system used to prescribe the following?</p>
+              <div class="btn-group" role="group">
+                <Field v-model="results.high_risk_meds" name="med-history" id="med-history-yes">
+                  <input type="radio" value="true" class="btn-check" autocomplete="off" checked>
+                </Field>
+                <label class="btn btn-outline-primary" for="med-history-yes">Yes</label>
+                <Field v-model="results.med_history" name="med-history" id="med-history-no">
+                  <input type="radio" value="false" class="btn-check" autocomplete="off">
+                </Field>                
+                <label class="btn btn-outline-primary" for="med-history-no">No</label>
+              </div>
+            </div>
+
+            
+            
+        
             <div class="hm-checkbox">
               <b-form-group label="Is the e-prescribing system used to prescribe the following?">
                 <b-form-checkbox-group id="high_risk" v-model="results.high_risk_meds" :options="results.options"
@@ -175,7 +226,7 @@
                   :disabled="isFormInvalid">Next</button>
               </div>
             </div>
-          </form>
+          </Form>
         </div>
       </div>
 
@@ -193,6 +244,7 @@
 import TabHeader from './TabHeader'
 import AppLogo from './AppLogo'
 import ExitModal from "./ExitModal"
+import { Form, Field, ErrorMessage } from 'vee-validate'
 import { dataService } from '../services/data.service'
 
 export default {
