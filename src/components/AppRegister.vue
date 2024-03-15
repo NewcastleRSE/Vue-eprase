@@ -165,7 +165,6 @@ export default {
       console.groupEnd()
     },
     async getInstitutions() {
-      console.log(this)
       const response = await rootStore().getInstitutions()
       if (response.status == 200) {
         this.institutions = response.data

@@ -21,6 +21,7 @@
     "bootstrap-icons": "^1.11.3",
     "jquery": "^3.7.1",
     "jstat": "^1.9.6",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
     "popper.js": "^1.16.1",

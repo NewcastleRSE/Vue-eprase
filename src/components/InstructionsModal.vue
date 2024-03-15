@@ -19,17 +19,20 @@
 <script>
 
 import GenericModal from './GenericModal'
-import { dataService } from '../services/data.service'
+import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 
 export default {
   name: "InstructionsModal",
   components: {
     GenericModal
   },
+  computed: {
+    ...mapStores(rootStore)
+  },
   methods: {
     close() {
-      //dataService.audit('View instructions', '/assessmentintro')
-      //this.$emit('close')
+      rootStore().audit('View instructions', '/assessmentintro')
     }
   }
 }

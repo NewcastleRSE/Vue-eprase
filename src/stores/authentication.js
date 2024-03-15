@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from "axios"
+import { jwtDecode } from 'jwt-decode'
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
@@ -8,8 +9,15 @@ export const authenticationStore = defineStore('authentication', {
     institutionId: localStorage.getItem('institutionId'),
     token: localStorage.getItem('token')
   }),
-  getters: {
-    isLoggedIn: (state) => state.token != null,
+  getters: {   
+    isLoggedIn: (state) => {
+      if (state.user && state.userId && state.institutionId && state.token) {
+        // Check token expiry date
+        const decodedToken = jwtDecode(state.token)
+        return decodedToken && (decodedToken.exp * 1000) > new Date().getTime()
+      }
+      return false
+    },
     getUser: (state) => state.user,
     getUserId: (state) => state.userId,
     getInstitutionId: (state) => state.institutionId,
@@ -64,7 +72,7 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return ret
-    },
+    },    
     async checkIsAdminUser(userId) {
 
       console.group('checkIsAdminUser()')

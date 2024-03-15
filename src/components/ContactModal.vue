@@ -22,18 +22,21 @@
 <script>
 
 import GenericModal from './GenericModal'
-import { dataService } from '../services/data.service'
+import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 
 export default {
   name: "ContactModal",
   components: {
     GenericModal
   },
+  computed: {
+    ...mapStores(rootStore)
+  },
   methods: {
-    // close (){
-    //     dataService.audit('View contact', '/assessmentintro');
-    //     this.$emit('close')
-    // }
+    close() {
+      rootStore().audit('View contact', '/assessmentintro')
+    }
   }
 }
 </script>

@@ -70,7 +70,7 @@
       <AppFooter />
     </div>
     <AppLogo cls="bottomright" />
-    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" />
+    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" @modal-closed="close()" />
   </main>
 </template>
 
@@ -195,13 +195,6 @@ export default {
     this.getAssessmentStatus()
     this.getRequiredPatients()
     rootStore().audit('View assessment intro', '/assessmentintro')
-  },
-  mounted: function () {
-    // Looks as though this disables the back button - do we still need this?
-    history.pushState(null, null, location.href)
-    window.onpopstate = function () {
-      history.go(1)
-    }
   }
 }
 </script>
