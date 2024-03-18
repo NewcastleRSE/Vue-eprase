@@ -1,18 +1,16 @@
 <template>
-  <div class="btn-toolbar" role="toolbar" aria-label="Control button toolbar">
-    <div class="btn-group me-2" role="group" aria-label="Control button group">
-      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aboutModal"><i
-          class="bi bi-info-circle pe-1"></i>About</button>
-      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#instructionsModal"><i
-          class="bi bi-clipboard pe-1"></i>Instructions</button>
-      <button type="button" class="btn btn-outline-primary" @click="reports()"><i
-          class="bi bi-bar-chart pe-1"></i>Reports</button>
-      <a href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank" type="button"
-        class="btn btn-outline-primary"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
-      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#contactModal"><i
-          class="bi bi-person-circle pe-1"></i>Contact</button>
-      <button class="btn btn-outline-primary" @click="signout()"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
-    </div>
+  <div>
+    <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#aboutModal"><i
+        class="bi bi-info-circle pe-1"></i>About</button>
+    <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#instructionsModal"><i
+        class="bi bi-clipboard pe-1"></i>Instructions</button>
+    <button type="button" class="btn btn-outline-primary m-1" @click="reports()"><i
+        class="bi bi-bar-chart pe-1"></i>Reports</button>
+    <a href="https://eprasedocs.blob.core.windows.net/web/Eprase2022UserGuide.pdf" target="_blank" type="button"
+      class="btn btn-outline-primary m-1"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
+    <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#contactModal"><i
+        class="bi bi-person-circle pe-1"></i>Contact</button>
+    <button class="btn btn-outline-primary m-1" @click="signout()"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
   </div>
   <AboutModal />
   <InstructionsModal />

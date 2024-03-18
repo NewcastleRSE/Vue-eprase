@@ -13,17 +13,14 @@ $light: #c4c4c4;
 main {
   border: 1px solid $light;
   border-radius: 2rem;
-  padding: 2rem;
-  margin: 5% auto auto auto;
+  margin: auto auto auto auto;
   background-color: #fff;
   text-align: center;
   justify-content: center;
   align-items: center;
-  max-width: 1200px;
 }
 
 main.leftalign {
-  border: none;
   text-align: left;
   justify-content: left;
   align-items: left;

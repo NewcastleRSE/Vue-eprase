@@ -44,7 +44,7 @@
       <div v-if="assessmentStatus" class="text-secondary-emphasis"> Your organisation ASSESSMENT STATUS is : {{
       assessmentStatus }}</div>
 
-      <div v-if="assessmentStatus" class="pt-4">
+      <div v-if="assessmentStatus !== 'Fully Complete'" class="pt-4">
         <button class="start-btn btn btn-primary" v-if="assessmentStatus === 'Not Started'"
           @click="onStartAssessmentClick()">Begin {{ year }} Assessment</button>
         <button class="btn btn-primary"
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="px-4 mt-4">
+    <div class="px-4 my-4">
       <AppFooter />
     </div>
     <AppLogo cls="bottomright" />
