@@ -1,10 +1,10 @@
 <template>
 
-  <div id ="tabbedHeader">
-    <div class="section" id="system" >System <img class="tick" src="../assets/images/tick.png" alt="completed" v-bind:style="showSystem"></div>
-    <div class="section" id="patients" >Patients <img class="tick" src="../assets/images/tick.png" alt="completed"  v-bind:style="showPatients"></div>
-    <div class="section" id="scenarios" >Scenarios <img class="tick" src="../assets/images/tick.png" alt="completed" v-bind:style="showScenarios"></div>
-    <div class="section" id="report" >Report <img class="tick" src="../assets/images/tick.png" alt="completed"  v-bind:style="showReport"></div>
+  <div class="tabbed-header">
+    <div class="tab-section bg-primary border border-primary" :class="showSystem ? 'opacity-100' : 'opacity-50'">System</div>
+    <div class="tab-section bg-primary border border-primary" :class="showPatients ? 'opacity-100' : 'opacity-50'">Patients</div>
+    <div class="tab-section bg-primary border border-primary" :class="showScenarios ? 'opacity-100' : 'opacity-50'">Scenarios</div>
+    <div class="tab-section bg-primary border border-primary" :class="showReport ? 'opacity-100' : 'opacity-50'">Report</div>
   </div>
 
 </template>
@@ -13,30 +13,10 @@
     export default {
         name: "TabHeader",
         props: {
-            systemOpacity : '',
-            patientOpacity : '',
-            scenarioOpacity: '',
-            reportOpacity: '',
-        },
-        data() {
-            return {
-                showSystem : {
-                   display: 'inline',
-                    opacity: this.systemOpacity
-                },
-                showPatients : {
-                    display: 'inline',
-                    opacity: this.patientOpacity
-                },
-                showScenarios : {
-                    display: 'inline',
-                    opacity: this.scenarioOpacity
-                },
-                showReport : {
-                    display: 'inline',
-                    opacity: this.reportOpacity
-                }
-            }
+            showSystem : true,
+            showPatients: false,
+            showScenarios: false,
+            showReport: false
         }
     }
 
@@ -44,18 +24,28 @@
 
 <style scoped>
 
-  #tabbedHeader {
-    height: 80px;
-    width: 98%;
-    margin: 10px;
+  .tabbed-header {
+    height: 80px;   
     display: grid;
     grid-template-columns: auto auto auto auto;
   }
 
-  #system {
-    background-color: #07818e;
-    border-top-left-radius: 15px;
+  .tab-section {
+    font-size: 2rem;
+    text-align: center;
+    color: #fff;
+    padding-top: 1rem; 
+    border-width: 1px;   
   }
+
+  .tab-section:first-child {    
+    border-top-left-radius: 2rem;
+  }
+
+  .tab-section:last-child {    
+    border-top-right-radius: 2rem;
+  }
+
   #patients {
     background-color: #029a99;
   }
@@ -64,7 +54,7 @@
   }
   #report {
     background-color: #02dddc;
-    border-top-right-radius: 15px;
+    border-top-right-radius: 2rem;
   }
 
   .tick {
