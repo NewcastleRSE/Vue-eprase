@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="pt-5">
     <AppLogo cls="banner" />
     <div class="pb-3">
       <h1>Welcome to ePRaSE 2024</h1>

@@ -2,7 +2,7 @@
 
   <main class="leftalign">
 
-    <TabHeader :showSystem="true" :showPatients="false" :showScenarios="false" :showReport="false"></TabHeader>
+    <TabHeader :showIndex="0"></TabHeader>
     <div class="content p-4">
       <h3>EP System Information</h3>
       <h4>Please answer the following questions about your ePrescribing system:</h4>
@@ -199,17 +199,17 @@
 
             <div class="mb-4 row">
               <p>Is the e-prescribing system used to prescribe the following?</p>
-              <div v-for="option in results.options" class="form-check ms-2">
-                <input v-model="results.high_risk_meds" type="checkbox" class="form-check-input" :id="'id_' + option.value" :name="option.value" :value="option.value">
-                <label class="form-check-label" :for="'id_' + option.value">{{ option.text }}</label>
+              <div v-for="(option, index) in results.options" class="form-check ms-2">
+                <input v-model="results.high_risk_meds" type="checkbox" class="form-check-input" :id="'id_high_risk_meds_' + index" name="high_risk_meds" :value="option.value">
+                <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
               </div>
             </div>
 
             <div class="mb-4 row">
               <p>Is the e-prescribing system used in the following areas?</p>
-              <div v-for="option in results.area_options" class="form-check ms-2">
-                <input v-model="results.clinical_areas" type="checkbox" class="form-check-input" :id="option.value" :name="option.value" :value="option.value">
-                <label class="form-check-label" :for="option.value">{{ option.text }}</label>
+              <div v-for="(option, index) in results.area_options" class="form-check ms-2">
+                <input v-model="results.clinical_areas" type="checkbox" class="form-check-input" :id="'id_clinical_areas_' + index" name="clinical_areas" :value="option.value">
+                <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
               </div>
             </div>
 
