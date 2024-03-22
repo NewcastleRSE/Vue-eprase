@@ -48,10 +48,7 @@
           </button>
           <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
             Cancel
-          </button>
-          <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
-            Register
-          </button>
+          </button>         
         </div>
       </Form>
       <p>
@@ -130,9 +127,6 @@ export default {
     },
     onResetClick() {
       this.$refs.loginForm.resetForm()
-    },
-    onRegisterClick() {
-      this.$router.push('/register')
     }
   }
 }

@@ -8,8 +8,11 @@
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
       <div class="py-4" v-if="appOpen">
-        <button type="button" class="btn btn-lg btn-primary" @click="login()">
-          Start
+        <button type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick()">
+          Login
+        </button>
+        <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
+          Register
         </button>
       </div>
       <div v-if="!appOpen">
@@ -18,7 +21,7 @@
     </div>
     <div class="row w-75 mx-auto">
       <div class="col p-1">
-        <img id="di-logo" src="../assets/images/Digital_Institute.jpg" alt="Digital Institute" />
+        <img id="nhse-logo" src="../assets/images/NHS-England-Logo.jpg" alt="NHS England" />
       </div>
       <div class="col p-1">
         <img id="nuth-logo" src="../assets/images/NUTHlogo.png"
@@ -47,11 +50,11 @@ export default {
     ...mapState(appSettingsStore, ['version', 'appOpen'])
   },
   methods: {
-    login() {
+    onLoginClick() {
       this.$router.push("/login")
     },
-    about() {
-      this.$router.push("/about")
+    onRegisterClick() {
+      this.$router.push('/register')
     },
   }
 }
@@ -62,7 +65,7 @@ export default {
   max-width: 600px;
 }
 
-#di-logo,
+#nhse-logo,
 #pharm-logo {
   height: 50px;
   max-width: 200px;
