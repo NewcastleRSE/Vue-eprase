@@ -17,9 +17,7 @@
       <p>
         The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's admissions
         system and then to prescribe a series of medications to those patients. You will then be asked to provide
-        feedback
-        about any
-        advice or intervention from the system.
+        feedback mabout any advice or intervention from the system.
       </p>
 
       <p>The patient build has 2 parts, which may take up to an hour depending on your system.</p>
@@ -32,8 +30,7 @@
       <div class="alert alert-warning mt-4" role="alert">
         <p>
           <span class="text-dark-emphasis">Disclaimer:</span> these patients have been designed to support the test tool
-          and may not necessarily
-          resemble real life. Please enter all information exactly as presented.
+          and may not necessarily resemble real life. Please enter all information exactly as presented.
         </p>
       </div>
 
@@ -105,6 +102,9 @@ export default {
     }
   },
   methods: {
+    close() {
+      this.errorText = ''
+    },
     async checkAssessmentComplete() {
 
       console.group('checkAssessmentComplete()')

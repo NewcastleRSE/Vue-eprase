@@ -69,7 +69,8 @@
             </div>
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient prescription orders are prescribed
+              <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
+                prescription orders are prescribed
                 through the eP system across your organisation? *</label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector"
@@ -109,13 +110,14 @@
             </div> -->
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in the organisation? if so,
-                  please provide their names.</label>
-              <div class="col-sm-4">                
+              <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in
+                the organisation? if so,
+                please provide their names.</label>
+              <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system"
                   rules="required|lengthBetween:3,50">
                   <input v-bind="field" type="text" class="form-control" placeholder="Other...">
-                </Field>                
+                </Field>
               </div>
               <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
@@ -123,21 +125,24 @@
             </div>
 
             <div class="mb-4 row">
-              <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your e-prescribing system? *</p>
+              <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
+                e-prescribing system? *</p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.lab_results" name="lab-results" id="lab-results-yes">
-                    <input v-bind="field" type="radio" value="true" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
+                    id="lab-results-yes" value="true">
+                    <input v-bind="field" type="radio" name="lab-results" value="true" class="form-check-input">
                   </Field>
                   <label class="form-check-label" for="lab-results-yes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.lab_results" name="lab-results" id="lab-results-no">
-                    <input  v-bind="field" type="radio" value="false" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
+                    id="lab-results-no" value="false">
+                    <input v-bind="field" type="radio" name="lab-results" value="false" class="form-check-input">
                   </Field>
                   <label class="form-check-label" for="lab-results-no">No</label>
                 </div>
-              </div>              
+              </div>
             </div>
 
             <div class="mb-4 row" v-if="results.lab_results === 'true'">
@@ -146,14 +151,18 @@
                 assessments?</p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.man_results" name="man-results" id="man-results-yes">
-                    <input  v-bind="field" type="radio" value="true" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
+                    id="man-results-yes" value="true">
+                    <input v-bind="field" type="radio" name="man-results" value="true" class="form-check-input"
+                      autocomplete="off">
                   </Field>
                   <label class="form-check-label" for="man-results-yes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.man_results" name="man-results" id="man-results-no">
-                    <input  v-bind="field" type="radio" value="false" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
+                    id="man-results-no" value="false">
+                    <input v-bind="field" type="radio" name="man-results" value="false" class="form-check-input"
+                      autocomplete="off">
                   </Field>
                   <label class="form-check-label" for="man-results-no">No</label>
                 </div>
@@ -161,46 +170,60 @@
             </div>
 
             <div class="mb-4 row">
-              <p class="col-sm-8 fw-bold">Are you able to manually enter diagnosis and medical history into your test system? *</p>
+              <p class="col-sm-8 fw-bold">Are you able to manually enter diagnosis and medical history into your test
+                system? *</p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.med_history" name="med-history" id="med-history-yes">
-                    <input v-bind="field" type="radio" value="true" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
+                    id="med-history-yes" value="true">
+                    <input v-bind="field" type="radio" name="med-history" value="true" class="form-check-input"
+                      autocomplete="off">
                   </Field>
                   <label class="form-check-label" for="med-history-yes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.med_history" name="med-history" id="med-history-no">
-                    <input v-bind="field" type="radio" value="false" class="form-check-input" autocomplete="off">
+                  <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
+                    id="med-history-no" value="false">
+                    <input v-bind="field" type="radio" name="med-history" value="false" class="form-check-input"
+                      autocomplete="off">
                   </Field>
                   <label class="form-check-label" for="med-history-no">No</label>
                 </div>
-              </div>              
+              </div>
             </div>
 
             <div v-if="results.med_history === 'true'" class="mb-4 row">
-              <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities into your test system
+              <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities
+                into your test system
                 that you are using to do this assessments?</p>
-                <div class="col-sm-4">
-                  <div class="form-check form-check-inline">
-                    <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results" id="diagnosis-results-yes">
-                      <input v-bind="field" type="radio" value="true" class="form-check-input" autocomplete="off" checked>
-                    </Field>
-                    <label class="form-check-label" for="diagnosis-results-yes">Yes</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results" id="diagnosis-results-no">
-                      <input v-bind="field" type="radio" value="false" class="form-check-input" autocomplete="off">
-                    </Field>
-                    <label class="form-check-label" for="diagnosis-results-no">No</label>
-                  </div>
-                </div>              
+              <div class="col-sm-4">
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
+                    id="diagnosis-results-yes" value="true">
+                    <input v-bind="field" type="radio" name="diagnosis-results" value="true" class="form-check-input"
+                      autocomplete="off" checked>
+                  </Field>
+                  <label class="form-check-label" for="diagnosis-results-yes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
+                    id="diagnosis-results-no" value="false">
+                    <input v-bind="field" type="radio" name="diagnosis-results" value="false" class="form-check-input"
+                      autocomplete="off">
+                  </Field>
+                  <label class="form-check-label" for="diagnosis-results-no">No</label>
+                </div>
+              </div>
             </div>
 
             <div class="mb-4 row">
               <p>Is the e-prescribing system used to prescribe the following?</p>
               <div v-for="(option, index) in results.options" class="form-check ms-2">
-                <input v-model="results.high_risk_meds" type="checkbox" class="form-check-input" :id="'id_high_risk_meds_' + index" name="high_risk_meds" :value="option.value">
+                <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox"
+                  :id="'id_high_risk_meds_' + index" name="high_risk_meds" :value="option.value">
+                  <input v-bind="field" type="checkbox" class="form-check-input" name="high_risk_meds"
+                    :value="option.value">
+                </Field>
                 <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
               </div>
             </div>
@@ -208,7 +231,11 @@
             <div class="mb-4 row">
               <p>Is the e-prescribing system used in the following areas?</p>
               <div v-for="(option, index) in results.area_options" class="form-check ms-2">
-                <input v-model="results.clinical_areas" type="checkbox" class="form-check-input" :id="'id_clinical_areas_' + index" name="clinical_areas" :value="option.value">
+                <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
+                  :id="'id_clinical_areas_' + index" name="clinical_areas" :value="option.value">
+                  <input v-bind="field" type="checkbox" class="form-check-input" name="clinical_areas"
+                    :value="option.value">
+                </Field>
                 <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
               </div>
             </div>
@@ -234,8 +261,9 @@
 
     </div>
 
-    <ExitModal @modal-closed="close()" @modal-actioned="exit()" />
-    <AppLogo></AppLogo>
+    <ExitModal :showActionBtn="true" @modal-closed="exitModalClose()" @modal-actioned="exit()" />
+    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" @modal-closed="errorAlertModalClose()" />
+    <AppLogo cls="bottomright" />
 
   </main>
 
@@ -243,11 +271,13 @@
 
 <script>
 
+import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 import TabHeader from './TabHeader'
 import AppLogo from './AppLogo'
+import ErrorAlertModal from './ErrorAlertModal'
 import ExitModal from "./ExitModal"
 import { Form, Field, ErrorMessage } from 'vee-validate'
-import { dataService } from '../services/data.service'
 
 export default {
   name: "AssessmentSystem",
@@ -255,14 +285,13 @@ export default {
     TabHeader,
     AppLogo,
     ExitModal,
+    ErrorAlertModal,
     Form,
     Field,
     ErrorMessage
   },
   computed: {
-    isFormInvalid() {
-      return Object.keys(this.fields).some(key => this.fields[key].invalid)
-    },
+    ...mapStores(rootStore),
     user() {
       return this.$store.state.authentication.user
     }
@@ -309,24 +338,28 @@ export default {
         ]
       },
       startTime: '',
-      showExitModal: false
+      showExitModal: false,
+      errorText: ''
     }
   },
   methods: {
-    close() {
+    exitModalClose() {
       this.showExitModal = false
     },
+    errorAlertModalClose() {
+      this.errorText = ''
+    },
     onResetClick() {
-      this.$refs.loginForm.resetForm()
+      this.$refs.assessmentSystemForm.resetForm()
     },
     exit() {
+      //TODO there should be a pre-hook action on logout to save the current state
       this.$router.push('/logout')
       this.showExitModal = false
     },
     onNextClick() {
-      this.submitted = true
-
-      this.$validator.validate().then(valid => {
+      this.errorText = ''
+      this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {
 
           let endTime = new Date()
@@ -346,13 +379,14 @@ export default {
           const time_taken = this.results.time_taken
           const high_risk_meds = this.results.high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas.toString()
-          const { dispatch } = this.$store
-          if (time_taken) {
-            dispatch('saveSystemData', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
-          }
-          // audit
-          dataService.audit('Save system data', '/assessmentSystem')
-          this.$router.push({ path: './setpatients/' + patient_type })
+
+          const response = rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
+          if (response.status < 400) {
+            rootStore().audit('Save system data', '/assessmentSystem')
+            this.$router.push('/setpatients/' + patient_type)
+          } else {
+
+          }                    
         }
       })
     }

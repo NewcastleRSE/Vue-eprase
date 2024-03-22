@@ -1,6 +1,7 @@
 <template>
   <GenericModal :modalName="'ExitModal'" :modalId="'exitModal'" :title="'Are you sure you want to exit?'"
     :actionBtnText="'Log out'" :closeBtnText="'Close'">
+    The current state of your work will be saved and can be resumed later
   </GenericModal>
 </template>
 
@@ -17,11 +18,6 @@ export default {
   },
   components: {
     GenericModal
-  },  
-  methods: {   
-    exit() {
-      this.$router.push('/logout')
-    }
   }
 }
 </script>
