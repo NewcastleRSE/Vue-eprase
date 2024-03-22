@@ -46,9 +46,6 @@ export const router = createRouter({
     {
       path: "/assessmentintro",
       component: AssessmentIntro,
-      // beforeEnter: (to, from, next) => {
-
-      // }
     },
     {
       path: "/assessmentSystem",

@@ -108,7 +108,7 @@ export default {
           const response = await this.authenticationStore.login(username, password)
           if (response.status == 200) {
             const userId = response.data
-            rootStore().audit('Successful login', '/login')
+            rootStore().audit('Successful login', '/login')            
             const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
             if (isAdmin) {
               this.$router.push('/adminhome')

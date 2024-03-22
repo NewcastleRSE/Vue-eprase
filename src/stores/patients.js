@@ -1,11 +1,39 @@
 import { defineStore } from 'pinia'
 import { rootStore } from './root'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { authenticationStore } from './authentication'
 
 export const patientStore = defineStore('patients', {
   actions: {
     async getRequiredTests() {
       const response = await rootStore().apiCall('requiredtests', 'GET')
       return response
+    },
+    async getAllPatients() {
+      const response = await rootStore().apiCall('patients', 'GET')
+      return response
+    },
+    async getAllPrescriptions() {
+      const response = await rootStore().apiCall('allprescriptions', 'GET')
+      return response
+    },
+    async getPatientDetails() {
+      const response = await rootStore().apiCall('patientdetails', 'GET')
+      return response
+    },
+    async getPatientIds() {
+      const instId = authenticationStore().institutionId
+      const response = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
+      return response
+    },
+    async getPatientByCode(code) {
+      const response = await rootStore().apiCall('patientByCode?code=' + code, 'GET')
+      return response      
+    },
+    async getPatientById(patientId) {
+      const response = await rootStore().apiCall('patientById?PATIENT_ID=' + patientId, 'GET')
+      return response      
     },
     // async setConfigErrors() {
 
@@ -63,6 +91,10 @@ export const patientStore = defineStore('patients', {
     },    
     formatComorbidity(comorbidity) {
       return comorbidity.map(c => c.comorbidity)      
+    },
+    formatDOB(patient) {
+      dayjs.extend(customParseFormat)
+      return dayjs().subtract(patient.age, 'year').format('DD/MM/YYYY')
     }
     
   }

@@ -385,7 +385,7 @@ export default {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/setpatients/' + patient_type)
           } else {
-
+            this.errorText = response.message
           }                    
         }
       })

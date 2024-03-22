@@ -7,6 +7,9 @@ export const authenticationStore = defineStore('authentication', {
     user: localStorage.getItem('user'),
     userId: localStorage.getItem('userId'),
     institutionId: localStorage.getItem('institutionId'),
+    orgCode: localStorage.getItem('orgCode'),
+    orgName: localStorage.getItem('orgName'),
+    trust: localStorage.getItem('trust'),
     token: localStorage.getItem('token')
   }),
   getters: {   
@@ -21,6 +24,9 @@ export const authenticationStore = defineStore('authentication', {
     getUser: (state) => state.user,
     getUserId: (state) => state.userId,
     getInstitutionId: (state) => state.institutionId,
+    getOrgCode: (state) => state.orgCode,
+    getOrgName: (state) => state.orgName,
+    getTrust: (state) => state.trust,
     getToken: (state) => state.token
   },
   actions: {
@@ -33,8 +39,9 @@ export const authenticationStore = defineStore('authentication', {
 
       try {
         const user = await axios.post('auth/signin', { username, password })
-        console.debug('User', user)
-        this.updateUser(user)
+        const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
+        console.debug('User', user, 'institution details', institutionDetails)
+        this.updateUser(user, institutionDetails)
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -91,6 +98,24 @@ export const authenticationStore = defineStore('authentication', {
         return false
       }
     },
+    async getInstitutionDetails(institutionId) {
+
+      console.group('getInstitutionDetails()')
+
+      institutionId = institutionId || this.institutionId
+      console.debug('Institution ID', institutionId)
+
+      try {
+        const res = await axios.get('auth/institutionDetails?institutionId=' + institutionId)
+        console.debug('Details', res.data)
+        console.groupEnd()
+        return res.data
+      } catch (err) {
+        console.error('Error getting user institution details:', err)
+        console.groupEnd()
+        return false
+      }
+    },
     triageError(err) {
 
       console.group('triageError()')
@@ -116,26 +141,29 @@ export const authenticationStore = defineStore('authentication', {
 
       return payload
     },
-    updateUser(payload) {
+    updateUser(user, institution) {
 
       console.group('updateUser()')
-      console.debug('Backend payload', payload)
+      console.debug('User data', user.data, 'institution', institution)
 
       const csPayload = {
-        user: payload.data.username,
-        userId: payload.data.user_id,
-        institutionId: payload.data.institution_id,
-        token: payload.data.jwt.accessToken
+        user: user.data.username,
+        userId: user.data.user_id,
+        institutionId: user.data.institution_id,
+        orgCode: institution.orgCode,
+        orgName: institution.orgName,
+        trust: institution.trust,
+        token: user.data.jwt.accessToken
       }
 
-      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.token)
+      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
 
       this.$patch(csPayload)
       Object.keys(csPayload).forEach((k) => {
         localStorage.setItem(k, csPayload[k])
       })
 
-      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.token)
+      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
       console.groupEnd()
     },    
     async requestNewPassword(email) {

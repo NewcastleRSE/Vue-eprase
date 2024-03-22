@@ -5,12 +5,15 @@
 
     <div class="px-4" v-if="assessmentComplete !== true">
 
+      <LoginInfo />
+
       <h1>Welcome to the ePRaSE Assessment</h1>
 
       <p>
         The following assessment is designed to evaluate the performance of an e-prescription system against a range of
         indicators.
       </p>
+
       <p>The ePRaSE assessment will be repeated annually.</p>
 
       <h4>Instructions</h4>
@@ -77,6 +80,7 @@ import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
+import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
@@ -88,6 +92,7 @@ export default {
     ...mapStores(rootStore, patientStore)
   },
   components: {
+    LoginInfo,
     AppFooter,
     AppLogo,
     ErrorAlertModal
