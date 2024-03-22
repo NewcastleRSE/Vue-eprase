@@ -2,12 +2,15 @@
 
   <main class="leftalign">
 
-    <TabHeader :showIndex="0"></TabHeader>
+    <TabHeader :showIndex="0" />
     <div class="content p-4">
+
+      <LoginInfo />
+
       <h3>EP System Information</h3>
       <h4>Please answer the following questions about your ePrescribing system:</h4>
 
-      <div class="assessment-system p-4">
+      <div class="p-4">
         <div>
           <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }">
 
@@ -114,8 +117,7 @@
                 the organisation? if so,
                 please provide their names.</label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system"
-                  rules="required|lengthBetween:3,50">
+                <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system">
                   <input v-bind="field" type="text" class="form-control" placeholder="Other...">
                 </Field>
               </div>
@@ -274,6 +276,7 @@
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import TabHeader from './TabHeader'
+import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
 import ExitModal from "./ExitModal"
@@ -283,6 +286,7 @@ export default {
   name: "AssessmentSystem",
   components: {
     TabHeader,
+    LoginInfo,
     AppLogo,
     ExitModal,
     ErrorAlertModal,
@@ -291,10 +295,7 @@ export default {
     ErrorMessage
   },
   computed: {
-    ...mapStores(rootStore),
-    user() {
-      return this.$store.state.authentication.user
-    }
+    ...mapStores(rootStore)
   },
   data() {
     return {
@@ -354,8 +355,8 @@ export default {
     },
     exit() {
       //TODO there should be a pre-hook action on logout to save the current state
-      this.$router.push('/logout')
       this.showExitModal = false
+      this.$router.push('/logout')      
     },
     onNextClick() {
       this.errorText = ''
