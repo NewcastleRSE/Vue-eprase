@@ -3,6 +3,7 @@ import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
 import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
 import { createApp } from "vue"
 import { createPinia } from "pinia"
+import { createPersistedState } from 'pinia-plugin-persistedstate'
 import App from "./App.vue"
 import axios from "axios"
 import VueAxios from "vue-axios"
@@ -15,6 +16,7 @@ import { router } from "./router"
 
 const app = createApp(App)
 const pinia = createPinia()
+pinia.use(createPersistedState({storage: localStorage}))
 
 configure({
   validateOnBlur: false,

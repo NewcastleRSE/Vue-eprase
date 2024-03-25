@@ -102,7 +102,6 @@ export default {
       assessmentComplete: false,
       assessmentStatus: '',
       assessmentId: '',
-      userIsAdmin: false,
       errorText: ''
     }
   },
@@ -115,16 +114,7 @@ export default {
       console.group('checkAssessmentComplete()')
 
       const response = await rootStore().getAssessmentStatus()
-      if (response.status < 400) {
-        // This call returns no data if no assessment is open for institution
-        this.assessmentComplete = (response.data && response.data.assessmentComplete) || false
-        this.assessmentId = (response.data && response.data.assessment_id) || 0
-
-        console.warn('Setting assessmentId in localStorage', this.assessmentId)
-        localStorage.setItem('assessmentId', this.assessmentId)
-      } else {
-        this.errorText = response.message
-      }
+      this.errorText = response.message || ''
 
       console.debug('Response', response)
       console.groupEnd()
@@ -134,12 +124,7 @@ export default {
       console.group('getAssessmentStatus()')
 
       const response = await rootStore().getAssessmentLatestCompletedPart()
-      if (response.status < 400) {
-        // This call returns no data if no assessment is open for institution
-        this.assessmentStatus = response.data ? response.data.status : 'Not Started'
-      } else {
-        this.errorText = response.message
-      }
+      this.errorText = response.message || ''
 
       console.debug('Response', response)
       console.groupEnd()
@@ -158,41 +143,9 @@ export default {
         this.$router.push('/assessmentsystem')
       }
     },
-    async getRequiredPatients() {
-
-      console.group('getRequiredPatients()')
-
-      let requiredAdultPatients = []
-      let requiredChildPatients = []
-      let allRequiredPatients = []
-
-      const patientService = patientStore()
-      const response = await patientService.getRequiredTests()
-      if (response.status < 400) {
-        response.data.forEach(test => {
-          let requiredPatient = patientService.formatPatientData(test.patient)
-          if (requiredPatient.age >= 18) {
-            requiredAdultPatients.push(requiredPatient)
-          } else {
-            requiredChildPatients.push(requiredPatient)
-          }
-          allRequiredPatients.push(requiredPatient)
-        })
-        console.debug('requiredAdultPatients', requiredAdultPatients)
-        console.debug('requiredChildPatients', requiredChildPatients)
-        console.debug('allRequiredPatients', allRequiredPatients)
-      } else {
-        this.errorText = response.message
-      }
-   
-      console.warn('Setting requiredAdultPatients in localStorage')
-      localStorage.setItem('requiredAdultPatients', JSON.stringify(requiredAdultPatients))
-      //localStorage.setItem('requiredChildPatients', JSON.stringify(requiredChildPatients))
-      console.warn('Setting allRequiredPatients in localStorage')
-      localStorage.setItem('allRequiredPatients', JSON.stringify(allRequiredPatients))
-
-      console.debug('Response', response)
-      console.groupEnd()
+    async getRequiredPatients() {  
+      const response = await patientStore().getRequiredTests()
+      this.errorText = response.message || ''
     }
   },
   created: function () {

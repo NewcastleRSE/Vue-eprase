@@ -4,14 +4,15 @@ import { jwtDecode } from 'jwt-decode'
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
-    user: localStorage.getItem('user'),
-    userId: localStorage.getItem('userId'),
-    institutionId: localStorage.getItem('institutionId'),
-    orgCode: localStorage.getItem('orgCode'),
-    orgName: localStorage.getItem('orgName'),
-    trust: localStorage.getItem('trust'),
-    token: localStorage.getItem('token')
+    user: null,
+    userId: null,
+    institutionId: null,
+    orgCode: null,
+    orgName: null,
+    trust: null,
+    token: null
   }),
+  persist: true,
   getters: {   
     isLoggedIn: (state) => {
       if (state.user && state.userId && state.institutionId && state.token) {
@@ -56,7 +57,6 @@ export const authenticationStore = defineStore('authentication', {
 
       console.group('logout()')
 
-      localStorage.clear()
       this.$reset()
 
       console.groupEnd()
@@ -158,10 +158,7 @@ export const authenticationStore = defineStore('authentication', {
 
       console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
 
-      this.$patch(csPayload)
-      Object.keys(csPayload).forEach((k) => {
-        localStorage.setItem(k, csPayload[k])
-      })
+      this.$patch(csPayload)      
 
       console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
       console.groupEnd()

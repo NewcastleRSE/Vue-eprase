@@ -118,8 +118,6 @@ export default {
           } else { 
             this.serverError = true
             rootStore().failedLoginAudit('Failed login', '/login')
-            console.debug('Setting errors...')    
-            this.$refs.loginForm.setFieldError('email', 'Unable to log you in - bad username or password')
           }              
         }
       })

@@ -34,7 +34,7 @@ export const router = createRouter({
       path: "/login",
       name: "login",
       component: AppLogin,
-    },
+    },   
     {
       path: "/register",
       component: AppRegister,
@@ -167,11 +167,12 @@ router.beforeEach((to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from, 'next', next)
 
+  const auth = authenticationStore()
   const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
-  const loggedIn = authenticationStore().isLoggedIn
+  const loggedIn = auth.isLoggedIn
   console.debug('Logged in user', loggedIn)
 
   if (authRequired && !loggedIn) {
@@ -180,6 +181,15 @@ router.beforeEach((to, from, next) => {
     console.groupEnd()
 
     return next('/login')
+    
+  } else if (to.path == 'logout') {
+
+    console.debug('Logout - routing to login page...')
+    auth.logout()
+    console.groupEnd()
+
+    return next('/login')
+
   } else {
 
     console.debug('Routing to', to)

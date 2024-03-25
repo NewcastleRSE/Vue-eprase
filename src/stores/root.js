@@ -7,7 +7,8 @@ const API = process.env.BASE_URL
 export const rootStore = defineStore('root', {
   state: () => ({
     assessmentId: null,
-    patientList: {},
+    assessmentStatus: null,
+    assessmentComplete: null,
     testList: [],
     patientIndex: 0,
     testIndex: 0,
@@ -16,7 +17,9 @@ export const rootStore = defineStore('root', {
     part3complete: null,
     part4complete: null,
     configErrorComplete: null,
-    mitigationData: []
+    mitigationData: [],
+    stackedChartData: null,
+    mitigationChartData: null
   }),
   actions: {
     async apiCall(url, method = 'POST', body = null) {
@@ -84,10 +87,18 @@ export const rootStore = defineStore('root', {
     async getAssessmentStatus(institution_id) {
       const insId = institution_id || authenticationStore().institutionId;
       const response = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + insId, 'GET')
+      if (response.status < 400) {
+        this.assessmentComplete = (response.data && response.data.assessmentComplete) || false
+        this.assessmentId = (response.data && response.data.assessment_id) || 0
+      }      
       return response   
     },
     async getAssessmentLatestCompletedPart() {
       const response = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + authenticationStore().institutionId, 'GET')
+      if (response.status < 400) {
+        // This call returns no data if no assessment is open for institution
+        this.assessmentStatus = response.data ? response.data.status : 'Not Started'
+      }
       return response           
     },
     async getReportByInstitutionId() {
