@@ -62,9 +62,16 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('patientById?PATIENT_ID=' + patientId, 'GET')
       return response      
     },   
+    async savePatientList(patient_list) {
+      const institutionId = authenticationStore().institutionId
+      const response = await this.apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
+      return(response)
+    },    
     async setPatientsInStore(patientType) {
       
       let ret = null
+      this.patientList = []
+      this.testList = []
 
       console.group('setPatientsInStore()')
       console.debug('Patient type', patientType)
@@ -72,69 +79,79 @@ export const patientStore = defineStore('patients', {
       const patientsResponse = await rootStore().apiCall('patients', 'GET')
       if (patientsResponse.status < 400) {
 
+        const allPatients = patientsResponse.data
+        console.debug('All patient list', allPatients)
+
         if (!patientType) {
+
           // Partially completed assessment - use API call to retrieve patient IDs
+          console.debug('Partial completed assessment - getting patient ids...')
+
+          let idList = []
           const instId = authenticationStore().institutionId
           const idsResponse = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
-          if (idsResponse < 400) {
-            const idList = idsResponse.data.split(',').filter(x => !isNaN(Math.floor(x))) // Eliminate case of a 200 return with 'No patient ids' as the response
+          if (idsResponse.status < 400) {
+            if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
+              idList = idsResponse.data.split(',')
+              console.debug('List of patient ids', idList)
+              this.patientList = allPatients.filter(p => idList.includes(p.id))
+            } else {
+              console.debug('No patient ids recorded')              
+            }
           } else {
-            ret = idsResponse // HERE
+            ret = idsResponse
           }
 
         } else {
           
+          // Coming from just completing the system information
+          console.debug('Coming from completed system information')
+          this.patientList = this.compilePatientList(patientsResponse.data, patientType, 15)          
+        }
+
+        console.debug('Adding prescriptions...')
+        this.patientList.forEach(async p => {
+          console.debug('Patient id', p.id)
+          const testResponse = await rootStore().apiCall('prescriptions?ID=' + p.id, 'GET')
+          if (testResponse.status < 400) {
+            console.debug('Prescriptions', testResponse.data)
+            this.testList.push(...testResponse.data)
+          } else {
+            console.error('Problems retrieving', testResponse.message)
+            ret = testResponse
+          }
+        })
+
+        if (!ret.message) {
+          ret = { status: 200, data: this.patientList }
         }
 
       } else {
         ret = patientsResponse
-      }
-      
-      if (!patientType) {
-        // Partially completed assessment - there will be IDs in the database
-        const instId = authenticationStore().institutionId
-        const idsResponse = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
-        if (idsResponse < 400) {
-          const idList = idsResponse.data.split(',').filter(x => !isNaN(Math.floor(x))) // Eliminate any non-numbers which apparently can happen...
-          idList.forEach(async id => {
-            const pdetailResponse = await this.getPatientById(id)
-
-          })
-        } else {
-          ret = idsResponse
-        }
-      } else {
-        // Coming from just completing the system information
-        
-        if (patientsResponse.status < 400) {
-          this.patientList = this.compilePatientList(patientsResponse.data, patientType, 15)
-          this.patientList.forEach(async p => {
-            const testResponse = await rootStore().apiCall('prescriptions?ID=' + p.id, 'GET')
-            if (testResponse.status < 400) {
-              this.testList.push(...testResponse.data)
-            } else {
-              ret = testResponse
-            }
-          })
-        } else {
-          ret = patientsResponse
-        }     
-      }
+      }     
       return ret
     },
     compilePatientList(pool, type, requiredLength) {
+
       // pool: list of all patients
       // type: Adults|Paediatrics|Both
       // requiredLength: 15 pro-tem
+
+      console.group('compilePatientList()')
+      console.debug('Compile list of', requiredLength, 'patients of type', type)
+
       let patientList = []
       const typeToLsMapping = {
         'Adults': 'requiredAdultPatients',
         'Paediatrics': 'requiredChildPatients',
         'Both': 'allRequiredPatients'
       }
+
       const poolOfType = type == 'Both' ? pool : pool.filter(p => (type == 'Adults' && p.is_adult))
       const requiredPatients = this[typeToLsMapping[type]] || []
       patientList = requiredPatients
+      console.debug('Required patient list', requiredPatients)
+
       let added = {}
       patientList.forEach(p => added[p.id] = true)
       while(patientList.length < requiredLength) {
@@ -143,16 +160,22 @@ export const patientStore = defineStore('patients', {
           patientList.push(patient)
           added[patient.id] = true
         }
-      }
+      }      
       this.shuffle(patientList)
-      return(patientList)
+
+      console.debug('Return', patientList)
+      console.groupEnd()
+
+      return patientList
     },
     shuffle(a) {
       // Durstenfeld shuffle in-place - see https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+      console.dir('List before shuffle', patientList)
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
       }
+      console.dir('List after shuffle', patientList)
     },
 
     // async setConfigErrors() {

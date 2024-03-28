@@ -384,7 +384,7 @@ export default {
           const response = rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
-            this.$router.push('/setpatients/' + patient_type)
+            this.$router.push('/assessmentpatients/' + patient_type)
           } else {
             this.errorText = response.message
           }                    

@@ -140,11 +140,6 @@ export const rootStore = defineStore('root', {
         this.patientIndex = index + 1
       }
       return(response)
-    },
-    async savePatientList(patient_list) {
-      const institutionId = authenticationStore().institutionId
-      const response = await this.apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
-      return(response)
     },    
     async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
       const assessmentId = await this.getAssessmentId()

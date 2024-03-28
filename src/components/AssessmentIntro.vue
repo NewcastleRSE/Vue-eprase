@@ -131,7 +131,7 @@ export default {
     },
     onStartAssessmentClick() {
       if (this.assessmentStatus === 'System Information Complete') {
-        this.$router.push('/setpatients')
+        this.$router.push('/assessmentpatients')
       }
       else if (this.assessmentStatus === 'Create Patients in Progress') {
         this.$router.push('/assessmentpatientdetails')

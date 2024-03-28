@@ -13,8 +13,7 @@
       <div class="p-4">
         <div>
           <h4>Patient Data</h4>
-          <p>Please admit the following test patients into your hospital's patient admissions system (or a test
-            environment).</p>
+          <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
           <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click
             <span class="fw-bold">Next</span> to continue.</p>
 
@@ -47,9 +46,9 @@
 
       <div class="form-group footer mx-auto">
         <div class="buttons">
-          <p>When all of the patients have been admitted to your ePrescription System, click <strong>Done</strong>.</p>
+          <p>When all of the patients have been admitted to your ePrescription System, click <span class="fw-bold">Done</span>.</p>
 
-          <p><strong>Please ensure you click the Done button to save your progress</strong></p>
+          <p><span class="fw-bold">Please ensure you click the Done button to save your progress</span></p>
           <!-- <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>-->
           <button type="button" class="next-btn btn btn-primary" id="next-button" @click="onNextClick()">Done</button>
         </div>
@@ -67,11 +66,11 @@
 <script>
 
 import { dataService } from '../services/data.service'
-import AppPatients from './AppPatients'
 import AppLogo from "./AppLogo"
 import TabHeader from './TabHeader'
 import LoginInfo from './LoginInfo'
-import { patientService } from "../services/patient.service"
+import { mapStores } from 'pinia'
+import { patientStore } from '../stores/patients'
 import ErrorAlertModal from './ErrorAlertModal'
 import ExitModal from "./ExitModal"
 
@@ -85,13 +84,9 @@ export default {
     ExitModal
   },
   computed: {
-    user() {
-      return this.$store.state.authentication.user
-    },
-    patients() {
-      return this.$store.state.patientList
+    computed: {
+      ...mapStores(patientStore)
     }
-
   },
   data() {
     return {
@@ -142,8 +137,24 @@ export default {
         }
       })
     },
-    getPatients() {
-      return this.patients
+    async getPatients() {
+      const patientType = this.$route.params.type
+      const patientService = patientStore()
+      let patientResponse = await patientService.setPatientsInStore(patientType)
+      if (patientResponse.status == 200) {
+        if (patientType != undefined) {
+          // Coming from completing the system information screen - save the ids
+          const patientIds = patientResponse.data.map(p => p.id).join(',')
+          const saveIdsResponse = await patientService.savePatientList(patientIds)
+          if (saveIdsResponse.status == 200) {
+
+          } else {
+            this.errorText = saveIdsResponse.message
+          }
+        }
+      } else {
+        this.errorText = patientResponse.message
+      }
     },
     savePatientIds() {
 
@@ -164,15 +175,7 @@ export default {
     this.startTime = new Date()
   },
   mounted() {
-    // TODO make this conditional
-    setTimeout(() => {
-      this.savePatientIds()
-    }, 1000),
-
-      history.pushState(null, null, location.href)
-    window.onpopstate = function () {
-      history.go(1)
-    }
+    this.getPatients()    
   }
 }
 </script>

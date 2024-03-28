@@ -52,7 +52,7 @@ export const router = createRouter({
       component: AssessmentSystem,
     },
     {
-      path: "/assessmentpatients",
+      path: "/assessmentpatients/:type?",
       component: AssessmentPatients,
     },
     {
