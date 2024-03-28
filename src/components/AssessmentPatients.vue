@@ -147,7 +147,7 @@ export default {
           const patientIds = patientResponse.data.map(p => p.id).join(',')
           const saveIdsResponse = await patientService.savePatientList(patientIds)
           if (saveIdsResponse.status == 200) {
-
+            
           } else {
             this.errorText = saveIdsResponse.message
           }

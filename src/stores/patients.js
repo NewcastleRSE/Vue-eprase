@@ -11,7 +11,9 @@ export const patientStore = defineStore('patients', {
       requiredChildPatients: [],
       allRequiredPatients: [],
       patientList: [], 
-      testList: []
+      testList: [],
+      patientIndex: 0,
+      testIndex: 0
     }
   },
   persist: true,
@@ -23,7 +25,7 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('requiredtests', 'GET')
       if (response.status < 400) {
         response.data.forEach(test => {
-          let requiredPatient = patientService.formatPatientData(test.patient)
+          let requiredPatient = this.formatPatientData(test.patient)
           if (requiredPatient.is_adult) {
             this.requiredAdultPatients.push(requiredPatient)
           } else {
@@ -67,6 +69,32 @@ export const patientStore = defineStore('patients', {
       const response = await this.apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
       return(response)
     },    
+    async saveCreatePatients(time_taken) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
+      if (response.status < 400)      {
+        rootStore().setPart2complete(true)
+      }
+      return(response)
+    },
+    async savePatientData(qualitative_data, code, time_taken, index, completed) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
+      if (response.status < 400) {
+        rootStore().setPart3complete(completed)
+        this.patientIndex = index + 1
+      }
+      return(response)
+    },    
+    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
+      const assessmentId = await this.getAssessmentId()
+      const response = await this.apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
+      if (response.status < 400) {
+        rootStore().setPart4complete(completed)
+        this.testIndex = index + 1
+      }
+      return(response)
+    },
     async setPatientsInStore(patientType) {
       
       let ret = null

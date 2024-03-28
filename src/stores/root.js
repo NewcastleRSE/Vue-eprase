@@ -8,10 +8,7 @@ export const rootStore = defineStore('root', {
   state: () => ({
     assessmentId: null,
     assessmentStatus: null,
-    assessmentComplete: null,
-    testList: [],
-    patientIndex: 0,
-    testIndex: 0,
+    assessmentComplete: null,    
     part1complete: null,
     part2complete: null,
     part3complete: null,
@@ -21,7 +18,32 @@ export const rootStore = defineStore('root', {
     stackedChartData: null,
     mitigationChartData: null
   }),
+  persist: true,
+  getters: {   
+    getAssessmentId: (state) => state.assessmentId, //TODO properly save this and retrieve from backend
+    getAssessmentComplete: (state) => state.assessmentComplete,
+    getPart1complete: (state) => state.part1complete,
+    getPart2complete: (state) => state.part2complete,
+    getPart3complete: (state) => state.part3complete,
+    getPart4complete: (state) => state.part4complete,
+    getConfigErrorComplete: (state) => state.configErrorComplete,
+    getMitigationData: (state) => state.mitigationData,
+    getStackedChartData: (state) => state.stackedChartData,
+    getMitigationChartData: (state) => state.mitigationChartData
+  },
   actions: {
+    setAssessmentId(id) { this.assessmentId = id },
+    setAssessmentStatus(status) { this.assessmentStatus = status },
+    setAssessmentComplete(complete) { this.assessmentComplete = complete },
+    setPart1complete(part1Complete) { this.part1Complete = part1Complete },
+    setPart2complete(part2Complete) { this.part2Complete = part2Complete },
+    setPart3complete(part3Complete) { this.part3Complete = part3Complete },
+    setPart4complete(part4Complete) { this.part4Complete = part4Complete },
+    setConfigErrorComplete(ceComplete) { this.configErrorComplete = ceComplete },
+    setMitigationData(md) { this.mitigationData = md },
+    setStackedChartData(sdd) { this.stackedChartData = sdd },
+    setMitigationChartData(mcd) { this.mitigationChartData = mcd },
+
     async apiCall(url, method = 'POST', body = null) {
 
       console.group('apiCall()')
@@ -123,33 +145,7 @@ export const rootStore = defineStore('root', {
         this.part1complete = true
       }
       return(response)
-    },
-    async saveCreatePatients(time_taken) {
-      const assessmentId = await this.getAssessmentId()
-      const response = await this.apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
-      if (response.status < 400)      {
-        this.part2complete = true
-      }
-      return(response)
-    },
-    async savePatientData(qualitative_data, code, time_taken, index, completed) {
-      const assessmentId = await this.getAssessmentId()
-      const response = await this.apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
-      if (response.status < 400) {
-        this.part3complete = completed
-        this.patientIndex = index + 1
-      }
-      return(response)
     },    
-    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
-      const assessmentId = await this.getAssessmentId()
-      const response = await this.apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
-      if (response.status < 400) {
-        this.part4complete = completed
-        this.testIndex = index + 1
-      }
-      return(response)
-    },
     async saveConfigError(test_id, result, time_taken, index) {
       const assessmentId = await this.getAssessmentId()
       const response = await this.apiCall('config?ID=' + assessmentId, 'POST', { test_id, result, time_taken })   
