@@ -12,14 +12,13 @@
 
       <div class="p-4">
         <div>
-          <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }">
+          <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="ep-system-selector">Which electronic prescribing (eP) service
-                are you using? *</label>
+                are you using? <span class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector"
-                  rules="required">
+                <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector">
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Select system...</option>
@@ -44,7 +43,7 @@
             </div>
 
             <div v-if="results.ep_service === 'Other'" class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service?</label>
+              <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" id="other-ep-system">
                   <input v-bind="field" type="text" class="form-control"
@@ -58,10 +57,9 @@
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="ep-version">What version of the service are you currently
-                using? *</label>
+                using? <span class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.ep_version" name="ep-version" id="ep-version"
-                  rules="required|lengthBetween:1,50">
+                <Field v-slot="{ field, meta }" v-model="results.ep_version" name="ep-version" id="ep-version">
                   <input v-bind="field" type="text" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter version...">
                 </Field>
@@ -73,11 +71,9 @@
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
-                prescription orders are prescribed
-                through the eP system across your organisation? *</label>
+                prescription orders are prescribed through the eP system across your organisation? <span class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector"
-                  rules="required">
+                <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector">
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Select Percentage...</option>
@@ -94,7 +90,7 @@
             </div>
 
             <!-- <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both?</label>
+              <label class="col-sm-8 col-form-label" for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both? <span class="required-field">*</span></label>
               <div class="col-sm-4">                
                 <Field v-slot="{ field, meta }" v-model="results.patient_type" name="ep-usage" id="ep-patients"
                   rules="required">
@@ -114,8 +110,7 @@
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in
-                the organisation? if so,
-                please provide their names.</label>
+                the organisation? if so, please provide their names.</label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system">
                   <input v-bind="field" type="text" class="form-control" placeholder="Other...">
@@ -128,7 +123,7 @@
 
             <div class="mb-4 row">
               <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
-                e-prescribing system? *</p>
+                e-prescribing system? <span class="required-field">*</span></p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
@@ -150,7 +145,7 @@
             <div class="mb-4 row" v-if="results.lab_results === 'true'">
               <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i> Are you able to manually enter laboratory
                 results into your patient admin and/ or e-prescribing test system that you are using to do this
-                assessments?</p>
+                assessments? <span class="required-field">*</span></p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
@@ -173,7 +168,7 @@
 
             <div class="mb-4 row">
               <p class="col-sm-8 fw-bold">Are you able to manually enter diagnosis and medical history into your test
-                system? *</p>
+                system? <span class="required-field">*</span></p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
@@ -196,14 +191,13 @@
 
             <div v-if="results.med_history === 'true'" class="mb-4 row">
               <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities
-                into your test system
-                that you are using to do this assessments?</p>
+                into your test system that you are using to do this assessment? <span class="required-field">*</span></p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
                     id="diagnosis-results-yes" value="true">
                     <input v-bind="field" type="radio" name="diagnosis-results" value="true" class="form-check-input"
-                      autocomplete="off" checked>
+                      autocomplete="off">
                   </Field>
                   <label class="form-check-label" for="diagnosis-results-yes">Yes</label>
                 </div>
@@ -299,6 +293,32 @@ export default {
   },
   data() {
     return {
+      validationSchema: {
+        //HERE - global rules not working
+        //'ep_service': 'required',
+        'other': (value) => {
+          console.debug('other', value)
+          return (this.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
+        },
+        //'ep_version': 'required|lengthBetween:1,50',
+        //'ep_usage': 'required',
+        'lab-results': (value) => {
+          console.debug('lab-results', value)
+          return ['true', 'false'].includes(value) ? true : 'Please select one' 
+        },
+        'man-results': (value) => {
+          console.debug('man-results', value)
+          return (this.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        },
+        'med-history': (value) => {
+          console.debug('med-history', value)
+          return ['true', 'false'].includes(value) ? true : 'Please select one' 
+        },
+        'diagnosis-results': (value) => {
+          console.debug('diagnosis-results', value)
+          return (this.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        }
+      },
       results: {
         ep_service: null,
         ep_version: '',
@@ -387,6 +407,7 @@ export default {
             this.$router.push('/assessmentpatients/' + patient_type)
           } else {
             this.errorText = response.message
+            console.debug('Error text', this.errorText, response)
           }                    
         }
       })

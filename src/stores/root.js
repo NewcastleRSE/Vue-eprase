@@ -111,7 +111,7 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + insId, 'GET')
       if (response.status < 400) {
         this.assessmentComplete = (response.data && response.data.assessmentComplete) || false
-        this.assessmentId = (response.data && response.data.assessment_id) || 0
+        this.assessmentId = (response.data && response.data.assessment_id) || -1
       }      
       return response   
     },

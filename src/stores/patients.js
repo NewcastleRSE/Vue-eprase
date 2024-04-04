@@ -70,7 +70,7 @@ export const patientStore = defineStore('patients', {
       return(response)
     },    
     async saveCreatePatients(time_taken) {
-      const assessmentId = await this.getAssessmentId()
+      const assessmentId = rootStore().assessmentId
       const response = await this.apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
       if (response.status < 400)      {
         rootStore().setPart2complete(true)
@@ -78,7 +78,7 @@ export const patientStore = defineStore('patients', {
       return(response)
     },
     async savePatientData(qualitative_data, code, time_taken, index, completed) {
-      const assessmentId = await this.getAssessmentId()
+      const assessmentId = rootStore().assessmentId
       const response = await this.apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       if (response.status < 400) {
         rootStore().setPart3complete(completed)
@@ -87,7 +87,7 @@ export const patientStore = defineStore('patients', {
       return(response)
     },    
     async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
-      const assessmentId = await this.getAssessmentId()
+      const assessmentId = rootStore().assessmentId
       const response = await this.apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       if (response.status < 400) {
         rootStore().setPart4complete(completed)
@@ -111,7 +111,6 @@ export const patientStore = defineStore('patients', {
         console.debug('All patient list', allPatients)
 
         if (!patientType) {
-
           // Partially completed assessment - use API call to retrieve patient IDs
           console.debug('Partial completed assessment - getting patient ids...')
 
@@ -129,9 +128,7 @@ export const patientStore = defineStore('patients', {
           } else {
             ret = idsResponse
           }
-
-        } else {
-          
+        } else {          
           // Coming from just completing the system information
           console.debug('Coming from completed system information')
           this.patientList = this.compilePatientList(patientsResponse.data, patientType, 15)          
