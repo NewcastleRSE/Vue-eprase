@@ -11,7 +11,7 @@
         register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema"
+      <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
         <div v-if="serverError" class="mb-4 row">
           <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
             If your login details continue to fail, please contact the RSE team at: <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a>
