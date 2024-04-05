@@ -395,7 +395,7 @@ export default {
           const high_risk_meds = this.results.high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas.toString()
 
-          const response = rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)

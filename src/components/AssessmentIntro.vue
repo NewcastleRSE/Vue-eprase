@@ -70,7 +70,7 @@
       <AppFooter />
     </div>
     <AppLogo cls="bottomright" />
-    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" @modal-closed="close()" />
+    <ErrorAlertModal ref="errorAlertModal" />
   </main>
 </template>
 
@@ -89,7 +89,10 @@ export default {
   name: "AssessmentIntro",
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapStores(rootStore, patientStore)
+    ...mapStores(rootStore, patientStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    }
   },
   components: {
     LoginInfo,
@@ -101,32 +104,22 @@ export default {
     return {
       assessmentComplete: false,
       assessmentStatus: '',
-      assessmentId: '',
-      errorText: ''
+      assessmentId: ''
     }
   },
-  methods: {
-    close() {
-      this.errorText = ''
-    },
-    async checkAssessmentComplete() {
+  methods: {  
+    async checkAssessmentProgress() {
 
-      console.group('checkAssessmentComplete()')
+      console.group('checkAssessmentProgress()')
 
-      const response = await rootStore().getAssessmentStatus()
-      this.errorText = response.message || ''
+      const response = await rootStore().getAssessmentProgress()
+      if (response.status < 400) {
+        Object.assign(this, response.data)//TODO
+      } else {
+        this.errorAlertModal.show(response.message)
+      }      
 
-      console.debug('Response', response)
-      console.groupEnd()
-    },
-    async getAssessmentStatus() {
-
-      console.group('getAssessmentStatus()')
-
-      const response = await rootStore().getAssessmentLatestCompletedPart()
-      this.errorText = response.message || ''
-
-      console.debug('Response', response)
+      console.debug('Response', response, this)
       console.groupEnd()
     },
     onStartAssessmentClick() {
@@ -145,12 +138,11 @@ export default {
     },
     async getRequiredPatients() {  
       const response = await patientStore().getRequiredTests()
-      this.errorText = response.message || ''
+      response.message && this.errorAlertModal.show(response.message)
     }
   },
   created: function () {
-    this.checkAssessmentComplete()
-    this.getAssessmentStatus()
+    this.checkAssessmentProgress()
     this.getRequiredPatients()
     rootStore().audit('View assessment intro', '/assessmentintro')
   }

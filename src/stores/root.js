@@ -18,32 +18,9 @@ export const rootStore = defineStore('root', {
     stackedChartData: null,
     mitigationChartData: null
   }),
-  persist: true,
-  getters: {   
-    getAssessmentId: (state) => state.assessmentId, //TODO properly save this and retrieve from backend
-    getAssessmentComplete: (state) => state.assessmentComplete,
-    getPart1complete: (state) => state.part1complete,
-    getPart2complete: (state) => state.part2complete,
-    getPart3complete: (state) => state.part3complete,
-    getPart4complete: (state) => state.part4complete,
-    getConfigErrorComplete: (state) => state.configErrorComplete,
-    getMitigationData: (state) => state.mitigationData,
-    getStackedChartData: (state) => state.stackedChartData,
-    getMitigationChartData: (state) => state.mitigationChartData
-  },
+  persist: true, 
   actions: {
-    setAssessmentId(id) { this.assessmentId = id },
-    setAssessmentStatus(status) { this.assessmentStatus = status },
-    setAssessmentComplete(complete) { this.assessmentComplete = complete },
-    setPart1complete(part1Complete) { this.part1Complete = part1Complete },
-    setPart2complete(part2Complete) { this.part2Complete = part2Complete },
-    setPart3complete(part3Complete) { this.part3Complete = part3Complete },
-    setPart4complete(part4Complete) { this.part4Complete = part4Complete },
-    setConfigErrorComplete(ceComplete) { this.configErrorComplete = ceComplete },
-    setMitigationData(md) { this.mitigationData = md },
-    setStackedChartData(sdd) { this.stackedChartData = sdd },
-    setMitigationChartData(mcd) { this.mitigationChartData = mcd },
-
+  
     async apiCall(url, method = 'POST', body = null) {
 
       console.group('apiCall()')
@@ -106,14 +83,21 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('configerrorbycode?CODE=' + code, 'GET')
       return response     
     },
-    async getAssessmentStatus(institution_id) {
-      const insId = institution_id || authenticationStore().institutionId;
-      const response = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + insId, 'GET')
-      if (response.status < 400) {
-        this.assessmentComplete = (response.data && response.data.assessmentComplete) || false
-        this.assessmentId = (response.data && response.data.assessment_id) || -1
-      }      
-      return response   
+    async getAssessmentProgress() {
+      let ret = null
+      const instId = authenticationStore().institutionId
+      const response1 = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + instId, 'GET') 
+      const response2 = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + instId, 'GET')
+      if (response1.status < 400 && response2.status < 400) {        
+        ret = { status: 200, data: {
+          assessmentId: response1.data ? response1.data.id : -1,
+          assessmentComplete: response1.data ? response1.data.status : false,
+          assessmentStatus: response2.data ? response2.data.status : 'Not Started'
+        }}
+      } else {
+        ret = { status: 500, message: 'Failed to get assessment progress for institution', instId}
+      }
+      return ret   
     },
     async getAssessmentLatestCompletedPart() {
       const response = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + authenticationStore().institutionId, 'GET')
@@ -174,13 +158,15 @@ export const rootStore = defineStore('root', {
       if (response.status >= 400) {
         console.error(response.message)
       }
-    },
-    setPatientList(patientList) {
-      this.patientList = patientList
-    },
-    setTestList(testList) {
-      this.testList = testList
-    },                
+    },     
+    storeAssessmentId(id) { this.assessmentId = id },
+    storeAssessmentStatus(status) { this.assessmentStatus = status },
+    storeAssessmentComplete(complete) { this.assessmentComplete = complete },
+    storePart1complete(part1Complete) { this.part1Complete = part1Complete },
+    storePart2complete(part2Complete) { this.part2Complete = part2Complete },
+    storePart3complete(part3Complete) { this.part3Complete = part3Complete },
+    storePart4complete(part4Complete) { this.part4Complete = part4Complete },
+    storeConfigErrorComplete(ceComplete) { this.configErrorComplete = ceComplete },        
     storeMitigationData(goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls) {
       this.mitigationData[0] = goodPercentage
       this.mitigationData[1] = somePercentage
@@ -188,11 +174,7 @@ export const rootStore = defineStore('root', {
       this.mitigationData[3] = overPercentage
       this.mitigationData[4] = percentageNulls
     },
-    storeStackedChartData(stackedChartData) {
-      this.stackedChartData = stackedChartData
-    },
-    storeMitigationChartData(mitigationChartData) {
-      this.mitigationChartData = mitigationChartData
-    }
+    storeStackedChartData(stackedChartData) { this.stackedChartData = stackedChartData },
+    storeMitigationChartData(mitigationChartData) { this.mitigationChartData = mitigationChartData }
   }
 })
