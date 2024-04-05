@@ -11,7 +11,7 @@
         register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" v-slot="{ meta: formMeta }">
+      <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema"
         <div v-if="serverError" class="mb-4 row">
           <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
             If your login details continue to fail, please contact the RSE team at: <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a>
@@ -20,7 +20,7 @@
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email" rules="required|nhsEmail">
+            <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email">
               <input v-bind="field" type="email" class="form-control"
                 :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
             </Field>
@@ -32,8 +32,7 @@
         <div class="mb-4 row">
           <label for="password" class="col-sm-4 form-label">Password:</label>
           <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password"
-              rules="required|lengthBetween:6,50">
+            <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password">
               <input v-bind="field" type="password" class="form-control"
                 :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
             </Field>
@@ -83,6 +82,10 @@ export default {
   },
   data() {
     return {
+      validationSchema: {
+        'email': 'required|nhsEmail',
+        'password': 'required|lengthBetween:6,50'
+      },
       user: {
         email: '',
         username: '',

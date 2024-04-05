@@ -15,13 +15,12 @@
 
           <p class="pb-2">To register with the ePRaSE system, please provide the following information.</p>
 
-          <Form ref="regForm" v-slot="{ meta: formMeta }">
+          <Form ref="regForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
             <div class="mb-4 row">
               <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email"
-                  rules="required|nhsEmail">
+                <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email">
                   <input v-bind="field" type="email" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
@@ -34,8 +33,7 @@
             <div class="mb-4 row">
               <label for="institution" class="col-sm-4 form-label">Your NHS Trust:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.institution" id="institution" name="institution" 
-                  rules="required">
+                <Field v-slot="{ field, meta }" v-model="user.institution" id="institution" name="institution">
                   <select v-bind="field" class="form-select" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Please select...</option>
                     <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
@@ -51,8 +49,7 @@
             <div class="mb-4 row">
               <label for="password" class="col-sm-4 form-label">Password:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password"
-                  rules="required|lengthBetween:6,50">
+                <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password">
                   <input v-bind="field" type="password" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
@@ -65,8 +62,7 @@
             <div class="mb-4 row">
               <label for="confirmPassword" class="col-sm-4 form-label">Confirm password:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword"
-                  rules="required|lengthBetween:6,50|passwordConfirmationEqual:@password">
+                <Field v-slot="{ field, meta }" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword">
                   <input v-bind="field" type="password" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
@@ -118,6 +114,12 @@ export default {
   },
   data() {
     return {
+      validationSchema: {
+        'email': 'required|nhsEmail',
+        'institution': 'required',
+        'password': 'required|lengthBetween:6,50',
+        'confirmPassword': 'required|lengthBetween:6,50|passwordConfirmationEqual:@password'
+      },
       user: {
         username: '',
         institution: '',

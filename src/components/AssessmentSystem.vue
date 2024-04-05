@@ -294,38 +294,32 @@ export default {
   data() {
     return {
       validationSchema: {
-        //HERE - global rules not working
-        //'ep_service': 'required',
+        'ep-service': 'required',
         'other': (value) => {
-          console.debug('other', value)
           return (this.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
         },
-        //'ep_version': 'required|lengthBetween:1,50',
-        //'ep_usage': 'required',
+        'ep-version': 'required|lengthBetween:1,50',
+        'ep-usage': 'required',
         'lab-results': (value) => {
-          console.debug('lab-results', value)
           return ['true', 'false'].includes(value) ? true : 'Please select one' 
         },
         'man-results': (value) => {
-          console.debug('man-results', value)
           return (this.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         },
         'med-history': (value) => {
-          console.debug('med-history', value)
           return ['true', 'false'].includes(value) ? true : 'Please select one' 
         },
         'diagnosis-results': (value) => {
-          console.debug('diagnosis-results', value)
           return (this.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         }
       },
       results: {
-        ep_service: null,
+        ep_service: '',
         ep_version: '',
-        ep_usage: null,
-        other_ep_system: null,
-        add_ep_system: null,
-        patient_type: null,
+        ep_usage: '',
+        other_ep_system: '',
+        add_ep_system: '',
+        patient_type: '',
         lab_results: '',
         med_history: '',
         man_results: '',
