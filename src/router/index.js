@@ -173,23 +173,19 @@ router.beforeEach((to, from, next) => {
   console.debug('Authentication required', authRequired)
 
   const loggedIn = auth.isLoggedIn
+  const loggingOut = to.path == 'logout'
   console.debug('Logged in user', loggedIn)
 
-  if (authRequired && !loggedIn) {
+  if (loggingOut || (authRequired && !loggedIn)) {
 
+    if (loggingOut) {
+      auth.logout()
+    }
     console.debug('Routing to login page...')
     console.groupEnd()
 
     return next('/login')
     
-  } else if (to.path == 'logout') {
-
-    console.debug('Logout - routing to login page...')
-    auth.logout()
-    console.groupEnd()
-
-    return next('/login')
-
   } else {
 
     console.debug('Routing to', to)

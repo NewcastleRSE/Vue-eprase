@@ -1,24 +1,51 @@
 <template>
-  <div class="row">
-    <div>
-      <div class="p-2 float-end bg-secondary opacity-75 rounded-3 text-white fw-bold"
-        v-if="authenticationStore.isLoggedIn"><i class="bi bi-person-circle pe-2 fs-4"></i>Logged in as {{
-          authenticationStore.user }} @ {{ authenticationStore.orgName }}</div>
-      <div class="p-2 float-end bg-secondary opacity-75 rounded-3 text-white fw-bold"
-        v-if="!authenticationStore.isLoggedIn"><i class="bi bi-person-circle pe-2 fs-4"></i>You are not logged in</div>
-    </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      Logged in
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">Save progress and log out</a></li>
+    </ul>
   </div>
+  <!-- <div class="row">
+    <div>
+      <div class="p-2 float-end">
+        <div v-if="isLoggedIn">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" :title="orgName"
+              data-bs-toggle="dropdown">
+              <i class="bi bi-person-check-fill me-2"></i>Logged in as {{ user }}
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Save progress and log out</a></li>             
+            </ul>
+          </div>
+        </div>        
+        <div v-if="!isLoggedIn">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button"
+              data-bs-toggle="dropdown">
+              <i class="bi bi-person-fill-x me-2"></i>You are not logged in
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Log in</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </template>
 
 <script>
 
-import { mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: "LoginInfo",
   computed: {
-    ...mapStores(authenticationStore)
+    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn'])
   }
 }
 

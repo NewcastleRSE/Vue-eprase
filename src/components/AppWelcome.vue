@@ -8,10 +8,13 @@
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
       <div class="py-4" v-if="appOpen">
-        <button type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick()">
+        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick()">
           Login
         </button>
-        <button type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
+        <button v-if="isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onResumeClick()">
+          Resume assessment
+        </button>
+        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
           Register
         </button>
       </div>
@@ -40,6 +43,7 @@
 import { mapState } from 'pinia'
 import AppLogo from "./AppLogo"
 import { appSettingsStore } from '../stores/appSettings'
+import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: "AppWelcome",
@@ -47,7 +51,8 @@ export default {
     AppLogo
   },
   computed: {
-    ...mapState(appSettingsStore, ['version', 'appOpen'])
+    ...mapState(appSettingsStore, ['version', 'appOpen']),
+    ...mapState(authenticationStore, ['isLoggedIn'])
   },
   methods: {
     onLoginClick() {
@@ -56,6 +61,9 @@ export default {
     onRegisterClick() {
       this.$router.push('/register')
     },
+    onResumeClick() {
+      alert('Continuing assessment from where we left off')
+    }
   }
 }
 </script>

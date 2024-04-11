@@ -258,7 +258,7 @@
     </div>
 
     <ExitModal :showActionBtn="true" @modal-closed="exitModalClose()" @modal-actioned="exit()" />
-    <ErrorAlertModal v-if="errorText != ''" :errorText="errorText" @modal-closed="errorAlertModalClose()" />
+    <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
   </main>
@@ -289,7 +289,10 @@ export default {
     ErrorMessage
   },
   computed: {
-    ...mapStores(rootStore)
+    ...mapStores(rootStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    }
   },
   data() {
     return {
@@ -353,17 +356,13 @@ export default {
         ]
       },
       startTime: '',
-      showExitModal: false,
-      errorText: ''
+      showExitModal: false
     }
   },
   methods: {
     exitModalClose() {
       this.showExitModal = false
-    },
-    errorAlertModalClose() {
-      this.errorText = ''
-    },
+    },    
     onResetClick() {
       this.$refs.assessmentSystemForm.resetForm()
     },
@@ -373,7 +372,6 @@ export default {
       this.$router.push('/logout')      
     },
     onNextClick() {
-      this.errorText = ''
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {
 
@@ -400,8 +398,7 @@ export default {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
           } else {
-            this.errorText = response.message
-            console.debug('Error text', this.errorText, response)
+            this.errorAlertModal.show(response.message)
           }                    
         }
       })

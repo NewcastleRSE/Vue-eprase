@@ -114,12 +114,14 @@ export default {
 
       const response = await rootStore().getAssessmentProgress()
       if (response.status < 400) {
-        Object.assign(this, response.data)//TODO
+        this.assessmentComplete = response.data.assessmentComplete
+        this.assessmentStatus = response.data.assessmentStatus
+        this.assessmentId = response.data.assessmentId
       } else {
         this.errorAlertModal.show(response.message)
       }      
 
-      console.debug('Response', response, this)
+      console.debug('Assessment', this.assessmentId, 'is complete', this.assessmentComplete, 'details', this.assessmentStatus)
       console.groupEnd()
     },
     onStartAssessmentClick() {

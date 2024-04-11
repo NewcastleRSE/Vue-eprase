@@ -8,12 +8,12 @@ export const rootStore = defineStore('root', {
   state: () => ({
     assessmentId: null,
     assessmentStatus: null,
-    assessmentComplete: null,    
-    part1complete: null,
-    part2complete: null,
-    part3complete: null,
-    part4complete: null,
-    configErrorComplete: null,
+    assessmentComplete: false,    
+    part1complete: false,
+    part2complete: false,
+    part3complete: false,
+    part4complete: false,
+    configErrorComplete: false,
     mitigationData: [],
     stackedChartData: null,
     mitigationChartData: null
@@ -88,12 +88,14 @@ export const rootStore = defineStore('root', {
       const instId = authenticationStore().institutionId
       const response1 = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + instId, 'GET') 
       const response2 = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + instId, 'GET')
-      if (response1.status < 400 && response2.status < 400) {        
-        ret = { status: 200, data: {
-          assessmentId: response1.data ? response1.data.id : -1,
-          assessmentComplete: response1.data ? response1.data.status : false,
-          assessmentStatus: response2.data ? response2.data.status : 'Not Started'
-        }}
+      if (response1.status < 400 && response2.status < 400) {
+          this.assessmentId = response1.data ? response1.data.id : -1,
+          this.assessmentComplete = response1.data ? response1.data.status : false,
+          this.assessmentStatus = response2.data ? response2.data.status : 'Not Started'
+          const data = {}
+          const reqKeys = ['assessmentId', 'assessmentComplete', 'assessmentStatus']
+          reqKeys.forEach(k => data[k] = this[k])
+        ret = { status: 200, data: data }
       } else {
         ret = { status: 500, message: 'Failed to get assessment progress for institution', instId}
       }
