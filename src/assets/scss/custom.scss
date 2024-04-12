@@ -36,6 +36,11 @@ body {
   padding: 2rem;
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-last-child - eliminates multiple modal backdrops - why they happen is a mystery...
+.modal-backdrop:nth-last-child(-n+2) {
+  display: none;
+}
+
 button.btn {
   min-width: 120px;
 }

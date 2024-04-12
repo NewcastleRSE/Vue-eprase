@@ -10,12 +10,7 @@
 import GenericModal from './GenericModal'
 
 export default {
-  name: "ExitModal",
-  data() {
-    return {
-      box: ''
-    }
-  },
+  name: "ExitModal",  
   components: {
     GenericModal
   }

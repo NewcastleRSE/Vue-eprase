@@ -17,6 +17,10 @@ export const patientStore = defineStore('patients', {
     }
   },
   persist: true,
+  getters: {
+    getPatientList: (state) => state.patientList,
+    getTestList: (state) => state.testList
+  },
   actions: {
     async getRequiredTests() {
 
@@ -75,7 +79,7 @@ export const patientStore = defineStore('patients', {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
       if (response.status < 400)      {
-        rootStore().setPart2complete(true)
+        rootStore().storePart2complete(true)
       }
       return(response)
     },
@@ -83,7 +87,7 @@ export const patientStore = defineStore('patients', {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       if (response.status < 400) {
-        rootStore().setPart3complete(completed)
+        rootStore().storePart3complete(completed)
         this.patientIndex = index + 1
       }
       return(response)
@@ -92,7 +96,7 @@ export const patientStore = defineStore('patients', {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       if (response.status < 400) {
-        rootStore().setPart4complete(completed)
+        rootStore().storePart4complete(completed)
         this.testIndex = index + 1
       }
       return(response)

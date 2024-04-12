@@ -52,7 +52,8 @@
               class="fw-bold">Done</span>.</p>
 
           <p><span class="fw-bold">Please ensure you click the Done button to save your progress</span></p>
-          <!-- <button type="button" class="exit-btn btn btn-primary"  id="exit-button" @click="onExitClick()">Exit</button>-->
+          <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
+                <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
           <button type="button" class="btn btn-primary" @click="onNextClick()">Done</button>
         </div>
       </div>
@@ -88,11 +89,9 @@ export default {
     ExitModal
   },
   computed: {
-    computed: {
-      ...mapStores(patientStore),
-      errorAlertModal() {
-        return this.$refs.errorAlertModal
-      }
+    ...mapStores(patientStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
     }
   },
   data() {
@@ -108,11 +107,11 @@ export default {
     exit() {
       this.$router.push('/logout')
     },
-    onNextClick() {
+    async onNextClick() {
       this.assessment.time_taken = dayjs().diff(this.startTime, 'seconds')
       const time_taken = this.assessment.time_taken
       const patientService = patientStore()
-      const saveResponse = patientService.saveCreatePatients(time_taken)
+      const saveResponse = await patientService.saveCreatePatients(time_taken)
       if (saveResponse.status < 400) {
         rootStore().audit('Add patient list', '/assessmentpatients')
         this.$router.push('/assessmentpatientdetails')

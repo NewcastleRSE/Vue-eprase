@@ -1,68 +1,65 @@
 <template>
- <div id="page">
+  <main class="leftalign">
 
-   <TabHeader system-opacity="1.0" patient-opacity="0.5" scenario-opacity="0.2" report-opacity="0.2"></TabHeader>
+    <TabHeader :showIndex="1" />
 
-    <div id="content">
+    <div class="content p-4">
+
+      <LoginInfo />
+
       <h3>Patient Information</h3>
       <p>Please enter the following patient information into your EP system.</p>
-      <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields with appropriate self-generated information.</p>
-      <p>When you are done, click <strong>Next</strong> to continue.</p>
-      <br/>
+      <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
+        with appropriate self-generated information.</p>
+      <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue.</p>
 
-      <div v-for="patient in myPatientList" v-bind:key="patient.id">
+      <div v-for="(patient, index) in myPatientList" :key="patient.id">
 
         <div class="mx-auto card" v-if="patient">
           <div class="card-header">
-            <h4>{{patient[getCurrentPatient].first_name}} {{patient[getCurrentPatient].surname}}</h4>
-            <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'male' && patient[getCurrentPatient].is_adult === true">
+            <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
+            <span class="patient-image" v-if="patient.gender === 'male' && patient.is_adult === true">
               <img src="../assets/images/anon-male.png" height="80px" />
             </span>
 
-            <span class="patient-image" v-if="patient[getCurrentPatient].gender === 'female' && patient[getCurrentPatient].is_adult === true">
+            <span class="patient-image" v-if="patient.gender === 'female' && patient.is_adult === true">
               <img src="../assets/images/anon-female.png" height="80px" />
             </span>
 
-            <span class="patient-image" v-if="!patient[getCurrentPatient].is_adult">
+            <span class="patient-image" v-if="!patient.is_adult">
               <img src="../assets/images/child.png" height="80px" />
             </span>
-            <p class="subtitle">(Patient {{getCurrentPatient+1}} of {{ numPatients }})</p>
+            <p class="subtitle">(Patient {{ index + 1 }} of {{ numPatients }})</p>
           </div>
 
           <div class="card-body">
 
-            <div class="left-col">
-
+            <div class="float-start">
+<!-- HERE-->
               <div class="patient-demographics">
                 <h5 class="card-title">Demographics</h5>
                 <table>
-                  <tr v-if="patient[getCurrentPatient].height === 0">
-                    <td><strong>Height (m):</strong> unavailable</td>
+                  <tr>
+                    <td><span class="fw-bold">Height (m):</span> {{ patient.height || 'unavailable' }}</td>
                   </tr>
-                  <tr v-if="patient[getCurrentPatient].height !== 0">
-                    <td><strong>Height (m):</strong> {{patient[getCurrentPatient].height}}</td>
-                  </tr>
-                  <tr v-if="patient[getCurrentPatient].weight === 0">
-                    <td><strong>Weight (kg):</strong> unavailable</td>
-                  </tr>
-                  <tr v-if="patient[getCurrentPatient].weight !== 0">
-                    <td><strong>Weight (kg):</strong> {{patient[getCurrentPatient].weight}}</td>
+                  <tr>
+                    <td><span class="fw-bold">Weight (kg):</span> {{ patient.weight || 'unavailable' }}</td>
                   </tr>
                 </table>
               </div>
 
               <div class="patient-info">
 
-               <div align="left" v-if="patient[getCurrentPatient].allergy.length !== 0">
+                <div v-if="patient.allergy.length !== 0">
                   <h5 class="card-title">Allergies</h5>
                   <table>
-                    <tr v-for="allergy in patient[getCurrentPatient].allergy" v-bind:key="allergy">
-                      <td>{{allergy}}</td>
+                    <tr v-for="allergy in patient.allergy" :key="allergy">
+                      <td>{{ allergy.allergy }}</td>
                     </tr>
                   </table>
                 </div>
 
-                <div align="left" v-if="patient[getCurrentPatient].allergy.length == 0">
+                <div v-if="patient.allergy.length == 0">
                   <h5 class="card-title">Allergies</h5>
                   <table>
                     <tr>
@@ -72,362 +69,219 @@
                 </div>
 
 
-                <div align="left"  v-if="patient[getCurrentPatient].medication_histories.length != 0">
+                <div v-if="patient.medication_histories.length != 0">
                   <h5 class="card-title">Current Medication</h5>
                   <table>
                     <tr>
-                      <td><strong>Name</strong></td>
-                      <td><strong>Dose</strong></td>
-                      <td><strong>Route</strong></td>
-                      <td><strong>Form</strong></td>
-                      <td><strong>Frequency</strong></td>
+                      <td><span class="fw-bold">Name</span></td>
+                      <td><span class="fw-bold">Dose</span></td>
+                      <td><span class="fw-bold">Route</span></td>
+                      <td><span class="fw-bold">Form</span></td>
+                      <td><span class="fw-bold">Frequency</span></td>
                     </tr>
-                    <tr v-for="history in patient[getCurrentPatient].medication_histories" v-bind:key="history">
-                      <td>{{history.name}}</td>
-                      <td>{{history.dose}} {{history.units}}</td>
-                      <td>{{history.route}}</td>
-                      <td>{{history.form}}</td>
-                      <td>{{history.frequency}}</td>
+                    <tr v-for="history in patient.medication_histories" v-bind:key="history">
+                      <td>{{ history.name }}</td>
+                      <td>{{ history.dose }} {{ history.units }}</td>
+                      <td>{{ history.route }}</td>
+                      <td>{{ history.form }}</td>
+                      <td>{{ history.frequency }}</td>
                     </tr>
                   </table>
                 </div>
 
               </div>
-           </div>
+            </div>
 
-            <div class="right-col">
+            <div class="float-end">
 
-              <div class="clinical-data" v-if="patient[getCurrentPatient].clinical_data.length != 0">
+              <div class="clinical-data" v-if="patient.clinical_data.length != 0">
                 <h5 class="card-title">Clinical Data</h5>
                 <table>
                   <tr>
-                    <td><strong>Investigation</strong></td>
-                    <td><strong>Value</strong></td>
-                    <td><strong>Unit</strong></td>
+                    <td><span class="fw-bold">Investigation</span></td>
+                    <td><span class="fw-bold">Value</span></td>
+                    <td><span class="fw-bold">Unit</span></td>
                   </tr>
-                  <tr v-for="clinical in patient[getCurrentPatient].clinical_data" v-bind:key="clinical">
-                    <td>{{clinical.investigation}}</td>
-                    <td>{{clinical.value}}</td>
+                  <tr v-for="clinical in patient.clinical_data" v-bind:key="clinical">
+                    <td>{{ clinical.investigation }}</td>
+                    <td>{{ clinical.value }}</td>
                     <td>{{ clinical.unit }}</td>
                   </tr>
                 </table>
               </div>
 
-              <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].diagnosis.length != 0">
+              <div class="clinical-data" v-if="patient.diagnosis.length != 0">
                 <h5 class="card-title">Presenting Complaint</h5>
                 <table>
-                  <tr v-for="diagnosis in patient[getCurrentPatient].diagnosis" v-bind:key="diagnosis">
-                    <td>{{diagnosis}}</td>
+                  <tr v-for="diagnosis in patient.diagnosis" v-bind:key="diagnosis">
+                    <td>{{ diagnosis }}</td>
                   </tr>
                 </table>
               </div>
 
-              <div class="clinical-data" align="left" v-if="patient[getCurrentPatient].comorbidity.length != 0">
+              <div class="clinical-data" v-if="patient.comorbidity.length != 0">
                 <h5 class="card-title">Comorbidities</h5>
                 <table>
-                  <tr v-for="comorbidity in patient[getCurrentPatient].comorbidity" v-bind:key="comorbidity">
-                    <td>{{comorbidity}}</td>
+                  <tr v-for="comorbidity in patient.comorbidity" v-bind:key="comorbidity">
+                    <td>{{ comorbidity }}</td>
                   </tr>
                 </table>
               </div>
 
-              <input type="hidden" id="patient_id" :value="patient[getCurrentPatient].code" />
+              <input type="hidden" id="patient_id" :value="patient.code" />
             </div>
 
           </div>
         </div>
 
-      <div class="assessment">
-        <p></p>
-        <div class="mx-auto">
-          <div class="alert alert-warning" role="alert">
-            To optimise the use of this tool please record ALL types of guidance that appears on your system screen
+        <div class="assessment">
+          <p></p>
+          <div class="mx-auto">
+            <div class="alert alert-warning" role="alert">
+              To optimise the use of this tool please record ALL types of guidance that appears on your system screen
+            </div>
+            <textarea type="text" class="form-control" name="input" id="patient-intervention"
+              v-model="assessment.qualitative_data" placeholder="Please note any interventions from the system..."
+              maxlength="500"></textarea>
           </div>
-          <textarea type="text" class="form-control" name="input" id="patient-intervention" v-model="assessment.qualitative_data" placeholder="Please note any interventions from the system..." maxlength="500"></textarea>
         </div>
-      </div>
-      <div class="form-group footer mx-auto">
-        <div class="buttons">
-          <p>When the patient has been admitted to the ePrescription System, click <strong>Next</strong>.</p>
-          <p v-show='doneEnabled'><strong>Please ensure you click the Done button to save your progress</strong></p>
-          <button v-show='getCurrentPatient+1 === 1' id="exit-button" type="button" class="exit-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary" @click="onNextClick()">Next</button>
-          <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary" @click="onDoneClick()">Done</button>
+        <div class="form-group footer mx-auto">
+          <div class="buttons">
+            <p>When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>.
+            </p>
+            <p v-show='doneEnabled'><span class="fw-bold">Please ensure you click the Done button to save your
+                progress</span></p>
+            <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
+              <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
+            <button v-show='nextEnabled' id="next-button" type="button" class="pat-btn btn btn-primary"
+              @click="onNextClick()">Next</button>
+            <button v-show='doneEnabled' id="done-button" type="button" class="pat-btn btn btn-primary"
+              @click="onDoneClick()">Done</button>
+          </div>
         </div>
       </div>
     </div>
-    </div>
-   <ExitModal v-if="showExitModal" @close="showExitModal = false" />
+    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <AppLogo></AppLogo>
- </div>
+  </main>
 </template>
 
 <script>
 
-    import { dataService } from '../services/data.service';
-    import { patientService } from '../services/patient.service';
-    import  TabHeader from './TabHeader';
-    import AppLogo from "./AppLogo";
-    import ExitModal from "./ExitModal";
-    import _ from 'lodash';
+import dayjs from 'dayjs'
+import AppLogo from "./AppLogo"
+import TabHeader from './TabHeader'
+import LoginInfo from './LoginInfo'
+import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
+import { patientStore } from '../stores/patients'
+import ErrorAlertModal from './ErrorAlertModal'
+import ExitModal from "./ExitModal"
 
-    export default {
-        name: "AssessmentPatientDetails",
-        components: {
-            TabHeader,
-            AppLogo,
-            ExitModal
-        },
-        computed: {
-            myPatientList() {
-              return this.$store.state.patientList;
-            },
-            getCurrentPatient() {
-                return this.$store.state.patientIndex;
-            },
-            user() {
-                return this.$store.state.authentication.user;
-            }
-        },
-        data() {
-            return {
-                submitted: false,
-                assessment: {
-                    qualitative_data : '',
-                    time_taken: ''
-                },
-                startTime: '',
-                nextEnabled: true,
-                doneEnabled: false,
-                completed : false,
-                showExitModal: false,
-                numPatients: patientService.getNumPatients()
-            }
-        },
-        methods: {
-            resetForm: function () {
-                this.$data.assessment = {};
-                this.errors.clear();
-            },
-            onExitClick() {
-              this.showExitModal = true;
-            },
-            onNextClick()  {
-                this.saveData();
-                // catch is needed as router keeps going to the same location and causes error
-                this.$router.push('/assessmentpatientdetails').catch(err => {});
-            },
-            onDoneClick() {
-                const unlockTime = new Date();
-                unlockTime.setHours(unlockTime.getHours() + 1);
-                localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString());
+import { dataService } from '../services/data.service'
+import { patientService } from '../services/patient.service'
 
-                // this is now true
-                this.completed = true;
-                // update the testList with config errors, before the
-                patientService.setConfigErrors();
-
-                // save the last patient data
-                this.saveData();
-                this.updateAssessmentStatus();
-
-              // audit
-                dataService.audit('Completed patient details', '/assessmentpatientdetails');
-                this.$router.push('/lockoutscreen');
-            },
-            saveData() {
-                this.$validator.validate().then(valid => {
-                    if (valid) {
-
-                        let index = this.$store.state.patientIndex;
-                        let endTime = new Date();
-                        let elapsedTime = endTime.getTime() - this.startTime.getTime();
-                        this.assessment.time_taken = elapsedTime / 1000;
-                        const qualitative_data = this.assessment.qualitative_data;
-                        const code = document.getElementById("patient_id").value;
-                        const time_taken = this.assessment.time_taken;
-                        const completed = this.completed;
-
-                        const {dispatch} = this.$store;
-                        if (time_taken) {
-                            dispatch('savePatientData', {qualitative_data, code, time_taken, index, completed});
-                        }
-                        this.submitted = true;
-                        this.assessment.qualitative_data = '';
-                    }
-                });
-            },
-            updateAssessmentStatus() {
-              dataService.updateInstitutionAssessment();
-            }
-        },
-        created : function() {
-            this.startTime = new Date();
-        },
-        beforeUpdate: function() {
-            let index = this.$store.state.patientIndex;
-            if (index === (this.numPatients - 1)) {
-                this.nextEnabled = false;
-                this.doneEnabled = true;
-            }
-        },
-        mounted() {
-            setTimeout(() => {
-               if(_.isEmpty(this.myPatientList)){
-                 patientService.setPatientsInStoreFromIds();
-               }
-            }, 1000);
-
-            this.numPatients = 15;
-           // this.numPatients = localStorage.getItem('numPatients');
-
-           history.pushState(null, null, location.href);
-            window.onpopstate = function () {
-                history.go(1);
-            };
-        }
+export default {
+  name: "AssessmentPatientDetails",
+  components: {
+    TabHeader,
+    LoginInfo,
+    AppLogo,
+    ErrorAlertModal,
+    ExitModal
+  },
+  computed: {
+    ...mapStores(patientStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    },
+    myPatientList() {
+      return patientStore().patientList
+    },
+    numPatients() {
+      return patientStore().patientList.length + 1
     }
+  },
+  data() {
+    return {
+      submitted: false,
+      assessment: {
+        qualitative_data: '',
+        time_taken: ''
+      },
+      startTime: '',
+      nextEnabled: true,
+      doneEnabled: false,
+      completed: false,
+      showExitModal: false
+    }
+  },
+  methods: {
+    exit() {
+      this.$router.push('/logout')
+    },
+    resetForm: function () {
+      this.$data.assessment = {}
+      this.errors.clear()
+    },
+    onNextClick() {
+      this.saveData()
+      // catch is needed as router keeps going to the same location and causes error
+      this.$router.push('/assessmentpatientdetails').catch(err => { })
+    },
+    onDoneClick() {
+      const unlockTime = new Date()
+      unlockTime.setHours(unlockTime.getHours() + 1)
+      localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString())
+
+      // this is now true
+      this.completed = true
+      // update the testList with config errors, before the
+      patientService.setConfigErrors()
+
+      // save the last patient data
+      this.saveData()
+      this.updateAssessmentStatus()
+
+      // audit
+      dataService.audit('Completed patient details', '/assessmentpatientdetails')
+      this.$router.push('/lockoutscreen')
+    },
+    saveData() {
+      this.$validator.validate().then(valid => {
+        if (valid) {
+
+          let index = this.$store.state.patientIndex
+          this.assessment.time_taken = dayjs().diff(this.startTime, 'seconds')
+          const qualitative_data = this.assessment.qualitative_data
+          const code = document.getElementById("patient_id").value
+          const time_taken = this.assessment.time_taken
+          const completed = this.completed
+
+          const { dispatch } = this.$store
+          if (time_taken) {
+            dispatch('savePatientData', { qualitative_data, code, time_taken, index, completed })
+          }
+          this.submitted = true
+          this.assessment.qualitative_data = ''
+        }
+      })
+    },
+    updateAssessmentStatus() {
+      dataService.updateInstitutionAssessment()
+    }
+  },
+  created: function () {
+    this.startTime = dayjs()
+  },
+  beforeUpdate: function () {
+    let index = this.$store.state.patientIndex
+    if (index === (this.numPatients - 1)) {
+      this.nextEnabled = false
+      this.doneEnabled = true
+    }
+  }
+}
 </script>
 
-<style scoped>
-
-  #page {
-    text-align: left;
-  }
-
-  #content {
-    padding: 40px;
-  }
-
-  h4 {
-    font-weight: bold;
-  }
-
-  .patient-info {
-    padding-left: 20px;
-    padding-bottom: 20px;
-  }
-
-  .subtitle {
-    text-align: center;
-  }
-
-  .patient-info p {
-    text-align: left;
-  }
-
-  .assessment {
-    padding-bottom: 20px;
-  }
-
-  table {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #c2c2c2;
-    border-collapse: collapse;
- /*   background-color: rgba(2, 255, 254, 0.09); */
-
-    background-color: #fff;
-  }
-
-  td {
-    width: auto;
-    font-size: 14px;
-    border: 1px solid #c2c2c2;
-  }
-
-  .patient-image {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px;
-  }
-
-  .card {
-    margin-bottom: 20px;
-  }
-
-  .card-body {
-    display: grid;
-    grid-template-columns: auto auto;
-    background-color: rgba(170, 231, 255, 0.11);
-  }
-
-  .patient-demographics {
-    text-align: left;
-    padding-left: 20px;
-  }
-
-  .patient-demographics table,  .clinical-data table {
-    width: 200px;
-    padding-left: 20px;
-    padding-bottom: 0;
-  }
-
-  .patient-demographics table td{
-    width: auto;
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .clinical-data table td,  .patient-info td  {
-    width: auto;
-    font-size: 14px;
-    padding: 5px;
-  }
-
-  .patient-info table {
-    text-align: left;
-    width: auto;
-  }
-
-  .right-col {
-    text-align: left;
-  }
-
-  #patient-intervention {
-    width: 100%;
-    height: 100px;
-  }
-
-  .card-header {
-      position:relative;
-  }
-
-  button {
-    height: 40px;
-    width: 100px;
-    font-size: 1.2em;
-    margin: 0 50px;
-  }
-
-  #done-button {
-    margin-left: 120px;
-    background-color: #029a99;
-  }
-
-  #done-button :hover {
-    background-color: #07818e;
-  }
-
-  .footer {
-    margin-top: 10px;
-    margin-bottom: 40px;
-  }
-
-  .footer p {
-    padding-bottom: 10px;
-  }
-
-  .alert-warning {
-    background-color: #f6ecb8;
-    border-color: #ffd47d;
-  }
-
-  .exit-btn, .pat-btn {
-    background-color: #029a99;
-    border: 0;
-  }
-
-
-</style>
+<style scoped></style>
