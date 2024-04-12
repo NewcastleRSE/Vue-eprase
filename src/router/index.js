@@ -158,7 +158,7 @@ router.afterEach((to, from) => {
   console.debug('Navigated to', to, 'from', from)
 
   console.debug('Replacing history state...')
-  history.replaceState(history.state, '', to.path)
+  history.replaceState(history.state, '', to.fullPath)
   console.debug('Assign onpopstate handler...')
   window.onpopstate = () => history.go(1)
 
@@ -170,7 +170,7 @@ router.afterEach((to, from) => {
 router.beforeEach((to, from, next) => {
 
   console.group('router.beforeEach()')
-  console.debug('Navigating to', to, 'from', from, 'next', next)
+  console.debug('Navigating to', to, 'from', from)
 
   const auth = authenticationStore()
   const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']

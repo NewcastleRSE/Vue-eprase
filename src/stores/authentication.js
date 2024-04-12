@@ -58,6 +58,7 @@ export const authenticationStore = defineStore('authentication', {
       console.group('logout()')
 
       this.$reset()
+      localStorage.clear()
 
       console.groupEnd()
     },
