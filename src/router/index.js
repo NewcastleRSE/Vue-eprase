@@ -18,7 +18,6 @@ import ResultsTable from "../components/ResultsTable"
 import AppCharts from "../components/AppCharts"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
-import SetPatients from "../components/SetPatients"
 import AdminHome from "../components/AdminHome"
 import MitigationComparison from "../components/MitigationComparison"
 import EpmaStatistics from "../components/EpmaStatistics"
@@ -92,10 +91,6 @@ export const router = createRouter({
     {
       path: "/charts",
       component: AppCharts,
-    },
-    {
-      path: "/setpatients/:type?",
-      component: SetPatients,
     },
     {
       path: "/resetpassword/:token?",

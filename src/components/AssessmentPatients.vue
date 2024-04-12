@@ -139,6 +139,7 @@ export default {
           }
         }
         this.myPatientList = patientResponse.data
+        rootStore().audit('Create patient and test list', '/setpatients/' + patientType);
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }
