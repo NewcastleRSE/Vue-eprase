@@ -62,7 +62,7 @@ export default {
       this.$router.push('/register')
     },
     onResumeClick() {
-      alert('Continuing assessment from where we left off')
+      this.$router.push('/assessmentintro')
     }
   }
 }

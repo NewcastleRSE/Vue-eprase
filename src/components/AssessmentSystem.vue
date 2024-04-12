@@ -257,7 +257,7 @@
 
     </div>
 
-    <ExitModal :showActionBtn="true" @modal-closed="exitModalClose()" @modal-actioned="exit()" />
+    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
@@ -267,6 +267,7 @@
 
 <script>
 
+import dayjs from 'dayjs'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import TabHeader from './TabHeader'
@@ -370,9 +371,7 @@ export default {
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {
 
-          let endTime = new Date()
-          let elapsedTime = endTime.getTime() - this.startTime.getTime()
-          this.results.time_taken = elapsedTime / 1000
+          this.results.time_taken = dayjs().diff(this.startTime, 'seconds')
 
           const ep_service = this.results.ep_service
           const ep_version = this.results.ep_version
@@ -400,7 +399,7 @@ export default {
     }
   },
   created: function () {
-    this.startTime = new Date()
+    this.startTime = dayjs()
   }
 }
 </script>

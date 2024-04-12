@@ -22,6 +22,8 @@ export const patientStore = defineStore('patients', {
 
       console.group('getRequiredTests()')
 
+      this.$reset()
+
       const response = await rootStore().apiCall('requiredtests', 'GET')
       if (response.status < 400) {
         response.data.forEach(test => {
@@ -66,12 +68,12 @@ export const patientStore = defineStore('patients', {
     },   
     async savePatientList(patient_list) {
       const institutionId = authenticationStore().institutionId
-      const response = await this.apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
+      const response = await rootStore().apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
       return(response)
     },    
     async saveCreatePatients(time_taken) {
       const assessmentId = rootStore().assessmentId
-      const response = await this.apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
+      const response = await rootStore().apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
       if (response.status < 400)      {
         rootStore().setPart2complete(true)
       }
@@ -79,7 +81,7 @@ export const patientStore = defineStore('patients', {
     },
     async savePatientData(qualitative_data, code, time_taken, index, completed) {
       const assessmentId = rootStore().assessmentId
-      const response = await this.apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
+      const response = await rootStore().apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       if (response.status < 400) {
         rootStore().setPart3complete(completed)
         this.patientIndex = index + 1
@@ -88,7 +90,7 @@ export const patientStore = defineStore('patients', {
     },    
     async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
       const assessmentId = rootStore().assessmentId
-      const response = await this.apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
+      const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       if (response.status < 400) {
         rootStore().setPart4complete(completed)
         this.testIndex = index + 1
@@ -121,7 +123,7 @@ export const patientStore = defineStore('patients', {
             if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
               idList = idsResponse.data.split(',')
               console.debug('List of patient ids', idList)
-              this.patientList = allPatients.filter(p => idList.includes(p.id))
+              this.patientList = allPatients.filter(p => idList.includes(p.id + ''))
             } else {
               console.debug('No patient ids recorded')              
             }
@@ -147,7 +149,8 @@ export const patientStore = defineStore('patients', {
           }
         })
 
-        if (!ret.message) {
+        if (ret == null) {
+          this.patientList.forEach(p => p.dob = this.formatDOB(p))
           ret = { status: 200, data: this.patientList }
         }
 
@@ -195,12 +198,12 @@ export const patientStore = defineStore('patients', {
     },
     shuffle(a) {
       // Durstenfeld shuffle in-place - see https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-      console.dir('List before shuffle', patientList)
+      console.dir('List before shuffle', a)
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
       }
-      console.dir('List after shuffle', patientList)
+      console.dir('List after shuffle', a)
     },
 
     // async setConfigErrors() {
@@ -260,9 +263,10 @@ export const patientStore = defineStore('patients', {
     formatComorbidity(comorbidity) {
       return comorbidity.map(c => c.comorbidity)      
     },
+    // Patient DOB is random date within last 12 months, adjusted by their stored age
     formatDOB(patient) {
       dayjs.extend(customParseFormat)
-      return dayjs().subtract(patient.age, 'year').format('DD/MM/YYYY')
+      return dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age, 'year').format('DD/MM/YYYY')
     }
     
   }

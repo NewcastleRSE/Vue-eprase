@@ -8,18 +8,7 @@ import { Tooltip } from 'bootstrap'
 
 export default {
   name: "app",
-  components: {},
-  computed: {
-    /*alert () {
-          return this.$store.state.alert
-      } */
-  },
-  watch: {
-    $route(to, from) {
-      // clear alert on location change
-      // this.$store.dispatch('alert/clear');
-    },
-  },
+  components: {}, 
   mounted() {
     new Tooltip(document.body, {
       selector: "[data-bs-toggle='tooltip']",

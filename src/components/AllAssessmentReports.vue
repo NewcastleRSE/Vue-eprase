@@ -28,7 +28,7 @@
 
     <div class="footer-bar-buttons">
       <button><i class="bi bi-house"></i><span class="headerLink"><router-link to="/adminhome">Admin Home</router-link></span></button>
-      <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/login">Logout</router-link></span></button>
+      <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link to="/logout">Logout</router-link></span></button>
     </div>
 
     <AppLogo></AppLogo>
