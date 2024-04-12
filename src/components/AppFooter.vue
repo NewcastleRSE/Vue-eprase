@@ -19,7 +19,6 @@
 
 <script>
 
-import { authenticationStore } from '../stores/authentication'
 import InstructionsModal from './InstructionsModal'
 import AboutModal from './AboutModal'
 import ContactModal from './ContactModal'
@@ -36,14 +35,7 @@ export default {
       this.$router.push('/resultshome')
     },
     signout() {
-      const auth = authenticationStore()
-      auth.logout()
-      this.$router.push('/login')
-    }
-  },
-  computed: {
-    user() {
-      //return this.$store.state.authentication.user;
+      this.$router.push('/logout')
     }
   }
 }

@@ -355,20 +355,15 @@ export default {
           { text: 'Intermediate Care', value: 'Intermediate care' }
         ]
       },
-      startTime: '',
-      showExitModal: false
+      startTime: ''
     }
   },
-  methods: {
-    exitModalClose() {
-      this.showExitModal = false
-    },    
+  methods: {   
     onResetClick() {
       this.$refs.assessmentSystemForm.resetForm()
     },
     exit() {
       //TODO there should be a pre-hook action on logout to save the current state
-      this.showExitModal = false
       this.$router.push('/logout')      
     },
     onNextClick() {

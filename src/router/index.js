@@ -3,6 +3,7 @@ import { authenticationStore } from "../stores/authentication"
 
 import AppWelcome from "../components/AppWelcome.vue"
 import AppLogin from "../components/AppLogin.vue"
+import AppLogout from "../components/AppLogout.vue"
 import AppRegister from "../components/AppRegister.vue"
 import AssessmentIntro from "../components/AssessmentIntro"
 import AssessmentSystem from "../components/AssessmentSystem"
@@ -31,10 +32,14 @@ export const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "/login",
+      path: "/login/:loggedOut?",
       name: "login",
       component: AppLogin,
-    },   
+    },
+    {
+      path: "/logout",
+      component: AppLogout
+    },
     {
       path: "/register",
       component: AppRegister,
@@ -163,7 +168,7 @@ router.afterEach((to, from) => {
 
 // Hook to ensure user logged in for all non-public pages
 router.beforeEach((to, from, next) => {
- 
+
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from, 'next', next)
 
@@ -173,19 +178,15 @@ router.beforeEach((to, from, next) => {
   console.debug('Authentication required', authRequired)
 
   const loggedIn = auth.isLoggedIn
-  const loggingOut = to.path == 'logout'
   console.debug('Logged in user', loggedIn)
 
-  if (loggingOut || (authRequired && !loggedIn)) {
+  if (authRequired && !loggedIn) {
 
-    if (loggingOut) {
-      auth.logout()
-    }
     console.debug('Routing to login page...')
     console.groupEnd()
 
     return next('/login')
-    
+
   } else {
 
     console.debug('Routing to', to)

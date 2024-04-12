@@ -2,7 +2,7 @@
   <main>
     <div class="loginpage">
       <AppLogo cls="banner" />
-
+      <h3 v-if="$route.params.loggedOut == 1" class="danger">You have successfully logged out</h3>
       <h2 class="mt-4">Log-in to ePRaSE</h2>
       <p class="pb-2">
         Please enter your login details below, or click 'Register' to create a
