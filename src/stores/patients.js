@@ -10,10 +10,9 @@ export const patientStore = defineStore('patients', {
       requiredAdultPatients: [],
       requiredChildPatients: [],
       allRequiredPatients: [],
+      totalNumPatients: 0,
       patientList: [], 
-      testList: [],
-      patientIndex: 0,
-      testIndex: 0
+      testList: []
     }
   },
   persist: true,
@@ -83,31 +82,29 @@ export const patientStore = defineStore('patients', {
       }
       return(response)
     },
-    async savePatientData(qualitative_data, code, time_taken, index, completed) {
+    async savePatientData(qualitative_data, code, time_taken, completed) {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       if (response.status < 400) {
         rootStore().storePart3complete(completed)
-        this.patientIndex = index + 1
       }
       return(response)
     },    
-    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed) {
+    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, completed) {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       if (response.status < 400) {
         rootStore().storePart4complete(completed)
-        this.testIndex = index + 1
       }
       return(response)
     },
-    async setPatientsInStore(patientType) {
+    async getCompletePatientDetails(patientType) {
       
       let ret = null
       this.patientList = []
       this.testList = []
 
-      console.group('setPatientsInStore()')
+      console.group('getCompletePatientDetails()')
       console.debug('Patient type', patientType)
 
       const patientsResponse = await rootStore().apiCall('patients', 'GET')
@@ -122,12 +119,13 @@ export const patientStore = defineStore('patients', {
 
           let idList = []
           const instId = authenticationStore().institutionId
-          const idsResponse = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
+          const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
           if (idsResponse.status < 400) {
             if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
-              idList = idsResponse.data.split(',')
-              console.debug('List of patient ids', idList)
+              idList = idsResponse.data.todopatients.split(',')
+              console.debug('List of patient ids still to enter', idList)
               this.patientList = allPatients.filter(p => idList.includes(p.id + ''))
+              this.totalNumPatients = idsResponse.data.allpatients.split(',').length
             } else {
               console.debug('No patient ids recorded')              
             }

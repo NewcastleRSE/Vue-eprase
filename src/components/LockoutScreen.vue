@@ -59,7 +59,7 @@
             if(this.patientscompleted){
                 this.nextEnabled = true;
                 this.disabled = false;
-                patientService.setPatientsInStoreFromIds();
+                patientService.getCompletePatientDetailsFromIds();
             }
         },
         mounted : function() {

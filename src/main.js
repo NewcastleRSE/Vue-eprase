@@ -66,9 +66,9 @@ app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
-app.config.errorHandler = function (err, vm, info) {
-  console.log(`Error: ${err.toString()}\nInfo: ${info}`)
-}
+// app.config.errorHandler = function (err, vm, info) {
+//   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
+// }
 
 // TODO - needs updating to get rid of deprecated calls - David Herbert 12/02/2024
 // Sentry.init({

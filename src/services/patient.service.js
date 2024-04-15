@@ -14,8 +14,8 @@ export const patientService = {
   getTestList,
   getPatientTests,
   getPatientIds,
-  setPatientsInStore,
-  setPatientsInStoreFromIds,
+  getCompletePatientDetails,
+  getCompletePatientDetailsFromIds,
   setConfigErrors,
   formatPatientData,
   getRequiredTests
@@ -64,7 +64,7 @@ function setConfigErrors() {
   });
 }
 
-function setPatientsInStore(patient_type) {
+function getCompletePatientDetails(patient_type) {
 
   let patients = [];
   let tempList = [];
@@ -258,7 +258,7 @@ function setPatientsInStore(patient_type) {
   });
 }
 
-function setPatientsInStoreFromIds() {
+function getCompletePatientDetailsFromIds() {
 
   let patient_ids = [];
   let patient_codes = [];
@@ -371,7 +371,7 @@ function getDOB(patient) {
 }
 
 
-// used by setPatientsInStore
+// used by getCompletePatientDetails
 function getAllPatients() {
 
   let token = getToken();
@@ -452,7 +452,7 @@ function getPatientByCode(code) {
 
 
 
-// used by setPatientsInStoreFromIds, (when patient ids are drawn from the database)
+// used by getCompletePatientDetailsFromIds, (when patient ids are drawn from the database)
 function getPatientById(patient_id) {
 
   let token = getToken();
@@ -495,7 +495,7 @@ function getPatientTests(index) {
 }
 
 
-// used by setPatientsInStoreFromIds
+// used by getCompletePatientDetailsFromIds
 function getPatientIds() {
 
   let token = getToken();

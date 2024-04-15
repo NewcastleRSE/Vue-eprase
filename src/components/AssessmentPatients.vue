@@ -127,7 +127,7 @@ export default {
       const patientService = patientStore()
       console.debug('Patient type', patientType)
 
-      let patientResponse = await patientService.setPatientsInStore(patientType)
+      let patientResponse = await patientService.getCompletePatientDetails(patientType)
       if (patientResponse.status < 400) {
         if (patientType != undefined) {
           // Coming from completing the system information screen - save the ids
