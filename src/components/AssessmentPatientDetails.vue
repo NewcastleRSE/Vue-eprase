@@ -15,7 +15,6 @@
         <p>You have a further {{ myPatientList.length }} patient entries to enter ({{ totalNumPatients -
       myPatientList.length }} already present)</p>
       </div>
-      <p>.</p>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
         with appropriate self-generated information.</p>
       <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue.</p>

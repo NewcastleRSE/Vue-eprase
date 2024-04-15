@@ -133,9 +133,7 @@ export default {
           // Coming from completing the system information screen - save the ids
           const patientIds = patientResponse.data.map(p => p.id).join(',')
           const saveIdsResponse = await patientService.savePatientList(patientIds)
-          if (saveIdsResponse.status >= 400) {
-            this.errorAlertModal.show(saveIdsResponse.message)
-          }
+          saveIdsResponse.message && this.errorAlertModal.show(saveIdsResponse.message)
         }
         this.myPatientList = patientResponse.data
         rootStore().audit('Create patient and test list', '/setpatients/' + patientType);

@@ -26,6 +26,9 @@ export const patientStore = defineStore('patients', {
       console.group('getRequiredTests()')
 
       this.$reset()
+      console.debug('requiredAdultPatients just after store reset', this.requiredAdultPatients)
+      console.debug('requiredChildPatients just after store reset', this.requiredChildPatients)
+      console.debug('allRequiredPatients just after store reset', this.allRequiredPatients)
 
       const response = await rootStore().apiCall('requiredtests', 'GET')
       if (response.status < 400) {
@@ -179,8 +182,8 @@ export const patientStore = defineStore('patients', {
 
       const poolOfType = type == 'Both' ? pool : pool.filter(p => (type == 'Adults' && p.is_adult))
       const requiredPatients = this[typeToLsMapping[type]] || []
-      patientList = requiredPatients
-      console.debug('Required patient list', requiredPatients)
+      patientList = structuredClone(requiredPatients)
+      console.debug('Required patient list', patientList)
 
       let added = {}
       patientList.forEach(p => added[p.id] = true)
