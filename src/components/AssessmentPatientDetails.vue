@@ -27,9 +27,10 @@
             <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
             <span class="patient-image">
               <img v-if="patient.gender === 'male' && patient.is_adult === true" src="../assets/images/anon-male.png" />
-              <img v-if="patient.gender === 'female' && patient.is_adult === true" src="../assets/images/anon-female.png" />
+              <img v-if="patient.gender === 'female' && patient.is_adult === true"
+                src="../assets/images/anon-female.png" />
               <img v-if="!patient.is_adult" src="../assets/images/child.png" />
-            </span>          
+            </span>
             <p class="subtitle">(Patient {{ index + 1 }} of {{ totalNumPatients }})</p>
           </div>
 
@@ -116,21 +117,20 @@
                 <div v-if="patient.comorbidity.length == 0">None</div>
               </div>
             </div>
-            
+
             <div class="row mb-4">
               <div class="alert alert-warning fw-bold" role="alert">
                 To optimise the use of this tool please record ALL types of guidance that appears on your system screen
               </div>
-              <textarea type="text" class="form-control" name="input" id="patient-intervention" rows="5"
-                v-model="assessment.qualitative_data" placeholder="Please note any interventions from the system..."
-                maxlength="500"></textarea>
+              <textarea class="form-control" :id="'patient_intervention_' + index" rows="5"
+                placeholder="Please note any interventions from the system..."></textarea>
             </div>
-            
-            <input type="hidden" id="patient_id" :value="patient.code" />
-          </div>            
 
-        </div>  
-        
+            <input type="hidden" :id="'patient_id_' + index" :value="patient.code" />
+          </div>
+
+        </div>
+
       </div>
       <div class="my-2">
         <h5 v-if="patientIndex < myPatientList.length - 1">
@@ -141,12 +141,10 @@
         </h5>
         <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
           <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
-        <button v-if="patientIndex < myPatientList.length - 1" type="button" class="btn btn-primary me-3"
-          @click="onNextClick()">Next</button>
-        <button v-if="patientIndex == myPatientList.length - 1" type="button" class="btn btn-primary"
-          @click="onDoneClick()">Done</button>
+        <button type="button" class="btn btn-primary"
+          @click="nextPatient()">{{ patientIndex < myPatientList.length - 1 ? 'Next' : 'Done' }}</button>       
       </div>
-    </div>      
+    </div>
     <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <AppLogo cls="bottomright" />
   </main>
@@ -159,12 +157,10 @@ import AppLogo from "./AppLogo"
 import TabHeader from './TabHeader'
 import LoginInfo from './LoginInfo'
 import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
 import ErrorAlertModal from './ErrorAlertModal'
 import ExitModal from "./ExitModal"
-
-import { dataService } from '../services/data.service'
-import { patientService } from '../services/patient.service'
 
 export default {
   name: "AssessmentPatientDetails",
@@ -176,7 +172,7 @@ export default {
     ExitModal
   },
   computed: {
-    ...mapStores(patientStore),
+    ...mapStores(patientStore, rootStore),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
@@ -188,11 +184,7 @@ export default {
     }
   },
   data() {
-    return {
-      assessment: {
-        qualitative_data: '',
-        time_taken: ''
-      },
+    return {     
       startTime: '',
       patientIndex: 0
     }
@@ -201,49 +193,40 @@ export default {
     exit() {
       this.$router.push('/logout')
     },
-    onNextClick() {
-      this.saveData()//TODO
-      this.patientIndex++
-    },
-    onDoneClick() {
-      const unlockTime = new Date()
-      unlockTime.setHours(unlockTime.getHours() + 1)
-      localStorage.setItem('assessmentUnlockTime', unlockTime.toISOString())
+    async nextPatient() {
 
-      // this is now true
-      this.completed = true
-      // update the testList with config errors, before the
-      patientService.setConfigErrors()
+      console.group('nextPatient()')
+      console.debug('Attempt save of patient', this.patientIndex)
 
-      // save the last patient data
-      this.saveData()
-      this.updateAssessmentStatus()
+      const completed = this.patientIndex = this.myPatientList.length - 1
+      const time_taken = dayjs().diff(this.startTime, 'seconds')
+      const qualitative_data = document.querySelector(`#patient_intervention_${this.patientIndex}`).value
+      const code = document.querySelector(`#patient_id_${this.patientIndex}`).value
+      console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
 
-      // audit
-      dataService.audit('Completed patient details', '/assessmentpatientdetails')
-      this.$router.push('/lockoutscreen')
-    },
-    saveData() {
-      this.$validator.validate().then(valid => {
-        if (valid) {
+      const dataService = rootStore()
+      const patientService = patientStore()
 
-          this.assessment.time_taken = dayjs().diff(this.startTime, 'seconds')
-          const qualitative_data = this.assessment.qualitative_data
-          const code = document.querySelector("#patient_id").value
-          const time_taken = this.assessment.time_taken
-          const completed = this.completed
-
-          const { dispatch } = this.$store
-          if (time_taken) {
-            dispatch('savePatientData', { qualitative_data, code, time_taken, index, completed })
+      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, index, completed)
+      if (saveResponse.status < 400) {
+        if (completed) {
+          // All patient details now entered
+          const updateResponse = await dataService.updateAssessmentProgress()
+          if (updateResponse.status < 400) {
+            dataService.audit('Completed patient details', '/assessmentpatientdetails')
+            this.$router.push('/lockoutscreen')
+          } else {
+            this.errorAlertModal.show(updateResponse.message)
           }
-          this.submitted = true
-          this.assessment.qualitative_data = ''
+        } else {
+          // On to the next one
+          this.patientIndex++
         }
-      })
-    },
-    updateAssessmentStatus() {
-      dataService.updateInstitutionAssessment()
+      } else {
+        this.errorAlertModal.show(saveResponse.message)
+      }
+
+      console.groupEnd()
     },
     async getPatientsToDo() {
 
@@ -266,7 +249,7 @@ export default {
 
 <style scoped>
 
-span.patient-image > img {
+span.patient-image>img {
   height: 80px;
 }
 

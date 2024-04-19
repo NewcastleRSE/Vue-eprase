@@ -101,6 +101,11 @@ export const rootStore = defineStore('root', {
       }
       return ret   
     },
+    async updateAssessmentProgress() {
+      const instId = authenticationStore().institutionId
+      const response = await this.apiCall('updateInstitutionAssessment?INSTITUTION_ID=' + instId, 'POST') 
+      return response      
+    },
     async getAssessmentLatestCompletedPart() {
       const response = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + authenticationStore().institutionId, 'GET')
       if (response.status < 400) {
@@ -125,8 +130,7 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
       if (response.status < 400) {
         const assessmentId = JSON.stringify(response.data)
-        console.debug('Assessment ID', assessmentId, '*** TODO - need to save in backend')
-        //TODO - save this in backend, not localStorage
+        console.debug('Assessment ID', assessmentId)
         this.assessmentId = assessmentId
         this.part1complete = true
       }

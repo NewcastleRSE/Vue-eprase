@@ -95,10 +95,7 @@ export default {
     }
   },
   data() {
-    return {
-      assessment: {
-        time_taken: ''
-      },
+    return {      
       startTime: '',
       myPatientList: []
     }
@@ -108,8 +105,7 @@ export default {
       this.$router.push('/logout')
     },
     async onNextClick() {
-      this.assessment.time_taken = dayjs().diff(this.startTime, 'seconds')
-      const time_taken = this.assessment.time_taken
+      const time_taken = dayjs().diff(this.startTime, 'seconds')
       const patientService = patientStore()
       const saveResponse = await patientService.saveCreatePatients(time_taken)
       if (saveResponse.status < 400) {

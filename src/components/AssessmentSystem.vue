@@ -328,7 +328,6 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
-        time_taken: '',
         high_risk_meds: [],
         options: [
           { text: 'Warfarin', value: 'Warfarin' },
@@ -371,7 +370,7 @@ export default {
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {
 
-          this.results.time_taken = dayjs().diff(this.startTime, 'seconds')
+          const time_taken = dayjs().diff(this.startTime, 'seconds')
 
           const ep_service = this.results.ep_service
           const ep_version = this.results.ep_version
@@ -383,7 +382,6 @@ export default {
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
           const med_history = this.results.med_history
-          const time_taken = this.results.time_taken
           const high_risk_meds = this.results.high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas.toString()
 
