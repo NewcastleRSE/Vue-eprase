@@ -21,7 +21,7 @@
 
       <div v-for="(patient, index) in myPatientList" :key="patient.id">
 
-        <div class="mx-auto card" v-if="index == patientIndex">
+        <div class="mx-auto card" :class="index == patientIndex ? 'd-block' : 'd-none'">
 
           <div class="card-header">
             <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
@@ -37,84 +37,130 @@
           <div class="card-body p-4">
 
             <div class="row mb-4">
-              <div class="patient-demographics col-lg-6 pt-lg-0 pt-2">
-                <h5 class="card-title">Demographics</h5>
-                <table>
-                  <tr>
-                    <td><span class="fw-bold">Height (m):</span> {{ patient.height || 'unavailable' }}</td>
-                  </tr>
-                  <tr>
-                    <td><span class="fw-bold">Weight (kg):</span> {{ patient.weight || 'unavailable' }}</td>
-                  </tr>
+              <div class="patient-demographics col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th colspan="2" class="card-title bg-primary-subtle">
+                        <h5>Demographics</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th>Height (m)</th><td>{{ patient.height || 'unavailable' }}</td>
+                    </tr>
+                    <tr>
+                      <th>Weight (kg)</th><td>{{ patient.weight || 'unavailable' }}</td>
+                    </tr>
+                  </tbody>                  
                 </table>
               </div>
-              <div class="patient-allergies col-lg-6 pt-lg-0 pt-2">
-                <div v-if="patient.allergy.length !== 0">
-                  <h5 class="card-title">Allergies</h5>
-                  <table v-if="patient.allergy.length > 0">
-                    <tr v-for="allergy in patient.allergy" :key="allergy">
+              <div class="patient-allergies col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th class="card-title bg-primary-subtle">
+                        <h5>Allergies</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="patient.allergy.length > 0" v-for="allergy in patient.allergy" :key="allergy">
                       <td>{{ allergy.allergy }}</td>
                     </tr>
-                  </table>
-                  <div v-if="patient.allergy.length == 0">No Known Drug Allergies</div>
-                </div>
+                    <tr v-if="patient.allergy.length == 0"><td>No Known Drug Allergies</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="patient-medication col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th colspan="5" class="card-title bg-primary-subtle">
+                        <h5>Current Medication</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="patient.medication_histories.length != 0">
+                      <th>Name</th>
+                      <th>Dose</th>
+                      <th>Route</th>
+                      <th>Form</th>
+                      <th>Frequency</th>                   
+                    </tr>
+                    <tr v-if="patient.medication_histories.length != 0" v-for="history in patient.medication_histories" :key="history">
+                      <td>{{ history.name }}</td>
+                      <td>{{ history.dose }} {{ history.units }}</td>
+                      <td>{{ history.route }}</td>
+                      <td>{{ history.form }}</td>
+                      <td>{{ history.frequency }}</td>
+                    </tr>
+                    <tr v-if="patient.medication_histories.length == 0"><td>None</td></tr>
+                  </tbody>                  
+                </table>                
               </div>
             </div>
 
             <div class="row mb-4">
-              <div class="patient-medication col-lg-3 pt-lg-0">
-                <h5 class="card-title">Current Medication</h5>
-                <table v-if="patient.medication_histories.length != 0">
-                  <tr>
-                    <td><span class="fw-bold">Name</span></td>
-                    <td><span class="fw-bold">Dose</span></td>
-                    <td><span class="fw-bold">Route</span></td>
-                    <td><span class="fw-bold">Form</span></td>
-                    <td><span class="fw-bold">Frequency</span></td>
-                  </tr>
-                  <tr v-for="history in patient.medication_histories" :key="history">
-                    <td>{{ history.name }}</td>
-                    <td>{{ history.dose }} {{ history.units }}</td>
-                    <td>{{ history.route }}</td>
-                    <td>{{ history.form }}</td>
-                    <td>{{ history.frequency }}</td>
-                  </tr>
+              <div class="patient-clinical-data col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th colspan="3" class="card-title bg-primary-subtle">
+                        <h5>Clinical Data</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="patient.clinical_data.length != 0">
+                      <th>Investigation</th>
+                      <th>Value</th>
+                      <th>Unit</th>
+                    </tr>
+                    <tr v-if="patient.clinical_data.length != 0" v-for="clinical in patient.clinical_data" :key="clinical">
+                      <td>{{ clinical.investigation }}</td>
+                      <td>{{ clinical.value }}</td>
+                      <td>{{ clinical.unit }}</td>
+                    </tr>
+                    <tr v-if="patient.clinical_data.length == 0"><td>None</td></tr>
+                  </tbody>                  
                 </table>
-                <div v-if="patient.medication_histories.length == 0">None</div>
               </div>
-              <div class="patient-clinical-data col-lg-3 pt-lg-0 pt-2">
-                <h5 class="card-title">Clinical Data</h5>
-                <table v-if="patient.clinical_data.length != 0">
-                  <tr>
-                    <td><span class="fw-bold">Investigation</span></td>
-                    <td><span class="fw-bold">Value</span></td>
-                    <td><span class="fw-bold">Unit</span></td>
-                  </tr>
-                  <tr v-for="clinical in patient.clinical_data" :key="clinical">
-                    <td>{{ clinical.investigation }}</td>
-                    <td>{{ clinical.value }}</td>
-                    <td>{{ clinical.unit }}</td>
-                  </tr>
+              <div class="patient-diagnosis col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th class="card-title bg-primary-subtle">
+                        <h5>Presenting Complaint</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="patient.diagnosis.length != 0" v-for="diagnosis in patient.diagnosis" :key="diagnosis">
+                      <td>{{ diagnosis.diagnosis }}</td>
+                    </tr>
+                    <tr v-if="patient.diagnosis.length == 0"><td>None</td></tr>
+                  </tbody>                  
                 </table>
-                <div v-if="patient.clinical_data.length == 0">None</div>
               </div>
-              <div class="patient-diagnosis col-lg-3 pt-lg-0 pt-2">
-                <h5 class="card-title">Presenting Complaint</h5>
-                <table v-if="patient.diagnosis.length != 0">
-                  <tr v-for="diagnosis in patient.diagnosis" :key="diagnosis">
-                    <td>{{ diagnosis }}</td>
-                  </tr>
-                </table>
-                <div v-if="patient.diagnosis.length == 0">None</div>
-              </div>
-              <div class="patient-comorbidities col-lg-3 pt-lg-0 pt-2">
-                <h5 class="card-title">Comorbidities</h5>
-                <table v-if="patient.comorbidity.length != 0">
-                  <tr v-for="comorbidity in patient.comorbidity" :key="comorbidity">
-                    <td>{{ comorbidity }}</td>
-                  </tr>
-                </table>
-                <div v-if="patient.comorbidity.length == 0">None</div>
+              <div class="patient-comorbidities col-auto col-xl-4 pt-lg-0 pt-2">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th class="card-title bg-primary-subtle">
+                        <h5>Comorbidities</h5>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="patient.comorbidity.length != 0" v-for="comorbidity in patient.comorbidity" :key="comorbidity">
+                      <td>{{ comorbidity.comorbidity }}</td>
+                    </tr>
+                    <tr v-if="patient.comorbidity.length == 0"><td>None</td></tr>
+                  </tbody>
+                </table>                
               </div>
             </div>
 
@@ -141,8 +187,8 @@
         </h5>
         <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
           <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
-        <button type="button" class="btn btn-primary"
-          @click="nextPatient()">{{ patientIndex < myPatientList.length - 1 ? 'Next' : 'Done' }}</button>       
+        <button type="button" class="btn btn-primary" @click="nextPatient()">{{ patientIndex < myPatientList.length - 1
+      ? 'Next' : 'Done' }}</button>
       </div>
     </div>
     <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
@@ -184,7 +230,7 @@ export default {
     }
   },
   data() {
-    return {     
+    return {
       startTime: '',
       patientIndex: 0
     }
@@ -197,8 +243,9 @@ export default {
 
       console.group('nextPatient()')
       console.debug('Attempt save of patient', this.patientIndex)
+      console.debug('qd', document.querySelector(`#patient_intervention_${this.patientIndex}`).value, 'code', document.querySelector(`#patient_id_${this.patientIndex}`).value)
 
-      const completed = this.patientIndex = this.myPatientList.length - 1
+      const completed = this.patientIndex == this.myPatientList.length - 1
       const time_taken = dayjs().diff(this.startTime, 'seconds')
       const qualitative_data = document.querySelector(`#patient_intervention_${this.patientIndex}`).value
       const code = document.querySelector(`#patient_id_${this.patientIndex}`).value
@@ -207,7 +254,7 @@ export default {
       const dataService = rootStore()
       const patientService = patientStore()
 
-      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, index, completed)
+      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, this.patientIndex, completed)
       if (saveResponse.status < 400) {
         if (completed) {
           // All patient details now entered
@@ -248,9 +295,7 @@ export default {
 </script>
 
 <style scoped>
-
 span.patient-image>img {
   height: 80px;
 }
-
 </style>
