@@ -25,21 +25,23 @@ export const patientStore = defineStore('patients', {
 
       console.group('getRequiredTests()')
 
-      this.$reset()
-      console.debug('requiredAdultPatients just after store reset', this.requiredAdultPatients)
-      console.debug('requiredChildPatients just after store reset', this.requiredChildPatients)
-      console.debug('allRequiredPatients just after store reset', this.allRequiredPatients)
+      this.$reset()      
 
       const response = await rootStore().apiCall('requiredtests', 'GET')
       if (response.status < 400) {
+        const addedIds = {};  // The above call returns a list with duplicates...
         response.data.forEach(test => {
-          let requiredPatient = this.formatPatientData(test.patient)
-          if (requiredPatient.is_adult) {
-            this.requiredAdultPatients.push(requiredPatient)
-          } else {
-            this.requiredChildPatients.push(requiredPatient)
-          }
-          this.allRequiredPatients.push(requiredPatient)
+          const patientId = test.patient.id
+          if (addedIds[patientId] !== true) {
+            let requiredPatient = this.formatPatientData(test.patient)
+            if (requiredPatient.is_adult) {
+              this.requiredAdultPatients.push(requiredPatient)
+            } else {
+              this.requiredChildPatients.push(requiredPatient)
+            }
+            this.allRequiredPatients.push(requiredPatient)
+            addedIds[patientId] = true
+          }          
         })
         console.debug('requiredAdultPatients', this.requiredAdultPatients)
         console.debug('requiredChildPatients', this.requiredChildPatients)
@@ -182,7 +184,7 @@ export const patientStore = defineStore('patients', {
 
       const poolOfType = type == 'Both' ? pool : pool.filter(p => (type == 'Adults' && p.is_adult))
       const requiredPatients = this[typeToLsMapping[type]] || []
-      patientList = structuredClone(requiredPatients)
+      patientList = requiredPatients.map(p => ({...p}))
       console.debug('Required patient list', patientList)
 
       let added = {}
