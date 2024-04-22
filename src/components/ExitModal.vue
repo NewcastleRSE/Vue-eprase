@@ -7,12 +7,18 @@
 
 <script>
 
+import { setVisible } from '../helpers/modal'
 import GenericModal from './GenericModal'
 
 export default {
-  name: "ExitModal",  
+  name: "ExitModal", 
   components: {
     GenericModal
+  },
+  methods: {
+    show() {
+      setVisible('exitModal', true)
+    }
   }
 }
 </script>

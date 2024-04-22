@@ -9,17 +9,20 @@
             'Logged in as ' + user : 'Not logged in' }}
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="Javascript:void(0)" @click="menuSelect()">{{ isLoggedIn ? 'Save progress and log out' : 'Log in' }}</a></li>
+            <li>
+              <a class="dropdown-item" href="Javascript:void(0)" @click="menuSelect()">{{ isLoggedIn ? 'Save progress and log out' : 'Log in ' }}</a>
+            </li>
           </ul>
         </div>
       </div>
     </div>
-    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
+    <ExitModal ref="exitModal" :showActionBtn="true" @modal-actioned="exit()" />
   </div>
 </template>
 
 <script>
 
+import { setVisible } from '../helpers/modal'
 import { Dropdown } from 'bootstrap'
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
@@ -27,8 +30,14 @@ import ExitModal from "./ExitModal"
 
 export default {
   name: "LoginInfo",
+  components:{
+    ExitModal
+  },
   computed: {
-    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn'])
+    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn']),
+    exitModal() {
+      return this.$refs.exitModal
+    }
   },
   data() {
     return {
@@ -37,15 +46,14 @@ export default {
   },
   methods: {
     exit() {
-      this.$router.push('/logout')      
+      this.$router.push('/logout')
     },
     toggleDropdownMenu() {
       this.loginInfoDd.toggle()
     },
     menuSelect() {
       if (this.isLoggedIn) {
-        //TODO save the current state
-        this.$router.push('/logout')
+        this.exitModal.show()
       } else {
         this.$router.push('/login')
       }

@@ -1,12 +1,12 @@
 <template>
   <GenericModal :modalName="'ErrorAlertModal'" :modalId="'errorAlertModal'" :title="'The following error occurred'" :closeBtnText="'Close'">
-    <div class="bg-danger-subtle text-danger-emphasis">{{ errorText }}</div>
+    <div class="bg-danger-subtle p-2 text-danger-emphasis">{{ errorText }}</div>
   </GenericModal>
 </template>
 
 <script>
 
-import Modal from 'bootstrap/js/dist/modal'
+import { setVisible } from '../helpers/modal'
 import GenericModal from './GenericModal'
 
 export default {
@@ -16,23 +16,17 @@ export default {
       errorText: ''
     }
   },
-  computed: {
-    childModal() {
-      const markup = document.querySelector('#errorAlertModal')
-      return Modal.getInstance(markup) || new Modal(markup)
-    }
-  },
   components: {
     GenericModal
   },
   methods: {
     close() {
       this.errorText = ''
-      this.childModal.hide()
+      setVisible('errorAlertModal', false)
     },
     show(text) {
       this.errorText = text
-      this.childModal.show()
+      setVisible('errorAlertModal', true)
     }
   }
 }

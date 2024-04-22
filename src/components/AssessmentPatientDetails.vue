@@ -191,7 +191,10 @@
       ? 'Next' : 'Done' }}</button>
       </div>
     </div>
+
+    <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
+    
   </main>
 </template>
 

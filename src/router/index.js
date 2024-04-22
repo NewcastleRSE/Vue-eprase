@@ -173,6 +173,10 @@ router.beforeEach((to, from, next) => {
   console.debug('Authentication required', authRequired)
 
   const loggedIn = auth.isLoggedIn
+  if (!loggedIn) {
+    // Clear all local storage, e.g. sessions where JWT has expired
+    auth.clear()
+  }
   console.debug('Logged in user', loggedIn)
 
   if (authRequired && !loggedIn) {

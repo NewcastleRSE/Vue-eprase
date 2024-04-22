@@ -53,12 +53,15 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
+    clear() {
+      this.$reset()
+      localStorage.clear()
+    },
     logout() {
 
       console.group('logout()')
 
-      this.$reset()
-      localStorage.clear()
+      this.clear()
 
       console.groupEnd()
     },
