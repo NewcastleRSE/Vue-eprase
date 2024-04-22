@@ -191,7 +191,6 @@
       ? 'Next' : 'Done' }}</button>
       </div>
     </div>
-    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <AppLogo cls="bottomright" />
   </main>
 </template>
@@ -206,7 +205,6 @@ import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
 import ErrorAlertModal from './ErrorAlertModal'
-import ExitModal from "./ExitModal"
 
 export default {
   name: "AssessmentPatientDetails",
@@ -214,8 +212,7 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
-    ErrorAlertModal,
-    ExitModal
+    ErrorAlertModal
   },
   computed: {
     ...mapStores(patientStore, rootStore),
@@ -235,10 +232,7 @@ export default {
       patientIndex: 0
     }
   },
-  methods: {
-    exit() {
-      this.$router.push('/logout')
-    },
+  methods: {  
     async nextPatient() {
 
       console.group('nextPatient()')

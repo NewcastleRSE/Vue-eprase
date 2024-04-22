@@ -14,6 +14,7 @@
         </div>
       </div>
     </div>
+    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
   </div>
 </template>
 
@@ -22,6 +23,7 @@
 import { Dropdown } from 'bootstrap'
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
+import ExitModal from "./ExitModal"
 
 export default {
   name: "LoginInfo",
@@ -34,6 +36,9 @@ export default {
     }
   },
   methods: {
+    exit() {
+      this.$router.push('/logout')      
+    },
     toggleDropdownMenu() {
       this.loginInfoDd.toggle()
     },

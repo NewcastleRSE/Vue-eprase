@@ -60,7 +60,6 @@
 
     </div>
 
-    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
@@ -77,7 +76,6 @@ import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
 import ErrorAlertModal from './ErrorAlertModal'
-import ExitModal from "./ExitModal"
 
 export default {
   name: "AssessmentPatients",
@@ -85,8 +83,7 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
-    ErrorAlertModal,
-    ExitModal
+    ErrorAlertModal
   },
   computed: {
     ...mapStores(patientStore),
@@ -100,10 +97,7 @@ export default {
       myPatientList: []
     }
   },
-  methods: {
-    exit() {
-      this.$router.push('/logout')
-    },
+  methods: {   
     async onNextClick() {
       const time_taken = dayjs().diff(this.startTime, 'seconds')
       const patientService = patientStore()

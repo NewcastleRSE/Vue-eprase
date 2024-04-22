@@ -257,7 +257,6 @@
 
     </div>
 
-    <ExitModal :showActionBtn="true" @modal-actioned="exit()" />
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
@@ -274,7 +273,6 @@ import TabHeader from './TabHeader'
 import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
-import ExitModal from "./ExitModal"
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
 export default {
@@ -283,7 +281,6 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
-    ExitModal,
     ErrorAlertModal,
     Form,
     Field,
@@ -361,11 +358,7 @@ export default {
   methods: {   
     onResetClick() {
       this.$refs.assessmentSystemForm.resetForm()
-    },
-    exit() {
-      //TODO there should be a pre-hook action on logout to save the current state
-      this.$router.push('/logout')      
-    },
+    },   
     onNextClick() {
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {

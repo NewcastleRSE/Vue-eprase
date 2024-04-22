@@ -10,7 +10,6 @@
       class="btn btn-outline-primary m-1"><i class="bi bi-question-circle pe-1"></i>User Guide</a>
     <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#contactModal"><i
         class="bi bi-person-circle pe-1"></i>Contact</button>
-    <button class="btn btn-outline-primary m-1" @click="signout()"><i class="bi bi-box-arrow-right pe-1"></i>Logout</button>
   </div>
   <AboutModal />
   <InstructionsModal />
@@ -33,9 +32,6 @@ export default {
   methods: {
     reports() {
       this.$router.push('/resultshome')
-    },
-    signout() {
-      this.$router.push('/logout')
     }
   }
 }
