@@ -1,93 +1,94 @@
 <template>
- <div id="page">
-   <TabHeader system-opacity="1.0" patient-opacity="1.0" scenario-opacity="0.5" report-opacity="0.2"></TabHeader>
-   <div id="content">
-     <h3>Assessment Scenarios</h3>
-     <p>Please follow the instructions for each scenario.<br/></p>
-     <div class="mx-auto">
-       <div id="test-header">Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</div>
+  <main class="leftalign">
 
-       <ScenarioPrescription v-if="assessment.isPrescriptionTest"></ScenarioPrescription>
-       <ConfigError v-if="assessment.isConfigErrorTest "></ConfigError>
-     </div>
-   </div>
-   <AppLogo></AppLogo>
- </div>
+    <TabHeader :showIndex="2" />
+
+    <div class="content p-4">
+
+      <LoginInfo />
+
+      <h3>Assessment Scenarios</h3>
+      <p class="pb-2">Please follow the instructions for each scenario</p>
+      <div class="mx-auto">
+        <div id="test-header">Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</div>
+
+        <ScenarioPrescription v-if="assessment.isPrescriptionTest"></ScenarioPrescription>
+        <ConfigError v-if="assessment.isConfigErrorTest"></ConfigError>
+      </div>
+    </div>
+    <AppLogo></AppLogo>
+  </main>
 
 </template>
 
 <script>
 
-    import { settings } from '../settings';
-    import ScenarioPrescription from "./ScenarioPrescription";
-    import ConfigError from "./ConfigError";
-    import TabHeader from"./TabHeader";
-    import AppLogo from "./AppLogo";
+import { settings } from '../settings'
+import ScenarioPrescription from "./ScenarioPrescription"
+import ConfigError from "./ConfigError"
+import TabHeader from "./TabHeader"
+import AppLogo from "./AppLogo"
 
-    export default {
-        name: "AssessmentScenarios",
-        components: {
-            ScenarioPrescription,
-            ConfigError,
-            TabHeader,
-            AppLogo
-        },
-        computed: {
-            getCurrentTestIndex() {
-                return this.$store.state.testIndex;
-            }
-        },
-        data() {
-            return {
-                assessment: {
-                    isPrescriptionTest: true,
-                    isConfigErrorTest: false
-                },
-                numPrescriptions: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
-            }
-        },
-        beforeUpdate: function() {
-            let index = this.$store.state.testIndex;
-            let tests = this.$store.state.testList;
-            let currentTest = tests.testList[index];
-
-            if(currentTest !== undefined) {
-              // make sure we get the right type of test
-              if (currentTest.hasOwnProperty('configErrorCode')) {
-                this.assessment.isPrescriptionTest = false;
-                this.assessment.isConfigErrorTest = true;
-              }
-              else {
-                this.assessment.isPrescriptionTest = true;
-                this.assessment.isConfigErrorTest = false;
-              }
-            }
-        },
-        mounted : function() {
-          history.pushState(null, null, location.href);
-            window.onpopstate = function () {
-                history.go(1);
-            };
-        }
+export default {
+  name: "AssessmentScenarios",
+  components: {
+    ScenarioPrescription,
+    ConfigError,
+    TabHeader,
+    AppLogo
+  },
+  computed: {
+    getCurrentTestIndex() {
+      return this.$store.state.testIndex
     }
+  },
+  data() {
+    return {
+      assessment: {
+        isPrescriptionTest: true,
+        isConfigErrorTest: false
+      },
+      numPrescriptions: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
+    }
+  },
+  beforeUpdate: function () {
+    let index = this.$store.state.testIndex
+    let tests = this.$store.state.testList
+    let currentTest = tests.testList[index]
+
+    if (currentTest !== undefined) {
+      // make sure we get the right type of test
+      if (currentTest.hasOwnProperty('configErrorCode')) {
+        this.assessment.isPrescriptionTest = false
+        this.assessment.isConfigErrorTest = true
+      }
+      else {
+        this.assessment.isPrescriptionTest = true
+        this.assessment.isConfigErrorTest = false
+      }
+    }
+  },
+  mounted: function () {
+    history.pushState(null, null, location.href)
+    window.onpopstate = function () {
+      history.go(1)
+    }
+  }
+}
 </script>
 
 <style scoped>
+#test-header {
+  font-size: 1.8em;
+  font-weight: 700;
+  padding-bottom: 25px;
+}
 
- #test-header {
-    font-size: 1.8em;
-    font-weight: 700;
-    padding-bottom: 25px;
- }
+#page {
+  text-align: left;
+}
 
-  #page {
-    text-align: left;
-  }
-
-  #content {
-    padding: 40px;
-  }
-
-
-
+#content {
+  padding: 40px;
+}
 </style>

@@ -7,6 +7,7 @@ import { authenticationStore } from './authentication'
 export const patientStore = defineStore('patients', {
   state: () => {
     return {
+      patientPool: [],
       requiredAdultPatients: [],
       requiredChildPatients: [],
       allRequiredPatients: [],
@@ -103,33 +104,45 @@ export const patientStore = defineStore('patients', {
       }
       return(response)
     },
-    async getCompletePatientDetails(patientType) {
+    // Main entry point for getting patient and test data from the backend
+    // Args:
+    // patientType - Adults|Paediatrics|Both, or null to compile patient data from stored ID list
+    // toDoOnly - true to only compile patient data from unentered IDs, otherwise will use whole assessment list
+    // prescriptions - true to fetch prescription data for each patient
+    async getCompletePatientDetails(patientType = null, toDoOnly = false, prescriptions = false) {
       
       let ret = null
       this.patientList = []
       this.testList = []
 
       console.group('getCompletePatientDetails()')
-      console.debug('Patient type', patientType)
+      console.debug('Patient type', patientType || 'using stored IDs, fetching only unentered data', toDoOnly)
 
-      const patientsResponse = await rootStore().apiCall('patients', 'GET')
-      if (patientsResponse.status < 400) {
+      if (this.patientPool.length == 0) {
+        const patientsResponse = await rootStore().apiCall('patients', 'GET')
+        if (patientsResponse.status < 400) {
+          // Cache the entire patient pool (invariant, so not a problem across sessions)
+          this.patientPool = patientsResponse.data
+          console.debug('All patient pool', this.patientPool)
+        } else {
+          // There was an error
+          ret = patientsResponse
+        }
+      }
 
-        const allPatients = patientsResponse.data
-        console.debug('All patient list', allPatients)
-
-        if (!patientType) {
+      if (!ret) {
+        if (patientType == null) {
           // Partially completed assessment - use API call to retrieve patient IDs
           console.debug('Partial completed assessment - getting patient ids...')
-
+  
           let idList = []
           const instId = authenticationStore().institutionId
           const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
           if (idsResponse.status < 400) {
             if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
-              idList = idsResponse.data.todopatients.split(',')
-              console.debug('List of patient ids still to enter', idList)
-              this.patientList = allPatients.filter(p => idList.includes(p.id + ''))
+              idList = (toDoOnly ? idsResponse.data.todopatients : idsResponse.data.allpatients).split(',')
+              console.debug('Patient ID list', idList)
+              this.patientList = this.patientPool.filter(p => idList.includes(p.id + ''))
               this.totalNumPatients = idsResponse.data.allpatients.split(',').length
             } else {
               console.debug('No patient ids recorded')              
@@ -142,7 +155,34 @@ export const patientStore = defineStore('patients', {
           console.debug('Coming from completed system information')
           this.patientList = this.compilePatientList(patientsResponse.data, patientType, 15)          
         }
+      }
+      if (patientType == null) {
+        // Partially completed assessment - use API call to retrieve patient IDs
+        console.debug('Partial completed assessment - getting patient ids...')
 
+        let idList = []
+        const instId = authenticationStore().institutionId
+        const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
+        if (idsResponse.status < 400) {
+          if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
+            idList = idsResponse.data.todopatients.split(',')
+            console.debug('List of patient ids still to enter', idList)
+            this.patientList = allPatients.filter(p => idList.includes(p.id + ''))
+            this.totalNumPatients = idsResponse.data.allpatients.split(',').length
+          } else {
+            console.debug('No patient ids recorded')              
+          }
+        } else {
+          ret = idsResponse
+        }
+      } else {          
+        // Coming from just completing the system information
+        console.debug('Coming from completed system information')
+        this.patientList = this.compilePatientList(patientType, 15)          
+      }
+
+      if (prescriptions) {
+        // ready to add the prescription data
         console.debug('Adding prescriptions...')
         this.patientList.forEach(async p => {
           console.debug('Patient id', p.id)
@@ -155,20 +195,17 @@ export const patientStore = defineStore('patients', {
             ret = testResponse
           }
         })
+      }      
 
-        if (ret == null) {
-          this.patientList.forEach(p => p.dob = this.formatDOB(p))
-          ret = { status: 200, data: this.patientList }
-        }
+      if (ret == null) {
+        this.patientList.forEach(p => p.dob = this.formatDOB(p))
+        ret = { status: 200, data: this.patientList }
+      }
 
-      } else {
-        ret = patientsResponse
-      }     
       return ret
     },
-    compilePatientList(pool, type, requiredLength) {
+    compilePatientList(type, requiredLength) {
 
-      // pool: list of all patients
       // type: Adults|Paediatrics|Both
       // requiredLength: 15 pro-tem
 
@@ -182,7 +219,7 @@ export const patientStore = defineStore('patients', {
         'Both': 'allRequiredPatients'
       }
 
-      const poolOfType = type == 'Both' ? pool : pool.filter(p => (type == 'Adults' && p.is_adult))
+      const poolOfType = type == 'Both' ? this.patientPool : this.patientPool.filter(p => (type == 'Adults' && p.is_adult))
       const requiredPatients = this[typeToLsMapping[type]] || []
       patientList = requiredPatients.map(p => ({...p}))
       console.debug('Required patient list', patientList)

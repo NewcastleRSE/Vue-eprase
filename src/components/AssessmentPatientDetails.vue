@@ -251,7 +251,7 @@ export default {
       const dataService = rootStore()
       const patientService = patientStore()
 
-      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, this.patientIndex, completed)
+      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, completed)
       if (saveResponse.status < 400) {
         if (completed) {
           // All patient details now entered
@@ -276,7 +276,7 @@ export default {
 
       console.group('getPatientsToDo()')
 
-      let patientResponse = await patientStore().getCompletePatientDetails(undefined)
+      let patientResponse = await patientStore().getCompletePatientDetails(null, true)
       patientResponse.message && this.errorAlertModal.show(patientResponse.message)
 
       console.groupEnd()
