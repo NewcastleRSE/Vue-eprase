@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { rootStore } from './root'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
 
 export const patientStore = defineStore('patients', {
@@ -13,13 +14,16 @@ export const patientStore = defineStore('patients', {
       allRequiredPatients: [],
       totalNumPatients: 0,
       patientList: [], 
-      testList: []
+      testList: [],
+      patientIdsToDo: []
     }
   },
   persist: true,
   getters: {
     getPatientList: (state) => state.patientList,
-    getTestList: (state) => state.testList
+    getTestList: (state) => state.testList,
+    getPatientIdsToDo: (state) => state.patientIdsToDo,
+    getTotalNumPatients: (state) => state.totalNumPatients
   },
   actions: {
     async getRequiredTests() {
@@ -106,17 +110,16 @@ export const patientStore = defineStore('patients', {
     },
     // Main entry point for getting patient and test data from the backend
     // Args:
-    // patientType - Adults|Paediatrics|Both, or null to compile patient data from stored ID list
-    // toDoOnly - true to only compile patient data from unentered IDs, otherwise will use whole assessment list
     // prescriptions - true to fetch prescription data for each patient
-    async getCompletePatientDetails(patientType = null, toDoOnly = false, prescriptions = false) {
+    async getCompletePatientDetails(prescriptions = false) {
       
       let ret = null
       this.patientList = []
       this.testList = []
+      this.patientIdsToDo = []
 
       console.group('getCompletePatientDetails()')
-      console.debug('Patient type', patientType || 'using stored IDs, fetching only unentered data', toDoOnly)
+      console.debug('Fetching prescription data', prescriptions)
 
       if (this.patientPool.length == 0) {
         const patientsResponse = await rootStore().apiCall('patients', 'GET')
@@ -131,54 +134,24 @@ export const patientStore = defineStore('patients', {
       }
 
       if (!ret) {
-        if (patientType == null) {
-          // Partially completed assessment - use API call to retrieve patient IDs
-          console.debug('Partial completed assessment - getting patient ids...')
-  
-          let idList = []
-          const instId = authenticationStore().institutionId
-          const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
-          if (idsResponse.status < 400) {
-            if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
-              idList = (toDoOnly ? idsResponse.data.todopatients : idsResponse.data.allpatients).split(',')
-              console.debug('Patient ID list', idList)
-              this.patientList = this.patientPool.filter(p => idList.includes(p.id + ''))
-              this.totalNumPatients = idsResponse.data.allpatients.split(',').length
-            } else {
-              console.debug('No patient ids recorded')              
-            }
-          } else {
-            ret = idsResponse
-          }
-        } else {          
-          // Coming from just completing the system information
-          console.debug('Coming from completed system information')
-          this.patientList = this.compilePatientList(patientsResponse.data, patientType, 15)          
-        }
-      }
-      if (patientType == null) {
-        // Partially completed assessment - use API call to retrieve patient IDs
-        console.debug('Partial completed assessment - getting patient ids...')
-
-        let idList = []
         const instId = authenticationStore().institutionId
         const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
         if (idsResponse.status < 400) {
-          if (idsResponse.status == 200 && idsResponse.data != 'No patient ids') {
-            idList = idsResponse.data.todopatients.split(',')
-            console.debug('List of patient ids still to enter', idList)
-            this.patientList = allPatients.filter(p => idList.includes(p.id + ''))
-            this.totalNumPatients = idsResponse.data.allpatients.split(',').length
+          if (idsResponse.data == 'No patient ids') {
+            // No stored IDs so compile list from scratch (coming from completing system info)
+            console.debug('Coming from completed system information')
+            this.patientList = this.compilePatientList(this.patientPool, patientType, appSettingsStore().assessmentNumPatients)
+            this.patientIdsToDo = this.patientList.map(p => p.id)            
           } else {
-            console.debug('No patient ids recorded')              
+            // Use stored IDs
+            console.debug('Using stored patient IDs', idsResponse.data.allpatients)
+            this.patientIdsToDo = idsResponse.data.allpatients.split(',')
+            this.patientList = this.patientPool.filter(p => this.patientIdsToDo.includes(p.id + ''))
           }
+          this.totalNumPatients = this.patientList.length
         } else {
           ret = idsResponse
         }
-      } else {          
-        // Coming from just completing the system information
-        console.debug('Coming from completed system information')
-        this.patientList = this.compilePatientList(patientType, 15)          
       }
 
       if (prescriptions) {

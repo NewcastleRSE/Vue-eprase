@@ -113,20 +113,23 @@ export default {
 
       console.group('getPatients()')
 
-      const patientType = this.$route.params.type
+      const patientType = this.$route.params.type || null
       const patientService = patientStore()
       console.debug('Patient type', patientType)
 
       let patientResponse = await patientService.getCompletePatientDetails(patientType)
       if (patientResponse.status < 400) {
-        if (patientType != undefined) {
+        if (patientType != null) {
           // Coming from completing the system information screen - save the ids
           const patientIds = patientResponse.data.map(p => p.id).join(',')
           const saveIdsResponse = await patientService.savePatientList(patientIds)
-          saveIdsResponse.message && this.errorAlertModal.show(saveIdsResponse.message)
-        }
-        this.myPatientList = patientResponse.data
-        rootStore().audit('Create patient and test list', '/setpatients/' + patientType);
+          if (saveIdsResponse.status < 400) {
+            this.myPatientList = patientResponse.data
+            rootStore().audit('Create patient and test list', '/setpatients/' + patientType);
+          } else {
+            this.errorAlertModal.show(saveIdsResponse.message)
+          }
+        }        
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }

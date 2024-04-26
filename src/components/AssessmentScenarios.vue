@@ -8,6 +8,7 @@
       <LoginInfo />
 
       <h3>Assessment Scenarios</h3>
+      <p class="pb-2">You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
       <p class="pb-2">Please follow the instructions for each scenario</p>
       <div class="mx-auto">
         <div id="test-header">Test {{ getCurrentTestIndex + 1 }} of {{ numPrescriptions }}</div>
@@ -49,6 +50,17 @@ export default {
         isConfigErrorTest: false
       },
       numPrescriptions: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
+    }
+  },
+  methods: {
+    async getPatientTests() {
+
+      console.group('getPatientTests()')
+
+      let patientResponse = await patientStore().getCompletePatientDetails(null, true, true, true)
+      patientResponse.message && this.errorAlertModal.show(patientResponse.message)
+
+      console.groupEnd()
     }
   },
   beforeUpdate: function () {

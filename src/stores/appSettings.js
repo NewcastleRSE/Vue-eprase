@@ -8,7 +8,8 @@ export const appSettingsStore = defineStore('appSettings', {
       appOpen: true,
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
-      passwordMaxLength: 50,      
+      passwordMaxLength: 50,
+      assessmentNumPatients: 15      
     }
   },
   actions: {

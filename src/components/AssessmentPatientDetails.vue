@@ -258,7 +258,7 @@ export default {
           const updateResponse = await dataService.updateAssessmentProgress()
           if (updateResponse.status < 400) {
             dataService.audit('Completed patient details', '/assessmentpatientdetails')
-            this.$router.push('/lockoutscreen')
+            this.$router.push('/assessmentscenarios')
           } else {
             this.errorAlertModal.show(updateResponse.message)
           }

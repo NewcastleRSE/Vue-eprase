@@ -10,7 +10,6 @@ import AssessmentSystem from "../components/AssessmentSystem"
 import AssessmentPatients from "../components/AssessmentPatients"
 import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
-import LockoutScreen from "../components/LockoutScreen"
 import ResultsHome from "../components/ResultsHome"
 import AssessmentResults from "../components/AssessmentResults"
 import AssessmentReports from "../components/AssessmentReports"
@@ -66,11 +65,7 @@ export const router = createRouter({
     {
       path: "/assessmentscenarios",
       component: AssessmentScenarios,
-    },
-    {
-      path: "/lockoutscreen/:patientscompleted?",
-      component: LockoutScreen,
-    },
+    },   
     {
       path: "/assessmentresults/:ID?",
       name: "assessmentresults",
