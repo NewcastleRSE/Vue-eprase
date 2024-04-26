@@ -17,7 +17,8 @@
         <ConfigError v-if="assessment.isConfigErrorTest"></ConfigError>
       </div>
     </div>
-    <AppLogo></AppLogo>
+    <ErrorAlertModal ref="errorAlertModal" />
+    <AppLogo cls="bottomright" />
   </main>
 
 </template>
@@ -28,7 +29,9 @@ import { settings } from '../settings'
 import ScenarioPrescription from "./ScenarioPrescription"
 import ConfigError from "./ConfigError"
 import TabHeader from "./TabHeader"
+import LoginInfo from './LoginInfo'
 import AppLogo from "./AppLogo"
+import ErrorAlertModal from './ErrorAlertModal'
 
 export default {
   name: "AssessmentScenarios",
@@ -36,7 +39,9 @@ export default {
     ScenarioPrescription,
     ConfigError,
     TabHeader,
-    AppLogo
+    LoginInfo,
+    AppLogo,
+    ErrorAlertModal
   },
   computed: {
     getCurrentTestIndex() {
@@ -57,9 +62,14 @@ export default {
 
       console.group('getPatientTests()')
 
-      let patientResponse = await patientStore().getCompletePatientDetails(null, true, true, true)
-      patientResponse.message && this.errorAlertModal.show(patientResponse.message)
-
+      const patientResponse = await patientStore().getCompletePatientDetails(true)
+      if (patientResponse.status < 400) {
+        // Splice in some config errors
+        //TODO HERE
+      } else {
+        this.errorAlertModal.show(patientResponse.message)
+      }
+      
       console.groupEnd()
     }
   },

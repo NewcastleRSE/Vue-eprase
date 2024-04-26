@@ -222,11 +222,17 @@ export default {
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
+    patientService() {
+      return patientStore()
+    },
+    patientIdsOutstanding() {
+      return this.patientService.patientIdsToDo
+    },
     myPatientList() {
-      return patientStore().patientList
+      return this.patientService.patientList.filter(p => this.patientIdsOutstanding.includes(p.id))
     },
     totalNumPatients() {
-      return patientStore().totalNumPatients
+      return this.patientService.totalNumPatients
     }
   },
   data() {
@@ -249,9 +255,8 @@ export default {
       console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
 
       const dataService = rootStore()
-      const patientService = patientStore()
 
-      const saveResponse = await patientService.savePatientData(qualitative_data, code, time_taken, completed)
+      const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken, completed)
       if (saveResponse.status < 400) {
         if (completed) {
           // All patient details now entered
@@ -275,8 +280,8 @@ export default {
     async getPatientsToDo() {
 
       console.group('getPatientsToDo()')
-
-      let patientResponse = await patientStore().getCompletePatientDetails(null, true)
+      
+      const patientResponse = await this.patientService.getCompletePatientDetails()
       patientResponse.message && this.errorAlertModal.show(patientResponse.message)
 
       console.groupEnd()
