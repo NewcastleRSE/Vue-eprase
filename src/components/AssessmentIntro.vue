@@ -132,7 +132,7 @@ export default {
         this.$router.push('/assessmentpatientdetails')
       }
       else if (this.assessmentStatus === 'Create Patients Complete') {
-        this.$router.push('/lockoutscreen?patientscompleted=true')
+        this.$router.push('/assessmentscenarios')
       }
       else {
         this.$router.push('/assessmentsystem')

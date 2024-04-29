@@ -19,7 +19,7 @@
         with appropriate self-generated information.</p>
       <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue.</p>
 
-      <div class="mx-auto card">
+      <div v-if="patient != null" class="mx-auto card">
 
         <div class="card-header">
           <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
@@ -29,7 +29,7 @@
               src="../assets/images/anon-female.png" />
             <img v-if="!patient.is_adult" src="../assets/images/child.png" />
           </span>
-          <p class="subtitle">(Patient {{ index + 1 }} of {{ totalNumPatients }})</p>
+          <p class="subtitle">(Patient {{ patientIndex + 1 }} of {{ totalNumPatients }})</p>
         </div>
 
         <div class="card-body p-4">
@@ -224,7 +224,8 @@ export default {
       return this.patientService.patientIdsToDo
     },
     myPatientList() {
-      return this.patientService.patientList.filter(p => this.patientIdsOutstanding.includes(p.id))
+      // Watch out here - patient id is a number, the outstanding list returns an array of string, so typing important here
+      return this.patientService.patientList.filter(p => this.patientIdsOutstanding.includes(p.id + ''))
     },
     totalNumPatients() {
       return this.patientService.totalNumPatients
@@ -265,7 +266,7 @@ export default {
           }
         } else {
           // On to the next one
-          this.patient = this.myPatientList[this.patientIndex++]
+          this.patient = this.myPatientList[++this.patientIndex]
         }
       } else {
         this.errorAlertModal.show(saveResponse.message)
