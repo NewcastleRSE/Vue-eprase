@@ -243,9 +243,7 @@
 
             <div>
               <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
-                <i class="bi bi-x pe-1"></i>Clear</button>
-              <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
-                <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
+                <i class="bi bi-x pe-1"></i>Clear</button>              
               <button type="button" class="next-btn btn btn-primary" :disabled="!formMeta.valid" id="next-button"
                 @click="onNextClick()">
                 <i class="bi bi-caret-right-fill pe-1"></i>Next</button>

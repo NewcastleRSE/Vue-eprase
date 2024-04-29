@@ -19,174 +19,169 @@
         with appropriate self-generated information.</p>
       <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue.</p>
 
-      <div v-for="(patient, index) in myPatientList" :key="patient.id">
+      <div class="mx-auto card">
 
-        <div class="mx-auto card" :class="index == patientIndex ? 'd-block' : 'd-none'">
+        <div class="card-header">
+          <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
+          <span class="patient-image">
+            <img v-if="patient.gender === 'male' && patient.is_adult === true" src="../assets/images/anon-male.png" />
+            <img v-if="patient.gender === 'female' && patient.is_adult === true"
+              src="../assets/images/anon-female.png" />
+            <img v-if="!patient.is_adult" src="../assets/images/child.png" />
+          </span>
+          <p class="subtitle">(Patient {{ index + 1 }} of {{ totalNumPatients }})</p>
+        </div>
 
-          <div class="card-header">
-            <h4>{{ patient.first_name }} {{ patient.surname }}</h4>
-            <span class="patient-image">
-              <img v-if="patient.gender === 'male' && patient.is_adult === true" src="../assets/images/anon-male.png" />
-              <img v-if="patient.gender === 'female' && patient.is_adult === true"
-                src="../assets/images/anon-female.png" />
-              <img v-if="!patient.is_adult" src="../assets/images/child.png" />
-            </span>
-            <p class="subtitle">(Patient {{ index + 1 }} of {{ totalNumPatients }})</p>
+        <div class="card-body p-4">
+
+          <div class="row mb-4">
+            <div class="patient-demographics col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th colspan="2" class="card-title bg-primary-subtle">
+                      <h5>Demographics</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Height (m)</th><td>{{ patient.height || 'unavailable' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Weight (kg)</th><td>{{ patient.weight || 'unavailable' }}</td>
+                  </tr>
+                </tbody>                  
+              </table>
+            </div>
+            <div class="patient-allergies col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th class="card-title bg-primary-subtle">
+                      <h5>Allergies</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="patient.allergy.length > 0" v-for="allergy in patient.allergy" :key="allergy">
+                    <td>{{ allergy.allergy }}</td>
+                  </tr>
+                  <tr v-if="patient.allergy.length == 0"><td>No Known Drug Allergies</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="patient-medication col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th colspan="5" class="card-title bg-primary-subtle">
+                      <h5>Current Medication</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="patient.medication_histories.length != 0">
+                    <th>Name</th>
+                    <th>Dose</th>
+                    <th>Route</th>
+                    <th>Form</th>
+                    <th>Frequency</th>                   
+                  </tr>
+                  <tr v-if="patient.medication_histories.length != 0" v-for="history in patient.medication_histories" :key="history">
+                    <td>{{ history.name }}</td>
+                    <td>{{ history.dose }} {{ history.units }}</td>
+                    <td>{{ history.route }}</td>
+                    <td>{{ history.form }}</td>
+                    <td>{{ history.frequency }}</td>
+                  </tr>
+                  <tr v-if="patient.medication_histories.length == 0"><td>None</td></tr>
+                </tbody>                  
+              </table>                
+            </div>
           </div>
 
-          <div class="card-body p-4">
-
-            <div class="row mb-4">
-              <div class="patient-demographics col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th colspan="2" class="card-title bg-primary-subtle">
-                        <h5>Demographics</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th>Height (m)</th><td>{{ patient.height || 'unavailable' }}</td>
-                    </tr>
-                    <tr>
-                      <th>Weight (kg)</th><td>{{ patient.weight || 'unavailable' }}</td>
-                    </tr>
-                  </tbody>                  
-                </table>
-              </div>
-              <div class="patient-allergies col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th class="card-title bg-primary-subtle">
-                        <h5>Allergies</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="patient.allergy.length > 0" v-for="allergy in patient.allergy" :key="allergy">
-                      <td>{{ allergy.allergy }}</td>
-                    </tr>
-                    <tr v-if="patient.allergy.length == 0"><td>No Known Drug Allergies</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="patient-medication col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th colspan="5" class="card-title bg-primary-subtle">
-                        <h5>Current Medication</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="patient.medication_histories.length != 0">
-                      <th>Name</th>
-                      <th>Dose</th>
-                      <th>Route</th>
-                      <th>Form</th>
-                      <th>Frequency</th>                   
-                    </tr>
-                    <tr v-if="patient.medication_histories.length != 0" v-for="history in patient.medication_histories" :key="history">
-                      <td>{{ history.name }}</td>
-                      <td>{{ history.dose }} {{ history.units }}</td>
-                      <td>{{ history.route }}</td>
-                      <td>{{ history.form }}</td>
-                      <td>{{ history.frequency }}</td>
-                    </tr>
-                    <tr v-if="patient.medication_histories.length == 0"><td>None</td></tr>
-                  </tbody>                  
-                </table>                
-              </div>
+          <div class="row mb-4">
+            <div class="patient-clinical-data col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th colspan="3" class="card-title bg-primary-subtle">
+                      <h5>Clinical Data</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="patient.clinical_data.length != 0">
+                    <th>Investigation</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                  </tr>
+                  <tr v-if="patient.clinical_data.length != 0" v-for="clinical in patient.clinical_data" :key="clinical">
+                    <td>{{ clinical.investigation }}</td>
+                    <td>{{ clinical.value }}</td>
+                    <td>{{ clinical.unit }}</td>
+                  </tr>
+                  <tr v-if="patient.clinical_data.length == 0"><td>None</td></tr>
+                </tbody>                  
+              </table>
             </div>
-
-            <div class="row mb-4">
-              <div class="patient-clinical-data col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th colspan="3" class="card-title bg-primary-subtle">
-                        <h5>Clinical Data</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="patient.clinical_data.length != 0">
-                      <th>Investigation</th>
-                      <th>Value</th>
-                      <th>Unit</th>
-                    </tr>
-                    <tr v-if="patient.clinical_data.length != 0" v-for="clinical in patient.clinical_data" :key="clinical">
-                      <td>{{ clinical.investigation }}</td>
-                      <td>{{ clinical.value }}</td>
-                      <td>{{ clinical.unit }}</td>
-                    </tr>
-                    <tr v-if="patient.clinical_data.length == 0"><td>None</td></tr>
-                  </tbody>                  
-                </table>
-              </div>
-              <div class="patient-diagnosis col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th class="card-title bg-primary-subtle">
-                        <h5>Presenting Complaint</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="patient.diagnosis.length != 0" v-for="diagnosis in patient.diagnosis" :key="diagnosis">
-                      <td>{{ diagnosis.diagnosis }}</td>
-                    </tr>
-                    <tr v-if="patient.diagnosis.length == 0"><td>None</td></tr>
-                  </tbody>                  
-                </table>
-              </div>
-              <div class="patient-comorbidities col-auto col-xl-4 pt-lg-0 pt-2">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th class="card-title bg-primary-subtle">
-                        <h5>Comorbidities</h5>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="patient.comorbidity.length != 0" v-for="comorbidity in patient.comorbidity" :key="comorbidity">
-                      <td>{{ comorbidity.comorbidity }}</td>
-                    </tr>
-                    <tr v-if="patient.comorbidity.length == 0"><td>None</td></tr>
-                  </tbody>
-                </table>                
-              </div>
+            <div class="patient-diagnosis col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th class="card-title bg-primary-subtle">
+                      <h5>Presenting Complaint</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="patient.diagnosis.length != 0" v-for="diagnosis in patient.diagnosis" :key="diagnosis">
+                    <td>{{ diagnosis.diagnosis }}</td>
+                  </tr>
+                  <tr v-if="patient.diagnosis.length == 0"><td>None</td></tr>
+                </tbody>                  
+              </table>
             </div>
-
-            <div class="row mb-4">
-              <div class="alert alert-warning fw-bold" role="alert">
-                To optimise the use of this tool please record ALL types of guidance that appears on your system screen
-              </div>
-              <textarea class="form-control" :id="'patient_intervention_' + index" rows="5"
-                placeholder="Please note any interventions from the system..."></textarea>
+            <div class="patient-comorbidities col-auto col-xl-4 pt-lg-0 pt-2">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th class="card-title bg-primary-subtle">
+                      <h5>Comorbidities</h5>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="patient.comorbidity.length != 0" v-for="comorbidity in patient.comorbidity" :key="comorbidity">
+                    <td>{{ comorbidity.comorbidity }}</td>
+                  </tr>
+                  <tr v-if="patient.comorbidity.length == 0"><td>None</td></tr>
+                </tbody>
+              </table>                
             </div>
-
-            <input type="hidden" :id="'patient_id_' + index" :value="patient.code" />
           </div>
 
+          <div class="row mb-4">
+            <div class="alert alert-warning fw-bold" role="alert">
+              To optimise the use of this tool please record ALL types of guidance that appears on your system screen
+            </div>
+            <textarea class="form-control" ref="patientIntervention" id="patient_intervention" rows="5"
+              placeholder="Please note any interventions from the system..."></textarea>
+          </div>
+
+          <input type="hidden" ref="patientId" id="patient_id" :value="patient.code" />
         </div>
 
       </div>
+
       <div class="my-2">
         <h5 v-if="patientIndex < myPatientList.length - 1">
           When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>.
         </h5>
         <h5 v-if="patientIndex == myPatientList.length - 1">
           Please ensure you click the <span class="fw-bold">Done</span> button to save your progress
-        </h5>
-        <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
-          <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
+        </h5>        
         <button type="button" class="btn btn-primary" @click="nextPatient()">{{ patientIndex < myPatientList.length - 1
       ? 'Next' : 'Done' }}</button>
       </div>
@@ -238,6 +233,7 @@ export default {
   data() {
     return {
       startTime: '',
+      patient: null,
       patientIndex: 0
     }
   },
@@ -246,12 +242,12 @@ export default {
 
       console.group('nextPatient()')
       console.debug('Attempt save of patient', this.patientIndex)
-      console.debug('qd', document.querySelector(`#patient_intervention_${this.patientIndex}`).value, 'code', document.querySelector(`#patient_id_${this.patientIndex}`).value)
+      console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
 
       const completed = this.patientIndex == this.myPatientList.length - 1
       const time_taken = dayjs().diff(this.startTime, 'seconds')
-      const qualitative_data = document.querySelector(`#patient_intervention_${this.patientIndex}`).value
-      const code = document.querySelector(`#patient_id_${this.patientIndex}`).value
+      const qualitative_data = this.$refs.patientIntervention.value
+      const code = this.$refs.patientId.value
       console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
 
       const dataService = rootStore()
@@ -269,7 +265,7 @@ export default {
           }
         } else {
           // On to the next one
-          this.patientIndex++
+          this.patient = this.myPatientList[this.patientIndex++]
         }
       } else {
         this.errorAlertModal.show(saveResponse.message)
@@ -282,13 +278,17 @@ export default {
       console.group('getPatientsToDo()')
       
       const patientResponse = await this.patientService.getCompletePatientDetails()
-      patientResponse.message && this.errorAlertModal.show(patientResponse.message)
+      if (patientResponse.status < 400) {
+        this.patient = this.myPatientList[0]
+      } else {
+        this.errorAlertModal.show(patientResponse.message)
+      }
 
       console.groupEnd()
     }
   },
   mounted() {
-    this.getPatientsToDo()
+    this.getPatientsToDo()    
   },
   created: function () {
     this.startTime = dayjs()

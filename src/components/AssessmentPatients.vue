@@ -52,8 +52,6 @@
               class="fw-bold">Done</span>.</p>
 
           <p><span class="fw-bold">Please ensure you click the Done button to save your progress</span></p>
-          <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exitModal">
-                <i class="bi bi-box-arrow-right pe-1"></i>Exit</button>
           <button type="button" class="btn btn-primary" @click="onNextClick()">Done</button>
         </div>
       </div>
@@ -117,7 +115,7 @@ export default {
       const patientService = patientStore()
       console.debug('Patient type', patientType)
 
-      let patientResponse = await patientService.getCompletePatientDetails(patientType)
+      let patientResponse = await patientService.getCompletePatientDetails(false, patientType)
       if (patientResponse.status < 400) {
         if (patientType != null) {
           // Coming from completing the system information screen - save the ids

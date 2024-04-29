@@ -62,6 +62,10 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('allprescriptions', 'GET')
       return response
     },
+    async getAllConfigErrors() {
+      const response = await rootStore().apiCall('configerrors', 'GET')
+      return response
+    },
     async getPatientDetails() {
       const response = await rootStore().apiCall('patientdetails', 'GET')
       return response
@@ -111,7 +115,7 @@ export const patientStore = defineStore('patients', {
     // Main entry point for getting patient and test data from the backend
     // Args:
     // prescriptions - true to fetch prescription data for each patient
-    async getCompletePatientDetails(prescriptions = false) {
+    async getCompletePatientDetails(prescriptions = false, patientType = null) {
       
       let ret = null
       this.patientList = []
@@ -140,7 +144,8 @@ export const patientStore = defineStore('patients', {
           if (idsResponse.data == 'No patient ids') {
             // No stored IDs so compile list from scratch (coming from completing system info)
             console.debug('Coming from completed system information')
-            this.patientList = this.compilePatientList(this.patientPool, patientType, appSettingsStore().assessmentNumPatients)
+            console.assert(patientType != null, 'patientType should not be null (Adults|Paediatrics|Both)')
+            this.patientList = this.compilePatientList(patientType, appSettingsStore().assessmentNumPatients)
             this.patientIdsToDo = this.patientList.map(p => p.id)            
           } else {
             // Use stored IDs
@@ -164,10 +169,19 @@ export const patientStore = defineStore('patients', {
             console.debug('Prescriptions', testResponse.data)
             this.testList.push(...testResponse.data)
           } else {
-            console.error('Problems retrieving', testResponse.message)
+            console.error('Problems retrieving prescription data', testResponse.message)
             ret = testResponse
-          }
+          }          
         })
+        // add in config errors (using all at the moment - may need to choose a random selection in future)
+        const confErrResponse = await this.getAllConfigErrors()
+        if (confErrResponse.status < 400) {
+          const configErrors = confErrResponse.data
+
+        } else {
+          console.error('Problems retrieving config errors', confErrResponse.message)
+          ret = confErrResponse
+        }
       }      
 
       if (ret == null) {

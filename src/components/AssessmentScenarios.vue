@@ -88,13 +88,7 @@ export default {
         this.assessment.isPrescriptionTest = true
         this.assessment.isConfigErrorTest = false
       }
-    }
-  },
-  mounted: function () {
-    history.pushState(null, null, location.href)
-    window.onpopstate = function () {
-      history.go(1)
-    }
+    }  
   }
 }
 </script>
