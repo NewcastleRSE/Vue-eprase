@@ -9,7 +9,7 @@
             <span class="patient-image">
               <img v-if="getCurrentPatientGender === 'male'" src="../assets/images/anon-male.png" />
               <img v-if="getCurrentPatientGender === 'female'" src="../assets/images/anon-female.png" />
-            </span>             
+            </span>
           </h5>
           <p class="card-text">Age: {{ prescription.patient.age }}</p>
 
@@ -20,7 +20,8 @@
     <h5 v-if="debugMode"> {{ prescription.id }} - Risk: {{ prescription.risk_level }}</h5>
 
     <div>
-      <p class="py-2">Prescribe the following medication to the specified patient using your normal prescribing practice, then
+      <p class="py-2">Prescribe the following medication to the specified patient using your normal prescribing
+        practice, then
         answer the questions below.</p>
 
       <p class="fw-bold">Patient: {{ getCurrentPatientName }}</p>
@@ -53,55 +54,124 @@
         </tr>
       </table>
     </div>
-    <!-- <div>
-      <div class="questionnaire">
-        <h4>Questions</h4>
-        <div class="question form-group" id="question-1">
-          <div class="outcomes">Which of the following best describes the response from the system when you attempted
-            to prescribe the specified drug?</div>
 
-          <div class="radio-buttons">
-            <div>
-              <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention"
-                v-model="response.outcomes" v-validate="'required'">
-              <label for="no-intervention">You were able to complete the prescription (includes followed order
-                sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button
-                v-b-tooltip.hover.right
-                title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system. "
-                variant="primary" class="category-tip">i</b-button>
+    <div>
+      <h4>Questions</h4>
+      <Form ref="scenarioPrescriptionForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
-            </div>
-            <div>
-              <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden"
-                v-model="response.outcomes">
-              <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to
-                    override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right
-                title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it"
-                variant="primary" class="category-tip">i</b-button>
-            </div>
-            <div>
-              <input type="radio" name="outcome-radios" value="intervention" id="intervention"
-                v-model="response.outcomes">
-              <label for="intervention">You were able to complete the prescription, <strong><em>with system/user
-                    intervention</em></strong></label><b-button v-b-tooltip.hover.right
-                title="Tip:  You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option. "
-                variant="primary" class="category-tip">i</b-button>
-            </div>
-            <div>
-              <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented"
-                v-model="response.outcomes">
-              <label for="order-prevented">Prevented from prescribing</label>
-            </div>
-            <div>
-              <input type="radio" name="outcome-radios" value="not-available" id="not-available"
-                v-model="response.outcomes">
-              <label for="not-available">Medicine or formulary alternative not available in the system</label>
-            </div>
+        <div ref="question1">
+          <h5>Which of the following best describes the response from the system when you attempted
+            to prescribe the specified drug? <span class="required-field">*</span></h5>
+
+          <div class="form-check">
+            <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios" id="no-intervention" value="no-intervention">
+              <input v-bind="field" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
+            </Field>
+            <label class="form-check-label" for="no-intervention">
+              You were able to complete the prescription (includes followed order sentence)
+              <span class="fw-bold">without any additional user or system input</span>
+              <button 
+                type="button" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="right"
+                data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
+                <i class="bi bi-info-circle-fill"></i>
+              </button>
+            </label>
           </div>
 
-        </div> -->
+          <div class="form-check">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios" id="order-set-overridden" value="order-set-overridden">
+              <input v-bind="field" type="radio" name="outcome-radios" value="order-set-overridden" class="form-check-input">
+            </Field>
+            <label class="form-check-label" for="order-set-overridden">
+              You were able to complete the prescription, <span class="fw-bold">but had to override components of the order sentence</span>
+              <button 
+                type="button" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="right"
+                data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
+                <i class="bi bi-info-circle-fill"></i>
+              </button>
+            </label>
+          </div>
 
-        <!-- <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
+          <div class="form-check">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios" id="intervention" value="intervention">
+              <input v-bind="field" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
+            </Field>
+            <label class="form-check-label" for="intervention">
+              You were able to complete the prescription, <span class="fw-bold">>with system/user intervention</span>
+              <button 
+                type="button" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="right"
+                data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
+                <i class="bi bi-info-circle-fill"></i>
+              </button>
+            </label>
+          </div>
+          <div class="form-check">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+              id="lab-results-yes" value="true">
+              <input v-bind="field" type="radio" name="outcome-radios" value="true" class="form-check-input">
+            </Field>
+            <label class="form-check-label" for="lab-results-yes">Yes</label>
+          </div>
+        </div>
+
+      </Form>
+
+
+
+
+
+      <div class="question form-group" id="question-1">
+        <div class="outcomes">Which of the following best describes the response from the system when you attempted
+          to prescribe the specified drug?</div>
+
+        <div class="radio-buttons">
+          <div>
+            <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention"
+              v-model="response.outcomes" v-validate="'required'">
+            <label for="no-intervention">You were able to complete the prescription (includes followed order
+              sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button
+              v-b-tooltip.hover.right
+              title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system. "
+              variant="primary" class="category-tip">i</b-button>
+
+          </div>
+          <div>
+            <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden"
+              v-model="response.outcomes">
+            <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to
+                  override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right
+              title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it"
+              variant="primary" class="category-tip">i</b-button>
+          </div>
+          <div>
+            <input type="radio" name="outcome-radios" value="intervention" id="intervention"
+              v-model="response.outcomes">
+            <label for="intervention">You were able to complete the prescription, <strong><em>with system/user
+                  intervention</em></strong></label><b-button v-b-tooltip.hover.right
+              title="Tip:  You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option. "
+              variant="primary" class="category-tip">i</b-button>
+          </div>
+          <div>
+            <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented"
+              v-model="response.outcomes">
+            <label for="order-prevented">Prevented from prescribing</label>
+          </div>
+          <div>
+            <input type="radio" name="outcome-radios" value="not-available" id="not-available"
+              v-model="response.outcomes">
+            <label for="not-available">Medicine or formulary alternative not available in the system</label>
+          </div>
+        </div>
+
+      </div> -->
+
+      <!-- <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
           <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate
             what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert
             (interruptive type, maybe a pop-up that requires action) OR advisory (passive dialogue, maybe a banner
@@ -235,19 +305,19 @@
           </div> -->
 
 
-          <!-- <textarea type="text" class="form-control" name="input" id="patient-intervention"
+      <!-- <textarea type="text" class="form-control" name="input" id="patient-intervention"
             v-model="response.qualitative_data" placeholder="Please tell us about the system response..."
             maxlength="500"></textarea>
         </div>
 
         <div id="discontinue">Please discontinue the prescription order before proceeding to the next scenario.</div> -->
 
-        <!-- TODO look for a solution to the direct assignment -->
-        <!-- <input type="hidden" id="test_id" v-model="prescription.id" />
+      <!-- TODO look for a solution to the direct assignment -->
+      <!-- <input type="hidden" id="test_id" v-model="prescription.id" />
         <input type="hidden" id="risk_level" v-model="prescription.risk_level" />
 
-      </div>
-    </div> -->
+      </div>-->
+    </div>
   </div> <!-- end box -->
 </template>
 
@@ -255,11 +325,17 @@
 
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
+import { Form, Field, ErrorMessage } from 'vee-validate'
 
 export default {
   name: "ScenarioPrescription",
   props: {
     prescription: {}
+  },
+  components: {
+    Form,
+    Field,
+    ErrorMessage
   },
   computed: {
     ...mapState(appSettingsStore, ['debugMode']),
@@ -274,7 +350,7 @@ export default {
     },
   },
   data() {
-    return {      
+    return {
       response: {
         outcomes: '',
         other: '',
@@ -292,6 +368,8 @@ export default {
       nextEnabled: true,
       doneEnabled: false,
       startTime: '',
+      validationSchema: {//TODO
+      }
       //numTests: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
     }
   },
@@ -411,36 +489,36 @@ export default {
     //   dataService.audit('Completed scenarios', '/assessmentscenarios')
     //   this.$router.push('/assessmentresults?ID=' + id)
     // },
-  //   clearCheckBoxes() {
-  //     for (let index in this.checkBoxList) {
-  //       if (this.checkBoxList.hasOwnProperty(index)) {
-  //         if (this.checkBoxList[index].selected === true) {
-  //           this.checkBoxList[index].selected = false
-  //         }
-  //       }
-  //     }
-  //   },
-  //   resetDataFields() {
-  //     this.response.outcomes = ''
-  //     this.response.other = ''
-  //     this.response.risk_level = ''
-  //     this.response.intervention_type = []
-  //     this.response.selected_type = ''
-  //     this.response.qualitative_data = ''
-  //     this.test_id = ''
-  //     //  this.result_score = null;
-  //   }
-  // },
-  // created: function () {
-  //   this.startTime = new Date()
-  // },
-  // beforeUpdate: function () {
-  //   let index = this.$store.state.testIndex
-  //   if (index === (this.numTests - 1) || index > (this.numTests - 1)) {
-  //     this.nextEnabled = false
-  //     this.doneEnabled = true
-  //   }
-  // }
+    //   clearCheckBoxes() {
+    //     for (let index in this.checkBoxList) {
+    //       if (this.checkBoxList.hasOwnProperty(index)) {
+    //         if (this.checkBoxList[index].selected === true) {
+    //           this.checkBoxList[index].selected = false
+    //         }
+    //       }
+    //     }
+    //   },
+    //   resetDataFields() {
+    //     this.response.outcomes = ''
+    //     this.response.other = ''
+    //     this.response.risk_level = ''
+    //     this.response.intervention_type = []
+    //     this.response.selected_type = ''
+    //     this.response.qualitative_data = ''
+    //     this.test_id = ''
+    //     //  this.result_score = null;
+    //   }
+    // },
+    // created: function () {
+    //   this.startTime = new Date()
+    // },
+    // beforeUpdate: function () {
+    //   let index = this.$store.state.testIndex
+    //   if (index === (this.numTests - 1) || index > (this.numTests - 1)) {
+    //     this.nextEnabled = false
+    //     this.doneEnabled = true
+    //   }
+    // }
   }
 }
 </script>
