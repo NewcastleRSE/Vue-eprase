@@ -60,10 +60,10 @@
       <Form ref="scenarioPrescriptionForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
         <div ref="question1">
-          <h5>Which of the following best describes the response from the system when you attempted
+          <h5 class="my-4">Which of the following best describes the response from the system when you attempted
             to prescribe the specified drug? <span class="required-field">*</span></h5>
 
-          <div class="form-check">
+          <div class="form-check mb-2">
             <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios"
               id="no-intervention" value="no-intervention">
               <input v-bind="field" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
@@ -71,15 +71,15 @@
             <label class="form-check-label" for="no-intervention">
               You were able to complete the prescription (includes followed order sentence)
               <span class="fw-bold">without any additional user or system input</span>
-              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
                 data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
-                <i class="bi bi-info-circle-fill"></i>
-              </button>
+                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+            </a>
             </label>
           </div>
 
-          <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+          <div class="form-check mb-2">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
               id="order-set-overridden" value="order-set-overridden">
               <input v-bind="field" type="radio" name="outcome-radios" value="order-set-overridden"
                 class="form-check-input">
@@ -87,29 +87,29 @@
             <label class="form-check-label" for="order-set-overridden">
               You were able to complete the prescription, <span class="fw-bold">but had to override components of the
                 order sentence</span>
-              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
                 data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
-                <i class="bi bi-info-circle-fill"></i>
-              </button>
+                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+              </a>
             </label>
           </div>
 
-          <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+          <div class="form-check mb-2">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
               id="intervention" value="intervention">
               <input v-bind="field" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
             </Field>
             <label class="form-check-label" for="intervention">
-              You were able to complete the prescription, <span class="fw-bold">>with system/user intervention</span>
-              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
+              You were able to complete the prescription, <span class="fw-bold">with system/user intervention</span>
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
                 data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
-                <i class="bi bi-info-circle-fill"></i>
-              </button>
+                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+            </a>
             </label>
           </div>
 
-          <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+          <div class="form-check mb-2">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
               id="order-prevented" value="order-prevented">
               <input v-bind="field" type="radio" name="outcome-radios" value="order-prevented" class="form-check-input">
             </Field>
@@ -118,8 +118,8 @@
             </label>
           </div>
 
-          <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+          <div class="form-check mb-2">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
               id="not-available" value="not-available">
               <input v-bind="field" type="radio" name="outcome-radios" value="not-available" class="form-check-input">
             </Field>
@@ -158,13 +158,13 @@
           </table>
         </div>
 
-        <div class="mb-2">
-          <label class="form-label" for="intervention-select">Please indicate whether intervention was an alert or
-            advisory:</label>
+        <div class="mt-4 mb-2">
+          <label class="form-label" for="intervention-select"><h5>Please indicate whether intervention was an alert or
+            advisory:</h5></label>
           <div>
             <Field v-slot="{ Field }" v-model="response.selected_type" name="intervention-select"
               id="intervention-select">
-              <select v-bind="field" class="form-select">
+              <select v-bind="field" class="form-select w-25">
                 <option value="" disabled>Select Type...</option>
                 <option value="alert">Alert</option>
                 <option value="advisory">Advisory</option>
@@ -172,10 +172,11 @@
               </select>
             </Field>
           </div>
-          <p><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require
-            action.</p>
-          <p><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires
-            action (pop-up boxes or requiring password entry).</p>
+          <div class="bg-info-subtle rounded p-2 mt-3">
+            <p><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require action.</p>
+            <p><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</p>
+          </div>
+          
         </div>
 
         <div class="mb-2">
@@ -191,16 +192,13 @@
           </div>
         </div>
 
-      </Form>
+        <h5 class="mb-2">Please discontinue the prescription order before proceeding to the next scenario.</h5>
 
-
-        <div id="discontinue">Please discontinue the prescription order before proceeding to the next scenario.</div> -->
-
-      <!-- TODO look for a solution to the direct assignment -->
-      <!-- <input type="hidden" id="test_id" v-model="prescription.id" />
+        <input type="hidden" id="test_id" v-model="prescription.id" />
         <input type="hidden" id="risk_level" v-model="prescription.risk_level" />
 
-      </div>-->
+      </Form>
+
     </div>
   </div> <!-- end box -->
 </template>
