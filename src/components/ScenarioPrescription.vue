@@ -64,16 +64,14 @@
             to prescribe the specified drug? <span class="required-field">*</span></h5>
 
           <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios" id="no-intervention" value="no-intervention">
+            <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios"
+              id="no-intervention" value="no-intervention">
               <input v-bind="field" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
             </Field>
             <label class="form-check-label" for="no-intervention">
               You were able to complete the prescription (includes followed order sentence)
               <span class="fw-bold">without any additional user or system input</span>
-              <button 
-                type="button" 
-                data-bs-toggle="tooltip" 
-                data-bs-placement="right"
+              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
                 data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
                 <i class="bi bi-info-circle-fill"></i>
               </button>
@@ -81,15 +79,15 @@
           </div>
 
           <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios" id="order-set-overridden" value="order-set-overridden">
-              <input v-bind="field" type="radio" name="outcome-radios" value="order-set-overridden" class="form-check-input">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+              id="order-set-overridden" value="order-set-overridden">
+              <input v-bind="field" type="radio" name="outcome-radios" value="order-set-overridden"
+                class="form-check-input">
             </Field>
             <label class="form-check-label" for="order-set-overridden">
-              You were able to complete the prescription, <span class="fw-bold">but had to override components of the order sentence</span>
-              <button 
-                type="button" 
-                data-bs-toggle="tooltip" 
-                data-bs-placement="right"
+              You were able to complete the prescription, <span class="fw-bold">but had to override components of the
+                order sentence</span>
+              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
                 data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
                 <i class="bi bi-info-circle-fill"></i>
               </button>
@@ -97,218 +95,104 @@
           </div>
 
           <div class="form-check">
-            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios" id="intervention" value="intervention">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+              id="intervention" value="intervention">
               <input v-bind="field" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
             </Field>
             <label class="form-check-label" for="intervention">
               You were able to complete the prescription, <span class="fw-bold">>with system/user intervention</span>
-              <button 
-                type="button" 
-                data-bs-toggle="tooltip" 
-                data-bs-placement="right"
+              <button type="button" data-bs-toggle="tooltip" data-bs-placement="right"
                 data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
                 <i class="bi bi-info-circle-fill"></i>
               </button>
             </label>
           </div>
+
           <div class="form-check">
             <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
-              id="lab-results-yes" value="true">
-              <input v-bind="field" type="radio" name="outcome-radios" value="true" class="form-check-input">
+              id="order-prevented" value="order-prevented">
+              <input v-bind="field" type="radio" name="outcome-radios" value="order-prevented" class="form-check-input">
             </Field>
-            <label class="form-check-label" for="lab-results-yes">Yes</label>
+            <label class="form-check-label" for="order-prevented">
+              Prevented from prescribing
+            </label>
+          </div>
+
+          <div class="form-check">
+            <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="outcome-radios"
+              id="not-available" value="not-available">
+              <input v-bind="field" type="radio" name="outcome-radios" value="not-available" class="form-check-input">
+            </Field>
+            <label class="form-check-label" for="not-available">
+              Medicine or formulary alternative not available in the system
+            </label>
+          </div>
+
+        </div>
+        <div ref="question2" v-if="response.outcomes === 'intervention'">
+          <h5 class="bg-warning">If the system were to respond to the challenge, please indicate
+            what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert
+            (interruptive type, maybe a pop-up that requires action) OR advisory (passive dialogue, maybe a banner
+            message on the bottom of the screen) you would expect.</h5>
+          <p>You have received advice or information concerning (check all that apply):</p>
+          <table class="table tabe-striped">
+            <tbody>
+              <tr v-for="intType in interventionTypeOptions">
+                <td>
+                  <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
+                    name="intervention_type" :value="intType.id">
+                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention_type"
+                      :value="intType.id">
+                  </Field>
+                </td>
+                <td>
+                  <label class="category-label" for="intType.id">{{ intType.label }}</label>
+                </td>
+                <td>
+                  <button type="button" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
+                    <i class="bi bi-info-circle-fill"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label" for="intervention-select">Please indicate whether intervention was an alert or
+            advisory:</label>
+          <div>
+            <Field v-slot="{ Field }" v-model="response.selected_type" name="intervention-select"
+              id="intervention-select">
+              <select v-bind="field" class="form-select">
+                <option value="" disabled>Select Type...</option>
+                <option value="alert">Alert</option>
+                <option value="advisory">Advisory</option>
+                <option value="alert">Both</option>
+              </select>
+            </Field>
+          </div>
+          <p><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require
+            action.</p>
+          <p><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires
+            action (pop-up boxes or requiring password entry).</p>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label" for="patient-intervention">Please indicate whether intervention was an alert or
+            advisory:</label>
+          <div>
+            <Field v-slot="{ Field }" v-model="response.qualitative_data" name="patient-intervention"
+              id="patient-intervention">
+              <textarea v-bind="field" class="form-control" placeholder="Please tell us about the system response..."
+                maxlength="500" rows="5">
+              </textarea>
+            </Field>
           </div>
         </div>
 
       </Form>
 
-
-
-
-
-      <div class="question form-group" id="question-1">
-        <div class="outcomes">Which of the following best describes the response from the system when you attempted
-          to prescribe the specified drug?</div>
-
-        <div class="radio-buttons">
-          <div>
-            <input type="radio" name="outcome-radios" value="no-intervention" id="no-intervention"
-              v-model="response.outcomes" v-validate="'required'">
-            <label for="no-intervention">You were able to complete the prescription (includes followed order
-              sentence) <strong><em>without any additional user or system input</em></strong>. </label> <b-button
-              v-b-tooltip.hover.right
-              title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system. "
-              variant="primary" class="category-tip">i</b-button>
-
-          </div>
-          <div>
-            <input type="radio" name="outcome-radios" value="order-set-overridden" id="order-set-overridden"
-              v-model="response.outcomes">
-            <label for="order-set-overridden">You were able to complete the prescription, <strong><em>but had to
-                  override components of the order sentence</em></strong>.</label> <b-button v-b-tooltip.hover.right
-              title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it"
-              variant="primary" class="category-tip">i</b-button>
-          </div>
-          <div>
-            <input type="radio" name="outcome-radios" value="intervention" id="intervention"
-              v-model="response.outcomes">
-            <label for="intervention">You were able to complete the prescription, <strong><em>with system/user
-                  intervention</em></strong></label><b-button v-b-tooltip.hover.right
-              title="Tip:  You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option. "
-              variant="primary" class="category-tip">i</b-button>
-          </div>
-          <div>
-            <input type="radio" name="outcome-radios" value="order-prevented" id="order-prevented"
-              v-model="response.outcomes">
-            <label for="order-prevented">Prevented from prescribing</label>
-          </div>
-          <div>
-            <input type="radio" name="outcome-radios" value="not-available" id="not-available"
-              v-model="response.outcomes">
-            <label for="not-available">Medicine or formulary alternative not available in the system</label>
-          </div>
-        </div>
-
-      </div> -->
-
-      <!-- <div v-show="response.outcomes === 'intervention'" class="question" id="question-2">
-          <div class="alert alert-warning" role="alert">If the system was to respond to the challenge, please indicate
-            what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert
-            (interruptive type, maybe a pop-up that requires action) OR advisory (passive dialogue, maybe a banner
-            message on the bottom of the screen) you would expect.</div>
-
-          <p>You have received advice or information concerning (check all that apply).</p>
-
-          <table id="drug-table" class="table-striped">
-            <tbody>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-age" id="drug-age"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-age">Drug and patient age</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Drug contraindication (or dose adjustment) based on patient age" variant="primary"
-                    class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-dose" id="drug-dose"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-dose">Drug dose level</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-formulary" id="drug-formulary"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-formulary">Drug formulary</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Drug is not recommended for prescribing according to local guidance" variant="primary"
-                    class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-interaction" id="drug-interaction"
-                    v-model="response.intervention_type"></td>
-                <td> <label class="category-label" for="drug-interaction">Drug interaction</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-allergies" id="drug-allergies"
-                    v-model="response.intervention_type"></td>
-                <td> <label class="category-label" for="drug-allergies">Drug allergies</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Allergy or intolerance to prescribed drug (or another drug in the same category) documented"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-duplication" id="drug-duplication"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-duplication">Drug duplication</label> <b-button
-                    v-b-tooltip.hover.right title="Tip: Specified drug prescribed more than once for the same patient"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-disease" id="drug-disease"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-disease">Drug disease</label><b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-ommissions" id="drug-ommissions"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-ommissions">Drug omissions</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="therapeutic_duplication"
-                    id="therapeutic_duplication" v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="therapeutic_duplication">Therapeutic duplication </label>
-                  <b-button v-b-tooltip.hover.right
-                    title="Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-lab" id="drug-lab"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-lab">Lab results/monitoring/TDM</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-brand" id="drug-brand"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-route">Drug brand</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Drug that must be prescribed by BRAND rather than using generic name"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="drug-route" id="drug-route"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="drug-route">Incorrect route</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Specified route is contraindicated for drug and/ or  dose prescribed"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="custom-checkbox" value="missing-field" id="missing-field"
-                    v-model="response.intervention_type"></td>
-                <td><label class="category-label" for="missing-field">Missing field alert</label> <b-button
-                    v-b-tooltip.hover.right
-                    title="Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)"
-                    variant="primary" class="category-tip">i</b-button></td>
-              </tr>
-
-            </tbody>
-          </table>
-
-          <div id="selected-type">
-            <label id="select-label" for="intervention-select"><strong>Please indicate whether intervention was an
-                alert or advisory:</strong> </label>
-
-            <select id="intervention-select" class="form-control" v-model="response.selected_type">
-              <option value="alert">Alert</option>
-              <option value="advisory">Advisory</option>
-              <option value="alert">Both</option>
-            </select>
-
-            <p><em><strong>Advisory:</strong> Information is provided which does not interrupt workflow or require
-                action.</em></p>
-            <p><em><strong>Alert:</strong> Information is provided which interrupts work flow and/or requires action
-                (pop-up boxes or requiring password entry).</em></p>
-          </div> -->
-
-
-      <!-- <textarea type="text" class="form-control" name="input" id="patient-intervention"
-            v-model="response.qualitative_data" placeholder="Please tell us about the system response..."
-            maxlength="500"></textarea>
-        </div>
 
         <div id="discontinue">Please discontinue the prescription order before proceeding to the next scenario.</div> -->
 
@@ -361,6 +245,21 @@ export default {
         qualitative_data: '',
         intervention_type: []
       },
+      interventionTypeOptions: [
+        { id: 'drug-age', label: 'Drug and patient age', tip: 'Tip: Drug contraindication (or dose adjustment) based on patient age' },
+        { id: 'drug-dose', label: 'Drug dose level', tip: 'Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)' },
+        { id: 'drug-formulary', label: 'Drug formulary', tip: 'Tip: Drug is not recommended for prescribing according to local guidance' },
+        { id: 'drug-interaction', label: 'Drug interaction', tip: 'Tip: Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm' },
+        { id: 'drug-allergies', label: 'Drug allergies', tip: 'Tip: Allergy or intolerance to prescribed drug (or another drug in the same category) documented' },
+        { id: 'drug-duplication', label: 'Drug duplication', tip: 'Tip: Specified drug prescribed more than once for the same patient' },
+        { id: 'drug-disease', label: 'Drug disease', tip: 'Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities' },
+        { id: 'drug-ommissions', label: 'Drug omissions', tip: 'Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication' },
+        { id: 'therapeutic-duplication', label: 'therapeutic-duplication', tip: 'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims' },
+        { id: 'drug-lab', label: 'Lab results/monitoring/TDM', tip: 'Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)' },
+        { id: 'drug-brand', label: 'Drug brand', tip: 'Tip: Drug that must be prescribed by BRAND rather than using generic name' },
+        { id: 'drug-route', label: 'Incorrect route', tip: 'Tip: Specified route is contraindicated for drug and/or dose prescribed' },
+        { id: 'missing-field', label: 'Missing field alert', tip: 'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)' }
+      ],
       result: null,
       result_score: '',
       showInterventions: false,
