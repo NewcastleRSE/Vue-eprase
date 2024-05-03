@@ -112,6 +112,11 @@ export const patientStore = defineStore('patients', {
       }
       return(response)
     },
+    async saveConfigError(config_err_id, result, time_taken) {
+      const assessmentId = rootStore().assessmentId
+      const response = await rootStore().apiCall('config?ID=' + assessmentId, 'POST', { config_err_id, result, time_taken })
+      return response
+    },
     // Main entry point for getting patient and test data from the backend
     // Args:
     // prescriptions - true to fetch prescription data for each patient

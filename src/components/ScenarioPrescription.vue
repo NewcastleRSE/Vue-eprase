@@ -5,26 +5,23 @@
     <div class="patient-details">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title"> {{ getCurrentPatient }}
+          <h5 class="card-title">Patient: {{ getCurrentPatientName }}
             <span class="patient-image">
               <img v-if="getCurrentPatientGender === 'male'" src="../assets/images/anon-male.png" />
               <img v-if="getCurrentPatientGender === 'female'" src="../assets/images/anon-female.png" />
             </span>
           </h5>
-          <p class="card-text">Age: {{ prescription.patient.age }}</p>
+          <p class="card-text">Age: {{ testPayload.patient.age }}</p>
 
         </div>
       </div>
     </div>
 
-    <h5 v-if="debugMode"> {{ prescription.id }} - Risk: {{ prescription.risk_level }}</h5>
+    <h5 v-if="debugMode"> {{ testPayload.id }} - Risk: {{ testPayload.risk_level }}</h5>
 
     <div>
       <p class="py-2">Prescribe the following medication to the specified patient using your normal prescribing
-        practice, then
-        answer the questions below.</p>
-
-      <p class="fw-bold">Patient: {{ getCurrentPatientName }}</p>
+        practice, then answer the questions below.</p>
 
       <table class="table table-striped">
         <thead>
@@ -38,19 +35,19 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ prescription.drug_name }}</td>
-            <td>{{ prescription.drug_dose }}</td>
-            <td>{{ prescription.route }}</td>
-            <td>{{ prescription.drug_frequency }}</td>
-            <td>{{ prescription.duration }}</td>
+            <td>{{ testPayload.drug_name }}</td>
+            <td>{{ testPayload.drug_dose }}</td>
+            <td>{{ testPayload.route }}</td>
+            <td>{{ testPayload.drug_frequency }}</td>
+            <td>{{ testPayload.duration }}</td>
           </tr>
         </tbody>
       </table>
 
-      <table class="table table-striped" v-if="prescription.justification">
+      <table class="table table-striped" v-if="testPayload.justification">
         <tr>
           <th>Indication</th>
-          <td>{{ prescription.justification }}</td>
+          <td>{{ testPayload.justification }}</td>
         </tr>
       </table>
     </div>
@@ -199,17 +196,30 @@
 
         <h5 class="mb-2">Please discontinue the prescription order before proceeding to the next scenario.</h5>
 
-        <input type="hidden" id="test_id" v-model="prescription.id" />
-        <input type="hidden" id="risk_level" v-model="prescription.risk_level" />
+        <input type="hidden" id="test_id" v-model="testPayload.id" />
+        <input type="hidden" id="risk_level" v-model="testPayload.risk_level" />
+
+        <div class="my-2">          
+          <button type="reset" class="btn btn-primary me-3" @click="onResetClick()">
+            <i class="bi bi-x pe-1"></i>Clear
+          </button>
+          <button type="button" class="btn btn-primary" @click="onNextClick()" :disabled="!formMeta.valid">
+            <i :class="isLast ? 'bi bi-check2-circle' : 'bi bi-arrow-right-circle'"></i>
+              {{ isLast ? 'Done' : 'Next' }}
+          </button>           
+        </div>
 
       </Form>
 
     </div>
+    
   </div>
+
 </template>
 
 <script>
 
+import dayjs from 'dayjs'
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { patientStore } from '../stores/patients'
@@ -218,7 +228,8 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 export default {
   name: "ScenarioPrescription",
   props: {
-    prescription: {}
+    testPayload: {},
+    isLast: false
   },
   components: {
     Form,
@@ -226,23 +237,24 @@ export default {
     ErrorMessage
   },
   computed: {
-    ...mapState(appSettingsStore, ['debugMode'], patientStore, ['savePrescriptionData']),
+    ...mapState(appSettingsStore, ['debugMode']),
+    ...mapState(patientStore, ['savePrescriptionData']),
     getCurrentPatientName() {
-      return this.prescription['patient'].first_name + ' ' + this.prescription['patient'].surname
+      return this.testPayload['patient'].first_name + ' ' + this.testPayload['patient'].surname
     },
     getCurrentPatientGender() {
-      return this.prescription['patient'].gender
+      return this.testPayload['patient'].gender
     },
     getCurrentPatientDOB() {
-      return this.prescription['patient'].dob
+      return this.testPayload['patient'].dob
     },
+    
   },
   data() {
     return {
       response: {
         outcomes: '',
         other: '',
-        time_taken: '',
         prescription: '',
         risk_level: '',
         selected_type: '',
@@ -272,164 +284,84 @@ export default {
           return value ? true : 'Please select one of the outcomes'
         },
         'intervention-type': (value) => {
-          return this.outcomes == 'intervention' ? ((Array.isArray(value) && value.length > 0) ? true : 'Please select an intervention type') : true
+          return this.response.outcomes == 'intervention' ? ((Array.isArray(value) && value.length > 0) ? true : 'Please select an intervention type') : true
         },
         'intervention-select': (value) => {
-          return this.outcomes == 'intervention' ? (value ? true : 'Please select one') : true
+          return this.response.outcomes == 'intervention' ? (value ? true : 'Please select one') : true
         },
         'patient-intervention': (value) => {
-          return this.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
+          return this.response.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
         }
       }
     }
   },
-  methods: {
+  methods: {   
     getResult(risk_level, outcome) {
-
-      let result = ''
-
-      // get outcome and result_score
-      // if no drug is available, don't bother with the risk level, as all results are null
-      if (outcome === 'not-available') {
-        result = 'Null'
-      }
-      else if (risk_level === 'Extreme') {
-
-        if (outcome === 'no-intervention') {
-          result = 'No Mitigation/Fail'
-        }
-        else if (outcome === 'order-prevented') {
-          result = 'Good Mitigation/Pass'
-        }
-        else if (outcome === 'order-set-overridden' || outcome === 'intervention') {
-          result = 'Some Mitigation'
-        }
-      }
-      else if (risk_level === 'High') {
-
-        if (outcome === 'no-intervention') {
-          result = 'No Mitigation/Fail'
-        }
-        else if (outcome === 'order-prevented') {
-          result = 'Over Mitigation'
-        }
-        else if (outcome === 'order-set-overridden' || outcome === 'intervention') {
-          result = 'Good Mitigation/Pass'
+      const resultMatrix = {
+        'Extreme': {
+          'no-intervention': 'No Mitigation/Fail',
+          'order-prevented': 'Good Mitigation/Pass',
+          'order-set-overridden': 'Some Mitigation',
+          'intervention': 'Some Mitigation'
+        },
+        'High': {
+          'no-intervention': 'No Mitigation/Fail',
+          'order-prevented': 'Over Mitigation',
+          'order-set-overridden': 'Good Mitigation/Pass',
+          'intervention': 'Good Mitigation/Pass'
+        },
+        'Low': {
+          'no-intervention': 'Good Mitigation/Pass',
+          'order-prevented': 'Over Mitigation',
+          'order-set-overridden': 'Over Mitigation',
+          'intervention': 'Over Mitigation'
         }
       }
-      else if (risk_level === 'Low') {
-
-        if (outcome === 'no-intervention') {
-          result = 'Good Mitigation/Pass'
-        }
-        else if (outcome === 'order-prevented') {
-          result = 'Over Mitigation'
-        }
-        else if (outcome === 'order-set-overridden' || outcome === 'intervention') {
-          result = 'Over Mitigation'
-        }
-      }
-
-      return result
+      return resultMatrix[risk_level] ? (resultMatrix[risk_level][outcome] || 'Null') : 'Null'
     },
     getResultScore(result) {
-
-      let result_score = 0
-
-      if (result === 'Over Mitigation') {
-        result_score = 15
+      const scoreMatrix = {
+        'Over Mitigation': 15,
+        'Good Mitigation/Pass': 10,
+        'Some Mitigation': 5,
+        'No Mitigation/Fail': 1
       }
-      if (result === 'Good Mitigation/Pass') {
-        result_score = 10
-      }
-      else if (result === 'Some Mitigation') {
-        result_score = 5
-      }
-      else if (result === 'No Mitigation/Fail') {
-        result_score = 1
-      }
-      return result_score
+      return scoreMatrix[result] || 0
     }, 
-    resetForm() {
+    onResetClick() {
       this.$refs.scenarioPrescriptionForm.reset()
-    }, 
-    validateForm() {
-      this.$refs.scenarioPrescriptionForm.validate()
-    },  
-    saveData() {
-      this.submitted = true
-      this.$validator.validate().then(valid => {
+    },   
+    async onNextClick() {
+     
+      console.group('ScenarioPrescription:onNextClick()')
+
+      this.$refs.scenarioPrescriptionForm.validate().then(async (valid) => {
         if (valid) {
-
-          let endTime = new Date()
-          let elapsedTime = endTime.getTime() - this.startTime.getTime()
-          this.response.time_taken = elapsedTime / 1000
-
+          const completed = this.isLast
+          const time_taken = dayjs().diff(this.startTime, 'seconds')
           const prescription = this.response.prescription
           const outcome = this.response.outcomes
           const other = this.response.other
           const intervention_type = this.response.intervention_type.toString()
           const selected_type = this.response.selected_type
-          const time_taken = this.response.time_taken
           const qualitative_data = this.response.qualitative_data
-          const risk_level = this.prescription.risk_level
+          const risk_level = this.response.risk_level
           const result = this.getResult(risk_level, outcome)
           const result_score = this.getResultScore(result)
-          const index = this.getPresTestIndex
-          const completed = this.completed
-          const { dispatch } = this.$store
-          if (time_taken) {
-            dispatch('savePrescriptionData', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed })
+          const saveResponse = await this.savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, completed)
+          if (saveResponse.status < 400) {
+            this.$emit('test-save-ok')
+          } else {
+            this.$emit('test-save-fail', saveResponse.message)
           }
-          // reset data fields
-          this.resetDataFields()
-          this.clearCheckBoxes()
-        }
+        }        
       })
-    },
-    // onDoneClick() {
-    //   // this is now true
-    //   this.completed = true
-    //   let id = localStorage.getItem('assessmentId')
-
-    //   // save the last test data
-    //   this.saveData()
-
-    //   // audit
-    //   const user_id = this.user.user_id
-    //   dataService.audit('Completed scenarios', '/assessmentscenarios')
-    //   this.$router.push('/assessmentresults?ID=' + id)
-    // },
-    //   clearCheckBoxes() {
-    //     for (let index in this.checkBoxList) {
-    //       if (this.checkBoxList.hasOwnProperty(index)) {
-    //         if (this.checkBoxList[index].selected === true) {
-    //           this.checkBoxList[index].selected = false
-    //         }
-    //       }
-    //     }
-    //   },
-    //   resetDataFields() {
-    //     this.response.outcomes = ''
-    //     this.response.other = ''
-    //     this.response.risk_level = ''
-    //     this.response.intervention_type = []
-    //     this.response.selected_type = ''
-    //     this.response.qualitative_data = ''
-    //     this.test_id = ''
-    //     //  this.result_score = null;
-    //   }
-    // },
-    // created: function () {
-    //   this.startTime = new Date()
-    // },
-    // beforeUpdate: function () {
-    //   let index = this.$store.state.testIndex
-    //   if (index === (this.numTests - 1) || index > (this.numTests - 1)) {
-    //     this.nextEnabled = false
-    //     this.doneEnabled = true
-    //   }
-    // }
+      
+      console.groupEnd()
+    }
+  },
+  mounted: function () {
+    this.startTime = dayjs()
   }
 }
 </script>

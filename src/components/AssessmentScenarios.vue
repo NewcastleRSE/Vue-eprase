@@ -16,20 +16,9 @@
       
       <div class="mx-auto" v-if="test != null">
         <div id="test-header">Test {{ testIndex + 1 }} of {{ myTestList.length }}</div>
-
-        <ScenarioPrescription v-if="!test.configErrorCode" :prescription="test" ref="scenarioPrescription"></ScenarioPrescription>
-        <ConfigError v-if="test.configErrorCode" :config="test" ref="configError"></ConfigError>
-      </div>
-      <div class="my-2">
+        <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="testIndex == myTestList.length - 1" ref="currentDisplayForm"></component>
         <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
-        <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
-          <i class="bi bi-x pe-1"></i>Clear
-        </button>
-        <button type="button" class="btn btn-primary" @click="nextTest()" :disabled="!isValid">
-          <i :class="testIndex < myTestList.length - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
-            {{ testIndex < myTestList.length - 1 ? 'Next' : 'Done' }}
-        </button>           
-      </div>
+      </div>      
     </div>
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
@@ -39,7 +28,6 @@
 
 <script>
 
-import dayjs from 'dayjs'
 import { mapStores } from 'pinia'
 import { patientStore } from '../stores/patients'
 import ScenarioPrescription from "./ScenarioPrescription"
@@ -66,26 +54,20 @@ export default {
     },
     patientService() {
       return patientStore()
-    },
-    currentTestForm() {
-      return this.test.configErrorCode ? this.$refs.scenarioPrescription : this.$refs.configError
-    },
+    },    
     myTestList() {
       return this.patientService.testList //pro-tem
     }
   },
   data() {
     return {
-      startTime: '',
       isValid: false,
       test: null,
-      testIndex: 0
+      testIndex: 0,
+      currentForm: 'ScenarioPrescription'
     }
   },
-  methods: {
-    onResetClick() {
-      this.currentTestForm().resetForm()
-    },
+  methods: {  
     async getPatientTests() {
 
       console.group('getPatientTests()')
@@ -100,19 +82,15 @@ export default {
 
       console.groupEnd()
     },
-    async nextTest() {
-      const currentlyDisplayedForm = this.currentTestForm()
-      if (currentlyDisplayedForm.validate()) {
-        currentlyDisplayedForm.saveData()
-      }
+    nextTest() {
       this.test = this.myTestList[++this.testIndex]
+    },
+    reportError(message) {
+      this.errorAlertModal.show(message)
     }
   },
   mounted() {
-    this.getPatientTests()    
-  },
-  created: function () {
-    this.startTime = dayjs()
+    this.getPatientTests() 
   }
 }
 </script>
