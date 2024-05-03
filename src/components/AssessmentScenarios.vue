@@ -22,8 +22,13 @@
       </div>
       <div class="my-2">
         <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
-        <button type="button" class="btn btn-primary" @click="nextTest()">{{ testIndex < myTestList.length - 1 ? 'Next'
-      : 'Done' }}</button>
+        <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
+          <i class="bi bi-x pe-1"></i>Clear
+        </button>
+        <button type="button" class="btn btn-primary" @click="nextTest()" :disabled="!isValid">
+          <i :class="testIndex < myTestList.length - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
+            {{ testIndex < myTestList.length - 1 ? 'Next' : 'Done' }}
+        </button>           
       </div>
     </div>
     <ErrorAlertModal ref="errorAlertModal" />
@@ -34,6 +39,7 @@
 
 <script>
 
+import dayjs from 'dayjs'
 import { mapStores } from 'pinia'
 import { patientStore } from '../stores/patients'
 import ScenarioPrescription from "./ScenarioPrescription"
@@ -70,11 +76,16 @@ export default {
   },
   data() {
     return {
+      startTime: '',
+      isValid: false,
       test: null,
       testIndex: 0
     }
   },
   methods: {
+    onResetClick() {
+      this.currentTestForm().resetForm()
+    },
     async getPatientTests() {
 
       console.group('getPatientTests()')
@@ -99,6 +110,9 @@ export default {
   },
   mounted() {
     this.getPatientTests()    
+  },
+  created: function () {
+    this.startTime = dayjs()
   }
 }
 </script>

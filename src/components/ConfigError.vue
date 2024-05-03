@@ -76,6 +76,12 @@ export default {
     }
   },
   methods: {
+    resetForm() {
+      this.$refs.configErrorForm.reset()
+    },   
+    validateForm() {
+      this.$refs.configErrorForm.validate()
+    },  
     onNextClick() {
       this.saveData()
       // catch is needed as router keeps going to the same location and causes error

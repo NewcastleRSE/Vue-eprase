@@ -144,8 +144,8 @@
               <tr v-for="intType in interventionTypeOptions">
                 <td>
                   <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
-                    name="intervention_type" :value="intType.id">
-                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention_type"
+                    name="intervention-type" :value="intType.id">
+                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention-type"
                       :value="intType.id">
                   </Field>
                 </td>
@@ -168,25 +168,31 @@
               <div><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</div>
             </div>
             <div class="mt-3">
-              <Field v-slot="{ Field }" v-model="response.selected_type" name="intervention-select"
+              <Field v-slot="{ field, meta }" v-model="response.selected_type" name="intervention-select"
                 id="intervention-select">
-                <select v-bind="field" class="form-select w-25">
+                <select v-bind="field" class="form-select w-25" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                   <option value="" disabled>Select Type...</option>
                   <option value="alert">Alert</option>
                   <option value="advisory">Advisory</option>
-                  <option value="alert">Both</option>
+                  <option value="both">Both</option>
                 </select>
               </Field>
+              <ErrorMessage name="intervention-select" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>                    
           </div>
 
           <div class="my-3">
             <label class="form-label" for="patient-intervention"><h5>Please tell us about the system response:</h5></label>
             <div>
-              <Field v-slot="{ Field }" v-model="response.qualitative_data" name="patient-intervention"
+              <Field v-slot="{ field, meta }" v-model="response.qualitative_data" name="patient-intervention"
                 id="patient-intervention">
-                <textarea v-bind="field" class="form-control w-25" maxlength="500" rows="5"></textarea>
+                <textarea v-bind="field" class="form-control w-25" maxlength="500" rows="5" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"></textarea>
               </Field>
+              <ErrorMessage name="patient-intervention" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
           </div>
         </div>
@@ -199,13 +205,14 @@
       </Form>
 
     </div>
-  </div> <!-- end box -->
+  </div>
 </template>
 
 <script>
 
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
+import { patientStore } from '../stores/patients'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
 export default {
@@ -219,7 +226,7 @@ export default {
     ErrorMessage
   },
   computed: {
-    ...mapState(appSettingsStore, ['debugMode']),
+    ...mapState(appSettingsStore, ['debugMode'], patientStore, ['savePrescriptionData']),
     getCurrentPatientName() {
       return this.prescription['patient'].first_name + ' ' + this.prescription['patient'].surname
     },
@@ -258,21 +265,22 @@ export default {
         { id: 'missing-field', label: 'Missing field alert', tip: 'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)' }
       ],
       result: null,
-      result_score: '',
-      showInterventions: false,
-      completed: false,
-      nextEnabled: true,
-      doneEnabled: false,
+      result_score: '',     
       startTime: '',
       validationSchema: {
-        'outcome-radios': (value) => {
-          if (value == 'intervention') {
-            // Check additional inputs have values
-          }          
+        'outcome-radios': (value) => {          
           return value ? true : 'Please select one of the outcomes'
+        },
+        'intervention-type': (value) => {
+          return this.outcomes == 'intervention' ? ((Array.isArray(value) && value.length > 0) ? true : 'Please select an intervention type') : true
+        },
+        'intervention-select': (value) => {
+          return this.outcomes == 'intervention' ? (value ? true : 'Please select one') : true
+        },
+        'patient-intervention': (value) => {
+          return this.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
         }
       }
-      //numTests: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
     }
   },
   methods: {
@@ -341,43 +349,44 @@ export default {
         result_score = 1
       }
       return result_score
+    }, 
+    resetForm() {
+      this.$refs.scenarioPrescriptionForm.reset()
+    }, 
+    validateForm() {
+      this.$refs.scenarioPrescriptionForm.validate()
+    },  
+    saveData() {
+      this.submitted = true
+      this.$validator.validate().then(valid => {
+        if (valid) {
+
+          let endTime = new Date()
+          let elapsedTime = endTime.getTime() - this.startTime.getTime()
+          this.response.time_taken = elapsedTime / 1000
+
+          const prescription = this.response.prescription
+          const outcome = this.response.outcomes
+          const other = this.response.other
+          const intervention_type = this.response.intervention_type.toString()
+          const selected_type = this.response.selected_type
+          const time_taken = this.response.time_taken
+          const qualitative_data = this.response.qualitative_data
+          const risk_level = this.prescription.risk_level
+          const result = this.getResult(risk_level, outcome)
+          const result_score = this.getResultScore(result)
+          const index = this.getPresTestIndex
+          const completed = this.completed
+          const { dispatch } = this.$store
+          if (time_taken) {
+            dispatch('savePrescriptionData', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed })
+          }
+          // reset data fields
+          this.resetDataFields()
+          this.clearCheckBoxes()
+        }
+      })
     },
-    // onNextClick() {
-    //   this.saveData()
-    //   // catch is needed as router keeps going to the same location and causes error
-    //   this.$router.push('/assessmentscenarios').catch(err => { })
-    // },
-    // saveData() {
-    //   this.submitted = true
-    //   this.$validator.validate().then(valid => {
-    //     if (valid) {
-
-    //       let endTime = new Date()
-    //       let elapsedTime = endTime.getTime() - this.startTime.getTime()
-    //       this.response.time_taken = elapsedTime / 1000
-
-    //       const prescription = this.response.prescription
-    //       const outcome = this.response.outcomes
-    //       const other = this.response.other
-    //       const intervention_type = this.response.intervention_type.toString()
-    //       const selected_type = this.response.selected_type
-    //       const time_taken = this.response.time_taken
-    //       const qualitative_data = this.response.qualitative_data
-    //       const risk_level = this.prescription.risk_level
-    //       const result = this.getResult(risk_level, outcome)
-    //       const result_score = this.getResultScore(result)
-    //       const index = this.getPresTestIndex
-    //       const completed = this.completed
-    //       const { dispatch } = this.$store
-    //       if (time_taken) {
-    //         dispatch('savePrescriptionData', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, index, completed })
-    //       }
-    //       // reset data fields
-    //       this.resetDataFields()
-    //       this.clearCheckBoxes()
-    //     }
-    //   })
-    // },
     // onDoneClick() {
     //   // this is now true
     //   this.completed = true

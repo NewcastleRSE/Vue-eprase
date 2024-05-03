@@ -84,7 +84,7 @@
                   </select>
                 </Field>
               </div>
-              <ErrorMessage name="ep-service" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="ep-usage" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -116,7 +116,7 @@
                   <input v-bind="field" type="text" class="form-control" placeholder="Other...">
                 </Field>
               </div>
-              <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="add-ep-system" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
