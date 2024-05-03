@@ -8,14 +8,17 @@
       <LoginInfo />
 
       <h3>Assessment Scenarios</h3>
-      <p class="pb-2">You have completed the initial phase of the assessment. The next stage is to complete the patient
-        scenarios.</p>
-      <p class="pb-2">Please follow the instructions for each scenario</p>
+
+      <div v-if="testIndex == 0">
+        <p class="pb-2">You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
+        <p class="pb-2">Please follow the instructions for each scenario</p>
+      </div>
+      
       <div class="mx-auto" v-if="test != null">
         <div id="test-header">Test {{ testIndex + 1 }} of {{ myTestList.length }}</div>
 
-        <ScenarioPrescription v-if="!test.configErrorCode" :prescription="test"></ScenarioPrescription>
-        <ConfigError v-if="test.configErrorCode" :config="test"></ConfigError>
+        <ScenarioPrescription v-if="!test.configErrorCode" :prescription="test" ref="scenarioPrescription"></ScenarioPrescription>
+        <ConfigError v-if="test.configErrorCode" :config="test" ref="configError"></ConfigError>
       </div>
       <div class="my-2">
         <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
@@ -58,6 +61,9 @@ export default {
     patientService() {
       return patientStore()
     },
+    currentTestForm() {
+      return this.test.configErrorCode ? this.$refs.scenarioPrescription : this.$refs.configError
+    },
     myTestList() {
       return this.patientService.testList //pro-tem
     }
@@ -84,7 +90,11 @@ export default {
       console.groupEnd()
     },
     async nextTest() {
-
+      const currentlyDisplayedForm = this.currentTestForm()
+      if (currentlyDisplayedForm.validate()) {
+        currentlyDisplayedForm.saveData()
+      }
+      this.test = this.myTestList[++this.testIndex]
     }
   },
   mounted() {

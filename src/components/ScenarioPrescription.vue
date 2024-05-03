@@ -128,14 +128,18 @@
             </label>
           </div>
 
+          <ErrorMessage name="outcome-radios" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+            {{ message }}
+          </ErrorMessage>
+
         </div>
         <div ref="question2" v-if="response.outcomes === 'intervention'">
-          <h5 class="bg-warning">If the system were to respond to the challenge, please indicate
+          <p class="bg-warning-subtle rounded p-2">If the system were to respond to the challenge, please indicate
             what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert
             (interruptive type, maybe a pop-up that requires action) OR advisory (passive dialogue, maybe a banner
-            message on the bottom of the screen) you would expect.</h5>
+            message on the bottom of the screen) you would expect.</p>
           <p>You have received advice or information concerning (check all that apply):</p>
-          <table class="table tabe-striped">
+          <table class="table table-striped w-50">
             <tbody>
               <tr v-for="intType in interventionTypeOptions">
                 <td>
@@ -149,46 +153,41 @@
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
                 </td>
                 <td>
-                  <button type="button" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
-                    <i class="bi bi-info-circle-fill"></i>
-                  </button>
+                  <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
+                    <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+                  </a>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
-
-        <div class="mt-4 mb-2">
-          <label class="form-label" for="intervention-select"><h5>Please indicate whether intervention was an alert or
-            advisory:</h5></label>
-          <div>
-            <Field v-slot="{ Field }" v-model="response.selected_type" name="intervention-select"
-              id="intervention-select">
-              <select v-bind="field" class="form-select w-25">
-                <option value="" disabled>Select Type...</option>
-                <option value="alert">Alert</option>
-                <option value="advisory">Advisory</option>
-                <option value="alert">Both</option>
-              </select>
-            </Field>
+          <div class="mt-4 mb-2">
+            <label class="form-label" for="intervention-select"><h5>Please indicate whether intervention was an alert or
+              advisory:</h5></label>
+            <div class="bg-info-subtle rounded p-2">
+              <div><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require action.</div>
+              <div><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</div>
+            </div>
+            <div class="mt-3">
+              <Field v-slot="{ Field }" v-model="response.selected_type" name="intervention-select"
+                id="intervention-select">
+                <select v-bind="field" class="form-select w-25">
+                  <option value="" disabled>Select Type...</option>
+                  <option value="alert">Alert</option>
+                  <option value="advisory">Advisory</option>
+                  <option value="alert">Both</option>
+                </select>
+              </Field>
+            </div>                    
           </div>
-          <div class="bg-info-subtle rounded p-2 mt-3">
-            <p><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require action.</p>
-            <p><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</p>
-          </div>
-          
-        </div>
 
-        <div class="mb-2">
-          <label class="form-label" for="patient-intervention">Please indicate whether intervention was an alert or
-            advisory:</label>
-          <div>
-            <Field v-slot="{ Field }" v-model="response.qualitative_data" name="patient-intervention"
-              id="patient-intervention">
-              <textarea v-bind="field" class="form-control" placeholder="Please tell us about the system response..."
-                maxlength="500" rows="5">
-              </textarea>
-            </Field>
+          <div class="my-3">
+            <label class="form-label" for="patient-intervention"><h5>Please tell us about the system response:</h5></label>
+            <div>
+              <Field v-slot="{ Field }" v-model="response.qualitative_data" name="patient-intervention"
+                id="patient-intervention">
+                <textarea v-bind="field" class="form-control w-25" maxlength="500" rows="5"></textarea>
+              </Field>
+            </div>
           </div>
         </div>
 
@@ -265,7 +264,13 @@ export default {
       nextEnabled: true,
       doneEnabled: false,
       startTime: '',
-      validationSchema: {//TODO
+      validationSchema: {
+        'outcome-radios': (value) => {
+          if (value == 'intervention') {
+            // Check additional inputs have values
+          }          
+          return value ? true : 'Please select one of the outcomes'
+        }
       }
       //numTests: parseInt(localStorage.getItem('numPrescriptions')) + settings.numConfigError
     }
