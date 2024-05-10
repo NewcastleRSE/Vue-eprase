@@ -75,7 +75,7 @@ export default {
   },
   methods: {  
     onResetClick() {
-      this.$refs.configErrorForm.reset()
+      this.$refs.configErrorForm.resetForm()
     },        
     async onNextClick() {
 

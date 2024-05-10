@@ -106,7 +106,7 @@ export const patientStore = defineStore('patients', {
     },    
     async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, completed) {
       const assessmentId = rootStore().assessmentId
-      const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
+      const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       if (response.status < 400) {
         rootStore().storePart4complete(completed)
       }

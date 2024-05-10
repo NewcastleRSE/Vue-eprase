@@ -74,7 +74,6 @@ export default {
 
       const patientResponse = await this.patientService.getCompletePatientDetails(true)
       if (patientResponse.status < 400) {
-        console.debug(this.myTestList)
         this.test = this.myTestList[0]
       } else {
         this.errorAlertModal.show(patientResponse.message)
@@ -83,7 +82,14 @@ export default {
       console.groupEnd()
     },
     nextTest() {
+
+      console.group('nextTest()')
+
+      this.$refs.currentDisplayForm.onResetClick()
       this.test = this.myTestList[++this.testIndex]
+      this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
+
+      console.groupEnd()
     },
     reportError(message) {
       this.errorAlertModal.show(message)

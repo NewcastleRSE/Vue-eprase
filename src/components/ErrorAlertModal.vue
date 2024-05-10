@@ -25,7 +25,7 @@ export default {
       setVisible('errorAlertModal', false)
     },
     show(text) {
-      this.errorText = text
+      this.errorText = text || 'No message was returned by the backend API'
       setVisible('errorAlertModal', true)
     }
   }

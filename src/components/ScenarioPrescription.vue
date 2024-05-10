@@ -255,7 +255,7 @@ export default {
       response: {
         outcomes: '',
         other: '',
-        prescription: '',
+        prescription: this.testPayload.id,
         risk_level: '',
         selected_type: '',
         qualitative_data: '',
@@ -329,7 +329,7 @@ export default {
       return scoreMatrix[result] || 0
     }, 
     onResetClick() {
-      this.$refs.scenarioPrescriptionForm.reset()
+      this.$refs.scenarioPrescriptionForm.resetForm()
     },   
     async onNextClick() {
      
