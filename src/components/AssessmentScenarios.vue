@@ -29,6 +29,7 @@
 <script>
 
 import { mapStores } from 'pinia'
+import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
 import ScenarioPrescription from "./ScenarioPrescription"
 import ConfigError from "./ConfigError"
@@ -48,7 +49,7 @@ export default {
     ErrorAlertModal
   },
   computed: {
-    ...mapStores(patientStore),
+    ...mapStores(patientStore, rootStore),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
@@ -85,11 +86,18 @@ export default {
 
       console.group('nextTest()')
 
-      this.$refs.currentDisplayForm.onResetClick()
-      this.test = this.myTestList[++this.testIndex]
-      this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
-
-      console.groupEnd()
+      if (this.testIndex < this.myTestList.length) {
+        // Move onto the next test or config error
+        this.$refs.currentDisplayForm.onResetClick()
+        this.test = this.myTestList[++this.testIndex]
+        this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
+        console.groupEnd()
+      } else {
+        // 'Done' button has been clicked => move to reports
+        rootStore().audit('Completed scenarios', '/assessmentscenarios')
+        console.groupEnd()
+        this.$router.push('/assessmentresults?ID='+ rootStore().assessmentId);
+      }            
     },
     reportError(message) {
       this.errorAlertModal.show(message)
