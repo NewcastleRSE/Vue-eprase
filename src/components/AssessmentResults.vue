@@ -222,6 +222,9 @@ export default {
     async getMitigations() {
       return await rootStore().getMitigationResults(this.assessmentId)
     },
+    async getPrescriptionTestData() {
+      return await rootStore().getPrescriptionTestData(this.assessmentId)
+    },
     createResults(id) {
 
       let tempData = []
@@ -259,6 +262,7 @@ export default {
 
       })
     },
+    //KEEP - TODO
     countCategories(data) {
       let jsonData = categoryService.countCategories(data)
       this.totalGood = jsonData.totals.totalGood
@@ -269,11 +273,8 @@ export default {
       this.totalInterventions = jsonData.totals.totalInterventions
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
-      this.createStackedChartData(jsonData)
-    },
-    createStackedChartData(jsonData) {
       this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
-    },
+    },   
     getInterventionTypeResult() {
       let interventionType = this.calc(this.totalAlerts, this.totalValidTests)
       interventionType = interventionType.slice(0, -1)
@@ -311,14 +312,6 @@ export default {
 
       dataService.saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls)
     },
-    formatData(item) {
-      return {
-        categoryName: item.prescription.indicator.category['categoryName'],
-        mitigation: item.result,
-        outcome: item.outcome,
-        selected_type: item.selected_type
-      }
-    },
     calc(num, total) {
       if (total !== 0) {
         return ((num / total) * 100).toFixed(1) + '%'
@@ -337,10 +330,7 @@ export default {
         return parseInt(tempnum)
       }
       return 0
-    },
-    onExitClick() {
-      this.$router.push('/logout')
-    },
+    },    
     onHomeClick() {
       this.userIsAdmin = localStorage.getItem('userIsAdmin')
       // string value since its been in local storage
@@ -432,14 +422,15 @@ export default {
     })
   },
   mounted: function () {
+    
     let failed = false
     const detailsResponse = this.getAssessmentDetails()
     if (detailsResponse.status < 400) {
       // System-level data
-      this.ep_service = detailsResponse.system.ep_service
-      this.other_ep_system = detailsResponse.system.other_ep_system
+      this.ep_service = detailsResponse.data.system.ep_service
+      this.other_ep_system = detailsResponse.data.$eventsystem.other_ep_system
       // Prescription list data
-      detailsResponse.prescriptionList.forEach(p => {
+      detailsResponse.data.prescriptionList.forEach(p => {
         const risk_level = p.risk_level
         if (risk_level === 'Extreme') {
           this.extremeRiskScenarios.push(p)
@@ -471,9 +462,29 @@ export default {
       // Mitigations data
       const mitigationsResponse = this.getMitigations()
       if (mitigationsResponse.status < 400) {
-
+        this.goodMitigation = mitigationsResponse.data.goodMitigation
+        this.someMitigation = mitigationsResponse.data.someMitigation
+        this.notMitigated = mitigationsResponse.data.notMitigated
+        this.overMitigated = mitigationsResponse.data.notMitigated
       } else {
         this.errorAlertModal.show(mitigationsResponse.message)
+        failed = true
+      }
+    }
+    if (!failed) {
+      // Prescription test data
+      const ptdResponse = this.getPrescriptionTestData()
+      if (ptdResponse.status < 400) {
+        this.countCategories(ptdResponse.data.map(ptd => {
+          return {
+            categoryName: ptd.prescription.indicator.category['categoryName'],
+            mitigation: ptd.result,
+            outcome: ptd.outcome,
+            selected_type: ptd.selected_type
+          }
+        }))
+      } else {
+        this.errorAlertModal.show(ptdResponse.message)
         failed = true
       }
     }
