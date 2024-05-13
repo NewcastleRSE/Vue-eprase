@@ -130,19 +130,20 @@ export const patientStore = defineStore('patients', {
       console.group('getCompletePatientDetails()')
       console.debug('Fetching prescription data', prescriptions)
 
-      if (this.patientPool.length == 0) {
-        const patientsResponse = await rootStore().apiCall('patients', 'GET')
-        if (patientsResponse.status < 400) {
-          // Cache the entire patient pool (invariant, so not a problem across sessions)
-          this.patientPool = patientsResponse.data
-          console.debug('All patient pool', this.patientPool)
-        } else {
-          // There was an error
-          ret = patientsResponse
-        }
-      }
+      try {
 
-      if (!ret) {
+        if (this.patientPool.length == 0) {
+          const patientsResponse = await rootStore().apiCall('patients', 'GET')
+          if (patientsResponse.status < 400) {
+            // Cache the entire patient pool (invariant, so not a problem across sessions)
+            this.patientPool = patientsResponse.data
+            console.debug('All patient pool', this.patientPool)
+          } else {
+            // There was an error
+            throw new Error(patientsResponse.message)
+          }
+        }
+          
         const instId = authenticationStore().institutionId
         const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
         if (idsResponse.status < 400) {
@@ -155,48 +156,55 @@ export const patientStore = defineStore('patients', {
           } else {
             // Use stored IDs
             console.debug('Using stored patient IDs', idsResponse.data.allpatients)
-            this.patientIdsToDo = idsResponse.data.allpatients.split(',')
+            this.patientIdsToDo = idsResponse.data.todopatients.split(',')
             this.patientList = this.patientPool.filter(p => this.patientIdsToDo.includes(p.id + ''))
           }
           this.totalNumPatients = this.patientList.length
         } else {
-          ret = idsResponse
+          throw new Error(idsResponse.message)
         }
-      }
-
-      if (prescriptions) {
-        // ready to add the prescription data
-        console.debug('Adding prescriptions...')
-        this.patientList.forEach(async p => {
-          console.debug('Patient id', p.id)
-          const testResponse = await rootStore().apiCall('prescriptions?ID=' + p.id, 'GET')
-          if (testResponse.status < 400) {
-            console.debug('Prescriptions', testResponse.data)
-            this.testList.push(...testResponse.data)
+  
+        if (prescriptions) {
+          // Ready to add the prescription data
+          console.debug('Adding prescriptions...')
+          // First determine which scenarios we have already done...
+          const doneScenarios = await rootStore().apiCall('resultCategories?ID=' + rootStore().assessmentId)
+          if (doneScenarios.status < 400) {
+            const doneIds = doneScenarios.data.map(ds => ds.prescription.prescription_id)          
+            this.patientList.forEach(async p => {
+              console.debug('Patient id', p.id)
+              const testResponse = await rootStore().apiCall('prescriptions?ID=' + p.id, 'GET')
+              if (testResponse.status < 400) {
+                console.debug('Prescriptions', testResponse.data)
+                // Filter out ones we have already done...
+                const outstandingTests = testResponse.data.filter(t => !doneIds.includes(t.prescription_id))
+                this.testList.push(...outstandingTests)
+              } else {
+                throw new Error(testResponse.message)
+              }    
+            })
           } else {
-            console.error('Problems retrieving prescription data', testResponse.message)
-            ret = testResponse
-          }          
-        })
-        // add in config errors (using all at the moment - may need to choose a random selection in future)
-        const confErrResponse = await this.getAllConfigErrors()
-        if (confErrResponse.status < 400) {
-          const configErrors = confErrResponse.data
-          configErrors.forEach(ce => {
-              let randInsertPoint = Math.floor(Math.random() * (this.testList.length - 2)) + 2
-              this.testList.splice(randInsertPoint, 0, ce)
-          })
-        } else {
-          console.error('Problems retrieving config errors', confErrResponse.message)
-          ret = confErrResponse
+            throw new Error(doneScenarios.message)
+          }
+         
+          // Add in config errors (using all at the moment - may need to choose a random selection in future)
+          const confErrResponse = await this.getAllConfigErrors()
+          if (confErrResponse.status < 400) {
+            const configErrors = confErrResponse.data
+            configErrors.forEach(ce => {
+                let randInsertPoint = Math.floor(Math.random() * (this.testList.length - 2)) + 2
+                this.testList.splice(randInsertPoint, 0, ce)
+            })
+          } else {
+            console.error('Problems retrieving config errors', confErrResponse.message)
+            ret = confErrResponse
+          }
         }
-      }      
-
-      if (ret == null) {
         this.patientList.forEach(p => p.dob = this.formatDOB(p))
-        ret = { status: 200, data: this.patientList }
-      }
-
+        ret = { status: 200, data: this.patientList }        
+      } catch(err) {
+        ret = { status: 500, message: err.message }
+      }      
       return ret
     },
     compilePatientList(type, requiredLength) {
