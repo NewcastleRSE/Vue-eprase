@@ -49,7 +49,7 @@
               <td>Config Errors</td>
               <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
             </tr>
-          </tbody>          
+          </tbody>
         </table>
       </div>
 
@@ -207,7 +207,7 @@ export default {
     }
   },
   computed: {
-    ...mapStores(authenticationStore, rootStore, patientStore, appSettingsStore), 
+    ...mapStores(authenticationStore, rootStore, patientStore, appSettingsStore),
     assessmentId() {
       return rootStore().assessmentId
     },
@@ -217,7 +217,7 @@ export default {
   },
   methods: {
     async getAssessmentDetails() {
-      return await rootStore().getAssessmentById(this.assessmentId)      
+      return await rootStore().getAssessmentById(this.assessmentId)
     },
     async getMitigations() {
       return await rootStore().getMitigationResults(this.assessmentId)
@@ -274,7 +274,7 @@ export default {
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
       this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
-    },   
+    },
     getInterventionTypeResult() {
       let interventionType = this.calc(this.totalAlerts, this.totalValidTests)
       interventionType = interventionType.slice(0, -1)
@@ -330,7 +330,7 @@ export default {
         return parseInt(tempnum)
       }
       return 0
-    },    
+    },
     onHomeClick() {
       this.userIsAdmin = localStorage.getItem('userIsAdmin')
       // string value since its been in local storage
@@ -422,7 +422,7 @@ export default {
     })
   },
   mounted: function () {
-    
+
     let failed = false
     const detailsResponse = this.getAssessmentDetails()
     if (detailsResponse.status < 400) {
@@ -493,5 +493,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

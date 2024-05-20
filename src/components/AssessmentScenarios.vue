@@ -9,13 +9,16 @@
 
       <h3>Assessment Scenarios</h3>
 
-      <div v-if="testIndex == 0">
+      <div v-if="noTestsDone == 0">
         <p class="pb-2">You have completed the initial phase of the assessment. The next stage is to complete the patient scenarios.</p>
         <p class="pb-2">Please follow the instructions for each scenario</p>
       </div>
+      <div v-if="noTestsDone != 0">
+        <p class="pb-2">You have completed {{ noTestsDone }} scenarios of {{ totalNumTests }}</p>
+      </div>
       
       <div class="mx-auto" v-if="test != null">
-        <div id="test-header">Test {{ testIndex + 1 }} of {{ myTestList.length }}</div>
+        <div id="test-header">Test {{ noTestsDone }} of {{ numPrescriptions }}</div>
         <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="testIndex == myTestList.length - 1" ref="currentDisplayForm"></component>
         <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
       </div>      
@@ -37,6 +40,7 @@ import TabHeader from "./TabHeader"
 import LoginInfo from './LoginInfo'
 import AppLogo from "./AppLogo"
 import ErrorAlertModal from './ErrorAlertModal'
+import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: "AssessmentScenarios",
@@ -49,7 +53,7 @@ export default {
     ErrorAlertModal
   },
   computed: {
-    ...mapStores(patientStore, rootStore),
+    ...mapStores(patientStore, rootStore, appSettingsStore),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
@@ -58,6 +62,13 @@ export default {
     },    
     myTestList() {
       return this.patientService.testList //pro-tem
+    },
+    totalNumTests() {
+      return appSettingsStore().numPrescriptions
+    },
+    noTestsDone() {
+      // Total number minus those still to do
+      return this.totalNumTests - this.myTestList.length + this.testIndex
     }
   },
   data() {
@@ -76,6 +87,7 @@ export default {
       const patientResponse = await this.patientService.getCompletePatientDetails(true)
       if (patientResponse.status < 400) {
         this.test = this.myTestList[0]
+        this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }

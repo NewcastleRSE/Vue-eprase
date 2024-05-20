@@ -112,9 +112,9 @@ export const patientStore = defineStore('patients', {
       }
       return(response)
     },
-    async saveConfigError(config_err_id, result, time_taken) {
+    async saveConfigError(test_id, result, time_taken) {
       const assessmentId = rootStore().assessmentId
-      const response = await rootStore().apiCall('config?ID=' + assessmentId, 'POST', { config_err_id, result, time_taken })
+      const response = await rootStore().apiCall('config?ID=' + assessmentId, 'POST', { test_id, result, time_taken })
       return response
     },
     // Main entry point for getting patient and test data from the backend
@@ -131,7 +131,7 @@ export const patientStore = defineStore('patients', {
       console.debug('Fetching prescription data', prescriptions)
 
       try {
-
+//TODO
         if (this.patientPool.length == 0) {
           const patientsResponse = await rootStore().apiCall('patients', 'GET')
           if (patientsResponse.status < 400) {
@@ -168,7 +168,7 @@ export const patientStore = defineStore('patients', {
           // Ready to add the prescription data
           console.debug('Adding prescriptions...')
           // First determine which scenarios we have already done...
-          const doneScenarios = await rootStore().apiCall('resultCategories?ID=' + rootStore().assessmentId)
+          const doneScenarios = await rootStore().apiCall('resultCategories?ID=' + rootStore().assessmentId, 'GET')
           if (doneScenarios.status < 400) {
             const doneIds = doneScenarios.data.map(ds => ds.prescription.prescription_id)          
             this.patientList.forEach(async p => {
@@ -186,14 +186,19 @@ export const patientStore = defineStore('patients', {
           } else {
             throw new Error(doneScenarios.message)
           }
+
+          console.debug('Test list before conf errors', this.testList, 'patient list', this.patientList)
          
           // Add in config errors (using all at the moment - may need to choose a random selection in future)
           const confErrResponse = await this.getAllConfigErrors()
           if (confErrResponse.status < 400) {
             const configErrors = confErrResponse.data
             configErrors.forEach(ce => {
-                let randInsertPoint = Math.floor(Math.random() * (this.testList.length - 2)) + 2
-                this.testList.splice(randInsertPoint, 0, ce)
+              let randInsertPoint = Math.floor(Math.random() * (this.testList.length - 2)) + 2
+              console.debug('Insert config error', ce, 'at random index', randInsertPoint)
+              console.debug('Test list before', this.testList)
+              this.testList.splice(randInsertPoint, 0, ce)
+              console.debug('Test list after', this.testList)
             })
           } else {
             console.error('Problems retrieving config errors', confErrResponse.message)
