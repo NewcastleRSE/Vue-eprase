@@ -167,12 +167,7 @@ export const rootStore = defineStore('root', {
     },     
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
-    storeAssessmentComplete(complete) { this.assessmentComplete = complete },
-    storePart1complete(part1Complete) { this.part1Complete = part1Complete },
-    storePart2complete(part2Complete) { this.part2Complete = part2Complete },
-    storePart3complete(part3Complete) { this.part3Complete = part3Complete },
-    storePart4complete(part4Complete) { this.part4Complete = part4Complete },
-    storeConfigErrorComplete(ceComplete) { this.configErrorComplete = ceComplete },        
+    storeAssessmentComplete(complete) { this.assessmentComplete = complete },    
     storeMitigationData(goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls) {
       this.mitigationData[0] = goodPercentage
       this.mitigationData[1] = somePercentage

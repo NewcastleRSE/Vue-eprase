@@ -1,6 +1,6 @@
 <template>
 
-  <div>
+  <div class="my-3">
     <h5>{{ testPayload.description }}</h5>
     <div>
       <Form ref="configErrorForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
@@ -23,7 +23,7 @@
 
         <input ref="configErrorCode" type="hidden" id="config-err-code" :value="testPayload.configErrorCode">
 
-        <div class="my-2">          
+        <div class="my-3">          
           <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
             <i class="bi bi-x pe-1"></i>Clear
           </button>

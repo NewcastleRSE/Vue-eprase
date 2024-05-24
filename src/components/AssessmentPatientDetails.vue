@@ -181,7 +181,11 @@
         </h5>
         <h5 v-if="patientIndex == myPatientList.length - 1">
           Please ensure you click the <span class="fw-bold">Done</span> button to save your progress
-        </h5>        
+        </h5>
+        <button type="button" class="btn btn-primary" @click="prevPatient()" :disabled="patientIndex == 0">
+          <i class='bi bi-arrow-left-circle'></i>
+            Previous
+        </button>     
         <button type="button" class="btn btn-primary" @click="nextPatient()">
           <i :class="patientIndex < myPatientList.length - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
             {{ patientIndex < myPatientList.length - 1 ? 'Next' : 'Done' }}

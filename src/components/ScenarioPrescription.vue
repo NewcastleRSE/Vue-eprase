@@ -2,7 +2,7 @@
 
   <div>
 
-    <div class="patient-details">
+    <div class="patient-details my-3">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Patient: {{ getCurrentPatientName }}
@@ -12,7 +12,6 @@
             </span>
           </h5>
           <p class="card-text">Age: {{ testPayload.patient.age }}</p>
-
         </div>
       </div>
     </div>
@@ -194,7 +193,7 @@
           </div>
         </div>
 
-        <h5 class="mb-2">Please discontinue the prescription order before proceeding to the next scenario.</h5>
+        <h5 class="my-3">Please discontinue the prescription order before proceeding to the next scenario</h5>
 
         <input type="hidden" id="test_id" v-model="testPayload.id" />
         <input type="hidden" id="risk_level" v-model="testPayload.risk_level" />
@@ -256,7 +255,7 @@ export default {
         outcomes: '',
         other: '',
         prescription: this.testPayload.id,
-        risk_level: '',
+        risk_level: this.testPayload.risk_level,
         selected_type: '',
         qualitative_data: '',
         intervention_type: []

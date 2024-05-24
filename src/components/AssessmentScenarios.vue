@@ -18,7 +18,7 @@
       </div>
       
       <div class="mx-auto" v-if="test != null">
-        <div id="test-header">Test {{ noTestsDone }} of {{ numPrescriptions }}</div>
+        <h5>Test {{ noTestsDone + 1 }} of {{ totalNumTests }}</h5>
         <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="testIndex == myTestList.length - 1" ref="currentDisplayForm"></component>
         <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
       </div>      
@@ -34,13 +34,13 @@
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import { patientStore } from '../stores/patients'
+import { appSettingsStore } from '../stores/appSettings'
 import ScenarioPrescription from "./ScenarioPrescription"
 import ConfigError from "./ConfigError"
 import TabHeader from "./TabHeader"
 import LoginInfo from './LoginInfo'
 import AppLogo from "./AppLogo"
 import ErrorAlertModal from './ErrorAlertModal'
-import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: "AssessmentScenarios",
@@ -61,14 +61,17 @@ export default {
       return patientStore()
     },    
     myTestList() {
-      return this.patientService.testList //pro-tem
+      return this.patientService.testList
     },
     totalNumTests() {
       return appSettingsStore().numPrescriptions
     },
+    totalNumConfigErrors() {
+      return appSettingsStore().numConfigError
+    },
     noTestsDone() {
       // Total number minus those still to do
-      return this.totalNumTests - this.myTestList.length + this.testIndex
+      return this.totalNumTests + this.totalNumConfigErrors - this.myTestList.length + this.testIndex
     }
   },
   data() {
