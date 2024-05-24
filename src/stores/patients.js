@@ -99,7 +99,7 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       return(response)
     },    
-    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, completed) {
+    async savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data) {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('prescriptionData?ID=' + assessmentId + '&TEST_ID='  + prescription, 'POST', { outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data })   
       return(response)
@@ -150,7 +150,7 @@ export const patientStore = defineStore('patients', {
             console.debug('Using stored patient IDs', idsResponse.data.allpatients)
             this.patientIdsToDo = idsResponse.data.todopatients.split(',')
             this.patientIds = idsResponse.data.allpatients.split(',')
-            this.patientList = this.patientPool.filter(p => this.patientIdsToDo.includes(p.id + ''))
+            this.patientList = this.patientPool.filter(p => this.patientIds.includes(p.id + ''))
           }
           this.totalNumPatients = this.patientList.length
         } else {

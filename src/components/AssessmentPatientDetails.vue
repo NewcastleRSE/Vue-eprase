@@ -8,16 +8,15 @@
       <LoginInfo />
 
       <h3>Patient Information</h3>
-      <div v-if="totalNumPatients == myPatientList.length">
-        <p>Please enter the following {{ myPatientList.length }} sets of patient details into your EP system</p>
+      <div v-if="numPatientsEntered == 0">
+        <p>Please enter the following {{ totalNumPatients }} sets of patient details into your EP system</p>
       </div>
-      <div v-if="totalNumPatients != myPatientList.length">
-        <p>You have a further {{ myPatientList.length }} sets of patient details to enter ({{ totalNumPatients -
-      myPatientList.length }} have already been entered)</p>
+      <div v-if="numPatientsEntered != totalNumPatients">
+        <p>You have a further {{ totalNumPatients - numPatientsEntered }} sets of patient details to enter ({{ numPatientsEntered }} have already been entered)</p>
       </div>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
         with appropriate self-generated information.</p>
-      <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue.</p>
+      <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue or <span class="fw-bold">Previous</span> to view already entered items</p>
 
       <div v-if="patient != null" class="mx-auto card">
 
@@ -176,10 +175,11 @@
       </div>
 
       <div class="my-2">
-        <h5 v-if="patientIndex < myPatientList.length - 1">
-          When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>.
+        <h5 v-if="numPatientsEntered < totalNumPatients">
+          When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>
+          or use <span class="fw-bold">Previous</span> to view already entered items
         </h5>
-        <h5 v-if="patientIndex == myPatientList.length - 1">
+        <h5 v-if="numPatientsEntered == totalNumPatients">
           Please ensure you click the <span class="fw-bold">Done</span> button to save your progress
         </h5>
         <button type="button" class="btn btn-primary" @click="prevPatient()" :disabled="patientIndex == 0">
@@ -187,8 +187,8 @@
             Previous
         </button>     
         <button type="button" class="btn btn-primary" @click="nextPatient()">
-          <i :class="patientIndex < myPatientList.length - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
-            {{ patientIndex < myPatientList.length - 1 ? 'Next' : 'Done' }}
+          <i :class="numPatientsEntered < totalNumPatients ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
+            {{ numPatientsEntered < totalNumPatients ? 'Next' : 'Done' }}
         </button>
       </div>
     </div>
@@ -229,9 +229,8 @@ export default {
     patientIdsOutstanding() {
       return this.patientService.patientIdsToDo
     },
-    myPatientList() {
-      // Watch out here - patient id is a number, the outstanding list returns an array of string, so typing important here
-      return this.patientService.patientList.filter(p => this.patientIdsOutstanding.includes(p.id + ''))
+    patientList() {
+      return this.patientService.patientList
     },
     totalNumPatients() {
       return this.patientService.totalNumPatients
@@ -241,43 +240,62 @@ export default {
     return {
       startTime: '',
       patient: null,
-      patientIndex: 0
+      patientIndex: 0,
+      numPatientsEntered: 0
     }
   },
-  methods: {  
+  methods: {
+    prevPatient() {
+
+      console.group('prevPatient()')
+
+      this.patient = this.patientList[--this.patientIndex]
+      console.debug('Stepped back to', this.patientIndex, 'now processed', this.numPatientsEntered)
+
+      console.groupEnd()
+    }, 
     async nextPatient() {
 
       console.group('nextPatient()')
-      console.debug('Attempt save of patient', this.patientIndex)
-      console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
 
-      const completed = this.patientIndex == this.myPatientList.length - 1
-      const time_taken = dayjs().diff(this.startTime, 'seconds')
-      const qualitative_data = this.$refs.patientIntervention.value
-      const code = this.$refs.patientId.value
-      console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
+      if (this.patientIndex >= this.numPatientsEntered) {
 
-      const dataService = rootStore()
+        console.debug('Attempt save of patient at index', this.patientIndex, 'already saved', this.numPatientsEntered, 'patients')
+        console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
 
-      const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken, completed)
-      if (saveResponse.status < 400) {
-        if (completed) {
-          // All patient details now entered
-          const updateResponse = await dataService.updateAssessmentProgress()
-          if (updateResponse.status < 400) {
-            dataService.audit('Completed patient details', '/assessmentpatientdetails')
-            this.$router.push('/assessmentscenarios')
+        const completed = this.numPatientsEntered == this.totalNumPatients
+        const time_taken = dayjs().diff(this.startTime, 'seconds')
+        const qualitative_data = this.$refs.patientIntervention.value
+        const code = this.$refs.patientId.value
+        console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
+
+        const dataService = rootStore()
+
+        const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken)
+        if (saveResponse.status < 400) {
+          if (completed) {
+            // All patient details now entered
+            const updateResponse = await dataService.updateAssessmentProgress()
+            if (updateResponse.status < 400) {
+              dataService.audit('Completed patient details', '/assessmentpatientdetails')
+              this.$router.push('/assessmentscenarios')
+            } else {
+              this.errorAlertModal.show(updateResponse.message)
+            }
           } else {
-            this.errorAlertModal.show(updateResponse.message)
+            // On to the next one
+            this.numPatientsEntered++
+            this.patient = this.patientList[++this.patientIndex]
+            console.debug('Advanced to', this.patientIndex, 'now processed', this.numPatientsEntered)
           }
         } else {
-          // On to the next one
-          this.patient = this.myPatientList[++this.patientIndex]
+          this.errorAlertModal.show(saveResponse.message)
         }
       } else {
-        this.errorAlertModal.show(saveResponse.message)
+        this.patient = this.patientList[++this.patientIndex]
+        console.debug('Advanced to', this.patientIndex, '(without additional save), now processed', this.numPatientsEntered)
       }
-
+      
       console.groupEnd()
     },
     async getPatientsToDo() {
@@ -286,7 +304,10 @@ export default {
       
       const patientResponse = await this.patientService.getCompletePatientDetails()
       if (patientResponse.status < 400) {
-        this.patient = this.myPatientList[0]
+        this.numPatientsEntered = this.totalNumPatients - this.patientIdsOutstanding.length
+        this.patientIndex = this.numPatientsEntered
+        this.patient = this.patientList[this.patientIndex]
+        console.debug('Initialising patient list at position', this.patientIndex, 'already entered', this.numPatientsEntered, 'patients')
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }
