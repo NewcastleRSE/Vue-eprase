@@ -21,14 +21,7 @@ export const authenticationStore = defineStore('authentication', {
         return decodedToken && (decodedToken.exp * 1000) > new Date().getTime()
       }
       return false
-    },
-    getUser: (state) => state.user,
-    getUserId: (state) => state.userId,
-    getInstitutionId: (state) => state.institutionId,
-    getOrgCode: (state) => state.orgCode,
-    getOrgName: (state) => state.orgName,
-    getTrust: (state) => state.trust,
-    getToken: (state) => state.token
+    }
   },
   actions: {
     async login(username, password) {

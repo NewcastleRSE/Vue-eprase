@@ -13,19 +13,13 @@ export const patientStore = defineStore('patients', {
       requiredChildPatients: [],
       allRequiredPatients: [],
       totalNumPatients: 0,
-      patientList: [],  // Holds the ones we still need to process
-      testList: [],
-      patientIdsToDo: [],
-      patientIds: []
+      patientList: [],    // The full list of all patient for this assessment
+      testList: [],       // The full list of all the scenario tests/config errors
+      patientData: [],    // The patient data already entered into the database
+      patientIds: []      // Patient IDs assigned to this assessment
     }
   },
-  persist: true,
-  getters: {
-    getPatientList: (state) => state.patientList,
-    getTestList: (state) => state.testList,
-    getPatientIdsToDo: (state) => state.patientIdsToDo,
-    getTotalNumPatients: (state) => state.totalNumPatients
-  },
+  persist: true, 
   actions: {
     async getRequiredTests() {
 
@@ -94,7 +88,7 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('createpatients?ID=' + assessmentId, 'POST', { time_taken })
       return(response)
     },
-    async savePatientData(qualitative_data, code, time_taken, completed) {
+    async savePatientData(qualitative_data, code, time_taken) {
       const assessmentId = rootStore().assessmentId
       const response = await rootStore().apiCall('patientdata?ID=' + assessmentId, 'POST', { qualitative_data, code, time_taken })   
       return(response)
@@ -117,7 +111,7 @@ export const patientStore = defineStore('patients', {
       let ret = null
       this.patientList = []
       this.testList = []
-      this.patientIdsToDo = []
+      this.patientData = []
 
       console.group('getCompletePatientDetails()')
       console.debug('Fetching prescription data', prescriptions)
@@ -137,20 +131,34 @@ export const patientStore = defineStore('patients', {
         }
           
         const instId = authenticationStore().institutionId
-        const idsResponse = await rootStore().apiCall('getPatientIdsOutstanding?INSTITUTION_ID=' + instId, 'GET')
+        const idsResponse = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
         if (idsResponse.status < 400) {
           if (idsResponse.data == 'No patient ids') {
             // No stored IDs so compile list from scratch (coming from completing system info)
             console.debug('Coming from completed system information')
             console.assert(patientType != null, 'patientType should not be null (Adults|Paediatrics|Both)')
             this.patientList = this.compilePatientList(patientType, appSettingsStore().assessmentNumPatients)
-            this.patientIdsToDo = this.patientList.map(p => p.id)            
           } else {
             // Use stored IDs
-            console.debug('Using stored patient IDs', idsResponse.data.allpatients)
-            this.patientIdsToDo = idsResponse.data.todopatients.split(',')
-            this.patientIds = idsResponse.data.allpatients.split(',')
-            this.patientList = this.patientPool.filter(p => this.patientIds.includes(p.id + ''))
+            console.debug('Using stored patient IDs', idsResponse.data)
+            this.patientIds = idsResponse.data
+            this.patientList = this.patientPool.filter(p => this.patientIds.includes(p.id))
+            // Get the existing patient data
+            const exPatientDataResponse = await rootStore().apiCall('getPatientDataByAssessmentId?INSTITUTION_ID=' + instId, 'GET')
+            if (exPatientDataResponse.status < 400) {
+              const epData = exPatientDataResponse.data
+              this.patientData = []
+              this.patientList.forEach(p => {
+                const exEpd = epData.find(epd => epd.code == p.code)
+                if (!exEpd) {
+                  this.patientData.push()//TODO
+                } else {
+                  this.patientData.push()
+                }
+              })             
+            } else {
+              throw new Error(exPatientDataResponse.message)
+            }
           }
           this.totalNumPatients = this.patientList.length
         } else {

@@ -125,8 +125,9 @@ export default {
       console.groupEnd()
     },
     onStartAssessmentClick() {
+      const patient_type = 'Adults'
       if (this.assessmentStatus === 'System Information Complete') {
-        this.$router.push('/assessmentpatients')
+        this.$router.push('/assessmentpatients/' + patient_type)
       }
       else if (this.assessmentStatus === 'Create Patients in Progress') {
         this.$router.push('/assessmentpatientdetails')

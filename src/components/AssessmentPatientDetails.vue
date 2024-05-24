@@ -8,11 +8,11 @@
       <LoginInfo />
 
       <h3>Patient Information</h3>
-      <div v-if="numPatientsEntered == 0">
+      <div v-if="patientIndex == 0">
         <p>Please enter the following {{ totalNumPatients }} sets of patient details into your EP system</p>
       </div>
-      <div v-if="numPatientsEntered != totalNumPatients">
-        <p>You have a further {{ totalNumPatients - numPatientsEntered }} sets of patient details to enter ({{ numPatientsEntered }} have already been entered)</p>
+      <div v-if="patientIndex < totalNumPatients">
+        <p>You have a further {{ totalNumPatients - patientIndex }} sets of patient details to enter ({{ patientData.length }} have already been entered)</p>
       </div>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
         with appropriate self-generated information.</p>
@@ -165,30 +165,30 @@
             <div class="alert alert-warning fw-bold" role="alert">
               To optimise the use of this tool please record ALL types of guidance that appears on your system screen
             </div>
-            <textarea class="form-control" ref="patientIntervention" id="patient_intervention" rows="5"
+            <textarea class="form-control" ref="patientIntervention" v-model="patientQualData" id="patient_intervention" rows="5"
               placeholder="Please note any interventions from the system..."></textarea>
           </div>
 
-          <input type="hidden" ref="patientId" id="patient_id" :value="patient.code" />
+          <input type="hidden" ref="patientId" id="patient_id" v-model="patient.code" />
         </div>
 
       </div>
 
       <div class="my-2">
-        <h5 v-if="numPatientsEntered < totalNumPatients">
+        <h5 v-if="patientIndex < totalNumPatients - 1">
           When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>
           or use <span class="fw-bold">Previous</span> to view already entered items
         </h5>
-        <h5 v-if="numPatientsEntered == totalNumPatients">
+        <h5 v-if="patientIndex == totalNumPatients - 1">
           Please ensure you click the <span class="fw-bold">Done</span> button to save your progress
         </h5>
-        <button type="button" class="btn btn-primary" @click="prevPatient()" :disabled="patientIndex == 0">
+        <button type="button" class="btn btn-primary me-2" @click="prevPatient()" :disabled="patientIndex == 0">
           <i class='bi bi-arrow-left-circle'></i>
             Previous
         </button>     
         <button type="button" class="btn btn-primary" @click="nextPatient()">
-          <i :class="numPatientsEntered < totalNumPatients ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
-            {{ numPatientsEntered < totalNumPatients ? 'Next' : 'Done' }}
+          <i :class="patientIndex == totalNumPatients - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
+            {{ patientIndex == totalNumPatients - 1 ? 'Next' : 'Done' }}
         </button>
       </div>
     </div>
@@ -225,32 +225,52 @@ export default {
     },
     patientService() {
       return patientStore()
-    },
-    patientIdsOutstanding() {
-      return this.patientService.patientIdsToDo
-    },
+    },    
     patientList() {
       return this.patientService.patientList
     },
+    patientData() {
+      return this.patientService.patientData
+    },
     totalNumPatients() {
-      return this.patientService.totalNumPatients
+      return this.patientList.length
     }
   },
   data() {
     return {
       startTime: '',
       patient: null,
-      patientIndex: 0,
-      numPatientsEntered: 0
+      patientQualData: {},
+      patientIndex: 0
     }
   },
   methods: {
+    async savePatient() {
+
+      console.group('savePatient()')
+
+      const qualitative_data = this.patientQualData
+      const code = this.patient.code
+
+      console.debug('Attempt save of patient at index', this.patientIndex)
+      console.debug('Qualitative data', qualitative_data, 'patient code', code)
+
+      const time_taken = dayjs().diff(this.startTime, 'seconds')
+      const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken)
+      
+      console.debug('Returning', saveResponse)
+
+      return saveResponse
+    },
     prevPatient() {
 
       console.group('prevPatient()')
-
-      this.patient = this.patientList[--this.patientIndex]
-      console.debug('Stepped back to', this.patientIndex, 'now processed', this.numPatientsEntered)
+      
+      //TODO
+      if (this.patientIndex > 0) {
+        this.patient = this.patientList[--this.patientIndex]
+        console.debug('Now viewing patient', this.patientIndex)
+      }      
 
       console.groupEnd()
     }, 
@@ -304,10 +324,9 @@ export default {
       
       const patientResponse = await this.patientService.getCompletePatientDetails()
       if (patientResponse.status < 400) {
-        this.numPatientsEntered = this.totalNumPatients - this.patientIdsOutstanding.length
-        this.patientIndex = this.numPatientsEntered
+        this.patientIndex = this.totalNumPatients - this.patientData.length
         this.patient = this.patientList[this.patientIndex]
-        console.debug('Initialising patient list at position', this.patientIndex, 'already entered', this.numPatientsEntered, 'patients')
+        console.debug('Initialising patient list at position', this.patientIndex)
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }
