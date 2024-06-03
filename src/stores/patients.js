@@ -15,8 +15,8 @@ export const patientStore = defineStore('patients', {
       totalNumPatients: 0,
       patientList: [],    // The full list of all patient for this assessment
       testList: [],       // The full list of all the scenario tests/config errors
-      patientData: [],    // The patient data already entered into the database
-      patientIds: []      // Patient IDs assigned to this assessment
+      patientIds: [],     // Patient IDs assigned to this assessment
+      nextEditablePatientIndex: 0
     }
   },
   persist: true, 
@@ -111,7 +111,7 @@ export const patientStore = defineStore('patients', {
       let ret = null
       this.patientList = []
       this.testList = []
-      this.patientData = []
+      this.nextEditablePatientIndex = 0
 
       console.group('getCompletePatientDetails()')
       console.debug('Fetching prescription data', prescriptions)
@@ -143,19 +143,10 @@ export const patientStore = defineStore('patients', {
             console.debug('Using stored patient IDs', idsResponse.data)
             this.patientIds = idsResponse.data
             this.patientList = this.patientPool.filter(p => this.patientIds.includes(p.id))
-            // Get the existing patient data
+            // Get the existing patient data => get next editable entry
             const exPatientDataResponse = await rootStore().apiCall('getPatientDataByAssessmentId?INSTITUTION_ID=' + instId, 'GET')
             if (exPatientDataResponse.status < 400) {
-              const epData = exPatientDataResponse.data
-              this.patientData = []
-              this.patientList.forEach(p => {
-                const exEpd = epData.find(epd => epd.code == p.code)
-                if (!exEpd) {
-                  this.patientData.push()//TODO
-                } else {
-                  this.patientData.push()
-                }
-              })             
+              this.nextEditablePatientIndex = exPatientDataResponse.data.length              
             } else {
               throw new Error(exPatientDataResponse.message)
             }

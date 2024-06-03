@@ -8,11 +8,11 @@
       <LoginInfo />
 
       <h3>Patient Information</h3>
-      <div v-if="patientIndex == 0">
+      <div v-if="nextUnsaved == 0">
         <p>Please enter the following {{ totalNumPatients }} sets of patient details into your EP system</p>
       </div>
-      <div v-if="patientIndex < totalNumPatients">
-        <p>You have a further {{ totalNumPatients - patientIndex }} sets of patient details to enter ({{ patientData.length }} have already been entered)</p>
+      <div v-if="nextUnsaved < totalNumPatients">
+        <p>You have a further {{ totalNumPatients - nextUnsaved }} sets of patient details to enter ({{ nextUnsaved }} have already been entered)</p>
       </div>
       <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
         with appropriate self-generated information.</p>
@@ -161,16 +161,17 @@
             </div>
           </div>
 
-          <div class="row mb-4">
+          <div v-if="patientIndex >= nextEditablePatient" class="row mb-4">
             <div class="alert alert-warning fw-bold" role="alert">
               To optimise the use of this tool please record ALL types of guidance that appears on your system screen
             </div>
             <textarea class="form-control" ref="patientIntervention" v-model="patientQualData" id="patient_intervention" rows="5"
               placeholder="Please note any interventions from the system..."></textarea>
           </div>
-
-          <input type="hidden" ref="patientId" id="patient_id" v-model="patient.code" />
+          
         </div>
+
+        <input type="hidden" ref="patientId" id="patient_id" v-model="patient.code" />
 
       </div>
 
@@ -229,9 +230,9 @@ export default {
     patientList() {
       return this.patientService.patientList
     },
-    patientData() {
-      return this.patientService.patientData
-    },
+    nextEditablePatient() {
+      return this.patientService.nextEditablePatientIndex
+    },    
     totalNumPatients() {
       return this.patientList.length
     }
@@ -241,7 +242,8 @@ export default {
       startTime: '',
       patient: null,
       patientQualData: {},
-      patientIndex: 0
+      patientIndex: 0,
+      nextUnsaved: 0
     }
   },
   methods: {
@@ -266,7 +268,6 @@ export default {
 
       console.group('prevPatient()')
       
-      //TODO
       if (this.patientIndex > 0) {
         this.patient = this.patientList[--this.patientIndex]
         console.debug('Now viewing patient', this.patientIndex)
@@ -278,12 +279,12 @@ export default {
 
       console.group('nextPatient()')
 
-      if (this.patientIndex >= this.numPatientsEntered) {
+      if (this.patientIndex >= this.nextUnsaved) {
 
-        console.debug('Attempt save of patient at index', this.patientIndex, 'already saved', this.numPatientsEntered, 'patients')
+        console.debug('Attempt save of patient at index', this.patientIndex, 'already saved', this.nextUnsaved, 'patients')
         console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
 
-        const completed = this.numPatientsEntered == this.totalNumPatients
+        const completed = this.nextUnsaved == this.totalNumPatients
         const time_taken = dayjs().diff(this.startTime, 'seconds')
         const qualitative_data = this.$refs.patientIntervention.value
         const code = this.$refs.patientId.value
@@ -304,16 +305,16 @@ export default {
             }
           } else {
             // On to the next one
-            this.numPatientsEntered++
+            this.nextUnsaved++
             this.patient = this.patientList[++this.patientIndex]
-            console.debug('Advanced to', this.patientIndex, 'now processed', this.numPatientsEntered)
+            console.debug('Advanced to', this.patientIndex, 'now processed', this.nextUnsaved)
           }
         } else {
           this.errorAlertModal.show(saveResponse.message)
         }
       } else {
         this.patient = this.patientList[++this.patientIndex]
-        console.debug('Advanced to', this.patientIndex, '(without additional save), now processed', this.numPatientsEntered)
+        console.debug('Advanced to', this.patientIndex, '(without additional save), now processed', this.nextUnsaved)
       }
       
       console.groupEnd()
@@ -324,7 +325,8 @@ export default {
       
       const patientResponse = await this.patientService.getCompletePatientDetails()
       if (patientResponse.status < 400) {
-        this.patientIndex = this.totalNumPatients - this.patientData.length
+        this.nextUnsaved = this.nextEditablePatient
+        this.patientIndex = this.nextUnsaved
         this.patient = this.patientList[this.patientIndex]
         console.debug('Initialising patient list at position', this.patientIndex)
       } else {
