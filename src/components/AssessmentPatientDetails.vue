@@ -161,7 +161,7 @@
             </div>
           </div>
 
-          <div v-if="patientIndex >= nextEditablePatient" class="row mb-4">
+          <div v-if="patientIndex >= nextUnsaved" class="row mb-4">
             <div class="alert alert-warning fw-bold" role="alert">
               To optimise the use of this tool please record ALL types of guidance that appears on your system screen
             </div>
@@ -188,8 +188,8 @@
             Previous
         </button>     
         <button type="button" class="btn btn-primary" @click="nextPatient()">
-          <i :class="patientIndex == totalNumPatients - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
-            {{ patientIndex == totalNumPatients - 1 ? 'Next' : 'Done' }}
+          <i :class="patientIndex < totalNumPatients - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
+            {{ patientIndex < totalNumPatients - 1 ? 'Next' : 'Done' }}
         </button>
       </div>
     </div>
@@ -241,7 +241,7 @@ export default {
     return {
       startTime: '',
       patient: null,
-      patientQualData: {},
+      patientQualData: '',
       patientIndex: 0,
       nextUnsaved: 0
     }
@@ -284,7 +284,7 @@ export default {
         console.debug('Attempt save of patient at index', this.patientIndex, 'already saved', this.nextUnsaved, 'patients')
         console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
 
-        const completed = this.nextUnsaved == this.totalNumPatients
+        const completed = this.nextUnsaved == this.totalNumPatients - 1
         const time_taken = dayjs().diff(this.startTime, 'seconds')
         const qualitative_data = this.$refs.patientIntervention.value
         const code = this.$refs.patientId.value

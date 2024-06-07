@@ -338,7 +338,7 @@ export default {
         if (valid) {
           const completed = this.isLast
           const time_taken = dayjs().diff(this.startTime, 'seconds')
-          const prescription = this.response.prescription
+          const prescription = this.response.prescription //TODO this ends up being the same across repeated prescriptions
           const outcome = this.response.outcomes
           const other = this.response.other
           const intervention_type = this.response.intervention_type.toString()
