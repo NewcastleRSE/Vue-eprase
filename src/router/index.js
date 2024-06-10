@@ -67,7 +67,7 @@ export const router = createRouter({
       component: AssessmentScenarios,
     },   
     {
-      path: "/assessmentresults/:ID?",
+      path: "/assessmentresults",
       name: "assessmentresults",
       component: AssessmentResults,
     },

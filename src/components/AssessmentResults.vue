@@ -225,6 +225,9 @@ export default {
     async getPrescriptionTestData() {
       return await rootStore().getPrescriptionTestData(this.assessmentId)
     },
+    async getConfigErrorByCode(code) {
+      return await rootStore().getConfigErrorByCode(code)
+    },
     createResults(id) {
 
       let tempData = []
@@ -457,9 +460,29 @@ export default {
         })
         this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
         this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
+        // Config errors
+        this.configErrorResults = []
+        detailsResponse.data.configErrorDataList.forEach(cd => {
+          const cdDataResponse = this.getConfigErrorByCode(cd.test_id)
+          if (cdDataResponse.status < 400) {
+            cd.question = cdDataResponse.data.description
+          } else {
+            // Pretty minor - don't bomb the whole thing for this
+            cd.question = cdDataResponse.message
+            console.error(cd.question)
+          }
+          this.configErrorResults.push(cd)
+        })
         rootStore().audit('View report', '/assessmentresults')
       } else {
         throw new Error(detailsResponse.message)
+      }
+      // Categories (these seem to be hard-coded everywhere, so not sure why this is useful?)
+      const catResponse = rootStore().getCategories()
+      if (catResponse.status < 400) {
+        this.categories = catResponse.data
+      } else {
+        throw new Error(catResponse.message)
       }
       // Mitigations data
       const mitigationsResponse = this.getMitigations()

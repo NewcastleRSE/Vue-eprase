@@ -267,7 +267,7 @@ export default {
         { id: 'drug-duplication', label: 'Drug duplication', tip: 'Tip: Specified drug prescribed more than once for the same patient' },
         { id: 'drug-disease', label: 'Drug disease', tip: 'Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities' },
         { id: 'drug-ommissions', label: 'Drug omissions', tip: 'Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication' },
-        { id: 'therapeutic-duplication', label: 'therapeutic-duplication', tip: 'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims' },
+        { id: 'therapeutic-duplication', label: 'Therapeutic duplication', tip: 'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims' },
         { id: 'drug-lab', label: 'Lab results/monitoring/TDM', tip: 'Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)' },
         { id: 'drug-brand', label: 'Drug brand', tip: 'Tip: Drug that must be prescribed by BRAND rather than using generic name' },
         { id: 'drug-route', label: 'Incorrect route', tip: 'Tip: Specified route is contraindicated for drug and/or dose prescribed' },
