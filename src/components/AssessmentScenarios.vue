@@ -19,8 +19,8 @@
       
       <div class="mx-auto" v-if="test != null">
         <h5>Test {{ noTestsDone + 1 }} of {{ totalNumTests }}</h5>
-        <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="testIndex == myTestList.length - 1" ref="currentDisplayForm"></component>
-        <h5 v-if="testIndex == myTestList.length - 1">Congratulations, you have reached the end of the scenarios!</h5>
+        <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="this.testIndex == this.myTestList.length - 1" ref="currentDisplayForm"></component>
+        <h5 v-if="noTestsDone == totalNumTests">Congratulations, you have reached the end of the scenarios!</h5>
       </div>      
     </div>
     <ErrorAlertModal ref="errorAlertModal" />
@@ -62,16 +62,19 @@ export default {
     },    
     myTestList() {
       return this.patientService.testList
-    },
-    totalNumTests() {
+    },    
+    totalNumPrescriptions() {
       return appSettingsStore().numPrescriptions
     },
     totalNumConfigErrors() {
       return appSettingsStore().numConfigError
     },
+    totalNumTests() {
+      return this.totalNumPrescriptions + this.totalNumConfigErrors
+    },
     noTestsDone() {
       // Total number minus those still to do
-      return this.totalNumTests + this.totalNumConfigErrors - this.myTestList.length + this.testIndex
+      return this.totalNumTests - this.myTestList.length + this.testIndex
     }
   },
   data() {
@@ -101,17 +104,19 @@ export default {
 
       console.group('nextTest()')
 
-      if (this.testIndex < this.myTestList.length) {
+      if (this.testIndex < this.myTestList.length - 1) {
         // Move onto the next test or config error
         this.$refs.currentDisplayForm.onResetClick()
         this.test = this.myTestList[++this.testIndex]
+        console.debug('Advanced to test', this.testIndex, 'test data is', this.test)
+        console.assert(this.test != undefined, 'Test data is undefined!')
         this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
         console.groupEnd()
       } else {
         // 'Done' button has been clicked => move to reports
         rootStore().audit('Completed scenarios', '/assessmentscenarios')
         console.groupEnd()
-        this.$router.push('/assessmentresults?ID='+ rootStore().assessmentId);
+        this.$router.push('/assessmentresults?ID=' + rootStore().assessmentId);
       }            
     },
     reportError(message) {

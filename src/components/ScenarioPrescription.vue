@@ -195,8 +195,8 @@
 
         <h5 class="my-3">Please discontinue the prescription order before proceeding to the next scenario</h5>
 
-        <input type="hidden" id="test_id" v-model="testPayload.id" />
-        <input type="hidden" id="risk_level" v-model="testPayload.risk_level" />
+        <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id"/>
+        <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level"/>
 
         <div class="my-2">          
           <button type="reset" class="btn btn-primary me-3" @click="onResetClick()">
@@ -253,9 +253,7 @@ export default {
     return {
       response: {
         outcomes: '',
-        other: '',
-        prescription: this.testPayload.id,
-        risk_level: this.testPayload.risk_level,
+        other: '',        
         selected_type: '',
         qualitative_data: '',
         intervention_type: []
@@ -338,13 +336,13 @@ export default {
         if (valid) {
           const completed = this.isLast
           const time_taken = dayjs().diff(this.startTime, 'seconds')
-          const prescription = this.response.prescription //TODO this ends up being the same across repeated prescriptions
+          const prescription = this.$refs.test_id.value
           const outcome = this.response.outcomes
           const other = this.response.other
           const intervention_type = this.response.intervention_type.toString()
           const selected_type = this.response.selected_type
           const qualitative_data = this.response.qualitative_data
-          const risk_level = this.response.risk_level
+          const risk_level = this.$refs.risk_level.value
           const result = this.getResult(risk_level, outcome)
           const result_score = this.getResultScore(result)
           const saveResponse = await this.savePrescriptionData(prescription, outcome, other, intervention_type, selected_type, risk_level, result, result_score, time_taken, qualitative_data, completed)

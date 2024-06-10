@@ -162,7 +162,7 @@ export const patientStore = defineStore('patients', {
           // First determine which scenarios we have already done...
           const doneScenarios = await rootStore().apiCall('getPrescriptionDataByAssessmentId?ID=' + rootStore().assessmentId, 'GET')
           if (doneScenarios.status < 400) {
-            const doneIds = doneScenarios.data.map(ds => ds.prescription.prescription_id)          
+            const doneIds = doneScenarios.data.map(ds => ds.prescription.prescription_id)
             this.patientIds.forEach(async pid => {
               console.debug('Patient id', pid)
               const testResponse = await rootStore().apiCall('prescriptions?ID=' + pid, 'GET')

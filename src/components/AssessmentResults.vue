@@ -423,42 +423,44 @@ export default {
   },
   mounted: function () {
 
-    let failed = false
-    const detailsResponse = this.getAssessmentDetails()
-    if (detailsResponse.status < 400) {
-      // System-level data
-      this.ep_service = detailsResponse.data.system.ep_service
-      this.other_ep_system = detailsResponse.data.$eventsystem.other_ep_system
-      // Prescription list data
-      detailsResponse.data.prescriptionList.forEach(p => {
-        const risk_level = p.risk_level
-        if (risk_level === 'Extreme') {
-          this.extremeRiskScenarios.push(p)
-          if (p.result === 'No Mitigation/Fail') {
-            this.extremeRiskFails.push(p)
+    console.group('mounted()')
+
+    try {
+      console.debug('Getting assessment details...')
+      const detailsResponse = this.getAssessmentDetails()
+      if (detailsResponse.status < 400) {
+        // System-level data
+        this.ep_service = detailsResponse.data.system.ep_service
+        this.other_ep_system = detailsResponse.data.system.other_ep_system
+        console.debug('System data : ep_service', this.ep_service, 'other_ep_system', this.other_ep_system)
+        // Prescription list data
+        detailsResponse.data.prescriptionList.forEach(p => {
+          const risk_level = p.risk_level
+          if (risk_level === 'Extreme') {
+            this.extremeRiskScenarios.push(p)
+            if (p.result === 'No Mitigation/Fail') {
+              this.extremeRiskFails.push(p)
+            }
           }
-        }
-        else if (risk_level === 'High') {
-          this.highRiskScenarios.push(p)
-          if (p.result === 'No Mitigation/Fail') {
-            this.highRiskFails.push(p)
+          else if (risk_level === 'High') {
+            this.highRiskScenarios.push(p)
+            if (p.result === 'No Mitigation/Fail') {
+              this.highRiskFails.push(p)
+            }
           }
-        }
-        else if (risk_level === 'Low') {
-          this.lowRiskScenarios.push(p)
-          if (p.result === 'Over Mitigation') {
-            this.lowRiskOverMitigations.push(p)
+          else if (risk_level === 'Low') {
+            this.lowRiskScenarios.push(p)
+            if (p.result === 'Over Mitigation') {
+              this.lowRiskOverMitigations.push(p)
+            }
           }
-        }
-      })
-      this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
-      this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
-      rootStore().audit('View report', '/assessmentresults')
-    } else {
-      this.errorAlertModal.show(detailsResponse.message)
-      failed = true
-    }
-    if (!failed) {
+        })
+        this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
+        this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
+        rootStore().audit('View report', '/assessmentresults')
+      } else {
+        throw new Error(detailsResponse.message)
+      }
       // Mitigations data
       const mitigationsResponse = this.getMitigations()
       if (mitigationsResponse.status < 400) {
@@ -467,11 +469,8 @@ export default {
         this.notMitigated = mitigationsResponse.data.notMitigated
         this.overMitigated = mitigationsResponse.data.notMitigated
       } else {
-        this.errorAlertModal.show(mitigationsResponse.message)
-        failed = true
+        throw new Error(mitigationsResponse.message)
       }
-    }
-    if (!failed) {
       // Prescription test data
       const ptdResponse = this.getPrescriptionTestData()
       if (ptdResponse.status < 400) {
@@ -484,10 +483,11 @@ export default {
           }
         }))
       } else {
-        this.errorAlertModal.show(ptdResponse.message)
-        failed = true
+        throw new Error(ptdResponse.message)
       }
-    }
+    } catch(error) {
+      this.errorAlertModal.show(error.message)
+    }   
   }
 
 }
