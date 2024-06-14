@@ -190,7 +190,7 @@ export const patientStore = defineStore('patients', {
             if (doneConfErrorsResponse.status < 400) {
               const doneConfIds = doneConfErrorsResponse.data.map(dce => dce.test_id)
               configErrorPool.forEach(ce => {
-                if (!doneConfIds.includes(ce.test_id)) {
+                if (!doneConfIds.includes(ce.configErrorCode)) {
                   let randInsertPoint = Math.floor(Math.random() * (this.testList.length - 2)) + 2
                   console.debug('Insert config error', ce, 'at random index', randInsertPoint)
                   console.debug('Test list before', this.testList)

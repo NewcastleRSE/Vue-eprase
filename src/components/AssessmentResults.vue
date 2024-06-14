@@ -10,8 +10,9 @@
       <h3>Assessment Report</h3>
 
       <div>
-        <span class="fw-bold">Institution:</span> {{ institution() }} <br />
-        <span class="fw-bold">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system }}</span>
+        <h4><span class="fw-bold me-2">Institution:</span><span class="fw-normal">{{ institution }}</span></h4>
+        <h4><span class="fw-bold me-2">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system
+            }}</span></h4>
       </div>
 
       <section>
@@ -29,77 +30,37 @@
           </thead>
           <tbody>
             <tr>
-              <td>Extreme risk scenarios</td>
-              <td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenario(s). Out of these, {{
-      extremeRiskMitigations }} was(were) mitigated. </td>
+              <th>Extreme risk scenarios</th>
+              <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
+      (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{
+      extremeRiskMitigations + ' ' + (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
             </tr>
             <tr>
-              <td>High risk scenarios</td>
-              <td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{
-      highRiskMitigations }} were mitigated. </td>
+              <th>High risk scenarios</th>
+              <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{
+      highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
             </tr>
             <tr>
-              <td>Alerts/Advisory interventions</td>
+              <th>Alerts/Advisory interventions</th>
               <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{ totalValidTests
                 }} total valid tests, where a system/user intervention was selected. This would be considered a {{
-      interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) }}). A high level of alerts can
+      interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) + '%' }}). A high level of alerts can
                 indicate an over-reliance on alerting within a system.</td>
             </tr>
             <tr>
-              <td>Config Errors</td>
+              <th>Config Errors</th>
               <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
             </tr>
           </tbody>
         </table>
-      </div>
-
-    </div>
-    <ErrorAlertModal ref="errorAlertModal" />
-    <AppLogo cls="bottomright" />
-
-  </main>
-  <div id="page">
-
-    <div id="content">
-
-      <div class="assessment-results">
-        <div class="results-summary">
-          <table class="table table-striped">
-            <tr>
-              <th>Category</th>
-              <th>Outcome</th>
-            </tr>
-            <tr>
-              <td>Extreme risk scenarios</td>
-              <td>You have completed {{ extremeRiskScenarios.length }} extreme risk scenario(s). Out of these, {{
-      extremeRiskMitigations }} was(were) mitigated. </td>
-            </tr>
-            <tr>
-              <td>High risk scenarios</td>
-              <td>You have completed {{ highRiskScenarios.length }} high risk scenarios. Out of these, {{
-      highRiskMitigations }} were mitigated. </td>
-            </tr>
-            <tr>
-              <td>Alerts/Advisory interventions</td>
-              <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{ totalValidTests
-                }} total valid tests, where a system/user intervention was selected. This would be considered a {{
-      interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) }}). A high level of alerts can
-                indicate an over-reliance on alerting within a system.</td>
-            </tr>
-            <tr>
-              <td>Config Errors</td>
-              <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
-            </tr>
-          </table>
-        </div>
 
         <div v-if="extremeRiskFails.length > 0">
 
-          <div class="table-header-warning">Extreme risk scenarios with no mitigation</div>
-          <table class="table table-striped extreme-risk-table">
+          <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
+          <table class="table table-striped bg-warning-subtle">
             <thead>
               <tr>
-                <th width="20%">Drug name</th>
+                <th>Drug name</th>
                 <th>Scenario description</th>
               </tr>
             </thead>
@@ -114,11 +75,11 @@
 
         <div v-if="configErrorResults.length > 0">
 
-          <div class="table-header">Configuration Error Results</div>
+          <h4>Configuration Error Results</h4>
           <table class="table table-striped extreme-risk-table">
             <thead>
               <tr>
-                <th width="50%">Question</th>
+                <th>Question</th>
                 <th>Result</th>
                 <th>Outcome</th>
               </tr>
@@ -126,7 +87,7 @@
             <tbody>
               <tr v-for="test in configErrorResults" :key="test">
                 <td>{{ test.question }}</td>
-                <td><span v-if="test.result === 1">True</span><span v-if="test.result === 0">False</span></td>
+                <td><span v-if="test.result === 1">Yes</span><span v-if="test.result === 0">No</span></td>
                 <td><span v-if="test.result === 1">This is undesirable system behaviour</span><span
                     v-if="test.result === 0">This is good system behaviour</span></td>
               </tr>
@@ -134,24 +95,27 @@
           </table>
         </div>
 
-        <button class="chartbutton" @click="onTableClick()"><i class="bi bi-percent"></i> View Percentages</button>
-        <button class="chartbutton" @click="onChartClick()"><i class="bi bi-bar-chart"></i> View Charts</button>
+        <div class="my-2">          
+          <button type="button" class="btn btn-primary me-3" @click="onTableClick()">
+            <i class="bi bi-percent pe-1"></i>View Percentages
+          </button>
+          <button type="button" class="btn btn-primary" @click="onChartClick()">
+            <i class="bi bi-bar-chart-fill pe-1"></i>View Charts              
+          </button>           
+        </div>
 
       </div>
-      <div class="mx-auto">
-        <div class="buttons">
-          <button type="button" class="results-btn btn btn-primary" @click="onExitClick()">Exit</button>
-          <button type="button" class="results-btn btn btn-primary" @click="onHomeClick()">Home</button>
-        </div>
-      </div>
     </div>
+
+    <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
-  </div>
+
+  </main>
+
 </template>
 
 <script>
 
-import { dataService } from '../services/data.service'
 import { categoryService } from "../services/categoryService"
 import { stackedChartService } from "../services/stackedChartService"
 import TabHeader from "./TabHeader"
@@ -200,14 +164,17 @@ export default {
       totalNulls: 0,
       totalInterventions: 0,
       interventionTypeResult: '',
-      totalConfigTests: appSettingsStore().numConfigErrors,
-      numPrescriptions: 0,
+      totalConfigTests: appSettingsStore().numConfigError,
+      numPrescriptions: appSettingsStore().numPrescriptions,
       ep_service: '',
       other_ep_system: ''
     }
   },
   computed: {
     ...mapStores(authenticationStore, rootStore, patientStore, appSettingsStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    },
     assessmentId() {
       return rootStore().assessmentId
     },
@@ -216,57 +183,10 @@ export default {
     }
   },
   methods: {
-    async getAssessmentDetails() {
-      return await rootStore().getAssessmentById(this.assessmentId)
-    },
-    async getMitigations() {
-      return await rootStore().getMitigationResults(this.assessmentId)
-    },
-    async getPrescriptionTestData() {
-      return await rootStore().getPrescriptionTestData(this.assessmentId)
-    },
-    async getConfigErrorByCode(code) {
-      return await rootStore().getConfigErrorByCode(code)
-    },
-    createResults(id) {
-
-      let tempData = []
-      let formattedData = []
-      let tempResult = []
-
-      dataService.getPrescriptionTestData(id).then(data => {
-        tempData = data
-        for (let index in tempData) {
-          if (tempData.hasOwnProperty(index)) {
-            tempResult = this.formatData(tempData[index])
-            formattedData.push(tempResult)
-          }
-        }
-        this.countCategories(formattedData)
-
-        // const variable for sending to storage
-        const stackedChartData = this.chartCategoryData
-        const { dispatch } = this.$store
-        if (id) {
-          dispatch('storeStackedChartData', { stackedChartData })
-        }
-
-        // if numPrescriptions isn't in local storage, get it from the settings
-        let numPrescriptions = parseInt(localStorage.getItem('numPrescriptions'))
-        if (!numPrescriptions) {
-          numPrescriptions = appSettingsStore().numPrescriptions
-          localStorage.setItem('numPrescriptions', numPrescriptions)
-        }
-
-        // calculate number of valid tests, ignoring null results
-        this.totalValidTests = numPrescriptions - this.totalNulls
-        this.getInterventionTypeResult()
-        this.saveMitigationResult(id)
-
-      })
-    },
-    //KEEP - TODO
     countCategories(data) {
+
+      console.group('countCategories()')
+
       let jsonData = categoryService.countCategories(data)
       this.totalGood = jsonData.totals.totalGood
       this.totalSome = jsonData.totals.totalSome
@@ -277,240 +197,132 @@ export default {
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
       this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
+
+      console.debug(jsonData)
+      console.groupEnd()
     },
     getInterventionTypeResult() {
-      let interventionType = this.calc(this.totalAlerts, this.totalValidTests)
-      interventionType = interventionType.slice(0, -1)
-      interventionType = parseInt(interventionType)
-      if (interventionType >= 70) {
-        return this.interventionTypeResult = 'high level of alerts'
-      }
-      else if (interventionType < 70 && interventionType >= 35) {
-        return this.interventionTypeResult = 'medium level of alerts'
-      }
-      else {
-        return this.interventionTypeResult = 'low level of alerts'
-      }
+      const interventionType = parseInt(this.calc(this.totalAlerts, this.totalValidTests))
+      return (interventionType >= 70) ? 'high' : ((interventionType < 70 && interventionType >= 35) ? 'medium' : 'low') + ' level of alerts'
     },
-    // calculate as % of all tests
+    // Calculate as % of all tests
     saveMitigationResult(id) {
-
-      let numTests = parseInt(localStorage.getItem('numPrescriptions'))
-      this.goodMitigation = this.calcPerCategory(this.totalGood, numTests)
-      this.someMitigation = this.calcPerCategory(this.totalSome, numTests)
-      this.notMitigated = this.calcPerCategory(this.totalNot, numTests)
-      this.overMitigated = this.calcPerCategory(this.totalOver, numTests)
-      this.percentageNulls = this.calcPerCategory(this.totalNulls, numTests)
-
-      // const variables for sending to storage
-      const goodPercentage = this.goodMitigation
-      const somePercentage = this.someMitigation
-      const notPercentage = this.notMitigated
-      const overPercentage = this.overMitigated
-      const percentageNulls = this.percentageNulls
-      const { dispatch } = this.$store
-      if (id) {
-        dispatch('storeMitigationData', { goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls })
-      }
-
-      dataService.saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, percentageNulls)
+      let numTests = this.numPrescriptions
+      this.goodMitigation = this.calc(this.totalGood, numTests)
+      this.someMitigation = this.calc(this.totalSome, numTests)
+      this.notMitigated = this.calc(this.totalNot, numTests)
+      this.overMitigated = this.calc(this.totalOver, numTests)
+      this.percentageNulls = this.calc(this.totalNulls, numTests)
+      rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
     },
     calc(num, total) {
-      if (total !== 0) {
-        return ((num / total) * 100).toFixed(1) + '%'
-      }
-      return 'n/a'
-    },
-    calcPerCategory(num, total) {
-      if (total !== 0) {
-        return ((num / total) * 100).toFixed(1)
-      }
-      return 0
-    },
-    calcNum(num, total) {
-      if (total !== 0) {
-        let tempnum = ((num / total) * 100).toFixed(1)
-        return parseInt(tempnum)
-      }
-      return 0
-    },
-    onHomeClick() {
-      this.userIsAdmin = localStorage.getItem('userIsAdmin')
-      // string value since its been in local storage
-      if (this.userIsAdmin === 'true') {
-        this.$router.push('/adminhome')
-      }
-      else {
-        this.$router.push('/assessmentintro')
-      }
+      return total !== 0 ? ((num / total) * 100).toFixed(1) : 0
     },
     onTableClick() {
       this.$router.push('/resultstable')
     },
     onChartClick() {
       this.$router.push('/charts')
-    }
-  },
-  created() {
-    // get the assessment id from the url or local storage if it isn't there
-    this.assessment_id = this.$route.query.ID
-    if (typeof (this.assessment_id) === 'undefined') {
-      this.assessment_id = localStorage.getItem('assessmentId')
-    }
-    else {
-      localStorage.setItem('assessmentId', this.assessment_id)
-    }
-    dataService.getCategories(this.assessment_id).then(data => {
-      this.categories = data
-    })
+    },
+    async getAllDetails() {
 
-    dataService.getAssessmentById(this.assessment_id).then(data => {
+      console.group('getAllDetails()')
 
-      let configErrorList = data.configErrorDataList
-
-      for (let index in configErrorList) {
-        if (configErrorList.hasOwnProperty(index)) {
-          dataService.getConfigErrorByCode(configErrorList[index].test_id).then(newdata => {
-            // assign a new element to the JSON
-            configErrorList[index]["question"] = newdata.description
-            this.configErrorResults.push(configErrorList[index])
+      try {
+        console.debug('Getting assessment details...')
+        const detailsResponse = await rootStore().getAssessmentById(this.assessmentId)
+        if (detailsResponse.status < 400) {
+          // System-level data
+          this.ep_service = detailsResponse.data.system.ep_service
+          this.other_ep_system = detailsResponse.data.system.other_ep_system
+          console.debug('System data : ep_service', this.ep_service, 'other_ep_system', this.other_ep_system)
+          // Prescription list data
+          detailsResponse.data.prescriptionList.forEach(p => {
+            const risk_level = p.risk_level
+            if (risk_level === 'Extreme') {
+              this.extremeRiskScenarios.push(p)
+              if (p.result === 'No Mitigation/Fail') {
+                this.extremeRiskFails.push(p)
+              }
+            }
+            else if (risk_level === 'High') {
+              this.highRiskScenarios.push(p)
+              if (p.result === 'No Mitigation/Fail') {
+                this.highRiskFails.push(p)
+              }
+            }
+            else if (risk_level === 'Low') {
+              this.lowRiskScenarios.push(p)
+              if (p.result === 'Over Mitigation') {
+                this.lowRiskOverMitigations.push(p)
+              }
+            }
           })
+          this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
+          this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
+          // Config errors
+          this.configErrorResults = []
+          detailsResponse.data.configErrorDataList.forEach(async cd => {
+            const cdDataResponse = await rootStore().getConfigErrorByCode(cd.test_id)
+            if (cdDataResponse.status < 400) {
+              cd.question = cdDataResponse.data.description
+            } else {
+              // Pretty minor - don't bomb the whole thing for this
+              cd.question = cdDataResponse.message
+              console.error(cd.question)
+            }          
+            this.configErrorResults.push(cd)
+          })
+          rootStore().audit('View report', '/assessmentresults')
+        } else {
+          throw new Error(detailsResponse.message)
         }
-      }
-
-      let prescriptionList = data.prescriptionList
-
-      for (let index in prescriptionList) {
-        if (prescriptionList.hasOwnProperty(index)) {
-          let risk_level = prescriptionList[index].risk_level
-          if (risk_level === 'Extreme') {
-            this.extremeRiskScenarios.push(prescriptionList[index])
-            if (prescriptionList[index].result === 'No Mitigation/Fail') {
-              this.extremeRiskFails.push(prescriptionList[index])
-            }
-          }
-          else if (risk_level === 'High') {
-            this.highRiskScenarios.push(prescriptionList[index])
-            if (prescriptionList[index].result === 'No Mitigation/Fail') {
-              this.highRiskFails.push(prescriptionList[index])
-            }
-          }
-          else if (risk_level === 'Low') {
-            this.lowRiskScenarios.push(prescriptionList[index])
-            if (prescriptionList[index].result === 'Over Mitigation') {
-              this.lowRiskOverMitigations.push(prescriptionList[index])
-            }
-          }
+        // Categories (these seem to be hard-coded everywhere, so not sure why this is useful?)
+        const catResponse = await rootStore().getCategories()
+        if (catResponse.status < 400) {
+          this.categories = catResponse.data
+        } else {
+          throw new Error(catResponse.message)
         }
+        // Mitigations data (this probably does not matter)
+        const mitigationsResponse = await rootStore().getMitigationResults(this.assessmentId)
+        if (mitigationsResponse.status < 400) {
+          console.debug('### Does this make any sense? mitigationResponse is ', mitigationsResponse)
+          this.goodMitigation = mitigationsResponse.data.goodMitigation || ''
+          this.someMitigation = mitigationsResponse.data.someMitigation || ''
+          this.notMitigated = mitigationsResponse.data.notMitigated || ''
+          this.overMitigated = mitigationsResponse.data.notMitigated || ''
+        } else {
+          //throw new Error(mitigationsResponse.message)
+          console.warn('Failed to get mitigation response')
+        }
+        // Prescription test data
+        const ptdResponse = await rootStore().getPrescriptionTestData(this.assessmentId)
+        if (ptdResponse.status < 400) {
+          this.countCategories(ptdResponse.data.map(ptd => {
+            return {
+              categoryName: ptd.prescription.indicator.category['categoryName'],
+              mitigation: ptd.result,
+              outcome: ptd.outcome,
+              selected_type: ptd.selected_type
+            }
+          }))
+          // Set chart data (set in countCategories())
+          rootStore().storeStackedChartData(this.chartCategoryData)
+          // Calculate number of valid tests, ignoring null results
+          this.totalValidTests = this.numPrescriptions - this.totalNulls
+          this.getInterventionTypeResult()
+          this.saveMitigationResult(this.assessmentId)
+        } else {
+          throw new Error(ptdResponse.message)
+        }
+      } catch (error) {
+        this.errorAlertModal.show(error.message)
       }
-
-      // calculate number of mitigated extreme & high risk scenarios
-      this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
-      this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
-
-      this.ep_service = data.system.ep_service
-      this.other_ep_system = data.system.other_ep_system
-      this.institution = data.institution.orgName
-
-      // audit
-      dataService.audit('View report', '/assessmentresults')
-
-      dataService.getMitigationResults(this.assessment_id).then(data => {
-        this.goodMitigation = data.goodMitigation
-        this.someMitigation = data.someMitigation
-        this.notMitigated = data.notMitigated
-        this.overMitigated = data.notMitigated
-        this.createResults(this.assessment_id)
-      })
-    })
+    }
   },
-  mounted: function () {
-
-    console.group('mounted()')
-
-    try {
-      console.debug('Getting assessment details...')
-      const detailsResponse = this.getAssessmentDetails()
-      if (detailsResponse.status < 400) {
-        // System-level data
-        this.ep_service = detailsResponse.data.system.ep_service
-        this.other_ep_system = detailsResponse.data.system.other_ep_system
-        console.debug('System data : ep_service', this.ep_service, 'other_ep_system', this.other_ep_system)
-        // Prescription list data
-        detailsResponse.data.prescriptionList.forEach(p => {
-          const risk_level = p.risk_level
-          if (risk_level === 'Extreme') {
-            this.extremeRiskScenarios.push(p)
-            if (p.result === 'No Mitigation/Fail') {
-              this.extremeRiskFails.push(p)
-            }
-          }
-          else if (risk_level === 'High') {
-            this.highRiskScenarios.push(p)
-            if (p.result === 'No Mitigation/Fail') {
-              this.highRiskFails.push(p)
-            }
-          }
-          else if (risk_level === 'Low') {
-            this.lowRiskScenarios.push(p)
-            if (p.result === 'Over Mitigation') {
-              this.lowRiskOverMitigations.push(p)
-            }
-          }
-        })
-        this.extremeRiskMitigations = this.extremeRiskScenarios.length - this.extremeRiskFails.length
-        this.highRiskMitigations = this.highRiskScenarios.length - this.highRiskFails.length
-        // Config errors
-        this.configErrorResults = []
-        detailsResponse.data.configErrorDataList.forEach(cd => {
-          const cdDataResponse = this.getConfigErrorByCode(cd.test_id)
-          if (cdDataResponse.status < 400) {
-            cd.question = cdDataResponse.data.description
-          } else {
-            // Pretty minor - don't bomb the whole thing for this
-            cd.question = cdDataResponse.message
-            console.error(cd.question)
-          }
-          this.configErrorResults.push(cd)
-        })
-        rootStore().audit('View report', '/assessmentresults')
-      } else {
-        throw new Error(detailsResponse.message)
-      }
-      // Categories (these seem to be hard-coded everywhere, so not sure why this is useful?)
-      const catResponse = rootStore().getCategories()
-      if (catResponse.status < 400) {
-        this.categories = catResponse.data
-      } else {
-        throw new Error(catResponse.message)
-      }
-      // Mitigations data
-      const mitigationsResponse = this.getMitigations()
-      if (mitigationsResponse.status < 400) {
-        this.goodMitigation = mitigationsResponse.data.goodMitigation
-        this.someMitigation = mitigationsResponse.data.someMitigation
-        this.notMitigated = mitigationsResponse.data.notMitigated
-        this.overMitigated = mitigationsResponse.data.notMitigated
-      } else {
-        throw new Error(mitigationsResponse.message)
-      }
-      // Prescription test data
-      const ptdResponse = this.getPrescriptionTestData()
-      if (ptdResponse.status < 400) {
-        this.countCategories(ptdResponse.data.map(ptd => {
-          return {
-            categoryName: ptd.prescription.indicator.category['categoryName'],
-            mitigation: ptd.result,
-            outcome: ptd.outcome,
-            selected_type: ptd.selected_type
-          }
-        }))
-      } else {
-        throw new Error(ptdResponse.message)
-      }
-    } catch(error) {
-      this.errorAlertModal.show(error.message)
-    }   
+  mounted() {
+    this.getAllDetails()
   }
 
 }

@@ -68,7 +68,7 @@ export const rootStore = defineStore('root', {
       return response            
     },
     async getMitigationResults(id) {
-      const response = await this.apiCall('getMitigationResults?ID=' + id + id, 'GET')
+      const response = await this.apiCall('getMitigationResults?ID=' + id, 'GET')
       return response                
     },
     async getAllMitigationResults() {
@@ -145,11 +145,11 @@ export const rootStore = defineStore('root', {
       }
       return(response)   
     },
-    async saveMitigationResults(assessmentId, epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests){
+    async saveMitigationResults(assessmentId, epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests) {
       const institutionId = authenticationStore().institutionId
       const response = await this.apiCall('saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, 'POST', { epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests })   
       if (response.status < 400) {
-        this.storeMitigationData(goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls)
+        this.storeMitigationData(goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests)
       }
       return(response)
     },

@@ -92,8 +92,14 @@ export default {
 
       const patientResponse = await this.patientService.getCompletePatientDetails(true)
       if (patientResponse.status < 400) {
-        this.test = this.myTestList[0]
-        this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
+        if (this.myTestList.length == 0) {
+          // Done them all => results page
+          this.$router.push('/assessmentresults')
+        } else {
+          // Some more to do
+          this.test = this.myTestList[0]
+          this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
+        }        
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }
@@ -116,7 +122,7 @@ export default {
         // 'Done' button has been clicked => move to reports
         rootStore().audit('Completed scenarios', '/assessmentscenarios')
         console.groupEnd()
-        this.$router.push('/assessmentresults?ID=' + rootStore().assessmentId);
+        this.$router.push('/assessmentresults')
       }            
     },
     reportError(message) {
