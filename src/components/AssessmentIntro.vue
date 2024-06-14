@@ -3,11 +3,11 @@
 
     <div class="pills-banner"></div>
 
-    <div class="px-4" v-if="assessmentComplete !== true">
+    <LoginInfo />
 
-      <LoginInfo />
+    <h1 class="px-4">Welcome to the ePRaSE Assessment</h1>
 
-      <h1>Welcome to the ePRaSE Assessment</h1>
+    <div class="px-4" v-if="!assessmentComplete">
 
       <p>
         The following assessment is designed to evaluate the performance of an e-prescription system against a range of
@@ -51,10 +51,9 @@
           v-if="assessmentStatus !== 'Not Started' && assessmentStatus !== 'Fully Complete'"
           @click="onStartAssessmentClick()">Continue {{ year }} Assessment</button>
       </div>
-      <p></p>
     </div>
 
-    <div class="px-4" v-if="assessmentComplete === true">
+    <div class="px-4" v-if="assessmentComplete">
 
       <h2>Assessment Complete</h2>
       <div class="pt-4">
@@ -107,7 +106,7 @@ export default {
       assessmentId: ''
     }
   },
-  methods: {  
+  methods: {
     async checkAssessmentProgress() {
 
       console.group('checkAssessmentProgress()')
@@ -119,7 +118,7 @@ export default {
         this.assessmentId = response.data.assessmentId
       } else {
         this.errorAlertModal.show(response.message)
-      }      
+      }
 
       console.debug('Assessment', this.assessmentId, 'is complete', this.assessmentComplete, 'details', this.assessmentStatus)
       console.groupEnd()
@@ -139,7 +138,7 @@ export default {
         this.$router.push('/assessmentsystem')
       }
     },
-    async getRequiredPatients() {  
+    async getRequiredPatients() {
       const response = await patientStore().getRequiredTests()
       response.message && this.errorAlertModal.show(response.message)
     }
