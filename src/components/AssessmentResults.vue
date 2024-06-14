@@ -15,96 +15,122 @@
             }}</span></h4>
       </div>
 
-      <section>
-        <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
-        <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
-      </section>
+      <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-primary active" id="pills-home-tab" data-bs-toggle="pill"
+            data-bs-target="#view-test-summary-tab" type="button" role="tab">Test summary</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-primary" id="pills-profile-tab" data-bs-toggle="pill"
+            data-bs-target="#view-percentages-tab" type="button" role="tab">View percentages</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-primary" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#view-charts-tab"
+            type="button" role="tab">View charts</button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="view-test-summary-tab" role="tabpanel">
+          <section>
+            <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
+            <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
+          </section>
 
-      <div class="results-summary">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Outcome</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Extreme risk scenarios</th>
-              <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
+          <div class="results-summary">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Extreme risk scenarios</th>
+                  <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
       (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{
       extremeRiskMitigations + ' ' + (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
-            </tr>
-            <tr>
-              <th>High risk scenarios</th>
-              <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{
+                </tr>
+                <tr>
+                  <th>High risk scenarios</th>
+                  <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
+      > 1 ? 's' : '') }}. Out of these, {{
       highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
-            </tr>
-            <tr>
-              <th>Alerts/Advisory interventions</th>
-              <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{ totalValidTests
-                }} total valid tests, where a system/user intervention was selected. This would be considered a {{
-      interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) + '%' }}). A high level of alerts can
-                indicate an over-reliance on alerting within a system.</td>
-            </tr>
-            <tr>
-              <th>Config Errors</th>
-              <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
-            </tr>
-          </tbody>
-        </table>
+                </tr>
+                <tr>
+                  <th>Alerts/Advisory interventions</th>
+                  <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{
+      totalValidTests
+    }} total valid tests, where a system/user intervention was selected. This would be considered a {{
+        interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) + '%' }}). A high level of alerts
+                    can
+                    indicate an over-reliance on alerting within a system.</td>
+                </tr>
+                <tr>
+                  <th>Config Errors</th>
+                  <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
+                </tr>
+              </tbody>
+            </table>
 
-        <div v-if="extremeRiskFails.length > 0">
+            <div v-if="extremeRiskFails.length > 0">
 
-          <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
-          <table class="table table-striped bg-warning-subtle">
-            <thead>
-              <tr>
-                <th>Drug name</th>
-                <th>Scenario description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="test in extremeRiskFails" :key="test">
-                <td>{{ test.prescription.drug_name }}</td>
-                <td>{{ test.prescription.indicator.description }}</td>
-              </tr>
-            </tbody>
-          </table>
+              <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
+              <table class="table table-striped bg-warning-subtle">
+                <thead>
+                  <tr>
+                    <th>Drug name</th>
+                    <th>Scenario description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="test in extremeRiskFails" :key="test">
+                    <td>{{ test.prescription.drug_name }}</td>
+                    <td>{{ test.prescription.indicator.description }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div v-if="configErrorResults.length > 0">
+
+              <h4>Configuration Error Results</h4>
+              <table class="table table-striped extreme-risk-table">
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Result</th>
+                    <th>Outcome</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="test in configErrorResults" :key="test">
+                    <td>{{ test.question }}</td>
+                    <td><span v-if="test.result === 1">Yes</span><span v-if="test.result === 0">No</span></td>
+                    <td><span v-if="test.result === 1">This is undesirable system behaviour</span><span
+                        v-if="test.result === 0">This is good system behaviour</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!--TODO - do percentages and charts as subcomponents -->
+          <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">...</div>
+          <div class="tab-pane fade" id="view-charts-tab" role="tabpanel">...</div>
         </div>
 
-        <div v-if="configErrorResults.length > 0">
 
-          <h4>Configuration Error Results</h4>
-          <table class="table table-striped extreme-risk-table">
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th>Result</th>
-                <th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="test in configErrorResults" :key="test">
-                <td>{{ test.question }}</td>
-                <td><span v-if="test.result === 1">Yes</span><span v-if="test.result === 0">No</span></td>
-                <td><span v-if="test.result === 1">This is undesirable system behaviour</span><span
-                    v-if="test.result === 0">This is good system behaviour</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
-        <div class="my-2">          
+        <!-- <div class="my-2">
           <button type="button" class="btn btn-primary me-3" @click="onTableClick()">
             <i class="bi bi-percent pe-1"></i>View Percentages
           </button>
           <button type="button" class="btn btn-primary me-3" @click="onChartClick()">
-            <i class="bi bi-bar-chart-fill pe-1"></i>View Charts              
+            <i class="bi bi-bar-chart-fill pe-1"></i>View Charts
           </button>
           <button type="button" class="btn btn-primary" @click="onHomeClick()"><i class="bi bi-house-fill pe-1"></i>
-            Home</button>          
-        </div>
+            Home</button>
+        </div> -->
 
       </div>
     </div>
@@ -118,6 +144,7 @@
 
 <script>
 
+import { calcPercentage } from '../helpers/utils'
 import { categoryService } from "../services/categoryService"
 import { stackedChartService } from "../services/stackedChartService"
 import TabHeader from "./TabHeader"
@@ -204,31 +231,28 @@ export default {
       console.groupEnd()
     },
     getInterventionTypeResult() {
-      const interventionType = parseInt(this.calc(this.totalAlerts, this.totalValidTests))
+      const interventionType = parseInt(calcPercentage(this.totalAlerts, this.totalValidTests))
       return (interventionType >= 70) ? 'high' : ((interventionType < 70 && interventionType >= 35) ? 'medium' : 'low') + ' level of alerts'
     },
     // Calculate as % of all tests
     saveMitigationResult(id) {
       let numTests = this.numPrescriptions
-      this.goodMitigation = this.calc(this.totalGood, numTests)
-      this.someMitigation = this.calc(this.totalSome, numTests)
-      this.notMitigated = this.calc(this.totalNot, numTests)
-      this.overMitigated = this.calc(this.totalOver, numTests)
-      this.percentageNulls = this.calc(this.totalNulls, numTests)
+      this.goodMitigation = calcPercentage(this.totalGood, numTests)
+      this.someMitigation = calcPercentage(this.totalSome, numTests)
+      this.notMitigated = calcPercentage(this.totalNot, numTests)
+      this.overMitigated = calcPercentage(this.totalOver, numTests)
+      this.percentageNulls = calcPercentage(this.totalNulls, numTests)
       rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
-    },
-    calc(num, total) {
-      return total !== 0 ? ((num / total) * 100).toFixed(1) : 0
-    },
+    },    
     onTableClick() {
       this.$router.push('/resultstable')
     },
     onChartClick() {
       this.$router.push('/charts')
     },
-    async onHomeClick() {   
+    async onHomeClick() {
       const isAdmin = await authenticationStore().checkIsAdminUser()
-      this.$router.push(isAdmin ? '/adminhome' : '/assessmentintro');
+      this.$router.push(isAdmin ? '/adminhome' : '/assessmentintro')
     },
     async getAllDetails() {
 
@@ -276,7 +300,7 @@ export default {
               // Pretty minor - don't bomb the whole thing for this
               cd.question = cdDataResponse.message
               console.error(cd.question)
-            }          
+            }
             this.configErrorResults.push(cd)
           })
           rootStore().audit('View report', '/assessmentresults')
