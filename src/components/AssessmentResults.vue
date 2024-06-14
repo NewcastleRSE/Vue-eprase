@@ -99,9 +99,11 @@
           <button type="button" class="btn btn-primary me-3" @click="onTableClick()">
             <i class="bi bi-percent pe-1"></i>View Percentages
           </button>
-          <button type="button" class="btn btn-primary" @click="onChartClick()">
+          <button type="button" class="btn btn-primary me-3" @click="onChartClick()">
             <i class="bi bi-bar-chart-fill pe-1"></i>View Charts              
-          </button>           
+          </button>
+          <button type="button" class="btn btn-primary" @click="onHomeClick()"><i class="bi bi-house-fill pe-1"></i>
+            Home</button>          
         </div>
 
       </div>
@@ -223,6 +225,10 @@ export default {
     },
     onChartClick() {
       this.$router.push('/charts')
+    },
+    async onHomeClick() {   
+      const isAdmin = await authenticationStore().checkIsAdminUser()
+      this.$router.push(isAdmin ? '/adminhome' : '/assessmentintro');
     },
     async getAllDetails() {
 
