@@ -246,8 +246,7 @@ export default {
     },
     getCurrentPatientDOB() {
       return this.testPayload['patient'].dob
-    },
-    
+    }    
   },
   data() {
     return {

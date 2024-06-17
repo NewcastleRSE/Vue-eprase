@@ -114,23 +114,14 @@
               </table>
             </div>
           </div>
-          <!--TODO - do percentages and charts as subcomponents -->
-          <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">...</div>
-          <div class="tab-pane fade" id="view-charts-tab" role="tabpanel">...</div>
+          <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
+            <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
+          </div>
+          <div class="tab-pane fade" id="view-charts-tab" role="tabpanel">
+            <PieChart :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" />
+            <StackedChart :mydata="chartCategoryData" />
+          </div>
         </div>
-
-
-
-        <!-- <div class="my-2">
-          <button type="button" class="btn btn-primary me-3" @click="onTableClick()">
-            <i class="bi bi-percent pe-1"></i>View Percentages
-          </button>
-          <button type="button" class="btn btn-primary me-3" @click="onChartClick()">
-            <i class="bi bi-bar-chart-fill pe-1"></i>View Charts
-          </button>
-          <button type="button" class="btn btn-primary" @click="onHomeClick()"><i class="bi bi-house-fill pe-1"></i>
-            Home</button>
-        </div> -->
 
       </div>
     </div>
@@ -156,6 +147,9 @@ import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
+import ResultsTable from './ResultsTable'
+import PieChart from './PieChart'
+import StackedChart from './StackedChart'
 
 export default {
   name: "AssessmentResults",
@@ -163,11 +157,15 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
+    ResultsTable,
+    PieChart,
+    StackedChart,
     ErrorAlertModal
   },
   data() {
     return {
       categories: [],
+      tableData: {},
       chartCategoryData: [],
       extremeRiskScenarios: [],
       extremeRiskFails: [],
@@ -217,6 +215,7 @@ export default {
       console.group('countCategories()')
 
       let jsonData = categoryService.countCategories(data)
+      this.tableData = jsonData
       this.totalGood = jsonData.totals.totalGood
       this.totalSome = jsonData.totals.totalSome
       this.totalOver = jsonData.totals.totalOver
@@ -227,7 +226,7 @@ export default {
       this.totalAdvisory = jsonData.totals.totalAdvisory
       this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
 
-      console.debug(jsonData)
+      console.debug(this.tableData)
       console.groupEnd()
     },
     getInterventionTypeResult() {

@@ -13,8 +13,6 @@ import AssessmentScenarios from "../components/AssessmentScenarios"
 import ResultsHome from "../components/ResultsHome"
 import AssessmentResults from "../components/AssessmentResults"
 import AssessmentReports from "../components/AssessmentReports"
-import ResultsTable from "../components/ResultsTable"
-import AppCharts from "../components/AppCharts"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
@@ -77,15 +75,7 @@ export const router = createRouter({
     {
       path: "/assessmentreports",
       component: AssessmentReports,
-    },
-    {
-      path: "/resultstable",
-      component: ResultsTable,
-    },
-    {
-      path: "/charts",
-      component: AppCharts,
-    },
+    },    
     {
       path: "/resetpassword/:token?",
       component: ResetPassword,
