@@ -5,6 +5,13 @@ $light: #c4c4c4;
 $form-check-input-border: 1px solid rgba($dark, .50);
 /* Increase the width of tooltips */
 $tooltip-max-width: 350px;
+/* Increase the width and visibility of navigation tabs */
+$nav-tabs-border-color: $primary;
+$nav-tabs-border-width: 2px;
+$nav-tabs-link-active-border-color: $primary;
+$nav-tabs-link-active-bg: $primary;
+$nav-tabs-link-active-color: white;
+$nav-link-font-weight: "bold";
 
 @import "~bootstrap/scss/bootstrap";
 
@@ -93,4 +100,8 @@ a {
 
 span.required-field {
   color: $primary;
+}
+
+span.note {
+  color: $info;
 }

@@ -15,24 +15,23 @@
             }}</span></h4>
       </div>
 
-      <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-primary active" data-bs-toggle="pill"
-            data-bs-target="#view-test-summary-tab" type="button" role="tab">Test summary</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-primary" data-bs-toggle="pill"
-            data-bs-target="#view-percentages-tab" type="button" role="tab">View percentages</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-primary" data-bs-toggle="pill" data-bs-target="#view-pie-chart-tab"
-            type="button" role="tab">View pie chart</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-primary" data-bs-toggle="pill" data-bs-target="#view-stacked-chart-tab"
-            type="button" role="tab">View bar chart</button>
-        </li>
-      </ul>
+      <nav class="mt-4">
+        <ul class="nav nav-tabs nav-fill mb-3" id="results-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#view-test-summary-tab" role="tab">Test summary</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-percentages-tab" role="tab">View percentages</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-pie-chart-tab" role="tab">View pie chart</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-stacked-chart-tab" role="tab">View bar chart</a>
+          </li>
+        </ul>
+      </nav>
+
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-test-summary-tab" role="tabpanel">
           <section>
@@ -52,21 +51,21 @@
                 <tr>
                   <th>Extreme risk scenarios</th>
                   <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
-      (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{
-      extremeRiskMitigations + ' ' + (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
+      (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
+      (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>High risk scenarios</th>
                   <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
-      > 1 ? 's' : '') }}. Out of these, {{
-      highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
+      > 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
+      'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>Alerts/Advisory interventions</th>
                   <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{
-      totalValidTests
-    }} total valid tests, where a system/user intervention was selected. This would be considered a {{
-        interventionTypeResult }} ({{ calc(totalAlerts, totalValidTests) + '%' }}). A high level of alerts
+      totalValidTests }} total valid tests, where a system/user intervention was selected. This would be
+                    considered a
+                    {{ interventionTypeResult }}. A high level of alerts
                     can
                     indicate an over-reliance on alerting within a system.</td>
                 </tr>
@@ -118,15 +117,16 @@
               </table>
             </div>
           </div>
-          <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
-            <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
-          </div>
-          <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
-            <PieChart :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" />
-          </div>
-          <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-            <StackedChart :mydata="chartCategoryData" />
-          </div>
+        </div>
+        <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
+          <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
+        </div>
+        <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
+          <PieChart :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
+            :overMitigated="totalOver" :nullTests="totalNulls" />
+        </div>
+        <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
+          <StackedChart :mydata="chartCategoryData" />
         </div>
 
       </div>
@@ -248,7 +248,7 @@ export default {
       this.overMitigated = calcPercentage(this.totalOver, numTests)
       this.percentageNulls = calcPercentage(this.totalNulls, numTests)
       rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
-    },    
+    },
     onTableClick() {
       this.$router.push('/resultstable')
     },
