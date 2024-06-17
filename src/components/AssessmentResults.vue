@@ -17,16 +17,20 @@
 
       <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-primary active" id="pills-home-tab" data-bs-toggle="pill"
+          <button class="nav-primary active" data-bs-toggle="pill"
             data-bs-target="#view-test-summary-tab" type="button" role="tab">Test summary</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-primary" id="pills-profile-tab" data-bs-toggle="pill"
+          <button class="nav-primary" data-bs-toggle="pill"
             data-bs-target="#view-percentages-tab" type="button" role="tab">View percentages</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-primary" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#view-charts-tab"
-            type="button" role="tab">View charts</button>
+          <button class="nav-primary" data-bs-toggle="pill" data-bs-target="#view-pie-chart-tab"
+            type="button" role="tab">View pie chart</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-primary" data-bs-toggle="pill" data-bs-target="#view-stacked-chart-tab"
+            type="button" role="tab">View bar chart</button>
         </li>
       </ul>
       <div class="tab-content">
@@ -117,8 +121,10 @@
           <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
             <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
           </div>
-          <div class="tab-pane fade" id="view-charts-tab" role="tabpanel">
+          <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
             <PieChart :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" />
+          </div>
+          <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
             <StackedChart :mydata="chartCategoryData" />
           </div>
         </div>
