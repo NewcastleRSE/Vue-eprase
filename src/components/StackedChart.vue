@@ -3,7 +3,7 @@
     <div class="container">
       <div id="combined-chart" style="width: 900px; height: 500px;">
         <GChart :settings="{ packages: ['corechart', 'bar'] }" type="ColumnChart" :data="chartData"
-          :options="chartOptions" style="width: 900px; height: 500px;" @ready="onChartReady" ref="gChart" />
+          :options="chartOptions" style="width: 100%; height: 100%;"  />
       </div>
     </div>
   </section>

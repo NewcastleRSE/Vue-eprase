@@ -105,3 +105,14 @@ span.required-field {
 span.note {
   color: $info;
 }
+
+.pie-chart-container {
+  width: 900px;
+  height: 500px;
+  display: flex;
+  overflow: auto;
+}
+
+.pie-chart-container div {
+  margin: auto;
+}
