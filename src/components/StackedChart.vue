@@ -1,13 +1,7 @@
 <template>
-  <section class="section">
-    <div class="container">
-      <div id="combined-chart" style="width: 900px; height: 500px;">
-        <GChart :settings="{ packages: ['corechart', 'bar'] }" type="ColumnChart" :data="chartData"
-          :options="chartOptions" style="width: 100%; height: 100%;"  />
-      </div>
-    </div>
-  </section>
-
+  <div ref="stackedChartContainer">
+    <GChart :settings="{ packages: ['corechart', 'bar'] }" type="ColumnChart" :options="chartOptions.chart" :data="chartData" />
+  </div>
 </template>
 
 <script>
@@ -26,65 +20,48 @@ export default {
   },
   data() {
     return {
-      chartData: this.mydata,
+      chartData: null,
       chartOptions: {
         chart: {
-          title: ''
-        },
-        hAxis: {
-          title: 'Error category',
-        },
-        vAxis: {
-          title: 'Percentage Response',
-          minValue: 0,
-          maxValue: 100
-        },
-        isStacked: true,
-        colors: ['#35d635', '#FFBF00', '#ff3b33', '#66b4ea'],
-        width: 900,
-        height: 500
+          title: 'Risk Mitigation Summary',
+          hAxis: {
+            title: 'Error category',
+            slantedText: true,
+            slantedTextAngle: 45
+          },
+          vAxis: {
+            title: 'Percentage Response',
+            minValue: 0,
+            maxValue: 100
+          },
+          isStacked: true,
+          colors: ['#35d635', '#FFBF00', '#ff3b33', '#66b4ea'],
+          width: 1000,
+          height: 900
+        }
       },
     }
   },
-  methods: {
-    onChartReady(chart, google) {
-      // now we have google lib loaded. Let's create data table based using it.
-      this.createDataTable(chart, google)
-    },
-    // Array will be automatically processed with visualization.arrayToDataTable function
-    createDataTable(chart, google) {
+  mounted() {
 
-      var data = new google.visualization.DataTable()
-      data.addColumn('string', 'Error Category')
-      data.addColumn('number', 'Good mitigation')
-      data.addColumn('number', 'Some mitigation')
-      data.addColumn('number', 'Not mitigated')
-      data.addColumn('number', 'Over mitigated')
+    console.group('StackedChart - mounted()')
 
-      let rows = []
+    console.assert(this.mydata.length > 0, 'No mitigation data supplied')
 
-      for (let index in this.chartData) {
+    this.chartData = [
+      [
+        {label: 'Error Category', type: 'string'},
+        {label: 'Good mitigation', type: 'number'},
+        {label: 'Some mitigation', type: 'number'},
+        {label: 'Not mitigated', type: 'number'},
+        {label: 'Over mitigated', type: 'number'}
+      ]
+    ]
+    this.mydata.forEach(cd => {        
+      this.chartData.push([cd.category, cd.good, cd.some, cd.not, cd.over])
+    })
 
-        if (this.chartData.hasOwnProperty(index)) {
-          this.category = this.chartData[index].category
-          this.good = this.chartData[index].good
-          this.some = this.chartData[index].some
-          this.not = this.chartData[index].not
-          this.over = this.chartData[index].over
-
-          rows[index] = []
-          rows[index][0] = this.category
-          rows[index][1] = this.good
-          rows[index][2] = this.some
-          rows[index][3] = this.not
-          rows[index][4] = this.over
-        }
-      }
-      data.addRows(rows)
-
-      var view = new google.visualization.DataView(data)
-      chart.draw(view, this.chartOptions)
-    },
+    console.groupEnd()
   }
 }
 

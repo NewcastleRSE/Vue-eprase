@@ -9,6 +9,7 @@ $tooltip-max-width: 350px;
 $nav-tabs-border-color: $primary;
 $nav-tabs-border-width: 2px;
 $nav-tabs-link-active-border-color: $primary;
+$nav-tabs-link-hover-border-color: $primary;
 $nav-tabs-link-active-bg: $primary;
 $nav-tabs-link-active-color: white;
 $nav-link-font-weight: "bold";
@@ -104,15 +105,4 @@ span.required-field {
 
 span.note {
   color: $info;
-}
-
-.pie-chart-container {
-  width: 900px;
-  height: 500px;
-  display: flex;
-  overflow: auto;
-}
-
-.pie-chart-container div {
-  margin: auto;
 }

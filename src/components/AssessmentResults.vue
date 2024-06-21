@@ -122,11 +122,11 @@
           <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
         </div>
         <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
-          <PieChart :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
+          <PieChart v-if="pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
             :overMitigated="totalOver" :nullTests="totalNulls" />
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <StackedChart :mydata="chartCategoryData" />
+          <StackedChart v-if="stackedDataComplete" :mydata="chartCategoryData" />
         </div>
 
       </div>
@@ -200,7 +200,10 @@ export default {
       totalConfigTests: appSettingsStore().numConfigError,
       numPrescriptions: appSettingsStore().numPrescriptions,
       ep_service: '',
-      other_ep_system: ''
+      other_ep_system: '',
+      // Flags to indicate chart data present in its entirety 
+      stackedDataComplete: false,
+      pieDataComplete: false
     }
   },
   computed: {
@@ -231,6 +234,7 @@ export default {
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
       this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
+      console.debug('Chart category data', this.chartCategoryData)
 
       console.debug(this.tableData)
       console.groupEnd()
@@ -247,7 +251,7 @@ export default {
       this.notMitigated = calcPercentage(this.totalNot, numTests)
       this.overMitigated = calcPercentage(this.totalOver, numTests)
       this.percentageNulls = calcPercentage(this.totalNulls, numTests)
-      rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
+      return rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
     },
     onTableClick() {
       this.$router.push('/resultstable')
@@ -342,12 +346,18 @@ export default {
               selected_type: ptd.selected_type
             }
           }))
+          this.pieDataComplete = true
           // Set chart data (set in countCategories())
           rootStore().storeStackedChartData(this.chartCategoryData)
           // Calculate number of valid tests, ignoring null results
           this.totalValidTests = this.numPrescriptions - this.totalNulls
           this.getInterventionTypeResult()
-          this.saveMitigationResult(this.assessmentId)
+          const smrResponse = await this.saveMitigationResult(this.assessmentId)
+          if (smrResponse.status < 400) {
+            this.stackedDataComplete = true
+          } else {
+            throw new Error(smrResponse.message)
+          }
         } else {
           throw new Error(ptdResponse.message)
         }
