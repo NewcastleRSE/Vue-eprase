@@ -122,11 +122,11 @@
           <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
         </div>
         <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
-          <PieChart v-if="pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
+          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
             :overMitigated="totalOver" :nullTests="totalNulls" />
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <StackedChart v-if="stackedDataComplete" :mydata="chartCategoryData" />
+          <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" />
         </div>
 
       </div>

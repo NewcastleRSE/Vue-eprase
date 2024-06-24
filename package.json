@@ -19,13 +19,13 @@
     "jwt-decode": "^4.0.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "plotly.js-cartesian-dist-min": "^2.33.0",
     "popper.js": "^1.16.1",
     "prettier": "^3.2.5",
     "terser-webpack-plugin": "^5.3.10",
     "vee-validate": "^4.12.5",
     "vue": "^3.4.18",
     "vue-axios": "^3.5.2",
-    "vue-google-charts": "^1.1.0",
     "vue-router": "^4.2.5"
   },
   "browserslist": [

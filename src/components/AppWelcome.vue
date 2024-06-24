@@ -19,7 +19,7 @@
         </button>
       </div>
       <div v-if="!appOpen">
-        <strong>This application is currently closed</strong>
+        <span class="fw-bold">This application is currently closed</span>
       </div>
     </div>
     <div class="row w-75 mx-auto">

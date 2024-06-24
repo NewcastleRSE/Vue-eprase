@@ -1,59 +1,67 @@
 <template>
-  <div id="page">
+   <main class="leftalign">
 
-    <div class="pills-banner">
+    <div class="pills-banner"></div>
+
+    <LoginInfo />
+
+    <h1 class="px-4">Admin Home</h1>
+
+    <div class="px-4">
+      <p>
+        The following reports are designed to give insight into the comparative performance of different 
+        institutions and their EPMA systems
+      </p>
+
+      <nav class="mt-4">
+        <ul class="nav nav-tabs nav-fill mb-3" id="admin-reports-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#view-all-inst-tab" role="tab">All Institution Reports</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-mit-comp-tab" role="tab">Mitigation Comparison</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-ep-comp-tab" role="tab">Ep System Comparison</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-epma-stats-tab" role="tab">EPMA Statistics</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-conf-errs-tab" role="tab">Configuration Error Results</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-ex-risk-comp-tab" role="tab">Extreme Risk Comparison</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="view-all-inst-tab" role="tabpanel">
+          All institution reports here...
+        </div>
+        <div class="tab-pane fade" id="view-mit-comp-tab" role="tabpanel">
+          Mitigation comparisons here...
+        </div>
+        <div class="tab-pane fade" id="view-ep-comp-tab" role="tabpanel">
+          EP system comparisons here...
+        </div>
+        <div class="tab-pane fade" id="view-epma-stats-tab" role="tabpanel">
+          EPMA stats here...
+        </div>
+        <div class="tab-pane fade" id="view-conf-errs-tab" role="tabpanel">
+          Config errors here...
+        </div>
+        <div class="tab-pane fade" id="view-ex-risk-comp-tab" role="tabpanel">
+          Extreme risk comparisons here...
+        </div>
+      </div>
     </div>
 
-    <div class="content">
+    <ErrorAlertModal ref="errorAlertModal" />
+    <AppLogo cls="bottomright" />
 
-      <h1>Admin Home</h1>
-
-      <p id="intro">The following reports are designed to give insight into the comparative performance of different
-        institutions and their EPMA systems.</p>
-
-      <p></p>
-
-      <b-container class="bv-example-row">
-        <b-row>
-          <b-col cols="4" class="menu-bar-buttons">
-            <button @click=getAllReports() @mouseover="guidanceText = 'Access all available institution reports.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">All
-                Institution Reports</a></button>
-            <button @click="mitigationComparison()" @mouseover="guidanceText = 'Compare overall mitigation results.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">Mititgation
-                Comparison</a></button>
-            <button @click="epsystemComparison()"
-              @mouseover="guidanceText = 'Compare mitigation results across institutions.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">Ep System
-                Comparison</a></button>
-            <!-- <button @click="categoryComparison()" @mouseover="guidanceText = 'Compare drug category results across institutions.' " @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="">Test Category Comparsion</a></button> -->
-            <button @click="epmaStatistics()" @mouseover="guidanceText = 'View EPMA data for institutions.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">EPMA
-                Statistics</a></button>
-            <button @click="configErrorResults()"
-              @mouseover="guidanceText = 'View config error results for institutions.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a
-                href="#">Configuration Error Results</a></button>
-            <button @click="highRiskComparison()"
-              @mouseover="guidanceText = 'View extreme risk results for institutions.'"
-              @mouseleave="guidanceText = 'Hover over a report button to see more information.'"><a href="#">Extreme
-                Risk Comparison</a></button>
-            <button><i class="bi bi-box-arrow-right"></i><span class="headerLink"><router-link
-                  to="/login">Logout</router-link></span></button>
-          </b-col>
-          <b-col cols="8">
-            <div id="guidance">{{ guidanceText }}</div>
-          </b-col>
-
-        </b-row>
-      </b-container>
-
-    </div>
-
-
-    <AppLogo></AppLogo>
-  </div>
-
+  </main>
 </template>
 
 <script>
@@ -62,6 +70,7 @@ import AppLogo from "./AppLogo"
 import ErrorAlertModal from "./ErrorAlertModal"
 import { mapStores } from "pinia"
 import { rootStore } from "../stores/root"
+import { authenticationStore } from "../stores/authentication"
 
 export default {
   name: 'AdminHome',
@@ -70,7 +79,7 @@ export default {
     ErrorAlertModal
   },
   computed: {
-    ...mapStores(rootStore)
+    ...mapStores(rootStore, authenticationStore)
   },
   data() {
     return {
@@ -100,13 +109,7 @@ export default {
     },
     highRiskComparison() {
       this.$router.push('/highriskcomparison')
-    },
-    onExitClick() {
-      this.$router.push('/logout')
-    },
-    onHomeClick() {
-      this.$router.push('/assessmentintro')
-    },
+    },    
     async getInstitutionMitResult() {
       const response = await rootStore().getAllMitigationResults()
       if (response.status < 400) {
@@ -130,67 +133,18 @@ export default {
       } else {
         //Error modal show TODO
       }
+    },
+    async checkAdmin() {
+      return await this.authenticationStore().checkIsAdminUser()
     }
   },
-  created() {
-    this.getInstitutionMitResult()
-    localStorage.setItem('userIsAdmin', true)
-    this.guidanceText = "Hover over a report button to see more information."
+  mounted() {
+    if (!this.checkAdmin()) {
+      this.$router.push('/login?requiresAdmin=1')
+    }   
   }
 }
 
 </script>
 
-<style scoped>
-#header {
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
-}
-
-#guidance {
-  font-size: 1.4em;
-  margin-top: 30px;
-  color: #1c3f37;
-}
-
-#intro {
-  margin-top: 20px;
-  font-size: 1.2em;
-}
-
-.level {
-  height: 80px;
-}
-
-.menu-bar-buttons {
-  padding: 20px 0;
-  width: 280px;
-}
-
-button {
-  height: 40px;
-  width: 250px;
-  margin: 10px 0;
-  font-size: 1em;
-  border-width: 1px;
-}
-
-button:hover {
-  background-color: #daffde;
-}
-
-button a {
-  padding: 3px;
-  text-decoration: none;
-}
-
-#page {
-  text-align: left;
-}
-
-.content {
-  padding: 40px;
-}
-</style>
+<style scoped></style>

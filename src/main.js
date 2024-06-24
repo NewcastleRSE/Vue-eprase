@@ -9,7 +9,6 @@ import axios from "axios"
 import VueAxios from "vue-axios"
 import { configure, defineRule } from "vee-validate"
 import { required } from '@vee-validate/rules'
-import VueGoogleCharts from "vue-google-charts"
 import { router } from "./router"
 // import * as Sentry from "@sentry/vue"
 // import { BrowserTracing } from "@sentry/tracing"
@@ -59,7 +58,7 @@ axios.defaults.baseURL = 'http://localhost:6001/api/',
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 
-app.use(pinia).use(VueAxios, axios).use(VueGoogleCharts).use(router)
+app.use(pinia).use(VueAxios, axios).use(router)
 
 // hides default console message
 app.config.productionTip = false

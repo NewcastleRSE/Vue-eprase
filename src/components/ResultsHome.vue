@@ -24,7 +24,7 @@
         <div v-if="assessment_id > 0 && completed !== false">
           <router-link v-bind:to="{ name: 'assessmentresults' }"
             class="list-group-item list-group-item-action flex-column align-items-start">
-            <p><strong>{{ institution }}</strong></p>
+            <p><span class="fw-bold">{{ institution }}</span></p>
             <p> <span v-if="ep_service !== 'Other'">{{ ep_service }} </span>
               <span v-if="other_ep_system">{{ other_ep_system }}</span><br />
             </p>

@@ -8,7 +8,7 @@
         <h2 class="mt-4">Register</h2>
 
         <div v-if="!appOpen">
-          <strong>This application is currently closed</strong>
+          <span class="fw-bold">This application is currently closed</span>
         </div>
 
         <div v-if="appOpen">

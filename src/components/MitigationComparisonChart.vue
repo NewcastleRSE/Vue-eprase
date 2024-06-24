@@ -3,7 +3,7 @@
   <section class="section">
     <div class="container">
       <div id="combined-chart" style="width: 900px; height: 500px;">
-        <GChart
+        <!-- <GChart
           :settings="{ packages: ['corechart', 'bar']}"
           type="ColumnChart"
           :data="chartData"
@@ -11,7 +11,7 @@
           style="width: 900px; height: 500px;"
           @ready="onChartReady"
           ref="gChart"
-        />
+        /> -->
       </div>
     </div>
   </section>
@@ -19,7 +19,6 @@
 </template>
 
 <script>
-  import { GChart } from "vue-google-charts";
 
     export default {
         name: "MitigationComparisonChart",
@@ -27,10 +26,7 @@
           mydata: {
             type: Array
           }
-        },
-        components: {
-          GChart
-        },
+        },      
         data() {
           return {
             chartData: this.mydata,

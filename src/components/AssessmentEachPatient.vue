@@ -27,16 +27,16 @@
         <h5 class="card-title">Demographics</h5>
         <table>
           <tr v-if="patient.height === 0">
-            <td><strong>Height (m):</strong> unavailable</td>
+            <td><span class="fw-bold">Height (m):</span> unavailable</td>
           </tr>
           <tr v-if="patient.height !== 0">
-            <td><strong>Height (m):</strong> {{patient.height}}</td>
+            <td><span class="fw-bold">Height (m):</span> {{patient.height}}</td>
           </tr>
           <tr v-if="patient.weight === 0">
-            <td><strong>Weight (kg):</strong> unavailable</td>
+            <td><span class="fw-bold">Weight (kg):</span> unavailable</td>
           </tr>
           <tr v-if="patient.weight !== 0">
-            <td><strong>Weight (kg):</strong> {{patient.weight}}</td>
+            <td><span class="fw-bold">Weight (kg):</span> {{patient.weight}}</td>
           </tr>
         </table>
       </div>
@@ -66,11 +66,11 @@
           <h5 class="card-title">Current Medication</h5>
           <table>
             <tr>
-              <td><strong>Name</strong></td>
-              <td><strong>Dose</strong></td>
-              <td><strong>Route</strong></td>
-              <td><strong>Form</strong></td>
-              <td><strong>Frequency</strong></td>
+              <td><span class="fw-bold">Name</span></td>
+              <td><span class="fw-bold">Dose</span></td>
+              <td><span class="fw-bold">Route</span></td>
+              <td><span class="fw-bold">Form</span></td>
+              <td><span class="fw-bold">Frequency</span></td>
             </tr>
             <tr v-for="history in patient.medication_histories" v-bind:key="history">
               <td>{{history.name}}</td>
@@ -91,9 +91,9 @@
         <h5 class="card-title">Clinical Data</h5>
         <table>
           <tr>
-            <td><strong>Investigation</strong></td>
-            <td><strong>Value</strong></td>
-            <td><strong>Unit</strong></td>
+            <td><span class="fw-bold">Investigation</span></td>
+            <td><span class="fw-bold">Value</span></td>
+            <td><span class="fw-bold">Unit</span></td>
           </tr>
           <tr v-for="clinical in patient.clinical_data" v-bind:key="clinical">
             <td>{{clinical.investigation}}</td>

@@ -2,7 +2,7 @@
     <section class="section">
         <div class="container">
             <div id="combined-chart" style="width: 900px; height: 500px;">
-            <GChart v-if="searchFieldItem"
+            <!-- <GChart v-if="searchFieldItem"
               :settings="{ packages: ['corechart', 'bar']}"
               type="ColumnChart"
               :data="chartData"
@@ -10,14 +10,13 @@
               style="width: 900px; height: 500px;"
               @ready="onChartReady"
               ref="gChart"
-            />
+            /> -->
           </div>
     </div>
   </section>
 </template>
 
 <script>
-import { GChart } from "vue-google-charts";
 
 export default {
     name: "EpSystemComparisonChart",
@@ -28,10 +27,7 @@ export default {
        searchfield: {
           type: String
        }
-    },
-    components: {
-        GChart
-    },
+    },   
     data() {
         return {
             chartData: this.mydata,

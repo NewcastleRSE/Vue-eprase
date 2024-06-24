@@ -1,67 +1,41 @@
 <template>
-  <div ref="stackedChartContainer">
-    <GChart :settings="{ packages: ['corechart', 'bar'] }" type="ColumnChart" :options="chartOptions.chart" :data="chartData" />
-  </div>
+  <div ref="stackedChartContainer"></div>
 </template>
 
 <script>
 
-import { GChart } from "vue-google-charts"
+import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
   name: "StackedChart",
   props: {
     mydata: {
       type: Array
+    },
+    dataLoading: true
+  }, 
+  watch: {
+    dataLoading(newVal) {
+      if (newVal === false) {
+        console.debug('data has all loaded')
+        this.renderChart()
+      }
     }
   },
-  components: {
-    GChart
-  },
-  data() {
-    return {
-      chartData: null,
-      chartOptions: {
-        chart: {
-          title: 'Risk Mitigation Summary',
-          hAxis: {
-            title: 'Error category',
-            slantedText: true,
-            slantedTextAngle: 45
-          },
-          vAxis: {
-            title: 'Percentage Response',
-            minValue: 0,
-            maxValue: 100
-          },
-          isStacked: true,
-          colors: ['#35d635', '#FFBF00', '#ff3b33', '#66b4ea'],
-          width: 1000,
-          height: 900
-        }
-      },
+  methods: {
+
+    renderChart() {
+
+      console.group('StackedChart - renderChart()')
+
+      Plotly.newPlot(this.$refs.stackedChartContainer, this.mydata, {
+        barmode: 'stack',
+        width: 900,
+        height: 700
+      }, {displayModeBar: false})
+
+      console.groupEnd()
     }
-  },
-  mounted() {
-
-    console.group('StackedChart - mounted()')
-
-    console.assert(this.mydata.length > 0, 'No mitigation data supplied')
-
-    this.chartData = [
-      [
-        {label: 'Error Category', type: 'string'},
-        {label: 'Good mitigation', type: 'number'},
-        {label: 'Some mitigation', type: 'number'},
-        {label: 'Not mitigated', type: 'number'},
-        {label: 'Over mitigated', type: 'number'}
-      ]
-    ]
-    this.mydata.forEach(cd => {        
-      this.chartData.push([cd.category, cd.good, cd.some, cd.not, cd.over])
-    })
-
-    console.groupEnd()
   }
 }
 

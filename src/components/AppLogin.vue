@@ -2,12 +2,13 @@
   <main>
     <div class="loginpage">
       <AppLogo cls="banner" />
+      <h3 v-if="$route.query.requiresAdmin === '1'" class="text-danger">You need to be an admin to access this page</h3>
       <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
       <h2 class="mt-4">Log-in to ePRaSE</h2>
       <p class="pb-2">
         Please enter your login details below, or click 'Register' to create a
         new user account. You will need a valid
-        <strong>'nhs.uk'</strong> or <strong>'nhs.net'</strong> email account to
+        <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to
         register with ePRaSE successfully.
       </p>
 

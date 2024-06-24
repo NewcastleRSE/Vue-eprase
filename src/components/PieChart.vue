@@ -1,12 +1,10 @@
 <template>
-  <div ref="pieChartContainer">
-    <GChart :settings="{ packages: ['corechart'] }" type="PieChart" :options="chartOptions.chart" :data="chartData" />
-  </div>
+  <div ref="pieChartContainer"></div>
 </template>
 
 <script>
 
-import { GChart } from "vue-google-charts"
+import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
   name: "PieChart",
@@ -15,29 +13,14 @@ export default {
     someMitigation: '',
     notMitigated: '',
     overMitigated: '',
-    nullTests: ''
-  },
-  components: {
-    GChart
-  },
-  data() {
-    return {
-      chartData: [
-        ['Mitigation', 'Percentage'],
-        ['Good mitigation', 0],
-        ['Some mitigation', 0],
-        ['Not mitigated', 0],
-        ['Over mitigated', 0],
-        ['Invalid tests', 0]
-      ],
-      chartOptions: {
-        chart: {
-          title: 'EPMA Risk Mitigation',          
-          is3D: false,
-          colors: ['#35d635', '#FFBF00', '#ff3b33', '#66b4ea', '#808080'],
-          width: 900,
-          height: 500
-        }
+    nullTests: '',
+    dataLoading: true
+  },  
+  watch: {
+    dataLoading(newVal) {
+      if (newVal === false) {
+        console.debug('data has all loaded')
+        this.renderChart()
       }
     }
   },
@@ -58,26 +41,26 @@ export default {
       return Math.round(this.nullTests)
     }
   },
-  mounted() {
+  methods: {
+    renderChart() {
 
-    console.group('PieChart - mounted()')
+      console.group('PieChart - renderChart()')
 
-    console.assert(this.goodMitigation != '', 'good mitigation not set')
-    console.assert(this.someMitigation != '', 'some mitigation not set')
-    console.assert(this.notMitigated != '', 'not mitigated not set')
-    console.assert(this.overMitigated != '', 'over mitigated not set')
-    console.assert(this.nullTests != '', 'null tests not set')
+      Plotly.newPlot(this.$refs.pieChartContainer, [{
+        values: [
+          this.roundedGood, this.roundedSome, this.roundedNot, this.roundedOver, this.roundedNull
+        ],
+        labels: [
+          'Good mitigation', 'Some mitigation', 'Not mitigated', 'Over mitigated', 'Invalid tests'
+        ],
+        type: 'pie'
+      }], {
+        width: 900,
+        height: 500
+      }, {displayModeBar: false})
 
-    this.chartData = [
-      ['Mitigation', 'Percentage'],
-      ['Good mitigation', this.roundedGood],
-      ['Some mitigation', this.roundedSome],
-      ['Not mitigated', this.roundedNot],
-      ['Over mitigated', this.roundedOver],
-      ['Invalid tests', this.roundedNull]
-    ]
-
-    console.groupEnd()
+      console.groupEnd()
+    }
   }
 }
 </script>
