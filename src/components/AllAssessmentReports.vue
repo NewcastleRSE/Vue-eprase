@@ -6,13 +6,23 @@
       <p>You currently have no reports available.</p>
     </div>
 
-    <div v-if="reports.length > 0" class="list-group">
-      <div v-for="report in reports" :key="report">
-        <div @click="onReportClick(report.assessmentId)"
-          class="list-group-item list-group-item-action flex-column align-items-start">
-          <span class="fw-bold">{{ report.institution.orgName }} - {{ report.system.time_created }}</span>
-        </div>
-      </div>
+    <div v-if="reports.length > 0">
+      <table class="table table-striped mb-4">
+        <thead>
+          <tr>
+            <th>Institution</th>
+            <th>Year</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="report in reports" :key="report" @click="onReportClick(report.assessmentId)"
+            data-bs-title="Click on row to view details (in a new tab)" data-bs-placement="top" data-bs-toggle="tooltip"
+            style="cursor:pointer">
+            <td>{{ report.institution.orgName }}</td>
+            <td>{{ report.system.time_created }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
   </div>
@@ -24,7 +34,7 @@ import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapStores } from 'pinia'
 export default {
-  name: "AllAssessmentReports", 
+  name: "AllAssessmentReports",
   computed: {
     ...mapStores(rootStore, authenticationStore)
   },
@@ -35,7 +45,7 @@ export default {
   },
   methods: {
     async getReports() {
-      allRepResponse = await rootStore().getAllReports()
+      const allRepResponse = await rootStore().getAllReports()
       if (allRepResponse.status < 400) {
         this.reports = allRepResponse.data
         this.reports.forEach(rep => {
@@ -43,13 +53,14 @@ export default {
         })
       } else {
         this.$emit('get-reports-fail', allRepResponse.message)
-      }      
+      }
     },
     onReportClick(assessmentId) {
-      this.$router.push({ path: './assessmentresults?ID=' + assessmentId })
+      const routeData = this.$router.resolve({ path: '/assessmentresults', params: {'ID': assessmentId}})
+      window.open(routeData.href, '_blank')
     },
     getFormattedDate(ts) {
-      return (new Date(ts * 1000).toLocaleDateString("en-GB").split('/'))[2]  
+      return (new Date(ts * 1000).toLocaleDateString("en-GB").split('/'))[2]
     }
   },
   mounted() {

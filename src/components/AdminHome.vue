@@ -38,7 +38,7 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-all-inst-tab" role="tabpanel">
-          All institution reports here...
+          <AllAssessmentReports @get-reports-fail="reportError" />
         </div>
         <div class="tab-pane fade" id="view-mit-comp-tab" role="tabpanel">
           Mitigation comparisons here...
@@ -71,27 +71,27 @@ import ErrorAlertModal from "./ErrorAlertModal"
 import { mapStores } from "pinia"
 import { rootStore } from "../stores/root"
 import { authenticationStore } from "../stores/authentication"
+import AllAssessmentReports from "./AllAssessmentReports.vue"
 
 export default {
   name: 'AdminHome',
   components: {
     AppLogo,
-    ErrorAlertModal
+    ErrorAlertModal,
+    AllAssessmentReports
   },
   computed: {
-    ...mapStores(rootStore, authenticationStore)
+    ...mapStores(rootStore, authenticationStore),
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    }
   },
   data() {
     return {
-      userIsAdmin: true,
-      chartData: [],
-      guidanceText: ''
+      chartData: []
     }
   },
-  methods: {
-    getAllReports() {
-      this.$router.push('/allassessmentreports')
-    },
+  methods: { 
     mitigationComparison() {
       this.$router.push('/mitigationcomparison')
     },
@@ -135,7 +135,10 @@ export default {
       }
     },
     async checkAdmin() {
-      return await this.authenticationStore().checkIsAdminUser()
+      return await authenticationStore().checkIsAdminUser()
+    },
+    reportError(message) {
+      this.errorAlertModal(message)
     }
   },
   mounted() {

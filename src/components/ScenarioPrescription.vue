@@ -67,7 +67,7 @@
             <label class="form-check-label" for="no-intervention">
               You were able to complete the prescription (includes followed order sentence)
               <span class="fw-bold">without any additional user or system input</span>
-              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
                 data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
                 <i class="bi bi-info-circle-fill link-primary ms-2"></i>
             </a>
