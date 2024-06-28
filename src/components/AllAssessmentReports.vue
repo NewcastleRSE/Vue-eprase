@@ -19,7 +19,7 @@
             data-bs-title="Click on row to view details (in a new tab)" data-bs-placement="top" data-bs-toggle="tooltip"
             style="cursor:pointer">
             <td>{{ report.institution.orgName }}</td>
-            <td>{{ report.system.time_created }}</td>
+            <td>{{ getFormattedDate(report.system.time_created) }}</td>
           </tr>
         </tbody>
       </table>
@@ -35,26 +35,14 @@ import { authenticationStore } from '../stores/authentication'
 import { mapStores } from 'pinia'
 export default {
   name: "AllAssessmentReports",
+  props: {
+    reports: [],
+    loading: true
+  },
   computed: {
     ...mapStores(rootStore, authenticationStore)
   },
-  data() {
-    return {
-      reports: []
-    }
-  },
-  methods: {
-    async getReports() {
-      const allRepResponse = await rootStore().getAllReports()
-      if (allRepResponse.status < 400) {
-        this.reports = allRepResponse.data
-        this.reports.forEach(rep => {
-          rep.system.time_created = this.getFormattedDate(rep.system.time_created)
-        })
-      } else {
-        this.$emit('get-reports-fail', allRepResponse.message)
-      }
-    },
+  methods: {    
     onReportClick(assessmentId) {
       const routeData = this.$router.resolve({ path: '/assessmentresults', params: {'ID': assessmentId}})
       window.open(routeData.href, '_blank')
@@ -62,9 +50,6 @@ export default {
     getFormattedDate(ts) {
       return (new Date(ts * 1000).toLocaleDateString("en-GB").split('/'))[2]
     }
-  },
-  mounted() {
-    this.getReports()
   }
 }
 </script>

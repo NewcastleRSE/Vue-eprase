@@ -38,10 +38,10 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-all-inst-tab" role="tabpanel">
-          <AllAssessmentReports @get-reports-fail="reportError" />
+          <AllAssessmentReports :reports="reports" :loading="reportDataLoading" />
         </div>
         <div class="tab-pane fade" id="view-mit-comp-tab" role="tabpanel">
-          Mitigation comparisons here...
+          <MitigationComparisonChart @get-mitigation-fail="reportError" />
         </div>
         <div class="tab-pane fade" id="view-ep-comp-tab" role="tabpanel">
           EP system comparisons here...
@@ -50,7 +50,7 @@
           EPMA stats here...
         </div>
         <div class="tab-pane fade" id="view-conf-errs-tab" role="tabpanel">
-          Config errors here...
+          <ConfigErrorResults :reports="reports" :loading="reportDataLoading" />
         </div>
         <div class="tab-pane fade" id="view-ex-risk-comp-tab" role="tabpanel">
           Extreme risk comparisons here...
@@ -71,14 +71,18 @@ import ErrorAlertModal from "./ErrorAlertModal"
 import { mapStores } from "pinia"
 import { rootStore } from "../stores/root"
 import { authenticationStore } from "../stores/authentication"
-import AllAssessmentReports from "./AllAssessmentReports.vue"
+import AllAssessmentReports from "./AllAssessmentReports"
+import MitigationComparisonChart from "./MitigationComparisonChart"
+import ConfigErrorResults from "./ConfigErrorResults"
 
 export default {
   name: 'AdminHome',
   components: {
     AppLogo,
     ErrorAlertModal,
-    AllAssessmentReports
+    AllAssessmentReports,
+    MitigationComparisonChart,
+    ConfigErrorResults
   },
   computed: {
     ...mapStores(rootStore, authenticationStore),
@@ -88,7 +92,9 @@ export default {
   },
   data() {
     return {
-      chartData: []
+      reports: [],
+      chartData: [],
+      reportDataLoading: true
     }
   },
   methods: { 
@@ -109,31 +115,19 @@ export default {
     },
     highRiskComparison() {
       this.$router.push('/highriskcomparison')
-    },    
-    async getInstitutionMitResult() {
-      const response = await rootStore().getAllMitigationResults()
-      if (response.status < 400) {
-        const data = response.data
-        for (let index in data) {
-          if (data.hasOwnProperty(index)) {
-            this.chartData.push([
-              data[index].institution.orgName,
-              data[index].goodMitigation,
-              data[index].someMitigation,
-              data[index].notMitigated,
-              data[index].overMitigated,
-              data[index].invalidTests,
-              data[index].epSystem])
-          }
-        }
-        const mitigationChartData = this.chartData
-        if (this.chartData) {
-          rootStore().storeMitigationChartData(mitigationChartData)
-        }
-      } else {
-        //Error modal show TODO
-      }
     },
+    async getReports() {
+      const allRepResponse = await rootStore().getAllReports()
+      if (allRepResponse.status < 400) {
+        this.reportDataLoading = false
+        this.reports = allRepResponse.data
+        this.reports.forEach(rep => {
+          rep.system.time_created = this.getFormattedDate(rep.system.time_created)
+        })
+      } else {
+        this.errorAlertModal.show(allRepResponse.message)
+      }
+    },        
     async checkAdmin() {
       return await authenticationStore().checkIsAdminUser()
     },
@@ -144,7 +138,9 @@ export default {
   mounted() {
     if (!this.checkAdmin()) {
       this.$router.push('/login?requiresAdmin=1')
-    }   
+    } else {
+      this.getReports()
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 <template>
-  <div ref="pieChartContainer"></div>
+  <div v-if="dataLoading">Loading chart data...</div>
+  <div v-if="! dataLoading" ref="pieChartContainer"></div>
 </template>
 
 <script>

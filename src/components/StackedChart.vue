@@ -1,5 +1,6 @@
 <template>
-  <div ref="stackedChartContainer"></div>
+  <div v-if="dataLoading">Loading chart data...</div>
+  <div v-if="! dataLoading" ref="stackedChartContainer"></div>
 </template>
 
 <script>
@@ -33,7 +34,7 @@ export default {
         width: 900,
         height: 700
       }, {displayModeBar: false})
-
+       
       console.groupEnd()
     }
   }

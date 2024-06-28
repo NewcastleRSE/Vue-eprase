@@ -141,9 +141,8 @@
 
 <script>
 
-import { calcPercentage } from '../helpers/utils'
-import { categoryService } from "../services/categoryService"
-import { stackedChartService } from "../services/stackedChartService"
+import { calcPercentage, calcNum } from '../helpers/utils'
+import { countCategories } from '../helpers/categories'
 import TabHeader from "./TabHeader"
 import LoginInfo from './LoginInfo'
 import AppLogo from "./AppLogo"
@@ -219,11 +218,44 @@ export default {
     }
   },
   methods: {
+
+    createStackedChartData(jsondata) {
+
+      console.group('createStackedChartData()')
+
+      const categories = [
+        'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions', 
+        'Theraputic Duplication', 'Drug Lab', 'Drug Brand', 'Drug Route', 'Drug Overdose', 'Drug Frequency'
+      ]
+      const categoryKeys = categories.map(c => {
+        return c.substring(0, 1).toLowerCase() + c.substring(1).replace(' ', '')
+      })
+      const categorySubkeys = ['good', 'some', 'not', 'over']
+
+      const stackedChartData = []
+      categorySubkeys.forEach(csk => {
+        const yArr = []
+        categoryKeys.forEach((ck, idx) => {        
+          yArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))        
+        })
+        stackedChartData.push({
+          x: categories,
+          y: yArr,
+          name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
+          type: 'bar'
+        })
+      })
+
+      console.debug('Chart category data', stackedChartData)
+      console.groupEnd()
+
+      return stackedChartData
+    },
     countCategories(data) {
 
       console.group('countCategories()')
 
-      let jsonData = categoryService.countCategories(data)
+      let jsonData = countCategories(data)
       this.tableData = jsonData
       this.totalGood = jsonData.totals.totalGood
       this.totalSome = jsonData.totals.totalSome
@@ -233,8 +265,7 @@ export default {
       this.totalInterventions = jsonData.totals.totalInterventions
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
-      this.chartCategoryData = stackedChartService.createStackedChartData(jsonData)
-      console.debug('Chart category data', this.chartCategoryData)
+      this.chartCategoryData = this.createStackedChartData(jsonData)      
 
       console.debug(this.tableData)
       console.groupEnd()
@@ -346,9 +377,7 @@ export default {
               selected_type: ptd.selected_type
             }
           }))
-          this.pieDataComplete = true
-          // Set chart data (set in countCategories())
-          rootStore().storeStackedChartData(this.chartCategoryData)
+          this.pieDataComplete = true          
           // Calculate number of valid tests, ignoring null results
           this.totalValidTests = this.numPrescriptions - this.totalNulls
           this.getInterventionTypeResult()

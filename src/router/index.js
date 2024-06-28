@@ -12,11 +12,9 @@ import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
 import ResultsHome from "../components/ResultsHome"
 import AssessmentResults from "../components/AssessmentResults"
-import AssessmentReports from "../components/AssessmentReports"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
-import MitigationComparison from "../components/MitigationComparison"
 import EpmaStatistics from "../components/EpmaStatistics"
 import AllAssessmentReports from "../components/AllAssessmentReports"
 import ConfigErrorResults from "../components/ConfigErrorResults"
@@ -71,11 +69,7 @@ export const router = createRouter({
     {
       path: "/resultshome",
       component: ResultsHome,
-    },
-    {
-      path: "/assessmentreports",
-      component: AssessmentReports,
-    },    
+    }, 
     {
       path: "/resetpassword/:token?",
       component: ResetPassword,
@@ -87,10 +81,6 @@ export const router = createRouter({
     {
       path: "/adminhome",
       component: AdminHome,
-    },
-    {
-      path: "/mitigationcomparison",
-      component: MitigationComparison,
     },
     {
       path: "/epsystemcomparison",
