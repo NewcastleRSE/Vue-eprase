@@ -1,6 +1,7 @@
 <template>
-  <div v-if="dataLoading">Loading chart data...</div>
-  <div v-if="! dataLoading" ref="stackedChartContainer"></div>
+  <div ref="stackedChartContainer">
+    <div v-if="dataLoading">Loading chart data...</div>
+  </div>    
 </template>
 
 <script>

@@ -13,7 +13,7 @@
           <tr>
             <th>Institution Name</th>
             <th>Ep System</th>
-            <th class="align-content-center">Are previous patient records open?</th>
+            <th style="text-align:center">Are previous patient records open?</th>
             <th class="align-content-center">Pass</th>
             <th class="align-content-center">Can insulin be prescribed in ML?</th>
             <th class="align-content-center">Pass</th>
@@ -63,7 +63,9 @@
 export default {
   name: "ConfigErrorResults",
   props: {
-    reports: []
+    reports: {
+      type: Array
+    }
   }
 }
 </script>

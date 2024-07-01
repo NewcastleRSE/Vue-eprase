@@ -10,14 +10,10 @@ import AssessmentSystem from "../components/AssessmentSystem"
 import AssessmentPatients from "../components/AssessmentPatients"
 import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
-import ResultsHome from "../components/ResultsHome"
 import AssessmentResults from "../components/AssessmentResults"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
-import EpmaStatistics from "../components/EpmaStatistics"
-import AllAssessmentReports from "../components/AllAssessmentReports"
-import ConfigErrorResults from "../components/ConfigErrorResults"
 import EpSystemComparison from "../components/EpSystemComparison"
 import HighRiskComparison from "../components/HighRiskComparison"
 import CategoryComparison from "../components/CategoryComparison"
@@ -67,10 +63,6 @@ export const router = createRouter({
       component: AssessmentResults
     },
     {
-      path: "/resultshome",
-      component: ResultsHome,
-    }, 
-    {
       path: "/resetpassword/:token?",
       component: ResetPassword,
     },
@@ -93,18 +85,6 @@ export const router = createRouter({
     {
       path: "/categorycomparison",
       component: CategoryComparison,
-    },
-    {
-      path: "/epmastatistics",
-      component: EpmaStatistics,
-    },
-    {
-      path: "/configerrorresults",
-      component: ConfigErrorResults,
-    },
-    {
-      path: "/allassessmentreports",
-      component: AllAssessmentReports,
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },

@@ -15,22 +15,29 @@
           </tr>
           <tr>
             <td>Drug Age ({{ tableData['categories'][0].drugAge.count }})</td>
-            <td>{{ calcPercentage(tableData['categories'][0].drugAge.good, tableData['categories'][0].drugAge.count) }}
+            <td>{{ calcPercentage(tableData['categories'][0].drugAge.good, tableData['categories'][0].drugAge.count)
+              }}
               <span class="success">({{ tableData['categories'][0].drugAge.good }}/{{
         tableData['categories'][0].drugAge.count
-      }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][0].drugAge.some, tableData['categories'][0].drugAge.count) }}
+      }})</span>
+            </td>
+            <td>{{ calcPercentage(tableData['categories'][0].drugAge.some, tableData['categories'][0].drugAge.count)
+              }}
               <span class="warning">({{ tableData['categories'][0].drugAge.some }}/{{
         tableData['categories'][0].drugAge.count
-      }})</span></td>
+      }})</span>
+            </td>
             <td>{{ calcPercentage(tableData['categories'][0].drugAge.not, tableData['categories'][0].drugAge.count) }}
               <span class="danger">({{ tableData['categories'][0].drugAge.not }}/{{
         tableData['categories'][0].drugAge.count
-      }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][0].drugAge.over, tableData['categories'][0].drugAge.count) }}
+      }})</span>
+            </td>
+            <td>{{ calcPercentage(tableData['categories'][0].drugAge.over, tableData['categories'][0].drugAge.count)
+              }}
               <span class="info">({{ tableData['categories'][0].drugAge.over }}/{{
         tableData['categories'][0].drugAge.count
-      }})</span></td>
+      }})</span>
+            </td>
           </tr>
           <tr>
             <td>Drug Dose ({{ tableData['categories'][1].drugDose.count }})</td>
@@ -40,10 +47,12 @@
             <td>{{ calcPercentage(tableData['categories'][1].drugDose.some, tableData['categories'][1].drugDose.count)
               }} <span class="warning">({{ tableData['categories'][1].drugDose.some }}/{{
         tableData['categories'][1].drugDose.count }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][1].drugDose.not, tableData['categories'][1].drugDose.count) }}
+            <td>{{ calcPercentage(tableData['categories'][1].drugDose.not, tableData['categories'][1].drugDose.count)
+              }}
               <span class="danger">({{ tableData['categories'][1].drugDose.not }}/{{
         tableData['categories'][1].drugDose.count
-      }})</span></td>
+      }})</span>
+            </td>
             <td>{{ calcPercentage(tableData['categories'][1].drugDose.over, tableData['categories'][1].drugDose.count)
               }} <span class="info">({{ tableData['categories'][1].drugDose.over }}/{{
         tableData['categories'][1].drugDose.count }})</span></td>
@@ -174,35 +183,46 @@
           </tr>
           <tr>
             <td>Drug Lab ({{ tableData['categories'][8].drugLab.count }})</td>
-            <td>{{ calcPercentage(tableData['categories'][8].drugLab.good, tableData['categories'][8].drugLab.count) }}
+            <td>{{ calcPercentage(tableData['categories'][8].drugLab.good, tableData['categories'][8].drugLab.count)
+              }}
               <span class="success">({{ tableData['categories'][8].drugLab.good }}/{{
         tableData['categories'][8].drugLab.count
-      }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][8].drugLab.some, tableData['categories'][8].drugLab.count) }}
+      }})</span>
+            </td>
+            <td>{{ calcPercentage(tableData['categories'][8].drugLab.some, tableData['categories'][8].drugLab.count)
+              }}
               <span class="warning">({{ tableData['categories'][8].drugLab.some }}/{{
         tableData['categories'][8].drugLab.count
-      }})</span></td>
+      }})</span>
+            </td>
             <td>{{ calcPercentage(tableData['categories'][8].drugLab.not, tableData['categories'][8].drugLab.count) }}
               <span class="danger">({{ tableData['categories'][8].drugLab.not }}/{{
         tableData['categories'][8].drugLab.count
-      }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][8].drugLab.over, tableData['categories'][8].drugLab.count) }}
+      }})</span>
+            </td>
+            <td>{{ calcPercentage(tableData['categories'][8].drugLab.over, tableData['categories'][8].drugLab.count)
+              }}
               <span class="info">({{ tableData['categories'][8].drugLab.over }}/{{
         tableData['categories'][8].drugLab.count
-      }})</span></td>
+      }})</span>
+            </td>
           </tr>
           <tr>
             <td>Drug Brand ({{ tableData['categories'][9].drugBrand.count }})</td>
-            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.good, tableData['categories'][9].drugBrand.count)
+            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.good,
+        tableData['categories'][9].drugBrand.count)
               }} <span class="success">({{ tableData['categories'][9].drugBrand.good }}/{{
         tableData['categories'][9].drugBrand.count }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.some, tableData['categories'][9].drugBrand.count)
+            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.some,
+        tableData['categories'][9].drugBrand.count)
               }} <span class="warning">({{ tableData['categories'][9].drugBrand.some }}/{{
         tableData['categories'][9].drugBrand.count }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.not, tableData['categories'][9].drugBrand.count)
+            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.not,
+        tableData['categories'][9].drugBrand.count)
               }} <span class="danger">({{ tableData['categories'][9].drugBrand.not }}/{{
         tableData['categories'][9].drugBrand.count }})</span></td>
-            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.over, tableData['categories'][9].drugBrand.count)
+            <td>{{ calcPercentage(tableData['categories'][9].drugBrand.over,
+        tableData['categories'][9].drugBrand.count)
               }} <span class="info">({{ tableData['categories'][9].drugBrand.over }}/{{
         tableData['categories'][9].drugBrand.count }})</span></td>
           </tr>
@@ -255,7 +275,7 @@
               }} <span class="success">({{ tableData['categories'][12].drugFrequency.good }}/{{
         tableData['categories'][12].drugFrequency.count }})</span></td>
             <td>{{ calcPercentage(tableData['categories'][12].drugFrequency.some,
-              tableData['categories'][12].drugFrequency.count)
+        tableData['categories'][12].drugFrequency.count)
               }} <span class="warning">({{ tableData['categories'][12].drugFrequency.some }}/{{
                 tableData['categories'][12].drugFrequency.count }})</span></td>
             <td>{{ calcPercentage(tableData['categories'][12].drugFrequency.not,
@@ -279,8 +299,8 @@
       </table>
     </div>
 
-    <div><span class="note fw-bold">*</span> All categories (Good/Some/Not/Over) calculated as a percentage of the <span
-        class="fw-bold">total valid tests</span>, not an average of the previous columns
+    <div><span class="note fw-bold">*</span> All categories (Good/Some/Not/Over) calculated as a percentage of the
+      <span class="fw-bold">total valid tests</span>, not an average of the previous columns
     </div>
 
   </div>

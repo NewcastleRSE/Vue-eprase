@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="loading">Loading report data...</div>
+  <div v-if="!loading">
     <h2>All Institution Reports</h2>
 
     <div v-if="reports.length === 0">
@@ -24,7 +25,6 @@
         </tbody>
       </table>
     </div>
-
   </div>
 </template>
 
@@ -36,15 +36,17 @@ import { mapStores } from 'pinia'
 export default {
   name: "AllAssessmentReports",
   props: {
-    reports: [],
+    reports: {
+      type: Array
+    },
     loading: true
   },
   computed: {
     ...mapStores(rootStore, authenticationStore)
   },
-  methods: {    
+  methods: {
     onReportClick(assessmentId) {
-      const routeData = this.$router.resolve({ path: '/assessmentresults', params: {'ID': assessmentId}})
+      const routeData = this.$router.resolve({ path: '/assessmentresults', params: { 'ID': assessmentId } })
       window.open(routeData.href, '_blank')
     },
     getFormattedDate(ts) {

@@ -47,7 +47,7 @@
           EP system comparisons here...
         </div>
         <div class="tab-pane fade" id="view-epma-stats-tab" role="tabpanel">
-          EPMA stats here...
+          <EpmaStatistics :reports="reports" :loading="reportDataLoading" />
         </div>
         <div class="tab-pane fade" id="view-conf-errs-tab" role="tabpanel">
           <ConfigErrorResults :reports="reports" :loading="reportDataLoading" />
@@ -66,22 +66,27 @@
 
 <script>
 
+import { getFormattedDate } from "../helpers/utils"
 import AppLogo from "./AppLogo"
+import LoginInfo from "./LoginInfo"
 import ErrorAlertModal from "./ErrorAlertModal"
 import { mapStores } from "pinia"
 import { rootStore } from "../stores/root"
 import { authenticationStore } from "../stores/authentication"
 import AllAssessmentReports from "./AllAssessmentReports"
 import MitigationComparisonChart from "./MitigationComparisonChart"
+import EpmaStatistics from "./EpmaStatistics"
 import ConfigErrorResults from "./ConfigErrorResults"
 
 export default {
   name: 'AdminHome',
   components: {
     AppLogo,
+    LoginInfo,
     ErrorAlertModal,
     AllAssessmentReports,
     MitigationComparisonChart,
+    EpmaStatistics,
     ConfigErrorResults
   },
   computed: {
@@ -94,6 +99,7 @@ export default {
     return {
       reports: [],
       chartData: [],
+      epmaStatsData: [],
       reportDataLoading: true
     }
   },
@@ -103,26 +109,20 @@ export default {
     },
     epsystemComparison() {
       this.$router.push('/epsystemcomparison')
-    },
-    epmaStatistics() {
-      this.$router.push('/epmastatistics')
-    },
+    },    
     categoryComparison() {
       this.$router.push('/categorycomparison')
     },
-    configErrorResults() {
-      this.$router.push('/configerrorresults')
-    },
     highRiskComparison() {
       this.$router.push('/highriskcomparison')
-    },
+    },    
     async getReports() {
       const allRepResponse = await rootStore().getAllReports()
       if (allRepResponse.status < 400) {
         this.reportDataLoading = false
         this.reports = allRepResponse.data
         this.reports.forEach(rep => {
-          rep.system.time_created = this.getFormattedDate(rep.system.time_created)
+          rep.system.time_created = getFormattedDate(rep.system.time_created)
         })
       } else {
         this.errorAlertModal.show(allRepResponse.message)

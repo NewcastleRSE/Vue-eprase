@@ -9,3 +9,7 @@ export function calcNum(num, total) {
   }
   return 0;
 }
+
+export function getFormattedDate(time){
+  return new Date(time * 1000).toLocaleDateString("en-GB");
+}

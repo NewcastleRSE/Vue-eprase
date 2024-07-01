@@ -72,11 +72,11 @@ export const rootStore = defineStore('root', {
       return response                
     },
     async getAllMitigationResults() {
-      const response = await this.apiCall('getAllMitigationResults' + id, 'GET')
+      const response = await this.apiCall('getAllMitigationResults', 'GET')
       return response       
     },
     async getConfigErrors() {
-      const response = await this.apiCall('configerrors' + id, 'GET')
+      const response = await this.apiCall('configerrors', 'GET')
       return response      
     },
     async getConfigErrorByCode(code){
