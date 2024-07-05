@@ -23,6 +23,7 @@
     "plotly.js-cartesian-dist-min": "^2.33.0",
     "popper.js": "^1.16.1",
     "prettier": "^3.2.5",
+    "print-js": "^1.6.0",
     "terser-webpack-plugin": "^5.3.10",
     "vee-validate": "^4.12.5",
     "vue": "^3.4.18",

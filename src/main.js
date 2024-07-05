@@ -1,4 +1,5 @@
 import "./assets/scss/custom.scss"
+import "../node_modules/print-js/dist/print.css"
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
 import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
 import { createApp } from "vue"

@@ -9,7 +9,7 @@
 
       <h3>Assessment Report</h3>
 
-      <div>
+      <div id="reportHeading">
         <h4><span class="fw-bold me-2">Institution:</span><span class="fw-normal">{{ institution }}</span></h4>
         <h4><span class="fw-bold me-2">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system
             }}</span></h4>
@@ -123,10 +123,10 @@
         </div>
         <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
           <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
-            :overMitigated="totalOver" :nullTests="totalNulls" />
+            :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" />
+          <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
         </div>
 
       </div>
@@ -218,7 +218,9 @@ export default {
     }
   },
   methods: {
-
+    getHeading() {
+      return `<h3>Institution: ${ this.institution }</h3><h4>EP System: ${ this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system }</h4>`
+    },
     createStackedChartData(jsondata) {
 
       console.group('createStackedChartData()')
@@ -234,15 +236,16 @@ export default {
 
       const stackedChartData = []
       categorySubkeys.forEach(csk => {
-        const yArr = []
+        const xArr = []
         categoryKeys.forEach((ck, idx) => {        
-          yArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))        
+          xArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))        
         })
-        stackedChartData.push({
-          x: categories,
-          y: yArr,
+        stackedChartData.push({       
+          x: xArr,
+          y: categories,       
           name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
-          type: 'bar'
+          type: 'bar',
+          orientation: 'h'   
         })
       })
 
