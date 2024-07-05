@@ -10,8 +10,7 @@ import VueAxios from "vue-axios"
 import { configure, defineRule } from "vee-validate"
 import { required } from '@vee-validate/rules'
 import { router } from "./router"
-// import * as Sentry from "@sentry/vue"
-// import { BrowserTracing } from "@sentry/tracing"
+import * as Sentry from "@sentry/vue"
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -69,21 +68,26 @@ app.config.devtools = true
 //   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
 // }
 
-// TODO - needs updating to get rid of deprecated calls - David Herbert 12/02/2024
-// Sentry.init({
-//     Vue,
-//     dsn: "https://4d30c2e7f1234eca9e329a4d4376a6b0@o1080315.ingest.sentry.io/6616496",
-//     integrations: [
-//       new BrowserTracing({
-//         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-//         tracingOrigins: ["localhost", "my-site-url.com", /^\//],
-//       }),
-//     ],
-//     Set tracesSampleRate to 1.0 to capture 100%
-//     of transactions for performance monitoring.
-//     We recommend adjusting this value in production
-//     tracesSampleRate: 1.0,
-//     environment: "development"
-//   });
+Sentry.init({
+  app,
+  dsn: 'https://4d30c2e7f1234eca9e329a4d4376a6b0@o1080315.ingest.us.sentry.io/6616496',
+  integrations: [
+    Sentry.browserTracingIntegration({ router }),
+    Sentry.replayIntegration(),
+  ],
 
-app.mount("#app")
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for tracing.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+
+  // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+  tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
+
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+})
+
+app.mount('#app')
