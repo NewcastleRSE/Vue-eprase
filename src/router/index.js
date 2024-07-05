@@ -14,7 +14,6 @@ import AssessmentResults from "../components/AssessmentResults"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
-import EpSystemComparison from "../components/EpSystemComparison"
 import HighRiskComparison from "../components/HighRiskComparison"
 import CategoryComparison from "../components/CategoryComparison"
 
@@ -73,11 +72,7 @@ export const router = createRouter({
     {
       path: "/adminhome",
       component: AdminHome,
-    },
-    {
-      path: "/epsystemcomparison",
-      component: EpSystemComparison,
-    },
+    },   
     {
       path: "/highriskcomparison",
       component: HighRiskComparison,

@@ -44,7 +44,7 @@
           <MitigationComparisonChart @get-mitigation-fail="reportError" />
         </div>
         <div class="tab-pane fade" id="view-ep-comp-tab" role="tabpanel">
-          EP system comparisons here...
+          <EpSystemComparisonChart @get-mitigation-fail="reportError" />
         </div>
         <div class="tab-pane fade" id="view-epma-stats-tab" role="tabpanel">
           <EpmaStatistics :reports="reports" :loading="reportDataLoading" />
@@ -75,6 +75,7 @@ import { rootStore } from "../stores/root"
 import { authenticationStore } from "../stores/authentication"
 import AllAssessmentReports from "./AllAssessmentReports"
 import MitigationComparisonChart from "./MitigationComparisonChart"
+import EpSystemComparisonChart from "./EpSystemComparisonChart"
 import EpmaStatistics from "./EpmaStatistics"
 import ConfigErrorResults from "./ConfigErrorResults"
 
@@ -86,6 +87,7 @@ export default {
     ErrorAlertModal,
     AllAssessmentReports,
     MitigationComparisonChart,
+    EpSystemComparisonChart,
     EpmaStatistics,
     ConfigErrorResults
   },
@@ -103,13 +105,7 @@ export default {
       reportDataLoading: true
     }
   },
-  methods: { 
-    mitigationComparison() {
-      this.$router.push('/mitigationcomparison')
-    },
-    epsystemComparison() {
-      this.$router.push('/epsystemcomparison')
-    },    
+  methods: {        
     categoryComparison() {
       this.$router.push('/categorycomparison')
     },
