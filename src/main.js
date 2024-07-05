@@ -68,6 +68,7 @@ app.config.devtools = true
 //   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
 // }
 
+// https://docs.sentry.io/platforms/javascript/guides/vue/
 Sentry.init({
   app,
   dsn: 'https://4d30c2e7f1234eca9e329a4d4376a6b0@o1080315.ingest.us.sentry.io/6616496',
