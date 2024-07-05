@@ -15,22 +15,22 @@
 
       <nav class="mt-4">
         <ul class="nav nav-tabs nav-fill mb-3" id="admin-reports-tab" role="tablist">
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="Access all available institution reports" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link active" data-bs-toggle="tab" href="#view-all-inst-tab" role="tab">All Institution Reports</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="Compare overall mitigation results" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-mit-comp-tab" role="tab">Mitigation Comparison</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="Compare mitigation results across EP systems" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-ep-comp-tab" role="tab">Ep System Comparison</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="View EPMA data for institutions" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-epma-stats-tab" role="tab">EPMA Statistics</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="View config error results for institutions" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-conf-errs-tab" role="tab">Configuration Error Results</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation" title="View extreme risk results for institutions" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-ex-risk-comp-tab" role="tab">Extreme Risk Comparison</a>
           </li>
         </ul>
@@ -53,7 +53,7 @@
           <ConfigErrorResults :reports="reports" :loading="reportDataLoading" />
         </div>
         <div class="tab-pane fade" id="view-ex-risk-comp-tab" role="tabpanel">
-          Extreme risk comparisons here...
+          <HighRiskComparison :reports="reports" :loading="reportDataLoading" />
         </div>
       </div>
     </div>
@@ -78,6 +78,7 @@ import MitigationComparisonChart from "./MitigationComparisonChart"
 import EpSystemComparisonChart from "./EpSystemComparisonChart"
 import EpmaStatistics from "./EpmaStatistics"
 import ConfigErrorResults from "./ConfigErrorResults"
+import HighRiskComparison from "./HighRiskComparison"
 
 export default {
   name: 'AdminHome',
@@ -89,7 +90,8 @@ export default {
     MitigationComparisonChart,
     EpSystemComparisonChart,
     EpmaStatistics,
-    ConfigErrorResults
+    ConfigErrorResults,
+    HighRiskComparison
   },
   computed: {
     ...mapStores(rootStore, authenticationStore),

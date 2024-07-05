@@ -20,7 +20,7 @@
             data-bs-title="Click on row to view details (in a new tab)" data-bs-placement="top" data-bs-toggle="tooltip"
             style="cursor:pointer">
             <td>{{ report.institution.orgName }}</td>
-            <td>{{ getFormattedDate(report.system.time_created) }}</td>
+            <td>{{ report.system.time_created.split('/')[2] }}</td>
           </tr>
         </tbody>
       </table>
@@ -48,9 +48,6 @@ export default {
     onReportClick(assessmentId) {
       const routeData = this.$router.resolve({ path: '/assessmentresults', params: { 'ID': assessmentId } })
       window.open(routeData.href, '_blank')
-    },
-    getFormattedDate(ts) {
-      return (new Date(ts * 1000).toLocaleDateString("en-GB").split('/'))[2]
     }
   }
 }
