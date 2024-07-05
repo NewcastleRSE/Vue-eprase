@@ -105,10 +105,7 @@ export default {
       reportDataLoading: true
     }
   },
-  methods: {        
-    categoryComparison() {
-      this.$router.push('/categorycomparison')
-    },
+  methods: {           
     highRiskComparison() {
       this.$router.push('/highriskcomparison')
     },    

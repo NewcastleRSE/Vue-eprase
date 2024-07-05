@@ -15,7 +15,6 @@ import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
 import HighRiskComparison from "../components/HighRiskComparison"
-import CategoryComparison from "../components/CategoryComparison"
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -76,10 +75,6 @@ export const router = createRouter({
     {
       path: "/highriskcomparison",
       component: HighRiskComparison,
-    },
-    {
-      path: "/categorycomparison",
-      component: CategoryComparison,
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
