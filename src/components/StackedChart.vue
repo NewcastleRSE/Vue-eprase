@@ -2,13 +2,12 @@
   <div ref="stackedChartContainer" id="stackedChartContainer">
     <div v-if="dataLoading">Loading chart data...</div>
   </div>
-  <button type="button" class="btn btn-primary m-1" @click="printablePdf"><i
-    class="bi bi-filetype-pdf pe-1"></i>Printable PDF</button>  
+  <PrintablePdf :heading="heading" :printableElementId="'stackedChartContainer'" :buttonCaption="'Printable PDF'" />
 </template>
 
 <script>
 
-import PrintJS from 'print-js'
+import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
@@ -20,18 +19,19 @@ export default {
     heading: '',
     dataLoading: true
   }, 
+  components: {
+    PrintablePdf
+  },  
   watch: {
     dataLoading(newVal) {
       if (newVal === false) {
-        console.debug('data has all loaded')
+        console.debug('Stacked chart data has all loaded')
         this.renderChart()
       }
     }
   },
   methods: {
-    printablePdf() {
-      PrintJS({ printable: 'stackedChartContainer', type: 'html', header: this.heading, targetStyles: ['*'] })
-    },
+
     renderChart() {
 
       console.group('StackedChart - renderChart()')

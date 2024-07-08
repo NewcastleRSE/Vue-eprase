@@ -33,12 +33,14 @@
   </Form>
 
   <div ref="epSystemComparisonContainer" class="mb-4"></div>
-  <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4">No instance of this EP System found</div>
+  <PrintablePdf v-if="searchfield != null && filteredChartData.length > 0" :heading="heading" :printableElementId="'epSystemComparisonContainer'" :buttonCaption="'Printable PDF'" />
+  <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4"><h4>No instance of this EP System found</h4></div>
 
 </template>
 
 <script>
 
+import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -53,12 +55,16 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
+    heading() {
+      'Results by EP System : ' + this.searchfield
+    }
   },
   emits: ['get-mitigation-fail'],
   components: {
     Form,
     Field,
-    ErrorMessage
+    ErrorMessage,
+    PrintablePdf
   },
   data() {
     return {
@@ -66,6 +72,7 @@ export default {
         'searchfield': 'required'              
       },
       chartData: [],
+      heading: '',
       filteredChartData: [],
       searchfield: null
     }
@@ -79,11 +86,13 @@ export default {
       const re = new RegExp('\\(' + this.searchfield + '\\)')
       this.filteredChartData = this.chartData.filter(cd => cd['x'][0].match(re))
       if (this.filteredChartData.length > 0) {
-        Plotly.newPlot(this.$refs.epSystemComparisonContainer, this.filteredChartData, {
+        Plotly.react(this.$refs.epSystemComparisonContainer, this.filteredChartData, {
           barmode: 'stack',
           width: 900,
           height: 700
         }, {displayModeBar: false})
+      } else {
+        Plotly.purge(this.$refs.epSystemComparisonContainer)
       }
 
       console.groupEnd()
