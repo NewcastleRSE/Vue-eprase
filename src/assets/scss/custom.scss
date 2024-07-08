@@ -58,6 +58,11 @@ button.btn {
   min-width: 120px;
 }
 
+button.btn:disabled {
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
 h1,
 h2 {
     font-weight: normal;

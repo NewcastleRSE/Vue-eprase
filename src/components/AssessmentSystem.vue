@@ -22,18 +22,28 @@
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Select system...</option>
-                    <option value="Cerner"> Cerner </option>
-                    <option value="All script"> All script </option>
-                    <option value="Meditech"> Meditech </option>
-                    <option value="JAC"> JAC </option>
-                    <option value="Medway"> Medway </option>
-                    <option value="EPIC"> EPIC </option>
-                    <option value="Open EP"> Open EP </option>
-                    <option value="PICS"> PICS </option>
-                    <option value="Sunrise"> Sunrise </option>
-                    <option value="MedChart">MedChart </option>
-                    <option value="Lorenzo">Lorenzo </option>
-                    <option value="Other"> Other (Please Specify)</option>
+                    <option value="Altera (Sunrise, Allscripts)">Altera (Sunrise, Allscripts)</option>
+                    <option value="Better">Better</option>
+                    <option value="Cerner">Cerner</option>
+                    <option value="CIS Chemocare">CIS Chemocare</option>
+                    <option value="Civica">Civica</option>
+                    <option value="CMM System C (JAC, Wellsky)">CMM System C (JAC, Wellsky)</option>
+                    <option value="Dedalus">Dedalus</option>
+                    <option value="EMIS">EMIS</option>
+                    <option value="EPIC">EPIC</option>
+                    <option value="InterSystems">InterSystems</option>
+                    <option value="Dedalus - Lorenzo">Dedalus - Lorenzo</option>
+                    <option value="Dedalus - Medchart">Dedalus - Medchart</option>
+                    <option value="Meditech">Meditech</option>
+                    <option value="Medchart">Medchart</option>
+                    <option value="NerveCentre">NerveCentre</option>
+                    <option value="Quadramed">Quadramed</option>
+                    <option value="Servelec">Servelec</option>
+                    <option value="TPP (SystmOne)">TPP (SystmOne)</option>                    
+                    <option value="Medway">Medway</option>
+                    <option value="Open EP ">Open EP </option>
+                    <option value="Phillips ICCA">Phillips ICCA</option>
+                    <option value="Other">Own System/Other (please specify)</option>
                   </select>
                 </Field>
               </div>
@@ -224,6 +234,19 @@
               </div>
             </div>
 
+            <div v-if="results.high_risk_meds.includes('Other')" class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="other-ep-system">Other intervention<span class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.other_high_risk_med" name="other_high_risk_med" id="other-high-risk-med">
+                  <input v-bind="field" type="text" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
+                </Field>
+              </div>
+              <ErrorMessage name="other_high_risk_med" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div>
+
             <div class="mb-4 row">
               <p>Is the e-prescribing system used in the following areas?</p>
               <div v-for="(option, index) in results.area_options" class="form-check ms-2">
@@ -324,6 +347,7 @@ export default {
         man_results: '',
         diagnosis_results: '',
         high_risk_meds: [],
+        other_high_risk_med: '',
         options: [
           // { text: 'Warfarin', value: 'Warfarin' },
           // { text: 'Insulin', value: 'Insulin' },
@@ -417,10 +441,14 @@ export default {
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
           const med_history = this.results.med_history
-          const high_risk_meds = this.results.high_risk_meds.toString()
+          const high_risk_meds = this.results.high_risk_meds
+          if (this.results.other_high_risk_med) {
+            high_risk_meds.push(this.results.other_high_risk_med)
+          }
+          const hrms = high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas.toString()
 
-          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, hrms, clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)

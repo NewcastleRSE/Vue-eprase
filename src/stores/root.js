@@ -1,3 +1,4 @@
+import { stringTrueFalseToBoolean } from '../helpers/utils'
 import { authenticationStore } from './authentication'
 import { defineStore } from 'pinia'
 import axios from 'axios'
@@ -90,11 +91,15 @@ export const rootStore = defineStore('root', {
       const response2 = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + instId, 'GET')
       if (response1.status < 400 && response2.status < 400) {
           this.assessmentId = response1.data ? response1.data.id : -1,
-          this.assessmentComplete = response1.data ? response1.data.status : false,
+          // Sigh - the return from the API is a string "true" or "false"...
+          this.assessmentComplete = response1.data ? stringTrueFalseToBoolean(response1.data.status) : false,
           this.assessmentStatus = response2.data ? response2.data.status : 'Not Started'
           const data = {}
           const reqKeys = ['assessmentId', 'assessmentComplete', 'assessmentStatus']
           reqKeys.forEach(k => data[k] = this[k])
+          console.log('#############')
+          console.dir(data)
+          console.log('#############')
         ret = { status: 200, data: data }
       } else {
         ret = { status: 500, message: 'Failed to get assessment progress for institution', instId}
