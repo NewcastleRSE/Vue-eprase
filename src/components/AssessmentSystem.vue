@@ -315,7 +315,7 @@ export default {
   },
   data() {
     return {
-      validationSchema: {
+      validationSchema: {//TODO - this needs extra .results everywhere...
         'ep-service': 'required',
         'other': (value) => {
           return (this.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
