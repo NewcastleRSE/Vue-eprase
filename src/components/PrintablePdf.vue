@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     printablePdfHandler() {
-      PrintJS({ printable: this.printableElementId, type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 1600 })
+      PrintJS({ printable: this.printableElementId, type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 2000 })
     }
   }
 }

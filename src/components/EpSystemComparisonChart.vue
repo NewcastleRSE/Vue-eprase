@@ -32,9 +32,11 @@
     </div>
   </Form>
 
-  <div ref="epSystemComparisonContainer" class="mb-4"></div>
-  <PrintablePdf v-if="searchfield != null && filteredChartData.length > 0" :heading="heading" :printableElementId="'epSystemComparisonContainer'" :buttonCaption="'Printable PDF'" />
-  <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4"><h4>No instance of this EP System found</h4></div>
+  <div ref="epSystemComparisonContainer" id="epSystemComparisonContainer" class="mb-4"></div>
+  <div v-if="searchfield != null && filteredChartData.length != 0" class="mb-4">
+    <PrintablePdf :heading="heading" :printableElementId="'epSystemComparisonContainer'" :buttonCaption="'Printable PDF'" />
+  </div>
+  <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4 bg-warning-subtle"><span class="fw-bold">No instance of this EP System found</span></div>
 
 </template>
 
@@ -56,7 +58,7 @@ export default {
   computed: {
     ...mapStores(rootStore),
     heading() {
-      'Results by EP System : ' + this.searchfield
+      return 'Results by EP System : ' + this.searchfield
     }
   },
   emits: ['get-mitigation-fail'],
@@ -72,7 +74,6 @@ export default {
         'searchfield': 'required'              
       },
       chartData: [],
-      heading: '',
       filteredChartData: [],
       searchfield: null
     }
