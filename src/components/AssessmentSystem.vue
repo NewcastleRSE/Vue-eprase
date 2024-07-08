@@ -232,20 +232,7 @@
                 </Field>
                 <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
               </div>
-            </div>
-
-            <div v-if="results.high_risk_meds.includes('Other')" class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="other-ep-system">Other intervention<span class="required-field">*</span></label>
-              <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.other_high_risk_med" name="other_high_risk_med" id="other-high-risk-med">
-                  <input v-bind="field" type="text" class="form-control"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
-                </Field>
-              </div>
-              <ErrorMessage name="other_high_risk_med" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-                {{ message }}
-              </ErrorMessage>
-            </div>
+            </div>            
 
             <div class="mb-4 row">
               <p>Is the e-prescribing system used in the following areas?</p>
@@ -257,6 +244,19 @@
                 </Field>
                 <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
               </div>
+            </div>
+
+            <div v-if="results.clinical_areas.includes('Other')" class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other_clinical_area" id="other-clinical-area">
+                  <input v-bind="field" type="text" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
+                </Field>
+              </div>
+              <ErrorMessage name="other_clinical_area" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
             </div>
 
             <div class="row">
@@ -333,6 +333,9 @@ export default {
         },
         'diagnosis-results': (value) => {
           return (this.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        },
+        'other_clinical_area': (value) => {
+          return this.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
         }
       },
       results: {
@@ -346,8 +349,7 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
-        high_risk_meds: [],
-        other_high_risk_med: '',
+        high_risk_meds: [],        
         options: [
           // { text: 'Warfarin', value: 'Warfarin' },
           // { text: 'Insulin', value: 'Insulin' },
@@ -383,6 +385,7 @@ export default {
           { text: 'Ability to prescribe dose titration', value: 'Dose Titration' }
         ],
         clinical_areas: [],
+        other_clinical_area: '',
         area_options: [
           // { text: 'Adult Critical Care', value: 'ACC' },
           // { text: 'Paediatric Critical Care', value: 'PCC' },
@@ -441,14 +444,13 @@ export default {
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
           const med_history = this.results.med_history
-          const high_risk_meds = this.results.high_risk_meds
-          if (this.results.other_high_risk_med) {
-            high_risk_meds.push(this.results.other_high_risk_med)
+          const high_risk_meds = this.results.high_risk_meds.toString()         
+          const clinical_areas = this.results.clinical_areas
+          if (this.results.other_clinical_area) {
+            clinical_areas.push(this.results.other_clinical_area)
           }
-          const hrms = high_risk_meds.toString()
-          const clinical_areas = this.results.clinical_areas.toString()
-
-          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, hrms, clinical_areas, time_taken)
+          const final_clincal_areas = clinical_areas.toString()          
+          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
