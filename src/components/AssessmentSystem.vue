@@ -318,7 +318,7 @@ export default {
       validationSchema: {//TODO - this needs extra .results everywhere...
         'ep-service': 'required',
         'other': (value) => {
-          return (this.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
+          return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
         },
         'ep-version': 'required|lengthBetween:1,50',
         'ep-usage': 'required',
@@ -326,16 +326,16 @@ export default {
           return ['true', 'false'].includes(value) ? true : 'Please select one' 
         },
         'man-results': (value) => {
-          return (this.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+          return (this.results.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         },
         'med-history': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one' 
         },
         'diagnosis-results': (value) => {
-          return (this.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+          return (this.results.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         },
         'other_clinical_area': (value) => {
-          return this.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
+          return this.results.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
         }
       },
       results: {
@@ -446,10 +446,10 @@ export default {
           const med_history = this.results.med_history
           const high_risk_meds = this.results.high_risk_meds.toString()         
           const clinical_areas = this.results.clinical_areas
-          if (this.results.other_clinical_area) {
+          if (this.results.other_clinical_area != '') {
             clinical_areas.push(this.results.other_clinical_area)
           }
-          const final_clincal_areas = clinical_areas.toString()          
+          const final_clinical_areas = clinical_areas.toString()          
           const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')

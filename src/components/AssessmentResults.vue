@@ -18,22 +18,22 @@
       <nav class="mt-4">
         <ul class="nav nav-tabs nav-fill mb-3" id="results-tab" role="tablist">
           <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#view-test-summary-tab" role="tab">Test summary</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#view-pie-chart-tab" role="tab">Pie chart</a>
           </li>
           <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-test-summary-tab" role="tab">Test summary</a>
+          </li>
+          <!-- <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#view-percentages-tab" role="tab">View percentages</a>
-          </li>
+          </li> -->
           <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#view-pie-chart-tab" role="tab">View pie chart</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#view-stacked-chart-tab" role="tab">View bar chart</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#view-stacked-chart-tab" role="tab">Bar chart</a>
           </li>
         </ul>
       </nav>
 
       <div class="tab-content">
-        <div class="tab-pane fade show active" id="view-test-summary-tab" role="tabpanel">
+        <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">
           <section>
             <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
             <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
@@ -51,19 +51,19 @@
                 <tr>
                   <th>Extreme risk scenarios</th>
                   <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
-      (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
-      (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
+                    (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
+                      (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>High risk scenarios</th>
                   <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
-      > 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
-      'were') }} mitigated. </td>
+                    > 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
+                      'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>Alerts/Advisory interventions</th>
                   <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{
-      totalValidTests }} total valid tests, where a system/user intervention was selected. This would be
+                    totalValidTests }} total valid tests, where a system/user intervention was selected. This would be
                     considered a
                     {{ interventionTypeResult }}. A high level of alerts
                     can
@@ -118,12 +118,12 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
+        <!-- <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
           <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
-        </div>
-        <div class="tab-pane fade" id="view-pie-chart-tab" role="tabpanel">
-          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome" :notMitigated="totalNot"
-            :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
+        </div> -->
+        <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
+          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
+            :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
           <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
@@ -131,7 +131,9 @@
 
       </div>
     </div>
-
+    <button type="button" class="btn btn-primary m-1" @click="assemblePrintableReport">
+      <i class="bi bi-filetype-pdf pe-1"></i>PDF Report
+    </button>
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
@@ -219,14 +221,26 @@ export default {
   },
   methods: {
     getHeading() {
-      return `<h3>Institution: ${ this.institution }</h3><h4>EP System: ${ this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system }</h4>`
+      return `<h3>Institution: ${this.institution}</h3><h4>EP System: ${this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system}</h4>`
+    },
+    assemblePrintableReport() {
+      const printableReport = document.createElement('div')      
+      document.querySelectorAll('div[role="tabpanel"]').forEach(div => {
+        const article = document.createElement('article')
+        article.setAttribute('style', 'page-break-after: always')
+        article.innerHTML = div.innerHTML
+        printableReport.appendChild(article)
+      })
+      const printPreview = window.open('/printpreview.html')
+      console.log(printableReport.innerHTML)
+      printPreview.document.write(printableReport.innerHTML)
     },
     createStackedChartData(jsondata) {
 
       console.group('createStackedChartData()')
 
       const categories = [
-        'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions', 
+        'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions',
         'Theraputic Duplication', 'Drug Lab', 'Drug Brand', 'Drug Route', 'Drug Overdose', 'Drug Frequency'
       ]
       const categoryKeys = categories.map(c => {
@@ -237,15 +251,15 @@ export default {
       const stackedChartData = []
       categorySubkeys.forEach(csk => {
         const xArr = []
-        categoryKeys.forEach((ck, idx) => {        
-          xArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))        
+        categoryKeys.forEach((ck, idx) => {
+          xArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))
         })
-        stackedChartData.push({       
+        stackedChartData.push({
           x: xArr,
-          y: categories,       
+          y: categories,
           name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
           type: 'bar',
-          orientation: 'h'   
+          orientation: 'h'
         })
       })
 
@@ -268,7 +282,7 @@ export default {
       this.totalInterventions = jsonData.totals.totalInterventions
       this.totalAlerts = jsonData.totals.totalAlerts
       this.totalAdvisory = jsonData.totals.totalAdvisory
-      this.chartCategoryData = this.createStackedChartData(jsonData)      
+      this.chartCategoryData = this.createStackedChartData(jsonData)
 
       console.debug(this.tableData)
       console.groupEnd()
@@ -380,7 +394,7 @@ export default {
               selected_type: ptd.selected_type
             }
           }))
-          this.pieDataComplete = true          
+          this.pieDataComplete = true
           // Calculate number of valid tests, ignoring null results
           this.totalValidTests = this.numPrescriptions - this.totalNulls
           this.getInterventionTypeResult()

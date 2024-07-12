@@ -91,6 +91,7 @@ export default {
       return meds ? meds.split(',').length * 0.1 : 0
     },
     findHighRiskAreas(clinical_areas) {
+      //TODO Note the values tested here have been superseded by the new clinical areas list - this column *may* no longer be required
       return clinical_areas ? clinical_areas.split(',').filter(ca => ca === 'ACC' || ca === 'PCC' || ca === 'A&E') : []
     }
   }

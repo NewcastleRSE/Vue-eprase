@@ -13,11 +13,15 @@ export default {
   props: {
     heading: '',
     printableElementId: 'printable',
-    buttonCaption: 'Printable PDF'
+    buttonCaption: 'Printable PDF',
+    options: {},
+    preprocess: () => {}
   },
-  methods: {
+  methods: {    
     printablePdfHandler() {
-      PrintJS({ printable: this.printableElementId, type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 2000 })
+      this.preprocess()
+      const pjsArgs = Object.assign({ printable: this.printableElementId, type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 2000 }, this.options)
+      PrintJS(pjsArgs)
     }
   }
 }
