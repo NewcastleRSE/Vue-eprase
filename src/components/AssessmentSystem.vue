@@ -65,6 +65,8 @@
               </ErrorMessage>
             </div>
 
+            <!-- 
+            Removed 12/07/2024 David - https://github.com/NewcastleRSE/Vue-eprase/issues/115
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="ep-version">What version of the service are you currently
                 using? <span class="required-field">*</span></label>
@@ -77,7 +79,21 @@
               <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
-            </div>
+            </div> 
+            -->
+
+            <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="ep-version">How many users currently use the eP service?<span class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.num_users" name="num-users" id="num-users">
+                  <input v-bind="field" type="number" min="0" step="1" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="1">
+                </Field>
+              </div>
+              <ErrorMessage name="num-users" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div> 
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
@@ -315,12 +331,12 @@ export default {
   },
   data() {
     return {
-      validationSchema: {//TODO - this needs extra .results everywhere...
+      validationSchema: {
         'ep-service': 'required',
         'other': (value) => {
           return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
         },
-        'ep-version': 'required|lengthBetween:1,50',
+        'num-users': 'required|min_value:1',
         'ep-usage': 'required',
         'lab-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one' 
@@ -341,6 +357,7 @@ export default {
       results: {
         ep_service: '',
         ep_version: '',
+        num_users: 1,
         ep_usage: '',
         other_ep_system: '',
         add_ep_system: '',
@@ -436,6 +453,7 @@ export default {
 
           const ep_service = this.results.ep_service
           const ep_version = this.results.ep_version
+          const num_users = this.results.num_users
           const other_ep_system = this.results.other_ep_system
           const ep_usage = this.results.ep_usage
           const add_ep_system = this.results.add_ep_system
@@ -449,7 +467,8 @@ export default {
           if (this.results.other_clinical_area != '') {
             clinical_areas.push(this.results.other_clinical_area)
           }
-          const final_clinical_areas = clinical_areas.toString()          
+          const final_clinical_areas = clinical_areas.toString() 
+          //TODO add new num_users field to system table         
           const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')

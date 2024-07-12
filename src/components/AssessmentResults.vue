@@ -23,9 +23,12 @@
           <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#view-test-summary-tab" role="tab">Test summary</a>
           </li>
-          <!-- <li class="nav-item" role="presentation">
+          <!-- 
+          Removed 12/07/2024 David - viewed by users as "mind-boggling"! I get it...
+          <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#view-percentages-tab" role="tab">View percentages</a>
-          </li> -->
+          </li> 
+          -->
           <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#view-stacked-chart-tab" role="tab">Bar chart</a>
           </li>

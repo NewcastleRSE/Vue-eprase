@@ -3,7 +3,7 @@
     <div ref="printableReportHeading"></div>
     <div ref="printableReportContainer" id="printableReportContainer"></div>
     <button type="button" class="btn btn-primary m-1" @click="printablePdfHandler">
-      <i class="bi bi-filetype-pdf pe-1"></i>{{ buttonCaption }}
+      <i class="bi bi-printer-fill pe-1"></i>{{ buttonCaption }}
     </button>
   </main>
 </template>
