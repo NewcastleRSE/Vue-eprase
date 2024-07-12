@@ -17,7 +17,8 @@ export const rootStore = defineStore('root', {
     configErrorComplete: false,
     mitigationData: [],
     stackedChartData: null,
-    mitigationChartData: null
+    mitigationChartData: null,
+    printableReportData: null
   }),
   persist: true, 
   actions: {
@@ -181,6 +182,10 @@ export const rootStore = defineStore('root', {
       this.mitigationData[4] = percentageNulls
     },
     storeStackedChartData(stackedChartData) { this.stackedChartData = stackedChartData },
-    storeMitigationChartData(mitigationChartData) { this.mitigationChartData = mitigationChartData }
+    storeMitigationChartData(mitigationChartData) { this.mitigationChartData = mitigationChartData },
+    storePrintableReportData(heading, content, buttonCaption) {
+      console.log(heading, content, buttonCaption)
+      this.printableReportData = { heading, content, buttonCaption }
+    }
   }
 })

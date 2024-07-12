@@ -2,12 +2,10 @@
   <div ref="pieChartContainer" id="pieChartContainer">
     <div v-if="dataLoading">Loading chart data...</div>
   </div>
-  <PrintablePdf :heading="heading" :printableElementId="'pieChartContainer'" :buttonCaption="'Printable PDF'"/>
 </template>
 
 <script>
 
-import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
@@ -21,9 +19,6 @@ export default {
     dataLoading: true,
     heading: ''
   },  
-  components: {
-    PrintablePdf
-  },
   watch: {
     dataLoading(newVal) {
       if (newVal === false) {

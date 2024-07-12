@@ -1,15 +1,11 @@
 <template>
   <h3>Institution Mitigation Comparison</h3>
   <p>This chart gives an overview of each institutions mitigation results</p>
-  <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4"></div>
-  <div class="mb-4">
-    <PrintablePdf :heading="'Institution Mitigation Comparison'" :printableElementId="'allMitigationsChartContainer'" :buttonCaption="'Printable PDF'" />
-  </div>
+  <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4"></div>  
 </template>
 
 <script>
 
-import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -23,10 +19,7 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
-  },
-  components: {
-    PrintablePdf
-  },
+  }, 
   emits: ['get-mitigation-fail'],
   methods: {
     renderChart() {

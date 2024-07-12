@@ -33,6 +33,10 @@
       </nav>
 
       <div class="tab-content">
+        <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
+          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
+            :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
+        </div>
         <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">
           <section>
             <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
@@ -121,19 +125,17 @@
         <!-- <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
           <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
         </div> -->
-        <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
-          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
-            :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
-        </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
           <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
         </div>
 
       </div>
+      <button type="button" class="btn btn-primary m-1" @click="assemblePrintableReport"
+        target="_blank" data-bs-toggle="tooltip" title="Create printable PDF (opens in new tab)">
+        <i class="bi bi-filetype-pdf pe-1"></i>Printable PDF Report
+      </button>
     </div>
-    <button type="button" class="btn btn-primary m-1" @click="assemblePrintableReport">
-      <i class="bi bi-filetype-pdf pe-1"></i>PDF Report
-    </button>
+
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
 
@@ -221,19 +223,20 @@ export default {
   },
   methods: {
     getHeading() {
-      return `<h3>Institution: ${this.institution}</h3><h4>EP System: ${this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system}</h4>`
+      return `<h2>Assessment Report</h2><h3>Institution: ${this.institution}</h3><h4>EP System: ${this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system}</h4>`
     },
     assemblePrintableReport() {
-      const printableReport = document.createElement('div')      
-      document.querySelectorAll('div[role="tabpanel"]').forEach(div => {
+      const tpl = document.createElement('tmeplate')
+      document.querySelectorAll('div[role="tabpanel"]').forEach(tbp => {
         const article = document.createElement('article')
         article.setAttribute('style', 'page-break-after: always')
-        article.innerHTML = div.innerHTML
-        printableReport.appendChild(article)
+        article.innerHTML = tbp.innerHTML
+        tpl.appendChild(article)
       })
-      const printPreview = window.open('/printpreview.html')
-      console.log(printableReport.innerHTML)
-      printPreview.document.write(printableReport.innerHTML)
+      rootStore().storePrintableReportData(this.getHeading(), tpl.innerHTML, 'Preview')
+      window.open(this.$router.resolve({
+        path: '/printablepdf'
+      }).href, '_blank')
     },
     createStackedChartData(jsondata) {
 

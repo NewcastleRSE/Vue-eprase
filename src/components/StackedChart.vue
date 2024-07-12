@@ -2,12 +2,10 @@
   <div ref="stackedChartContainer" id="stackedChartContainer">
     <div v-if="dataLoading">Loading chart data...</div>
   </div>
-  <PrintablePdf :heading="heading" :printableElementId="'stackedChartContainer'" :buttonCaption="'Printable PDF'" />
 </template>
 
 <script>
 
-import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
@@ -19,9 +17,6 @@ export default {
     heading: '',
     dataLoading: true
   }, 
-  components: {
-    PrintablePdf
-  },  
   watch: {
     dataLoading(newVal) {
       if (newVal === false) {

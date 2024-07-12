@@ -32,17 +32,13 @@
     </div>
   </Form>
 
-  <div ref="epSystemComparisonContainer" id="epSystemComparisonContainer" class="mb-4"></div>
-  <div v-if="searchfield != null && filteredChartData.length != 0" class="mb-4">
-    <PrintablePdf :heading="heading" :printableElementId="'epSystemComparisonContainer'" :buttonCaption="'Printable PDF'" />
-  </div>
+  <div ref="epSystemComparisonContainer" id="epSystemComparisonContainer" class="mb-4"></div>  
   <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4 bg-warning-subtle"><span class="fw-bold">No instance of this EP System found</span></div>
 
 </template>
 
 <script>
 
-import PrintablePdf from './PrintablePdf'
 import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -65,8 +61,7 @@ export default {
   components: {
     Form,
     Field,
-    ErrorMessage,
-    PrintablePdf
+    ErrorMessage
   },
   data() {
     return {
