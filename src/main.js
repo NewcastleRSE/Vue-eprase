@@ -2,6 +2,8 @@ import "./assets/scss/custom.scss"
 import "../node_modules/print-js/dist/print.css"
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
 import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
+import VueDatePicker from "@vuepic/vue-datepicker"
+import "@vuepic/vue-datepicker/dist/main.css"
 import { createApp } from "vue"
 import { createPinia } from "pinia"
 import { createPersistedState } from 'pinia-plugin-persistedstate'
@@ -9,9 +11,13 @@ import App from "./App.vue"
 import axios from "axios"
 import VueAxios from "vue-axios"
 import { configure, defineRule } from "vee-validate"
-import { required } from '@vee-validate/rules'
+import { min_value, required } from '@vee-validate/rules'
 import { router } from "./router"
 import * as Sentry from "@sentry/vue"
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -36,6 +42,7 @@ defineRule('nhsEmail', value => {
   }
 })
 defineRule('required', required)
+defineRule('min_value', min_value)
 defineRule('lengthBetween', (value, [minLength, maxLength]) => {
   console.debug('Validate length of', value, 'between', minLength, 'and', maxLength)
   if (value && value.length >= minLength && value.length <= maxLength) {
@@ -53,12 +60,50 @@ defineRule('passwordConfirmationEqual', (value, [target]) => {
   }
   return 'Password and confirmation must match'
 })
+defineRule('validMonthYearDateBefore', (value, [target]) => {
+  console.debug('Validate date', value, 'before', target)
+  // value and target are both objects with keys month, year
+  dayjs.extend(customParseFormat)
+  dayjs.extend(isSameOrBefore)
+  if (!value || !value.month || !value.year) {
+    return 'Date is not set'
+  }
+  const dstr = `${value.year}-${value.month + 1}-01`
+  const date1 = dayjs(`${value.year}-${value.month + 1}-01`, 'YYYY-MM-DD', true)
+  console.debug(dstr)
+  if (!date1.isValid()) {
+    return 'Please enter a valid date'
+  }
+  if (!target || !target.month || !target.year) {
+    return true
+  }
+  const date2 = dayjs(`${target.year}-${target.month + 1}-01`, 'YYYY-MM-DD', true)
+  return date1.isSameOrBefore(date2) ? true : `Must be before ${target.month + 1}/${target.year}`
+})
+defineRule('validMonthYearDateAfter', (value, [target]) => {
+  // value and target are both objects with keys month, year
+  dayjs.extend(customParseFormat)
+  dayjs.extend(isSameOrAfter)
+  if (!value || !value.month || !value.year) {
+    return 'Date is not set'
+  }
+  const date1 = dayjs(`${value.year}-${value.month + 1}-01`, 'YYYY-MM-DD', true)
+  console.debug(date1)
+  if (!date1.isValid()) {
+    return 'Please enter a valid date'
+  }
+  if (!target || !target.month || !target.year) {
+    return true
+  }
+  const date2 = dayjs(`${target.year}-${target.month + 1}-01`, 'YYYY-MM-DD', true)
+  return date1.isSameOrAfter(date2) ? true : `Must be after ${target.month + 1}/${target.year}`
+})
 
 axios.defaults.baseURL = 'http://localhost:6001/api/',
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 
-app.use(pinia).use(VueAxios, axios).use(router)
+app.use(pinia).use(VueAxios, axios).use(router).use(VueDatePicker)
 
 // hides default console message
 app.config.productionTip = false

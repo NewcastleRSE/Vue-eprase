@@ -132,8 +132,8 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('results', 'GET')
       return response        
     },
-    async saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken) {
-      const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
+    async saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken) {
+      const response = await this.apiCall('system', 'POST', { ep_service, other_ep_system, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, clinical_areas, time_taken })
       if (response.status < 400) {
         const assessmentId = JSON.stringify(response.data)
         console.debug('Assessment ID', assessmentId)

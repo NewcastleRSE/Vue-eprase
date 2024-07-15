@@ -39,7 +39,7 @@
                     <option value="NerveCentre">NerveCentre</option>
                     <option value="Quadramed">Quadramed</option>
                     <option value="Servelec">Servelec</option>
-                    <option value="TPP (SystmOne)">TPP (SystmOne)</option>                    
+                    <option value="TPP (SystmOne)">TPP (SystmOne)</option>
                     <option value="Medway">Medway</option>
                     <option value="Open EP ">Open EP </option>
                     <option value="Phillips ICCA">Phillips ICCA</option>
@@ -53,7 +53,8 @@
             </div>
 
             <div v-if="results.ep_service === 'Other'" class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span class="required-field">*</span></label>
+              <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span
+                  class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" id="other-ep-system">
                   <input v-bind="field" type="text" class="form-control"
@@ -83,21 +84,53 @@
             -->
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">How many users currently use the eP service?<span class="required-field">*</span></label>
+              <label class="col-sm-8 col-form-label" for="ep-version">When (month/year) was current eP service
+                implemented? <span class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
+                  <VueDatePicker v-bind="field" v-model="results.ep_service_implemented" month-picker :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                </Field>
+              </div>
+              <ErrorMessage name="ep-service-implemented" as="div" class="mt-2 text-danger text-center"
+                v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div>
+
+            <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="ep-version">When (month/year) was current eP service last
+                updated? <span class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated">
+                  <VueDatePicker v-bind="field" v-model="results.ep_service_updated" month-picker  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                </Field>
+              </div>
+              <ErrorMessage name="ep-service-updated" as="div" class="mt-2 text-danger text-center"
+                v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div>
+
+            <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="ep-version">How many users currently use the eP service? <span
+                  class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.num_users" name="num-users" id="num-users">
-                  <input v-bind="field" type="number" min="0" step="1" class="form-control"
+                  <input v-bind="field" type="number" min="0" step="1" class="form-control" data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="How many people (FTEs) across your trust do you have who maintain your drug catalogue and associated decision support for the electronic prescribing system you are using for this assessment?"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="1">
                 </Field>
               </div>
               <ErrorMessage name="num-users" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
-            </div> 
+            </div>
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
-                prescription orders are prescribed through the eP system across your organisation? <span class="required-field">*</span></label>
+                prescription orders are prescribed through the eP system across your organisation? <span
+                  class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector">
                   <select v-bind="field" class="form-select"
@@ -217,7 +250,8 @@
 
             <div v-if="results.med_history === 'true'" class="mb-4 row">
               <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities
-                into your test system that you are using to do this assessment? <span class="required-field">*</span></p>
+                into your test system that you are using to do this assessment? <span class="required-field">*</span>
+              </p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
@@ -248,7 +282,7 @@
                 </Field>
                 <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
               </div>
-            </div>            
+            </div>
 
             <div class="mb-4 row">
               <p>Is the e-prescribing system used in the following areas?</p>
@@ -263,14 +297,17 @@
             </div>
 
             <div v-if="results.clinical_areas.includes('Other')" class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span class="required-field">*</span></label>
+              <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span
+                  class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other_clinical_area" id="other-clinical-area">
+                <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area"
+                  id="other-clinical-area">
                   <input v-bind="field" type="text" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
                 </Field>
               </div>
-              <ErrorMessage name="other_clinical_area" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="other-clinical-area" as="div" class="mt-2 text-danger text-center"
+                v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -282,7 +319,7 @@
 
             <div>
               <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
-                <i class="bi bi-x pe-1"></i>Clear</button>              
+                <i class="bi bi-x pe-1"></i>Clear</button>
               <button type="button" class="next-btn btn btn-primary" :disabled="!formMeta.valid" id="next-button"
                 @click="onNextClick()">
                 <i class="bi bi-caret-right-fill pe-1"></i>Next</button>
@@ -311,6 +348,7 @@ import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
 import { Form, Field, ErrorMessage } from 'vee-validate'
+import VueDatePicker from '@vuepic/vue-datepicker'
 
 export default {
   name: "AssessmentSystem",
@@ -321,7 +359,8 @@ export default {
     ErrorAlertModal,
     Form,
     Field,
-    ErrorMessage
+    ErrorMessage,
+    VueDatePicker
   },
   computed: {
     ...mapStores(rootStore),
@@ -334,28 +373,38 @@ export default {
       validationSchema: {
         'ep-service': 'required',
         'other': (value) => {
-          return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true        
+          return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true
         },
+        'ep-service-implemented': 'required|validMonthYearDateBefore:@ep-service-updated',
+        'ep-service-updated': 'required',
         'num-users': 'required|min_value:1',
         'ep-usage': 'required',
         'lab-results': (value) => {
-          return ['true', 'false'].includes(value) ? true : 'Please select one' 
+          return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
         'man-results': (value) => {
           return (this.results.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         },
         'med-history': (value) => {
-          return ['true', 'false'].includes(value) ? true : 'Please select one' 
+          return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
         'diagnosis-results': (value) => {
           return (this.results.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
         },
-        'other_clinical_area': (value) => {
+        'other-clinical-area': (value) => {
           return this.results.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
         }
       },
       results: {
         ep_service: '',
+        ep_service_implemented: {
+          month: '',
+          year: ''
+        },
+        ep_service_updated: {
+          month: '',
+          year: ''
+        },
         ep_version: '',
         num_users: 1,
         ep_usage: '',
@@ -366,7 +415,7 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
-        high_risk_meds: [],        
+        high_risk_meds: [],
         options: [
           // { text: 'Warfarin', value: 'Warfarin' },
           // { text: 'Insulin', value: 'Insulin' },
@@ -441,10 +490,10 @@ export default {
       startTime: ''
     }
   },
-  methods: {   
+  methods: {
     onResetClick() {
       this.$refs.assessmentSystemForm.resetForm()
-    },   
+    },
     onNextClick() {
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
         if (valid) {
@@ -452,7 +501,9 @@ export default {
           const time_taken = dayjs().diff(this.startTime, 'seconds')
 
           const ep_service = this.results.ep_service
-          const ep_version = this.results.ep_version
+          const ep_service_implemented = `${this.results.ep_service_implemented.month + 1}/${this.results.ep_service_implemented.year}`
+          const ep_service_updated = `${this.results.ep_service_updated.month + 1}/${this.results.ep_service_updated.year}`
+          const ep_version = this.results.ep_version  // Note: no longer used as of July 2024
           const num_users = this.results.num_users
           const other_ep_system = this.results.other_ep_system
           const ep_usage = this.results.ep_usage
@@ -462,20 +513,20 @@ export default {
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
           const med_history = this.results.med_history
-          const high_risk_meds = this.results.high_risk_meds.toString()         
+          const high_risk_meds = this.results.high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas
           if (this.results.other_clinical_area != '') {
             clinical_areas.push(this.results.other_clinical_area)
           }
-          const final_clinical_areas = clinical_areas.toString() 
+          const final_clinical_areas = clinical_areas.toString()
           //TODO add new num_users field to system table         
-          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
           } else {
             this.errorAlertModal.show(response.message)
-          }                    
+          }
         }
       })
     }
