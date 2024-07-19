@@ -18,6 +18,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import arraySupport from 'dayjs/plugin/arraySupport'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -65,37 +66,36 @@ defineRule('validMonthYearDateBefore', (value, [target]) => {
   // value and target are both objects with keys month, year
   dayjs.extend(customParseFormat)
   dayjs.extend(isSameOrBefore)
+  dayjs.extend(arraySupport)
   if (!value || !value.month || !value.year) {
     return 'Date is not set'
   }
-  const dstr = `${value.year}-${value.month + 1}-01`
-  const date1 = dayjs(`${value.year}-${value.month + 1}-01`, 'YYYY-MM-DD', true)
-  console.debug(dstr)
+  const date1 = dayjs([value.year, value.month, 1])
   if (!date1.isValid()) {
     return 'Please enter a valid date'
   }
   if (!target || !target.month || !target.year) {
     return true
   }
-  const date2 = dayjs(`${target.year}-${target.month + 1}-01`, 'YYYY-MM-DD', true)
+  const date2 = dayjs([target.year, target.month, 1])
   return date1.isSameOrBefore(date2) ? true : `Must be before ${target.month + 1}/${target.year}`
 })
 defineRule('validMonthYearDateAfter', (value, [target]) => {
   // value and target are both objects with keys month, year
   dayjs.extend(customParseFormat)
   dayjs.extend(isSameOrAfter)
+  dayjs.extend(arraySupport)
   if (!value || !value.month || !value.year) {
     return 'Date is not set'
   }
-  const date1 = dayjs(`${value.year}-${value.month + 1}-01`, 'YYYY-MM-DD', true)
-  console.debug(date1)
+  const date1 = dayjs([value.year, value.month, 1])
   if (!date1.isValid()) {
     return 'Please enter a valid date'
   }
   if (!target || !target.month || !target.year) {
     return true
   }
-  const date2 = dayjs(`${target.year}-${target.month + 1}-01`, 'YYYY-MM-DD', true)
+  const date2 = dayjs([target.year, target.month, 1])
   return date1.isSameOrAfter(date2) ? true : `Must be after ${target.month + 1}/${target.year}`
 })
 
