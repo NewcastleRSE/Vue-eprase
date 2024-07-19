@@ -3,7 +3,9 @@
   <div class="my-3">
     <h5>{{ testPayload.description }}</h5>
     <div>
-      <Form ref="configErrorForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
+      <Form ref="configErrorForm" v-slot="{ meta: formMeta }">
+
+        <h5>If neither option below is applicable, simply leave both options blank</h5>
 
         <div class="form-check mb-2">
           <Field v-slot="{ field }" v-model="response.result" type="radio" name="config-err-radios"
@@ -65,13 +67,7 @@ export default {
       response: {
         result: ''
       },
-      startTime: '',
-      validationSchema: {
-        'config-err-radios': (value) => {
-          console.debug('Validating radio value', value)
-          return ['1', '0'].includes(value) ? true : 'Please select one' 
-        }
-      }
+      startTime: ''
     }
   },
   methods: {  
@@ -86,7 +82,7 @@ export default {
         if (valid) {
           const time_taken = dayjs().diff(this.startTime, 'seconds')
           const test_id = this.$refs.configErrorCode.value
-          const result = this.response.result
+          const result = this.response.result || 2  // 2 is the new 'N/A' value - https://github.com/NewcastleRSE/Vue-eprase/issues/116
           const saveResponse = await patientStore().saveConfigError(test_id, result, time_taken)
           console.log('Save response', saveResponse)
           if (saveResponse.status < 400) {

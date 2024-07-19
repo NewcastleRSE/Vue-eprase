@@ -10,7 +10,7 @@ export const appSettingsStore = defineStore('appSettings', {
       passwordMinLength: 6,
       passwordMaxLength: 50,
       assessmentNumPatients: 15,
-      numConfigError: 2,
+      numConfigError: 5,
       numPrescriptions: 45
     }
   },

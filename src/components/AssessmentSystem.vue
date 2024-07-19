@@ -66,6 +66,16 @@
               </ErrorMessage>
             </div>
 
+            <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for eP service?</label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name" id="local-ep-system-name">
+                  <input v-bind="field" type="text" class="form-control" 
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="Local name for the e-Prescribing service, if different from the official name">
+                </Field>
+              </div>              
+            </div>
+
             <!-- 
             Removed 12/07/2024 David - https://github.com/NewcastleRSE/Vue-eprase/issues/115
             <div class="mb-4 row">
@@ -88,7 +98,8 @@
                 implemented? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
-                  <VueDatePicker v-bind="field" v-model="results.ep_service_implemented" month-picker :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                  <VueDatePicker v-bind="field" v-model="results.ep_service_implemented" month-picker auto-apply placeholder="Select month/year"
+                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-implemented" as="div" class="mt-2 text-danger text-center"
@@ -102,7 +113,8 @@
                 updated? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated">
-                  <VueDatePicker v-bind="field" v-model="results.ep_service_updated" month-picker  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                  <VueDatePicker v-bind="field" v-model="results.ep_service_updated" month-picker auto-apply placeholder="Select month/year"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-updated" as="div" class="mt-2 text-danger text-center"
@@ -341,6 +353,7 @@
 <script>
 
 import dayjs from 'dayjs'
+import { prependZero } from '../helpers/utils'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import TabHeader from './TabHeader'
@@ -405,6 +418,7 @@ export default {
           month: '',
           year: ''
         },
+        local_ep_system_name: '',
         ep_version: '',
         num_users: 1,
         ep_usage: '',
@@ -501,8 +515,9 @@ export default {
           const time_taken = dayjs().diff(this.startTime, 'seconds')
 
           const ep_service = this.results.ep_service
-          const ep_service_implemented = `${this.results.ep_service_implemented.month + 1}/${this.results.ep_service_implemented.year}`
-          const ep_service_updated = `${this.results.ep_service_updated.month + 1}/${this.results.ep_service_updated.year}`
+          const local_ep_system_name = this.results.local_ep_system_name
+          const ep_service_implemented = `${prependZero(this.results.ep_service_implemented.month + 1)}-${this.results.ep_service_implemented.year}`
+          const ep_service_updated = `${prependZero(this.results.ep_service_updated.month + 1)}-${this.results.ep_service_updated.year}`
           const ep_version = this.results.ep_version  // Note: no longer used as of July 2024
           const num_users = this.results.num_users
           const other_ep_system = this.results.other_ep_system
@@ -520,7 +535,7 @@ export default {
           }
           const final_clinical_areas = clinical_areas.toString()
           //TODO add new num_users field to system table         
-          const response = await rootStore().saveSystemData(ep_service, other_ep_system, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)

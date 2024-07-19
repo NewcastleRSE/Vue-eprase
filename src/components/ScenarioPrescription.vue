@@ -131,20 +131,22 @@
         </div>
         <div ref="question2" v-if="response.outcomes === 'intervention'">
           <p class="bg-warning-subtle rounded p-2">If the system were to respond to the challenge, please indicate
-            what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e. alert
-            (interruptive type, maybe a pop-up that requires action) OR advisory (passive dialogue, maybe a banner
-            message on the bottom of the screen) you would expect.</p>
-          <p>You have received advice or information concerning (check all that apply):</p>
+            what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
+            <ul class="list-group">
+              <li class="list-group-item">
+                <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action 
+                e.g. pop-up boxes or requiring password entry
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Advisory</span> - nformation is provided which does not interrupt workflow or require action e.g. 
+                a passive dialogue, maybe a banner message on the bottom of the screen
+              </li>
+            </ul>
+          </p>
+          <h5>You have received advice or information concerning (check all that apply):</h5>
           <table class="table table-striped w-50">
             <tbody>
-              <tr v-for="intType in interventionTypeOptions">
-                <td>
-                  <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
-                    name="intervention-type" :value="intType.id">
-                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention-type"
-                      :value="intType.id">
-                  </Field>
-                </td>
+              <tr v-for="intType in interventionTypeOptions">                
                 <td>
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
                 </td>
@@ -153,9 +155,37 @@
                     <i class="bi bi-info-circle-fill link-primary ms-2"></i>
                   </a>
                 </td>
+                <td>
+                  <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
+                    name="intervention-type" :value="intType.id">
+                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention-type"
+                      :value="intType.id">
+                  </Field>
+                </td>
+                <td>
+                  <div class="form-check form-check-inline">
+                    <Field v-slot="{ field }" v-model="response.selected_type" type="radio" name="intervention-select"
+                      :id="'intervention-select-' + intType.id + '-alert'" value="alert">
+                      <input v-bind="field" type="radio" name="intervention-select" value="alert"
+                        class="form-check-input">
+                    </Field>
+                    <label class="form-check-label" :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <Field v-slot="{ field }" v-model="response.selected_type" type="radio" name="intervention-select"
+                      :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
+                      <input v-bind="field" type="radio" name="intervention-select" value="advisory"
+                        class="form-check-input">
+                    </Field>
+                    <label class="form-check-label" :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
+          <!-- 
+          Original code commented out 19/07/2024 David - now display the alert/advisory choice inline - apparently that's simpler...
+          https://github.com/orgs/NewcastleRSE/projects/72/views/1?pane=issue&itemId=70286651
           <div class="mt-4 mb-2">
             <label class="form-label" for="intervention-select"><h5>Please indicate whether intervention was an alert or
               advisory:</h5></label>
@@ -177,7 +207,8 @@
                 {{ message }}
               </ErrorMessage>
             </div>                    
-          </div>
+          </div> 
+          -->
 
           <div class="my-3">
             <label class="form-label" for="patient-intervention"><h5>Please tell us about the system response:</h5></label>
@@ -282,6 +313,7 @@ export default {
         'intervention-type': (value) => {
           return this.response.outcomes == 'intervention' ? ((Array.isArray(value) && value.length > 0) ? true : 'Please select an intervention type') : true
         },
+        //TODO 19/07/2024 - update validator
         'intervention-select': (value) => {
           return this.response.outcomes == 'intervention' ? (value ? true : 'Please select one') : true
         },
