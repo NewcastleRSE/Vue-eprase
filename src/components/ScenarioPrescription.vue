@@ -138,7 +138,7 @@
                 e.g. pop-up boxes or requiring password entry
               </li>
               <li class="list-group-item">
-                <span class="fw-bold">Advisory</span> - nformation is provided which does not interrupt workflow or require action e.g. 
+                <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. 
                 a passive dialogue, maybe a banner message on the bottom of the screen
               </li>
             </ul>
@@ -149,40 +149,50 @@
               <tr v-for="intType in interventionTypeOptions">                
                 <td>
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
-                </td>
-                <td>
-                  <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
-                    <i class="bi bi-info-circle-fill link-primary ms-2"></i>
-                  </a>
-                </td>
+                </td>                
+                <!-- 
+                Selection of either of the alert/advisory radios will do the job, the extra checkbox is redundant
                 <td>
                   <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
                     name="intervention-type" :value="intType.id">
                     <input v-bind="field" type="checkbox" class="form-check-input" name="intervention-type"
                       :value="intType.id">
                   </Field>
-                </td>
+                </td> 
+                -->
                 <td>
                   <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type" type="radio" name="intervention-select"
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-alert'" value="alert">
-                      <input v-bind="field" type="radio" name="intervention-select" value="alert"
-                        class="form-check-input">
+                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'" value="alert"
+                        class="form-check-input" @change="onSelectedInterventionTypeChange()">
                     </Field>
                     <label class="form-check-label" :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
                   </div>
                   <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type" type="radio" name="intervention-select"
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
-                      <input v-bind="field" type="radio" name="intervention-select" value="advisory"
-                        class="form-check-input">
+                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'" value="advisory"
+                        class="form-check-input" @change="onSelectedInterventionTypeChange()">
                     </Field>
                     <label class="form-check-label" :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
                   </div>
                 </td>
+                <td>
+                  <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
+                    <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>
+          <Field v-slot="{ field }" v-model="response.intervention_types" type="hidden" name="intervention-types">
+            <input v-bind="field" type="hidden" name="intervention-types" value="">
+          </Field>          
+          <ErrorMessage name="intervention-types" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+            {{ message }}
+          </ErrorMessage>
+
           <!-- 
           Original code commented out 19/07/2024 David - now display the alert/advisory choice inline - apparently that's simpler...
           https://github.com/orgs/NewcastleRSE/projects/72/views/1?pane=issue&itemId=70286651
@@ -277,46 +287,78 @@ export default {
     },
     getCurrentPatientDOB() {
       return this.testPayload['patient'].dob
-    }    
+    }
   },
   data() {
-    return {
+    const categories = [
+      'drug-age',
+      'drug-dose',
+      'drug-formulary',
+      'drug-interaction',
+      'drug-allergies',
+      'drug-duplication',
+      'drug-disease',
+      'drug-ommissions',
+      'therapeutic-duplication',
+      'drug-lab',
+      'drug-brand',
+      'drug-route',
+      'missing-field'
+    ]
+    const interventionTypeLabels = [
+      'Drug age',
+      'Drug dose',
+      'Drug disease (contraindication)',
+      'Drug, drug interaction',
+      'Drug allergy',
+      'Drug duplication',
+      'Drug disease',
+      'Drug omission',
+      'Therapeutic duplication',
+      'Drug laboratory',
+      'Drug brand',
+      'Drug route',
+      'Drug frequency'
+    ]
+    const interventionTypeTips = [
+      'Tip: Drug contraindication (or dose adjustment) based on patient age',
+      'Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)',
+      'Tip: Drug is not recommended for prescribing according to local guidance',
+      'Tip: Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm',
+      'Tip: Allergy or intolerance to prescribed drug (or another drug in the same category) documented',
+      'Tip: Specified drug prescribed more than once for the same patient',
+      'Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities',
+      'Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication',
+      'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims',
+      'Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)',
+      'Tip: Drug that must be prescribed by BRAND rather than using generic name',
+      'Tip: Specified route is contraindicated for drug and/or dose prescribed',
+      'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)'
+    ]
+    return {      
       response: {
         outcomes: '',
         other: '',        
-        selected_type: '',
-        qualitative_data: '',
-        intervention_type: []
+        selected_type: Object.fromEntries(categories.map(c => [c, ''])),
+        qualitative_data: '',        
+        intervention_types: ''
       },
-      interventionTypeOptions: [
-        { id: 'drug-age', label: 'Drug age', tip: 'Tip: Drug contraindication (or dose adjustment) based on patient age' },
-        { id: 'drug-dose', label: 'Drug dose', tip: 'Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)' },
-        { id: 'drug-formulary', label: 'Drug disease (contraindication)', tip: 'Tip: Drug is not recommended for prescribing according to local guidance' },
-        { id: 'drug-interaction', label: 'Drug, drug interaction', tip: 'Tip: Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm' },
-        { id: 'drug-allergies', label: 'Drug allergy', tip: 'Tip: Allergy or intolerance to prescribed drug (or another drug in the same category) documented' },
-        { id: 'drug-duplication', label: 'Drug duplication', tip: 'Tip: Specified drug prescribed more than once for the same patient' },
-        { id: 'drug-disease', label: 'Drug disease', tip: 'Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities' },
-        { id: 'drug-ommissions', label: 'Drug omission', tip: 'Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication' },
-        { id: 'therapeutic-duplication', label: 'Therapeutic duplication', tip: 'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims' },
-        { id: 'drug-lab', label: 'Drug laboratory', tip: 'Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)' },
-        { id: 'drug-brand', label: 'Drug brand', tip: 'Tip: Drug that must be prescribed by BRAND rather than using generic name' },
-        { id: 'drug-route', label: 'Drug route', tip: 'Tip: Specified route is contraindicated for drug and/or dose prescribed' },
-        { id: 'missing-field', label: 'Drug frequency', tip: 'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)' }
-      ],
       result: null,
       result_score: '',     
       startTime: '',
+      interventionTypeOptions: categories.map((c, i) => {
+        return { id: c, label: interventionTypeLabels[i], tip: interventionTypeTips[i] }
+      }),
       validationSchema: {
         'outcome-radios': (value) => {          
           return value ? true : 'Please select one of the outcomes'
         },
-        'intervention-type': (value) => {
-          return this.response.outcomes == 'intervention' ? ((Array.isArray(value) && value.length > 0) ? true : 'Please select an intervention type') : true
-        },
-        //TODO 19/07/2024 - update validator
-        'intervention-select': (value) => {
-          return this.response.outcomes == 'intervention' ? (value ? true : 'Please select one') : true
-        },
+        'intervention-types': (value) => {
+          if (this.response.outcomes == 'intervention') {
+            return value != ''
+          }
+          return true
+        },        
         'patient-intervention': (value) => {
           return this.response.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
         }
@@ -356,12 +398,29 @@ export default {
       }
       return scoreMatrix[result] || 0
     }, 
+    onSelectedInterventionTypeChange() {
+      
+      console.group('onSelectedInterventionTypeChange()')
+      console.debug('Selected type object currently', this.response.selected_type)
+
+      let intData = []
+      Object.keys(this.response.selected_type).forEach(k => {
+        if (this.response.selected_type[k] != '') {
+          intData.push(`${k}/${this.response.selected_type[k]}`)
+        }
+      })
+      console.debug('Current state of play', intData)
+      this.response.intervention_types = intData.toString()
+
+      console.groupEnd()
+    },
     onResetClick() {
       this.$refs.scenarioPrescriptionForm.resetForm()
     },   
     async onNextClick() {
      
       console.group('ScenarioPrescription:onNextClick()')
+      console.debug(this.response)
 
       this.$refs.scenarioPrescriptionForm.validate().then(async (valid) => {
         if (valid) {
@@ -370,8 +429,19 @@ export default {
           const prescription = this.$refs.test_id.value
           const outcome = this.response.outcomes
           const other = this.response.other
-          const intervention_type = this.response.intervention_type.toString()
-          const selected_type = this.response.selected_type
+
+          // These are now strings of comma-separated values, reflecting alert/advisory responses from multiple categories - David 22/07/2024
+          // const intervention_type = this.response.intervention_type.toString()
+          // const selected_type = this.response.selected_type
+          const cats = []
+          const types = []
+          this.response.intervention_types.split(',').forEach(idata => {
+            cats.push(idata.split('/').shift())
+            types.push(idata.split('/').pop())
+          })
+          const intervention_type = cats.toString()
+          const selected_type = types.toString()
+
           const qualitative_data = this.response.qualitative_data
           const risk_level = this.$refs.risk_level.value
           const result = this.getResult(risk_level, outcome)
