@@ -244,6 +244,7 @@ export default {
     createStackedChartData(jsondata) {
 
       console.group('createStackedChartData()')
+      console.debug('#### jsondata', jsondata)
 
       const categories = [
         'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions',
@@ -278,7 +279,7 @@ export default {
 
       console.group('countCategories()')
 
-      let jsonData = countCategories(data)
+      let jsonData = countCategories(this.categories, data)
       this.tableData = jsonData
       this.totalGood = jsonData.totals.totalGood
       this.totalSome = jsonData.totals.totalSome
@@ -370,7 +371,7 @@ export default {
         } else {
           throw new Error(detailsResponse.message)
         }
-        // Categories (these seem to be hard-coded everywhere, so not sure why this is useful?)
+        // Categories
         const catResponse = await rootStore().getCategories()
         if (catResponse.status < 400) {
           this.categories = catResponse.data
@@ -394,7 +395,7 @@ export default {
         if (ptdResponse.status < 400) {
           this.countCategories(ptdResponse.data.map(ptd => {
             return {
-              categoryName: ptd.prescription.indicator.category['categoryName'],
+              categoryName: ptd.prescription.indicator.category['categoryCode'],
               mitigation: ptd.result,
               outcome: ptd.outcome,
               selected_type: ptd.selected_type

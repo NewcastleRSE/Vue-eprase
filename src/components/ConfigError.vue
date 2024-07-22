@@ -52,6 +52,9 @@ export default {
   name: "ConfigError",
   props: {
     testPayload: {},
+    categories: {
+      type: Array
+    },
     isLast: false
   },
   components: {

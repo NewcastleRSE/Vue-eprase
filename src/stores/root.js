@@ -15,6 +15,7 @@ export const rootStore = defineStore('root', {
     part3complete: false,
     part4complete: false,
     configErrorComplete: false,
+    categories: [],
     mitigationData: [],
     stackedChartData: null,
     mitigationChartData: null,
@@ -62,8 +63,15 @@ export const rootStore = defineStore('root', {
       return response
     },
     async getCategories() {
-      const response = await this.apiCall('categories', 'GET')
-      return response      
+      if (this.categories.length == 0) {
+        const response = await this.apiCall('categories', 'GET')
+        if (response.status < 400) {
+          this.categories = response.data
+        }
+        return response
+      } else {
+        return { status: 200, data: this.categories }
+      }      
     },
     async getPrescriptionTestData(id) {
       const response = await this.apiCall('resultCategories?ID=' + id, 'GET')
@@ -97,10 +105,7 @@ export const rootStore = defineStore('root', {
           this.assessmentStatus = response2.data ? response2.data.status : 'Not Started'
           const data = {}
           const reqKeys = ['assessmentId', 'assessmentComplete', 'assessmentStatus']
-          reqKeys.forEach(k => data[k] = this[k])
-          console.log('#############')
-          console.dir(data)
-          console.log('#############')
+          reqKeys.forEach(k => data[k] = this[k])         
         ret = { status: 200, data: data }
       } else {
         ret = { status: 500, message: 'Failed to get assessment progress for institution', instId}
@@ -170,7 +175,7 @@ export const rootStore = defineStore('root', {
       if (response.status >= 400) {
         console.error(response.message)
       }
-    },     
+    },   
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
     storeAssessmentComplete(complete) { this.assessmentComplete = complete },    

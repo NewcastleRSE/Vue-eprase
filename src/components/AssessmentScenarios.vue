@@ -19,7 +19,7 @@
       
       <div class="mx-auto" v-if="test != null">
         <h5>Test {{ noTestsDone + 1 }} of {{ totalNumTests }}</h5>
-        <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :testPayload="test" :isLast="this.testIndex == this.myTestList.length - 1" ref="currentDisplayForm"></component>
+        <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :categories="categories" :testPayload="test" :isLast="this.testIndex == this.myTestList.length - 1" ref="currentDisplayForm"></component>
         <h5 v-if="noTestsDone == totalNumTests">Congratulations, you have reached the end of the scenarios!</h5>
       </div>      
     </div>
@@ -80,6 +80,7 @@ export default {
   data() {
     return {
       isValid: false,
+      categories: [],
       test: null,
       testIndex: 0,
       currentForm: 'ScenarioPrescription'
@@ -90,18 +91,24 @@ export default {
 
       console.group('getPatientTests()')
 
-      const patientResponse = await this.patientService.getCompletePatientDetails(true)
-      if (patientResponse.status < 400) {
-        if (this.myTestList.length == 0) {
-          // Done them all => results page
-          this.$router.push('/assessmentresults')
+      const catResponse = await rootStore().getCategories()
+      if (catResponse.status < 400) {
+        this.categories = catResponse.data
+        const patientResponse = await this.patientService.getCompletePatientDetails(true)
+        if (patientResponse.status < 400) {
+          if (this.myTestList.length == 0) {
+            // Done them all => results page
+            this.$router.push('/assessmentresults')
+          } else {
+            // Some more to do
+            this.test = this.myTestList[0]
+            this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
+          }        
         } else {
-          // Some more to do
-          this.test = this.myTestList[0]
-          this.currentForm = this.test.configErrorCode ? 'configError' : 'scenarioPrescription'
-        }        
+          this.reportError(patientResponse.message)
+        }
       } else {
-        this.errorAlertModal.show(patientResponse.message)
+        this.reportError(catResponse.message)
       }
 
       console.groupEnd()

@@ -1,136 +1,17 @@
-export function countCategories(data){
+export function countCategories(cats, data){
 
   const categoryData = {
-    "totals":
-      {
-        "totalGood": 0,
-        "totalSome": 0,
-        "totalNot": 0,
-        "totalOver": 0,
-        "totalNulls": 0,
-        "totalAlerts": 0,
-        "totalAdvisory": 0,
-        "totalInterventions": 0
-      },
-    "categories": [
-      {
-        "drugAge":{
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugDose": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugInteraction": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugAllergy":{
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugDuplication": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugDisease": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugOmissions": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "theraputicDuplication": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugLab": {
-           "good": 0,
-           "some": 0,
-           "not": 0,
-           "over": 0,
-           "count": 0
-        }
-      },
-      {
-        "drugBrand": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugRoute": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugOverdose": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      },
-      {
-        "drugFrequency": {
-          "good": 0,
-          "some": 0,
-          "not": 0,
-          "over": 0,
-          "count": 0
-        }
-      }
-    ]
+    'totals': Object.fromEntries([
+        'totalGood',
+        'totalSome',
+        'totalNot',
+        'totalOver',
+        'totalNulls',
+        'totalAlerts',
+        'totalAdvisory',
+        'totalInterventions'].map(e => [e, 0])
+    ),
+    'categories': Object.fromEntries(cats.map(c => c.categoryCode).map(cc => [cc, {'good': 0, 'some': 0, 'not': 0, 'over': 0, 'count': 0 }]))
   };
 
   let name = '';

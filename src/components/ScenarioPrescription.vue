@@ -269,6 +269,9 @@ export default {
   name: "ScenarioPrescription",
   props: {
     testPayload: {},
+    categories: { 
+      type: Array 
+    },
     isLast: false
   },
   components: {
@@ -290,36 +293,6 @@ export default {
     }
   },
   data() {
-    const categories = [
-      'drug-age',
-      'drug-dose',
-      'drug-formulary',
-      'drug-interaction',
-      'drug-allergies',
-      'drug-duplication',
-      'drug-disease',
-      'drug-ommissions',
-      'therapeutic-duplication',
-      'drug-lab',
-      'drug-brand',
-      'drug-route',
-      'missing-field'
-    ]
-    const interventionTypeLabels = [
-      'Drug age',
-      'Drug dose',
-      'Drug disease (contraindication)',
-      'Drug, drug interaction',
-      'Drug allergy',
-      'Drug duplication',
-      'Drug disease',
-      'Drug omission',
-      'Therapeutic duplication',
-      'Drug laboratory',
-      'Drug brand',
-      'Drug route',
-      'Drug frequency'
-    ]
     const interventionTypeTips = [
       'Tip: Drug contraindication (or dose adjustment) based on patient age',
       'Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)',
@@ -339,15 +312,15 @@ export default {
       response: {
         outcomes: '',
         other: '',        
-        selected_type: Object.fromEntries(categories.map(c => [c, ''])),
+        selected_type: Object.fromEntries(this.categories.map(c => [c.category_code, ''])),
         qualitative_data: '',        
         intervention_types: ''
       },
       result: null,
       result_score: '',     
       startTime: '',
-      interventionTypeOptions: categories.map((c, i) => {
-        return { id: c, label: interventionTypeLabels[i], tip: interventionTypeTips[i] }
+      interventionTypeOptions: this.categories.map((c, i) => {
+        return { id: c.category_code, label: c.category_name, tip: interventionTypeTips[i] }
       }),
       validationSchema: {
         'outcome-radios': (value) => {          
