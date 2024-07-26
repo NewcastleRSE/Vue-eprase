@@ -2,14 +2,14 @@
   <h3>EP System Comparison</h3>
   <p>This chart gives an overview of results by EP System</p>  
 
-  <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
+  <Form ref="epSystemComparisonForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
     <div class="mb-4 row">
       <label class="col-sm-8 col-form-label" for="ep-system-selector">Please choose an EP System to filter results</label>
       <div class="col-sm-4">
-        <Field v-slot="{ field, meta }" v-model="searchfield" name="ep-service" id="ep-system-selector">
+        <Field v-slot="{ field, meta }" v-model="searchfield" name="searchfield" id="ep-system-selector">
           <select v-bind="field" class="form-select"
-            :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" @change="renderChart">
+            :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
             <option value="" disabled>Select system...</option>
             <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{  epSystem.text }}</option>           
           </select>
@@ -19,10 +19,30 @@
         {{ message }}
       </ErrorMessage>
     </div>
+
+    <div v-if="searchfield === 'Other'" class="mb-4 row">
+      <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span
+          class="required-field">*</span></label>
+      <div class="col-sm-4">
+        <Field v-slot="{ field, meta }" v-model="other" name="other" id="other-ep-system">
+          <input v-bind="field" type="text" class="form-control"
+            :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter service name...">
+        </Field>
+      </div>
+      <ErrorMessage name="other" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+        {{ message }}
+      </ErrorMessage>
+    </div>
+
+    <div>     
+      <button type="button" class="btn btn-primary" :disabled="!formMeta.valid" id="search-button" @click="renderChart">
+        <i class="bi bi-search pe-1"></i>Search
+      </button>
+    </div>
   </Form>
 
   <div ref="epSystemComparisonContainer" id="epSystemComparisonContainer" class="mb-4"></div>  
-  <div v-if="searchfield != null && filteredChartData.length == 0" class="mb-4 bg-warning-subtle"><span class="fw-bold">No instance of this EP System found</span></div>
+  <div v-if="submitted && filteredChartData.length == 0" class="mb-4 bg-warning-subtle"><span class="fw-bold">No instance of this EP System found</span></div>
 
 </template>
 
@@ -45,7 +65,7 @@ export default {
     ...mapStores(rootStore),
     ...mapState(appSettingsStore, ['epSystemOptions']),
     heading() {
-      return 'Results by EP System : ' + this.searchfield
+      return 'Results by EP System : ' + this.searchfield == 'Other' ? this.other : this.searchfield
     },
     epSystemOptions() {
       return appSettingsStore().epSystemOptions
@@ -60,11 +80,16 @@ export default {
   data() {
     return {
       validationSchema: {
-        'searchfield': 'required'              
+        'searchfield': 'required',
+        'other': (value) => {
+          return (this.searchfield == 'Other') ? (value != '' ? true : 'Please give details') : true
+        },           
       },
       chartData: [],
       filteredChartData: [],
-      searchfield: null
+      searchfield: '',
+      other: '',
+      submitted: false
     }
   },
   methods: {  
@@ -72,9 +97,32 @@ export default {
       
       console.group('EpSystemComparisonChart - renderChart()')
       console.debug('Filtering chart data', this.chartData, 'by system type', this.searchfield)
+      if (this.searchfield == 'Other') {
+        console.debug('Searching user-defined system type', this.other)
+      }
 
-      const re = new RegExp('\\(' + this.searchfield + '\\)')
-      this.filteredChartData = this.chartData.filter(cd => cd['x'][0].match(re))
+      this.submitted = true
+
+      const searchValue = this.searchfield == 'Other' ? this.other : this.searchfield
+      this.filteredChartData = []
+      this.chartData.forEach(elt => {
+        const filteredX = []
+        const filteredY = []
+        elt.x.forEach((xval, idx) => {
+          if (xval.endsWith(`(${searchValue})`)) {
+            filteredX.push(xval)
+            filteredY.push(elt.y[idx])
+          }
+        })
+        if (filteredX.length > 0) {
+          this.filteredChartData.push({
+            name: elt.name,
+            type: elt.type,
+            x: filteredX,
+            y: filteredY
+          })
+        }
+      })
       if (this.filteredChartData.length > 0) {
         Plotly.react(this.$refs.epSystemComparisonContainer, this.filteredChartData, {
           barmode: 'stack',
