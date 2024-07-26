@@ -14,7 +14,6 @@ import AssessmentResults from "../components/AssessmentResults"
 import ResetPassword from "../components/ResetPassword"
 import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
-import HighRiskComparison from "../components/HighRiskComparison"
 import PrintablePdf from "../components/PrintablePdf"
 
 export const router = createRouter({
@@ -72,11 +71,7 @@ export const router = createRouter({
     {
       path: "/adminhome",
       component: AdminHome,
-    },   
-    {
-      path: "/highriskcomparison",
-      component: HighRiskComparison,
-    },
+    },       
     {
       path: "/printablepdf",
       component: PrintablePdf,
@@ -111,14 +106,16 @@ router.afterEach((to, from) => {
 })
 
 // Hook to ensure user logged in for all non-public pages
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
   const auth = authenticationStore()
   const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
+  const adminPages = ['/adminhome']
   const authRequired = !publicPages.includes(to.path)
+  const adminRequired = adminPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
   const loggedIn = auth.isLoggedIn
@@ -128,7 +125,17 @@ router.beforeEach((to, from, next) => {
   }
   console.debug('Logged in user', loggedIn)
 
-  if (authRequired && !loggedIn) {
+  const isAdmin = await (async () => { return await auth.checkIsAdminUser() })()
+  console.debug('Admin required', adminRequired, 'user is admin', isAdmin)
+
+  if (adminRequired && !isAdmin) {
+
+    console.debug('Routing to login page for admin')
+    console.groupEnd()
+
+    return next('/login?requiresAdmin=1')
+
+  } else if (authRequired && !loggedIn) {
 
     console.debug('Routing to login page...')
     console.groupEnd()

@@ -72,7 +72,6 @@ import LoginInfo from "./LoginInfo"
 import ErrorAlertModal from "./ErrorAlertModal"
 import { mapStores } from "pinia"
 import { rootStore } from "../stores/root"
-import { authenticationStore } from "../stores/authentication"
 import AllAssessmentReports from "./AllAssessmentReports"
 import MitigationComparisonChart from "./MitigationComparisonChart"
 import EpSystemComparisonChart from "./EpSystemComparisonChart"
@@ -94,7 +93,7 @@ export default {
     HighRiskComparison
   },
   computed: {
-    ...mapStores(rootStore, authenticationStore),
+    ...mapStores(rootStore),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     }
@@ -123,19 +122,12 @@ export default {
         this.errorAlertModal.show(allRepResponse.message)
       }
     },        
-    async checkAdmin() {
-      return await authenticationStore().checkIsAdminUser()
-    },
     reportError(message) {
       this.errorAlertModal(message)
     }
   },
   mounted() {
-    if (!this.checkAdmin()) {
-      this.$router.push('/login?requiresAdmin=1')
-    } else {
-      this.getReports()
-    }
+    this.getReports()
   }
 }
 

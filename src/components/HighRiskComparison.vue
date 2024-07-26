@@ -7,7 +7,7 @@
       <p>You currently have no reports available.</p>
     </div>
 
-    <div v-if="reports.length > 0">
+    <div v-if="reports.length !== 0">
       <table class="table table-striped mb-4">
         <thead>
           <tr>
