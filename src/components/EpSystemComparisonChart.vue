@@ -11,18 +11,7 @@
           <select v-bind="field" class="form-select"
             :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" @change="renderChart">
             <option value="" disabled>Select system...</option>
-            <option value="Cerner"> Cerner </option>
-            <option value="All script"> All script </option>
-            <option value="Meditech"> Meditech </option>
-            <option value="JAC"> JAC </option>
-            <option value="Medway"> Medway </option>
-            <option value="EPIC"> EPIC </option>
-            <option value="Open EP"> Open EP </option>
-            <option value="PICS"> PICS </option>
-            <option value="Sunrise"> Sunrise </option>
-            <option value="MedChart">MedChart </option>
-            <option value="Lorenzo">Lorenzo </option>
-            <option value="Other"> Other (Please Specify)</option>
+            <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{  epSystem.text }}</option>           
           </select>
         </Field>
       </div>
@@ -40,8 +29,9 @@
 <script>
 
 import Plotly from 'plotly.js-cartesian-dist-min'
-import { mapStores } from 'pinia'
+import { mapStores, mapState } from 'pinia'
 import { rootStore } from '../stores/root'
+import { appSettingsStore } from '../stores/appSettings'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
 export default {
@@ -53,8 +43,12 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
+    ...mapState(appSettingsStore, ['epSystemOptions']),
     heading() {
       return 'Results by EP System : ' + this.searchfield
+    },
+    epSystemOptions() {
+      return appSettingsStore().epSystemOptions
     }
   },
   emits: ['get-mitigation-fail'],

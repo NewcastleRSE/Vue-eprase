@@ -312,7 +312,7 @@ export default {
       response: {
         outcomes: '',
         other: '',        
-        selected_type: Object.fromEntries(this.categories.map(c => [c.category_code, ''])),
+        selected_type: Object.fromEntries(this.categories.map(c => [c.categoryCode, ''])),
         qualitative_data: '',        
         intervention_types: ''
       },
@@ -320,7 +320,7 @@ export default {
       result_score: '',     
       startTime: '',
       interventionTypeOptions: this.categories.map((c, i) => {
-        return { id: c.category_code, label: c.category_name, tip: interventionTypeTips[i] }
+        return { id: c.categoryCode, label: c.categoryName, tip: interventionTypeTips[i] }
       }),
       validationSchema: {
         'outcome-radios': (value) => {          

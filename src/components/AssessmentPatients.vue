@@ -53,7 +53,7 @@
 
           <p><span class="fw-bold">Please ensure you click the Done button to save your progress</span></p>
           <button type="button" class="btn btn-primary" @click="onNextClick()">
-            <i class='bi bi-check2-circle'></i>Done
+            <i class='bi bi-check2-circle pe-1'></i>Done
           </button>
         </div>
       </div>

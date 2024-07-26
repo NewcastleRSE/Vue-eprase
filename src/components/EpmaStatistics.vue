@@ -88,7 +88,7 @@ export default {
       console.log(this.epma_stats)
     },
     calcMeds(meds) {
-      return meds ? meds.split(',').length * 0.1 : 0
+      return (meds ? meds.split(',').length * 0.1 : 0).toFixed(2)
     },
     findHighRiskAreas(clinical_areas) {
       //TODO Note the values tested here have been superseded by the new clinical areas list - this column *may* no longer be required

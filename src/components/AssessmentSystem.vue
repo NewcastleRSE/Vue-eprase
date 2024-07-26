@@ -20,30 +20,9 @@
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector">
                   <select v-bind="field" class="form-select"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">                    
                     <option value="" disabled>Select system...</option>
-                    <option value="Altera (Sunrise, Allscripts)">Altera (Sunrise, Allscripts)</option>
-                    <option value="Better">Better</option>
-                    <option value="Cerner">Cerner</option>
-                    <option value="CIS Chemocare">CIS Chemocare</option>
-                    <option value="Civica">Civica</option>
-                    <option value="CMM System C (JAC, Wellsky)">CMM System C (JAC, Wellsky)</option>
-                    <option value="Dedalus">Dedalus</option>
-                    <option value="EMIS">EMIS</option>
-                    <option value="EPIC">EPIC</option>
-                    <option value="InterSystems">InterSystems</option>
-                    <option value="Dedalus - Lorenzo">Dedalus - Lorenzo</option>
-                    <option value="Dedalus - Medchart">Dedalus - Medchart</option>
-                    <option value="Meditech">Meditech</option>
-                    <option value="Medchart">Medchart</option>
-                    <option value="NerveCentre">NerveCentre</option>
-                    <option value="Quadramed">Quadramed</option>
-                    <option value="Servelec">Servelec</option>
-                    <option value="TPP (SystmOne)">TPP (SystmOne)</option>
-                    <option value="Medway">Medway</option>
-                    <option value="Open EP ">Open EP </option>
-                    <option value="Phillips ICCA">Phillips ICCA</option>
-                    <option value="Other">Own System/Other (please specify)</option>
+                    <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{ epSystem.text }}</option>                    
                   </select>
                 </Field>
               </div>
@@ -354,7 +333,8 @@
 
 import dayjs from 'dayjs'
 import { prependZero } from '../helpers/utils'
-import { mapStores } from 'pinia'
+import { mapStores, mapState } from 'pinia'
+import { appSettingsStore } from '../stores/appSettings'
 import { rootStore } from '../stores/root'
 import TabHeader from './TabHeader'
 import LoginInfo from './LoginInfo'
@@ -377,8 +357,12 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
+    ...mapState(appSettingsStore, ['epSystemOptions']),
     errorAlertModal() {
       return this.$refs.errorAlertModal
+    },
+    epSystemOptions() {
+      return appSettingsStore().epSystemOptions
     }
   },
   data() {

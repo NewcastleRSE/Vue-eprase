@@ -71,10 +71,8 @@
                   <th>Alerts/Advisory interventions</th>
                   <td>You had a total of {{ totalAlerts }} alerts and {{ totalAdvisory }} advisory out of {{
                     totalValidTests }} total valid tests, where a system/user intervention was selected. This would be
-                    considered a
-                    {{ interventionTypeResult }}. A high level of alerts
-                    can
-                    indicate an over-reliance on alerting within a system.</td>
+                    considered a {{ getInterventionTypeResult() }}. A high level of alerts
+                    can indicate an over-reliance on alerting within a system.</td>
                 </tr>
                 <tr>
                   <th>Config Errors</th>
@@ -116,9 +114,16 @@
                 <tbody>
                   <tr v-for="test in configErrorResults" :key="test">
                     <td>{{ test.question }}</td>
-                    <td><span v-if="test.result === 1">Yes</span><span v-if="test.result === 0">No</span></td>
-                    <td><span v-if="test.result === 1">This is undesirable system behaviour</span><span
-                        v-if="test.result === 0">This is good system behaviour</span></td>
+                    <td>
+                      <span v-if="test.result === 0">No</span>
+                      <span v-if="test.result === 1">Yes</span>                      
+                      <span v-if="test.result === 2">N/A</span>
+                    </td>
+                    <td>
+                      <span v-if="test.result === 0">This is good system behaviour</span>
+                      <span v-if="test.result === 1">This is undesirable system behaviour</span>                      
+                      <span v-if="test.result === 2">Question not applicable</span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -149,7 +154,7 @@
 <script>
 
 import { calcPercentage, calcNum } from '../helpers/utils'
-import { countCategories } from '../helpers/categories'
+import { mitigationDataByCategory } from '../helpers/categories'
 import TabHeader from "./TabHeader"
 import LoginInfo from './LoginInfo'
 import AppLogo from "./AppLogo"
@@ -246,24 +251,28 @@ export default {
       console.group('createStackedChartData()')
       console.debug('#### jsondata', jsondata)
 
-      const categories = [
-        'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions',
-        'Theraputic Duplication', 'Drug Lab', 'Drug Brand', 'Drug Route', 'Drug Overdose', 'Drug Frequency'
-      ]
-      const categoryKeys = categories.map(c => {
-        return c.substring(0, 1).toLowerCase() + c.substring(1).replace(' ', '')
-      })
+      // Categories now created as an object rather than an array
+      // const categories = [
+      //   'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions',
+      //   'Theraputic Duplication', 'Drug Lab', 'Drug Brand', 'Drug Route', 'Drug Overdose', 'Drug Frequency'
+      // ]
+      // const categoryKeys = categories.map(c => {
+      //   return c.substring(0, 1).toLowerCase() + c.substring(1).replace(' ', '')
+      // })
+      const categoryNames = this.categories.map(c => c.categoryName)
+      const categoryCodes = this.categories.map(c => c.categoryCode)
+      
       const categorySubkeys = ['good', 'some', 'not', 'over']
 
       const stackedChartData = []
       categorySubkeys.forEach(csk => {
         const xArr = []
-        categoryKeys.forEach((ck, idx) => {
-          xArr.push(calcNum(jsondata['categories'][idx][ck][csk], jsondata['categories'][idx][ck].count))
+        categoryCodes.forEach(ck => {
+          xArr.push(calcNum(jsondata['categories'][ck][csk], jsondata['categories'][ck].count))
         })
         stackedChartData.push({
           x: xArr,
-          y: categories,
+          y: categoryNames,
           name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
           type: 'bar',
           orientation: 'h'
@@ -279,7 +288,7 @@ export default {
 
       console.group('countCategories()')
 
-      let jsonData = countCategories(this.categories, data)
+      let jsonData = mitigationDataByCategory(this.categories, data)
       this.tableData = jsonData
       this.totalGood = jsonData.totals.totalGood
       this.totalSome = jsonData.totals.totalSome
@@ -395,9 +404,10 @@ export default {
         if (ptdResponse.status < 400) {
           this.countCategories(ptdResponse.data.map(ptd => {
             return {
-              categoryName: ptd.prescription.indicator.category['categoryCode'],
+              categoryCode: ptd.prescription.indicator.category['categoryCode'],
               mitigation: ptd.result,
               outcome: ptd.outcome,
+              intervention_type: ptd.intervention_type,
               selected_type: ptd.selected_type
             }
           }))
