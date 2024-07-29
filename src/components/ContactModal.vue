@@ -5,7 +5,7 @@
     <ul class="list-group">
       <li class="list-group-item">
         <i class="bi bi-envelope pe-2"></i>
-        rseteam@newcastle.ac.uk
+        rseteam@newcastle.ac.uk (for technical queries relating to the tool website)
       </li>
       <li class="list-group-item">
         <i class="bi bi-envelope pe-2"></i>

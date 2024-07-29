@@ -3,7 +3,7 @@
   <div class="my-3">
     <h5>{{ testPayload.description }}</h5>
     <div>
-      <Form ref="configErrorForm" v-slot="{ meta: formMeta }">
+      <Form ref="configErrorForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
         <h5>If neither option below is applicable, simply leave both options blank</h5>
 
@@ -23,6 +23,18 @@
           <label class="form-check-label" for="config-err-radio-no">No</label>
         </div>
 
+        <div class="form-check mb-2">
+          <Field v-slot="{ field }" v-model="response.result" type="radio" name="config-err-radios"
+            id="config-err-radio-na" value="2">
+            <input v-bind="field" type="radio" name="config-err-radios" value="2" class="form-check-input">
+          </Field>
+          <label class="form-check-label" for="config-err-radio-na">Not applicable</label>
+        </div>
+
+        <ErrorMessage name="config-err-radios" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+          {{ message }}
+        </ErrorMessage>
+
         <input ref="configErrorCode" type="hidden" id="config-err-code" :value="testPayload.configErrorCode">
 
         <div class="my-3">          
@@ -33,7 +45,7 @@
             <i :class="isLast ? 'bi bi-check2-circle' : 'bi bi-arrow-right-circle'"></i>
               {{ isLast ? 'Done' : 'Next' }}
           </button>           
-        </div>
+        </div>        
       </Form>
 
     </div>
@@ -67,6 +79,11 @@ export default {
   },
   data() {
     return {
+      validationSchema: {        
+        'config-err-radios': (value) => {         
+          return (this.result ? ([0, 1, 2].includes(parseInt(value)) ? true : 'Please select one') : true)
+        }
+      },
       response: {
         result: ''
       },
@@ -85,7 +102,7 @@ export default {
         if (valid) {
           const time_taken = dayjs().diff(this.startTime, 'seconds')
           const test_id = this.$refs.configErrorCode.value
-          const result = this.response.result || 2  // 2 is the new 'N/A' value - https://github.com/NewcastleRSE/Vue-eprase/issues/116
+          const result = this.response.result || 2
           const saveResponse = await patientStore().saveConfigError(test_id, result, time_taken)
           console.log('Save response', saveResponse)
           if (saveResponse.status < 400) {

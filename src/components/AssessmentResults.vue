@@ -58,13 +58,13 @@
                 <tr>
                   <th>Extreme risk scenarios</th>
                   <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
-                    (extremeRiskScenarios.length > 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
+                    (extremeRiskScenarios.length != 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
                       (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>High risk scenarios</th>
                   <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
-                    > 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
+                    != 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
                       'were') }} mitigated. </td>
                 </tr>
                 <tr>
@@ -81,7 +81,7 @@
               </tbody>
             </table>
 
-            <div v-if="extremeRiskFails.length > 0">
+            <div v-if="extremeRiskFails.length != 0">
 
               <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
               <table class="table table-striped bg-warning-subtle">
@@ -100,7 +100,7 @@
               </table>
             </div>
 
-            <div v-if="configErrorResults.length > 0">
+            <div v-if="configErrorResults.length != 0">
 
               <h4>Configuration Error Results</h4>
               <table class="table table-striped extreme-risk-table">
@@ -120,9 +120,9 @@
                       <span v-if="test.result === 2">N/A</span>
                     </td>
                     <td>
-                      <span v-if="test.result === 0">This is good system behaviour</span>
-                      <span v-if="test.result === 1">This is undesirable system behaviour</span>                      
                       <span v-if="test.result === 2">Question not applicable</span>
+                      <span v-if="test.result === test.good_answer">This is good system behaviour</span>
+                      <span v-if="test.result === ! test.good_answer">This is undesirable system behaviour</span>                                            
                     </td>
                   </tr>
                 </tbody>
@@ -130,9 +130,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="tab-pane fade" id="view-percentages-tab" role="tabpanel">
-          <ResultsTable :tableData="tableData" :totalValidTests="totalValidTests" />
-        </div> -->
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
           <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
         </div>
@@ -164,7 +161,6 @@ import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
-import ResultsTable from './ResultsTable'
 import PieChart from './PieChart'
 import StackedChart from './StackedChart'
 
@@ -174,7 +170,6 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
-    ResultsTable,
     PieChart,
     StackedChart,
     ErrorAlertModal
@@ -316,13 +311,7 @@ export default {
       this.overMitigated = calcPercentage(this.totalOver, numTests)
       this.percentageNulls = calcPercentage(this.totalNulls, numTests)
       return rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
-    },
-    onTableClick() {
-      this.$router.push('/resultstable')
-    },
-    onChartClick() {
-      this.$router.push('/charts')
-    },
+    },     
     async onHomeClick() {
       const isAdmin = await authenticationStore().checkIsAdminUser()
       this.$router.push(isAdmin ? '/adminhome' : '/assessmentintro')
@@ -369,10 +358,12 @@ export default {
             const cdDataResponse = await rootStore().getConfigErrorByCode(cd.test_id)
             if (cdDataResponse.status < 400) {
               cd.question = cdDataResponse.data.description
+              cd.good_answer = cdDataResponse.data.good_answer
             } else {
               // Pretty minor - don't bomb the whole thing for this
               cd.question = cdDataResponse.message
-              console.error(cd.question)
+              cd.good_answer = 'n/a'
+              console.error(cd.question, cd.good_answer)
             }
             this.configErrorResults.push(cd)
           })

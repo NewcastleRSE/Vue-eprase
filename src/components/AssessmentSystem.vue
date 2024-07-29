@@ -15,7 +15,7 @@
           <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-system-selector">Which electronic prescribing (eP) service
+              <label class="col-sm-8 col-form-label" for="ep-system-selector">Which electronic prescribing (eP) system
                 are you using? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector">
@@ -37,7 +37,7 @@
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" id="other-ep-system">
                   <input v-bind="field" type="text" class="form-control"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter service...">
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter system...">
                 </Field>
               </div>
               <ErrorMessage name="other" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
@@ -46,34 +46,17 @@
             </div>
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for eP service?</label>
+              <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for eP system?</label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name" id="local-ep-system-name">
                   <input v-bind="field" type="text" class="form-control" 
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="Local name for the e-Prescribing service, if different from the official name">
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="Local name for the e-Prescribing system, if different from the official name">
                 </Field>
               </div>              
             </div>
 
-            <!-- 
-            Removed 12/07/2024 David - https://github.com/NewcastleRSE/Vue-eprase/issues/115
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">What version of the service are you currently
-                using? <span class="required-field">*</span></label>
-              <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.ep_version" name="ep-version" id="ep-version">
-                  <input v-bind="field" type="text" class="form-control"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter version...">
-                </Field>
-              </div>
-              <ErrorMessage name="ep-version" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-                {{ message }}
-              </ErrorMessage>
-            </div> 
-            -->
-
-            <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">When (month/year) was current eP service
+              <label class="col-sm-8 col-form-label" for="ep-service-implemented">When (month/year) was current eP system
                 implemented? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
@@ -88,7 +71,7 @@
             </div>
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">When (month/year) was current eP service last
+              <label class="col-sm-8 col-form-label" for="ep-service-updated">When (month/year) was current eP system last
                 updated? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated">
@@ -103,17 +86,17 @@
             </div>
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">How many users currently use the eP service? <span
+              <label class="col-sm-8 col-form-label" for="ep-version">How many WTE maintain the drug catalogue and prescribing decision support for this system? <span
                   class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.num_users" name="num-users" id="num-users">
-                  <input v-bind="field" type="number" min="0" step="1" class="form-control" data-bs-toggle="tooltip"
+                <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num_maintainers" id="num_maintainers">
+                  <input v-bind="field" type="number" min="0.0" step="0.1" class="form-control" data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="How many people (FTEs) across your trust do you have who maintain your drug catalogue and associated decision support for the electronic prescribing system you are using for this assessment?"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="1">
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                 </Field>
               </div>
-              <ErrorMessage name="num-users" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="num_maintainers" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -374,7 +357,9 @@ export default {
         },
         'ep-service-implemented': 'required|validMonthYearDateBefore:@ep-service-updated',
         'ep-service-updated': 'required',
-        'num-users': 'required|min_value:1',
+        'num_maintainers': (value) => { 
+          return value && value > 0.0999 //TODO - this validator not working
+        },
         'ep-usage': 'required',
         'lab-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
@@ -404,7 +389,7 @@ export default {
         },
         local_ep_system_name: '',
         ep_version: '',
-        num_users: 1,
+        num_maintainers: 1,
         ep_usage: '',
         other_ep_system: '',
         add_ep_system: '',
@@ -503,7 +488,7 @@ export default {
           const ep_service_implemented = `${prependZero(this.results.ep_service_implemented.month + 1)}-${this.results.ep_service_implemented.year}`
           const ep_service_updated = `${prependZero(this.results.ep_service_updated.month + 1)}-${this.results.ep_service_updated.year}`
           const ep_version = this.results.ep_version  // Note: no longer used as of July 2024
-          const num_users = this.results.num_users
+          const num_maintainers = this.results.num_maintainers
           const other_ep_system = this.results.other_ep_system
           const ep_usage = this.results.ep_usage
           const add_ep_system = this.results.add_ep_system
@@ -518,8 +503,7 @@ export default {
             clinical_areas.push(this.results.other_clinical_area)
           }
           const final_clinical_areas = clinical_areas.toString()
-          //TODO add new num_users field to system table         
-          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_users, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)

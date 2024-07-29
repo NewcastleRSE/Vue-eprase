@@ -113,11 +113,22 @@ export default {
     async getReports() {
       const allRepResponse = await rootStore().getAllReports()
       if (allRepResponse.status < 400) {
-        this.reportDataLoading = false
-        this.reports = allRepResponse.data
-        this.reports.forEach(rep => {
-          rep.system.time_created = getFormattedDate(rep.system.time_created)
-        })
+        const ceDetailsResponse = await rootStore().getConfigErrors()
+        if (ceDetailsResponse.status < 400) {
+          // Additional details about the config errpors that report viewers want to know
+          const ceObjects = Object.fromEntries(ceDetailsResponse.data.map(ce => [ce.configErrorCode, { question: ce.description, good_answer: ce.good_answer }]))
+          this.reportDataLoading = false
+          this.reports = allRepResponse.data
+          this.reports.forEach(rep => {
+            rep.system.time_created = getFormattedDate(rep.system.time_created)
+            rep.configErrorDataList.forEach(cedElt => {
+              cedElt.question = ceObjects[cedElt.test_id].question
+              cedElt.good_answer = ceObjects[cedElt.test_id].good_answer
+            })
+          })
+        } else {
+          this.errorAlertModal.show(ceDetailsResponse.message)
+        }        
       } else {
         this.errorAlertModal.show(allRepResponse.message)
       }

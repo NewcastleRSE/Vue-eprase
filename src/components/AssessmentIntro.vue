@@ -38,8 +38,7 @@
       </div>
 
       <h3>{{ year }} ePRaSE Assessment</h3>
-      <p>The original ePRaSE assessment was released in July 2019. <br />To take part in the current ePRaSE assessment,
-        click the button below.</p>
+      <p>To take part in the current ePRaSE assessment, click the button below.</p>
 
       <div v-if="assessmentStatus" class="text-secondary-emphasis"> Your organisation ASSESSMENT STATUS is : {{
       assessmentStatus }}</div>

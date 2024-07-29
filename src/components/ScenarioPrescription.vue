@@ -30,6 +30,7 @@
             <th>Route</th>
             <th>Frequency</th>
             <th>Duration</th>
+            <th>Indication</th>
           </tr>
         </thead>
         <tbody>
@@ -39,16 +40,10 @@
             <td>{{ testPayload.route }}</td>
             <td>{{ testPayload.drug_frequency }}</td>
             <td>{{ testPayload.duration }}</td>
+            <td>{{ testPayload.justification }}</td>
           </tr>
         </tbody>
-      </table>
-
-      <table class="table table-striped" v-if="testPayload.justification">
-        <tr>
-          <th>Indication</th>
-          <td>{{ testPayload.justification }}</td>
-        </tr>
-      </table>
+      </table>     
     </div>
 
     <div>

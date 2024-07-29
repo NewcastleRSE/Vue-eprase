@@ -1,14 +1,12 @@
 <template>
   <GenericModal :modalName="'AboutModal'" :modalId="'aboutModal'" :title="'About ePRaSE'" :closeBtnText="'Close'">
-    <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription services,
-      in order to determine their usefulness and to encourage the correct use of these systems
-      and deliver improved patient outcomes.</p>
+    <p>The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription systems,
+      in order to determine their usefulness and to encourage the correct use of these systems and deliver improved patient outcomes.</p>
     <p>ePRaSE has been developed by the Pharmacy Department at the The Newcastle Hospitals NHS Foundation Trust and
       Newcastle University</p>
     <h4>Credits</h4>
     <p>The assessments were developed by Stephanie Klein and Jude Heed.</p>
-    <p>The ePRaSE tool was developed by Mike Simpson and Rebecca Osselton from the Research Software Engineering Team at
-      Newcastle University.</p>
+    <p>The ePRaSE tool was developed by the Research Software Engineering Team at Newcastle University.</p>
   </GenericModal>
 </template>
 
