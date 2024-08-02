@@ -43,7 +43,7 @@
             <td>{{ testPayload.justification }}</td>
           </tr>
         </tbody>
-      </table>     
+      </table>
     </div>
 
     <div>
@@ -64,8 +64,8 @@
               <span class="fw-bold">without any additional user or system input</span>
               <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
                 data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
-                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
-            </a>
+                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
+              </a>
             </label>
           </div>
 
@@ -78,24 +78,24 @@
             <label class="form-check-label" for="order-set-overridden">
               You were able to complete the prescription, <span class="fw-bold">but had to override components of the
                 order sentence</span>
-              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
                 data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
-                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
               </a>
             </label>
           </div>
 
           <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
-              id="intervention" value="intervention">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" id="intervention"
+              value="intervention">
               <input v-bind="field" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
             </Field>
             <label class="form-check-label" for="intervention">
               You were able to complete the prescription, <span class="fw-bold">with system/user intervention</span>
-              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascroipt:void(0)"
+              <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
                 data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
-                <i class="bi bi-info-circle-fill link-primary ms-2"></i>
-            </a>
+                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
+              </a>
             </label>
           </div>
 
@@ -110,8 +110,8 @@
           </div>
 
           <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
-              id="not-available" value="not-available">
+            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" id="not-available"
+              value="not-available">
               <input v-bind="field" type="radio" name="outcome-radios" value="not-available" class="form-check-input">
             </Field>
             <label class="form-check-label" for="not-available">
@@ -125,26 +125,28 @@
 
         </div>
         <div ref="question2" v-if="response.outcomes === 'intervention'">
-          <p class="bg-warning-subtle rounded p-2">If the system were to respond to the challenge, please indicate
+          <h5 class="bg-warning-subtle rounded p-4">If the system were to respond to the challenge, please indicate
             what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
-            <ul class="list-group">
+            <ul class="list-group mt-4">
               <li class="list-group-item">
-                <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action 
+                <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires
+                action
                 e.g. pop-up boxes or requiring password entry
               </li>
               <li class="list-group-item">
-                <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. 
+                <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or
+                require action e.g.
                 a passive dialogue, maybe a banner message on the bottom of the screen
               </li>
             </ul>
-          </p>
-          <h5>You have received advice or information concerning (check all that apply):</h5>
+          </h5>
+          <h5 class="my-4">You have received advice or information concerning (check all that apply):</h5>
           <table class="table table-striped w-50">
             <tbody>
-              <tr v-for="intType in interventionTypeOptions">                
-                <td>
+              <tr v-for="intType in interventionTypeOptions">
+                <td class="align-middle">
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
-                </td>                
+                </td>
                 <!-- 
                 Selection of either of the alert/advisory radios will do the job, the extra checkbox is redundant
                 <td>
@@ -155,27 +157,31 @@
                   </Field>
                 </td> 
                 -->
-                <td>
+                <td class="pt-4">
                   <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio"
+                      :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-alert'" value="alert">
-                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'" value="alert"
-                        class="form-check-input" @change="onSelectedInterventionTypeChange()">
+                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
+                        value="alert" class="form-check-input" @change="onSelectedInterventionTypeChange()">
                     </Field>
-                    <label class="form-check-label" :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
+                    <label class="form-check-label"
+                      :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
                   </div>
                   <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio"
+                      :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
-                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'" value="advisory"
-                        class="form-check-input" @change="onSelectedInterventionTypeChange()">
+                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
+                        value="advisory" class="form-check-input" @change="onSelectedInterventionTypeChange()">
                     </Field>
-                    <label class="form-check-label" :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
+                    <label class="form-check-label"
+                      :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
                   </div>
                 </td>
-                <td>
+                <td class="align-middle">
                   <a class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" :data-bs-title="intType.tip">
-                    <i class="bi bi-info-circle-fill link-primary ms-2"></i>
+                    <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
                   </a>
                 </td>
               </tr>
@@ -183,7 +189,7 @@
           </table>
           <Field v-slot="{ field }" v-model="response.intervention_types" type="hidden" name="intervention-types">
             <input v-bind="field" type="hidden" name="intervention-types" value="">
-          </Field>          
+          </Field>
           <ErrorMessage name="intervention-types" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
             {{ message }}
           </ErrorMessage>
@@ -216,13 +222,17 @@
           -->
 
           <div class="my-3">
-            <label class="form-label" for="patient-intervention"><h5>Please tell us about the system response:</h5></label>
+            <label class="form-label" for="patient-intervention">
+              <h5>Please tell us about the system response:</h5>
+            </label>
             <div>
               <Field v-slot="{ field, meta }" v-model="response.qualitative_data" name="patient-intervention"
                 id="patient-intervention">
-                <textarea v-bind="field" class="form-control w-25" maxlength="500" rows="5" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"></textarea>
+                <textarea v-bind="field" class="form-control w-25" maxlength="500" rows="5"
+                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"></textarea>
               </Field>
-              <ErrorMessage name="patient-intervention" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="patient-intervention" as="div" class="mt-2 text-danger text-center"
+                v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -231,23 +241,23 @@
 
         <h5 class="my-3">Please discontinue the prescription order before proceeding to the next scenario</h5>
 
-        <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id"/>
-        <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level"/>
+        <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id" />
+        <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level" />
 
-        <div class="my-2">          
+        <div class="my-2">
           <button type="reset" class="btn btn-primary me-3" @click="onResetClick()">
             <i class="bi bi-x pe-1"></i>Clear
           </button>
           <button type="button" class="btn btn-primary" @click="onNextClick()" :disabled="!formMeta.valid">
             <i :class="isLast ? 'bi bi-check2-circle' : 'bi bi-arrow-right-circle'"></i>
-              {{ isLast ? 'Done' : 'Next' }}
-          </button>           
+            {{ isLast ? 'Done' : 'Next' }}
+          </button>
         </div>
 
       </Form>
 
     </div>
-    
+
   </div>
 
 </template>
@@ -264,8 +274,8 @@ export default {
   name: "ScenarioPrescription",
   props: {
     testPayload: {},
-    categories: { 
-      type: Array 
+    categories: {
+      type: Array
     },
     isLast: false
   },
@@ -303,22 +313,22 @@ export default {
       'Tip: Specified route is contraindicated for drug and/or dose prescribed',
       'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)'
     ]
-    return {      
+    return {
       response: {
         outcomes: '',
-        other: '',        
+        other: '',
         selected_type: Object.fromEntries(this.categories.map(c => [c.categoryCode, ''])),
-        qualitative_data: '',        
+        qualitative_data: '',
         intervention_types: ''
       },
       result: null,
-      result_score: '',     
+      result_score: '',
       startTime: '',
       interventionTypeOptions: this.categories.map((c, i) => {
         return { id: c.categoryCode, label: c.categoryName, tip: interventionTypeTips[i] }
       }),
       validationSchema: {
-        'outcome-radios': (value) => {          
+        'outcome-radios': (value) => {
           return value ? true : 'Please select one of the outcomes'
         },
         'intervention-types': (value) => {
@@ -326,14 +336,14 @@ export default {
             return value != ''
           }
           return true
-        },        
+        },
         'patient-intervention': (value) => {
           return this.response.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
         }
       }
     }
   },
-  methods: {   
+  methods: {
     getResult(risk_level, outcome) {
       const resultMatrix = {
         'Extreme': {
@@ -365,9 +375,9 @@ export default {
         'No Mitigation/Fail': 1
       }
       return scoreMatrix[result] || 0
-    }, 
+    },
     onSelectedInterventionTypeChange() {
-      
+
       console.group('onSelectedInterventionTypeChange()')
       console.debug('Selected type object currently', this.response.selected_type)
 
@@ -384,9 +394,9 @@ export default {
     },
     onResetClick() {
       this.$refs.scenarioPrescriptionForm.resetForm()
-    },   
+    },
     async onNextClick() {
-     
+
       console.group('ScenarioPrescription:onNextClick()')
       console.debug(this.response)
 
@@ -420,9 +430,9 @@ export default {
           } else {
             this.$emit('test-save-fail', saveResponse.message)
           }
-        }        
+        }
       })
-      
+
       console.groupEnd()
     }
   },

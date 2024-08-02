@@ -4,7 +4,7 @@ export function calcPercentage(num, total) {
 
 export function calcNum(num, total) {
   if(total !== 0) {
-    let tempnum = ((num/total) *100).toFixed(1)
+    let tempnum = ((num/total) * 100).toFixed(1)
     return parseInt(tempnum);
   }
   return 0;

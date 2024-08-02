@@ -1,12 +1,9 @@
 <template>
 
   <div class="my-3">
-    <h5>{{ testPayload.description }}</h5>
+    <h5 class="my-4">{{ testPayload.description }}</h5>
     <div>
       <Form ref="configErrorForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
-
-        <h5>If neither option below is applicable, simply leave both options blank</h5>
-
         <div class="form-check mb-2">
           <Field v-slot="{ field }" v-model="response.result" type="radio" name="config-err-radios"
             id="config-err-radio-yes" value="1">

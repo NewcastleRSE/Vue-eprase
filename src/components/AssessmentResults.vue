@@ -120,9 +120,9 @@
                       <span v-if="test.result === 2">N/A</span>
                     </td>
                     <td>
-                      <span v-if="test.result === 2">Question not applicable</span>
-                      <span v-if="test.result === test.good_answer">This is good system behaviour</span>
-                      <span v-if="test.result === ! test.good_answer">This is undesirable system behaviour</span>                                            
+                      <span v-if="test.result == 2">Question not applicable</span>
+                      <span v-if="test.result == test.good_answer">This is good system behaviour</span>
+                      <span v-if="test.result == ! test.good_answer">This is undesirable system behaviour</span>                                            
                     </td>
                   </tr>
                 </tbody>
@@ -261,13 +261,18 @@ export default {
 
       const stackedChartData = []
       categorySubkeys.forEach(csk => {
-        const xArr = []
+        const xArr = [], customdata = []
         categoryCodes.forEach(ck => {
-          xArr.push(calcNum(jsondata['categories'][ck][csk], jsondata['categories'][ck].count))
+          const nQs = jsondata['categories'][ck].count
+          const percentInCat = calcNum(jsondata['categories'][ck][csk], nQs)
+          xArr.push(percentInCat)
+          customdata.push(`${percentInCat}% of ${nQs} question${nQs == 1 ? '' : 's'}`)
         })
         stackedChartData.push({
           x: xArr,
           y: categoryNames,
+          customdata: customdata,
+          hovertemplate: '%{customdata}', // See e.g. https://codepen.io/etpinard/pen/zXLEXJ?editors=0010
           name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
           type: 'bar',
           orientation: 'h'

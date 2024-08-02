@@ -61,7 +61,7 @@
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
                   <VueDatePicker ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented" month-picker auto-apply placeholder="Select month/year"
-                  :state="meta.dirty ? meta.valid : null" />
+                  :state="meta.dirty ? meta.valid : null" :max-date="new Date()" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-implemented" as="div" class="mt-2 text-danger text-center"
@@ -76,7 +76,7 @@
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated"> 
                   <VueDatePicker ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker auto-apply placeholder="Select month/year"
-                    :state="meta.dirty ? meta.valid : null" />
+                    :state="meta.dirty ? meta.valid : null" :max-date="new Date()" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-updated" as="div" class="mt-2 text-danger text-center"
