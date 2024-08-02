@@ -67,14 +67,14 @@ defineRule('validMonthYearDateBefore', (value, [target]) => {
   dayjs.extend(customParseFormat)
   dayjs.extend(isSameOrBefore)
   dayjs.extend(arraySupport)
-  if (!value || !value.month || !value.year) {
+  if (!value || isNaN(value.month) || isNaN(value.year)) {
     return 'Date is not set'
   }
   const date1 = dayjs([value.year, value.month, 1])
   if (!date1.isValid()) {
     return 'Please enter a valid date'
   }
-  if (!target || !target.month || !target.year) {
+  if (!target || isNaN(target.month) || isNaN(target.year)) {
     return true
   }
   const date2 = dayjs([target.year, target.month, 1])
@@ -85,14 +85,14 @@ defineRule('validMonthYearDateAfter', (value, [target]) => {
   dayjs.extend(customParseFormat)
   dayjs.extend(isSameOrAfter)
   dayjs.extend(arraySupport)
-  if (!value || !value.month || !value.year) {
+  if (!value || isNaN(value.month) || isNaN(value.year)) {
     return 'Date is not set'
   }
   const date1 = dayjs([value.year, value.month, 1])
   if (!date1.isValid()) {
     return 'Please enter a valid date'
   }
-  if (!target || !target.month || !target.year) {
+  if (!target || isNaN(target.month) || isNaN(target.year)) {
     return true
   }
   const date2 = dayjs([target.year, target.month, 1])

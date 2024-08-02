@@ -60,8 +60,8 @@
                 implemented? <span class="required-field">*</span></label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
-                  <VueDatePicker v-bind="field" v-model="results.ep_service_implemented" month-picker auto-apply placeholder="Select month/year"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                  <VueDatePicker ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented" month-picker auto-apply placeholder="Select month/year"
+                  :state="meta.dirty ? meta.valid : null" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-implemented" as="div" class="mt-2 text-danger text-center"
@@ -74,9 +74,9 @@
               <label class="col-sm-8 col-form-label" for="ep-service-updated">When (month/year) was current eP system last
                 updated? <span class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated">
-                  <VueDatePicker v-bind="field" v-model="results.ep_service_updated" month-picker auto-apply placeholder="Select month/year"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
+                <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated"> 
+                  <VueDatePicker ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker auto-apply placeholder="Select month/year"
+                    :state="meta.dirty ? meta.valid : null" />
                 </Field>
               </div>
               <ErrorMessage name="ep-service-updated" as="div" class="mt-2 text-danger text-center"
@@ -86,17 +86,17 @@
             </div>
 
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-version">How many WTE maintain the drug catalogue and prescribing decision support for this system? <span
+              <label class="col-sm-8 col-form-label" for="num-maintainers">How many WTE maintain the drug catalogue and prescribing decision support for this system? <span
                   class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num_maintainers" id="num_maintainers">
-                  <input v-bind="field" type="number" min="0.0" step="0.1" class="form-control" data-bs-toggle="tooltip"
+                <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num-maintainers" id="num-maintainers">
+                  <input v-bind="field" type="text" class="form-control" data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="How many people (FTEs) across your trust do you have who maintain your drug catalogue and associated decision support for the electronic prescribing system you are using for this assessment?"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                 </Field>
               </div>
-              <ErrorMessage name="num_maintainers" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="num-maintainers" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
@@ -121,25 +121,6 @@
                 {{ message }}
               </ErrorMessage>
             </div>
-
-            <!-- <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="ep-patients">Do you use your ePrescribing system for adults, paediatrics or both? <span class="required-field">*</span></label>
-              <div class="col-sm-4">                
-                <Field v-slot="{ field, meta }" v-model="results.patient_type" name="ep-usage" id="ep-patients"
-                  rules="required">
-                  <select v-bind="field" class="form-select"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                    <option value="" disabled>Select an option...</option>
-                    <option value="Adults">Adults</option>
-                    <option value="Paediatrics">Paediatrics</option>
-                    <option value="Both">Both</option>
-                  </select>
-                </Field>               
-              </div>
-              <ErrorMessage name="ep-usage" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-                {{ message }}
-              </ErrorMessage>
-            </div> -->
 
             <div class="mb-4 row">
               <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in
@@ -294,7 +275,7 @@
             <div>
               <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
                 <i class="bi bi-x pe-1"></i>Clear</button>
-              <button type="button" class="next-btn btn btn-primary" :disabled="!formMeta.valid" id="next-button"
+              <button type="button" class="next-btn btn btn-primary" id="next-button" :disabled="!formMeta.valid"
                 @click="onNextClick()">
                 <i class="bi bi-caret-right-fill pe-1"></i>Next</button>
             </div>
@@ -356,9 +337,10 @@ export default {
           return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true
         },
         'ep-service-implemented': 'required|validMonthYearDateBefore:@ep-service-updated',
-        'ep-service-updated': 'required',
-        'num_maintainers': (value) => { 
-          return value && value > 0.0999 //TODO - this validator not working
+        'ep-service-updated': 'required',        
+        'num-maintainers': (value) => {
+          const re = new RegExp('^\\d*(\\.\\d)?$')
+          return re.test(value) ? true : 'Should be a number with at most one decimal place'        
         },
         'ep-usage': 'required',
         'lab-results': (value) => {
@@ -379,17 +361,11 @@ export default {
       },
       results: {
         ep_service: '',
-        ep_service_implemented: {
-          month: '',
-          year: ''
-        },
-        ep_service_updated: {
-          month: '',
-          year: ''
-        },
+        ep_service_implemented: null, 
+        ep_service_updated: null,
         local_ep_system_name: '',
         ep_version: '',
-        num_maintainers: 1,
+        num_maintainers: '',
         ep_usage: '',
         other_ep_system: '',
         add_ep_system: '',
@@ -476,6 +452,8 @@ export default {
   methods: {
     onResetClick() {
       this.$refs.assessmentSystemForm.resetForm()
+      this.results.ep_service_implemented = null
+      this.results.ep_service_updated = null
     },
     onNextClick() {
       this.$refs.assessmentSystemForm.validate().then(async (valid) => {
