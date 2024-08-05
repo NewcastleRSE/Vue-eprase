@@ -1,5 +1,5 @@
 # build environment
-FROM node:21 as build
+FROM node:20 as build
 WORKDIR /app
 ARG TARGET
 ENV PATH /app/node_modules/.bin:$PATH
