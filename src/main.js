@@ -115,26 +115,26 @@ app.config.devtools = true
 // }
 
 // https://docs.sentry.io/platforms/javascript/guides/vue/
-Sentry.init({
-  app,
-  dsn: 'https://4d30c2e7f1234eca9e329a4d4376a6b0@o1080315.ingest.us.sentry.io/6616496',
-  integrations: [
-    Sentry.browserTracingIntegration({ router }),
-    Sentry.replayIntegration(),
-  ],
+// Sentry.init({
+//   app,
+//   dsn: 'https://4d30c2e7f1234eca9e329a4d4376a6b0@o1080315.ingest.us.sentry.io/6616496',
+//   integrations: [
+//     Sentry.browserTracingIntegration({ router }),
+//     Sentry.replayIntegration(),
+//   ],
 
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for tracing.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
+//   // Set tracesSampleRate to 1.0 to capture 100%
+//   // of transactions for tracing.
+//   // We recommend adjusting this value in production
+//   tracesSampleRate: 1.0,
 
-  // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
-  tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
+//   // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+//   tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
 
-  // Capture Replay for 10% of all sessions,
-  // plus for 100% of sessions with an error
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-})
+//   // Capture Replay for 10% of all sessions,
+//   // plus for 100% of sessions with an error
+//   replaysSessionSampleRate: 0.1,
+//   replaysOnErrorSampleRate: 1.0,
+// })
 
 app.mount('#app')

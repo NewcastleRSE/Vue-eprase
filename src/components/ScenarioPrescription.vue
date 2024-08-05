@@ -147,18 +147,8 @@
                 <td class="align-middle">
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
                 </td>
-                <!-- 
-                Selection of either of the alert/advisory radios will do the job, the extra checkbox is redundant
-                <td>
-                  <Field v-slot="{ field }" v-model="response.intervention_type" type="checkbox" :id="intType.id"
-                    name="intervention-type" :value="intType.id">
-                    <input v-bind="field" type="checkbox" class="form-check-input" name="intervention-type"
-                      :value="intType.id">
-                  </Field>
-                </td> 
-                -->
                 <td class="pt-4">
-                  <div class="form-check form-check-inline">
+                  <!-- <div class="form-check form-check-inline">
                     <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio"
                       :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-alert'" value="alert">
@@ -173,6 +163,26 @@
                       :name="'intervention-select-' + intType.id + '-alert'"
                       :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
                       <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
+                        value="advisory" class="form-check-input" @change="onSelectedInterventionTypeChange()">
+                    </Field>
+                    <label class="form-check-label"
+                      :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
+                  </div> -->
+                  <div class="form-check form-check-inline">
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="checkbox"
+                      :name="'intervention-select-' + intType.id + '-alert'"
+                      :id="'intervention-select-' + intType.id + '-alert'" value="alert">
+                      <input v-bind="field" type="checkbox" :name="'intervention-select-' + intType.id + '-alert'"
+                        value="alert" class="form-check-input" @change="onSelectedInterventionTypeChange()">
+                    </Field>
+                    <label class="form-check-label"
+                      :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="checkbox"
+                      :name="'intervention-select-' + intType.id + '-advisory'"
+                      :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
+                      <input v-bind="field" type="checkbox" :name="'intervention-select-' + intType.id + '-advisory'"
                         value="advisory" class="form-check-input" @change="onSelectedInterventionTypeChange()">
                     </Field>
                     <label class="form-check-label"
@@ -193,33 +203,6 @@
           <ErrorMessage name="intervention-types" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
             {{ message }}
           </ErrorMessage>
-
-          <!-- 
-          Original code commented out 19/07/2024 David - now display the alert/advisory choice inline - apparently that's simpler...
-          https://github.com/orgs/NewcastleRSE/projects/72/views/1?pane=issue&itemId=70286651
-          <div class="mt-4 mb-2">
-            <label class="form-label" for="intervention-select"><h5>Please indicate whether intervention was an alert or
-              advisory:</h5></label>
-            <div class="bg-info-subtle rounded p-2">
-              <div><span class="fw-bold">Advisory:</span> Information is provided which does not interrupt workflow or require action.</div>
-              <div><span class="fw-bold">Alert:</span> Information is provided which interrupts work flow and/or requires action (pop-up boxes or requiring password entry).</div>
-            </div>
-            <div class="mt-3">
-              <Field v-slot="{ field, meta }" v-model="response.selected_type" name="intervention-select"
-                id="intervention-select">
-                <select v-bind="field" class="form-select w-25" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                  <option value="" disabled>Select Type...</option>
-                  <option value="alert">Alert</option>
-                  <option value="advisory">Advisory</option>
-                  <option value="both">Both</option>
-                </select>
-              </Field>
-              <ErrorMessage name="intervention-select" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-                {{ message }}
-              </ErrorMessage>
-            </div>                    
-          </div> 
-          -->
 
           <div class="my-3">
             <label class="form-label" for="patient-intervention">
@@ -317,7 +300,7 @@ export default {
       response: {
         outcomes: '',
         other: '',
-        selected_type: Object.fromEntries(this.categories.map(c => [c.categoryCode, ''])),
+        selected_type: Object.fromEntries(this.categories.map(c => [c.categoryCode, []])),
         qualitative_data: '',
         intervention_types: ''
       },
@@ -383,9 +366,7 @@ export default {
 
       let intData = []
       Object.keys(this.response.selected_type).forEach(k => {
-        if (this.response.selected_type[k] != '') {
-          intData.push(`${k}/${this.response.selected_type[k]}`)
-        }
+        intData.push(`${k}/${this.response.selected_type[k].join('|')}`)
       })
       console.debug('Current state of play', intData)
       this.response.intervention_types = intData.toString()
@@ -414,8 +395,14 @@ export default {
           const cats = []
           const types = []
           this.response.intervention_types.split(',').forEach(idata => {
-            cats.push(idata.split('/').shift())
-            types.push(idata.split('/').pop())
+            const currCat = idata.split('/').shift()
+            const currTypes = idata.split('/').pop()
+            if (currTypes != '') {
+              currTypes.split('|').forEach(ct => {
+                cats.push(currCat)
+                types.push(ct)
+              })     
+            }                  
           })
           const intervention_type = cats.toString()
           const selected_type = types.toString()
@@ -428,7 +415,7 @@ export default {
           if (saveResponse.status < 400) {
             this.$emit('test-save-ok')
           } else {
-            this.$emit('test-save-fail', saveResponse.message)
+           this.$emit('test-save-fail', saveResponse.message)
           }
         }
       })

@@ -70,7 +70,7 @@ module.exports = {
               sourceMap: true
             }
           },
-          { loader: "sass-loader" },
+          { loader: "sass-loader", options: { sassOptions: { quietDeps: true } } },
         ],
       },
       {
