@@ -1,7 +1,7 @@
 <template>
    <main class="leftalign">
 
-    <div class="pills-banner" :style="{ 'background-image': 'url(' + pillsImage + ')' }"></div>
+    <div class="pills-banner"><img :src="pillsImage" alt="banner graphic"></div>
 
     <LoginInfo />
 
@@ -147,15 +147,4 @@ export default {
 
 </script>
 
-<style scoped>
-
-.pills-banner {  
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
-  height: 80px;
-  margin-bottom: 1rem;
-}
-
-</style>
+<style scoped></style>
