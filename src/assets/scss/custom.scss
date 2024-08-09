@@ -87,17 +87,6 @@ a {
     text-decoration: none;
 }
 
-.pills-banner {
-  /* NOTE: this banner is in the 'public' folder at the top level - its being in 'src/assets' leads to huge webpack problems I can't resolve - David Herbert 01/03/2024 */
-  background-image: url('/pills-bw.png');
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
-  height: 80px;
-  margin-bottom: 1rem;
-}
-
 .smallimg {
   height: 25px;
   width: auto;

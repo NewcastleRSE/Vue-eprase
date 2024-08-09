@@ -1,7 +1,7 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"></div>
+    <div class="pills-banner" :style="{ 'background-image': 'url(' + pillsImage + ')' }"></div>
 
     <LoginInfo />
 
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-''
+
 import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { rootStore } from '../stores/root'
@@ -88,6 +88,9 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapStores(rootStore, patientStore),
+    pillsImage() {
+      return '/pills-bw.png'
+    },
     errorAlertModal() {
       return this.$refs.errorAlertModal
     }
@@ -150,4 +153,15 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+.pills-banner {
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+</style>
