@@ -70,7 +70,8 @@ module.exports = {
               sourceMap: true
             }
           },
-          { loader: "sass-loader", options: { sassOptions: { quietDeps: true } } },
+          // Option here necessary to suppress spurious warnings in bootstrap files after swapping node-sass for Dart sass - David 05/08/2024
+          { loader: "sass-loader", options: { sassOptions: { quietDeps: true } } }
         ],
       },
       {
@@ -119,7 +120,7 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === "production") {
-  let baseURL = '"http://localhost:6001/api/"'
+  let baseURL = '"https://eprase.ncldata.dev/api/"'
   let sentryENV = "development"
 
   if (process.env.TARGET === "staging") {

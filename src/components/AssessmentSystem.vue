@@ -228,7 +228,7 @@
             </div>
 
             <div class="mb-4 row">
-              <p>Is the e-prescribing system used to prescribe the following?</p>
+              <p class="fw-bold">Is the e-prescribing system used to prescribe the following?</p>
               <div v-for="(option, index) in results.options" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox"
                   :id="'id_high_risk_meds_' + index" name="high_risk_meds" :value="option.value">
@@ -240,7 +240,7 @@
             </div>
 
             <div class="mb-4 row">
-              <p>Is the e-prescribing system used in the following areas?</p>
+              <p class="fw-bold">Is the e-prescribing system used in the following areas?</p>
               <div v-for="(option, index) in results.area_options" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
                   :id="'id_clinical_areas_' + index" name="clinical_areas" :value="option.value">
