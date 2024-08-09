@@ -99,7 +99,7 @@ defineRule('validMonthYearDateAfter', (value, [target]) => {
   return date1.isSameOrAfter(date2) ? true : `Must be after ${target.month + 1}/${target.year}`
 })
 
-axios.defaults.baseURL = 'http://localhost:6001/api/',
+axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 

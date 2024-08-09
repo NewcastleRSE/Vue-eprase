@@ -120,7 +120,7 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === "production") {
-  let baseURL = '"https://eprase.ncldata.dev/api/"'
+  let baseURL = '"http://localhost:6001/api/"'
   let sentryENV = "development"
 
   if (process.env.TARGET === "staging") {
