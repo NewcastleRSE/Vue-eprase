@@ -95,7 +95,7 @@ export default {
   computed: {
     ...mapStores(rootStore),
     pillsImage() {
-      return '/pills-bw.png'
+      return '../assets/images/pills-bw.png'
     },
     errorAlertModal() {
       return this.$refs.errorAlertModal

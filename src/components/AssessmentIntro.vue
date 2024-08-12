@@ -89,7 +89,7 @@ export default {
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapStores(rootStore, patientStore),
     pillsImage() {
-      return '/pills-bw.png'
+      return '../assets/images/pills-bw.png'
     },
     errorAlertModal() {
       return this.$refs.errorAlertModal
