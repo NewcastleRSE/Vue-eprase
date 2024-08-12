@@ -48,7 +48,11 @@ module.exports = {
             // translates CSS into CommonJS modules
             loader: "css-loader",
             options: {
+              importLoaders: 2,
               url: false,
+              modules: {
+                mode: "icss", // Enable ICSS (Interoperable CSS)
+              }
             }
           },
           {

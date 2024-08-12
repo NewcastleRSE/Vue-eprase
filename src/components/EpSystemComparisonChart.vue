@@ -48,6 +48,7 @@
 
 <script>
 
+import bsColors from '../assets/scss/variables.scss'
 import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores, mapState } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -104,7 +105,15 @@ export default {
       this.submitted = true
 
       const searchValue = this.searchfield == 'Other' ? this.other : this.searchfield
+      const colorMapping = {
+        'GoodMitigation': bsColors.successColor,
+        'SomeMitigation': bsColors.warningColor,
+        'NotMitigated': bsColors.dangerColor,
+        'OverMitigated': bsColors.infoColor,
+        'InvalidTests': bsColors.lightColor
+      }
       this.filteredChartData = []
+
       this.chartData.forEach(elt => {
         const filteredX = []
         const filteredY = []
@@ -119,11 +128,15 @@ export default {
             name: elt.name,
             type: elt.type,
             x: filteredX,
-            y: filteredY
+            y: filteredY,
+            marker: {
+              color: colorMapping[elt.name]
+            }
           })
         }
       })
       if (this.filteredChartData.length > 0) {
+        console.debug('filteredChartData : ', this.filteredChartData)
         Plotly.react(this.$refs.epSystemComparisonContainer, this.filteredChartData, {
           barmode: 'stack',
           width: 900,

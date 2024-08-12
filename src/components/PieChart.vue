@@ -6,6 +6,7 @@
 
 <script>
 
+import bsColors from '../assets/scss/variables.scss'
 import Plotly from 'plotly.js-cartesian-dist-min'
 
 export default {
@@ -56,6 +57,9 @@ export default {
         labels: [
           'Good mitigation', 'Some mitigation', 'Not mitigated', 'Over mitigated', 'Invalid tests'
         ],
+        marker: {
+          colors: [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.lightColor]
+        },
         type: 'pie'
       }], {
         width: 900,

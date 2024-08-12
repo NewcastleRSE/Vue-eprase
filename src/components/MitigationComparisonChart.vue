@@ -6,6 +6,7 @@
 
 <script>
 
+import bsColors from '../assets/scss/variables.scss'
 import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -43,12 +44,16 @@ export default {
           this.chartData = []
           const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
           const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
-          mkeys.forEach(mk => {
+          const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.lightColor]
+          mkeys.forEach((mk, mkIdx) => {
             const chartBlock = {
               x: orgNamesSystems,
               y: [],
               name: mk.substring(0, 1).toUpperCase() + mk.substring(1),
-              type: 'bar'
+              type: 'bar',
+              marker: {
+                color: colorMapping[mkIdx]
+              }
             }
             chartBlock.y = response.data.map(d => d[mk])            
             this.chartData.push(chartBlock)

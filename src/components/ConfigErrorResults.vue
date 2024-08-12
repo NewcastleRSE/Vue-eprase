@@ -31,12 +31,17 @@
                   <th>Question</th>
                   <th>Result</th>
                 </tr>
-                <tr v-for="cErrData in report.configErrorDataList"
-                  :class="cErrData.result == cErrData.good_answer ? 'table-success' : (cErrData.result == !cErrData.good_answer ? 'table-danger' : 'table-secondary')">
+                <tr v-for="cErrData in report.configErrorDataList">
                   <td>{{ cErrData.question }}</td>
-                  <td v-if="cErrData.result == cErrData.good_answer"><i class="bi bi-check-circle text-success fw-bold"></i></td>
-                  <td v-if="cErrData.result == !cErrData.good_answer"><i class="bi bi-x-circle text-danger fw-bold"></i></td>
-                  <td v-if="cErrData.result == 2"><i class="bi bi-ban text-secondary fw-bold"></i></td>
+                  <td v-if="cErrData.result == 2" class="d-flex align-items-baseline">
+                    <h5 class="text-secondary bg-secondary-subtle fw-bolder"><i class="bi bi-ban"></i></h5>                    
+                  </td>
+                  <td v-if="cErrData.result == cErrData.good_answer" class="d-flex align-items-baseline">
+                    <h5 class="text-success bg-success-subtle fw-bolder"><i class="bi bi-check-circle"></i></h5>
+                  </td>
+                  <td v-if="cErrData.result == !cErrData.good_answer" class="d-flex align-items-baseline">                  
+                    <h5 class="text-danger bg-danger-subtle fw-bolder"><i class="bi bi-x-circle"></i></h5>
+                  </td>                  
                 </tr>
               </table>
             </td>

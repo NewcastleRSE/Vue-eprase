@@ -1,7 +1,7 @@
 <template>
    <main class="leftalign">
 
-    <div class="pills-banner"><img :src="pillsImage" alt="banner graphic"></div>
+    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="banner graphic"></div>
 
     <LoginInfo />
 

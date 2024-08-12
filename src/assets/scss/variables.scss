@@ -1,0 +1,36 @@
+/* Agreed ePRaSE colour palette */
+$primary: #07818e;
+$success: #35d635;
+$warning: #ffbf00;
+$danger: #ff3b33;
+$info: #66b4ea;
+$light: #808080;
+$dark: #2c3e50;
+
+/* Checkbox outlines are so light by default they are difficult to see */
+$form-check-input-border: 2px solid rgba($dark, .50);
+/* Size of radio/checkbox */
+$form-check-input-width: 1.5em;
+/* Height between */
+$form-check-min-height: 2.5em;
+/* Increase the width of tooltips */
+$tooltip-max-width: 350px;
+/* Increase the width and visibility of navigation tabs */
+$nav-tabs-border-color: $primary;
+$nav-tabs-border-width: 2px;
+$nav-tabs-link-active-border-color: $primary;
+$nav-tabs-link-hover-border-color: $primary;
+$nav-tabs-link-active-bg: $primary;
+$nav-tabs-link-active-color: white;
+$nav-link-font-weight: "bold";
+
+/* Webpack magic - see https://github.com/alexanderweigelt/ExportSassVarsToJS */
+:export {
+  primaryColor: $primary;
+  successColor: $success;
+  warningColor: $warning;
+  dangerColor: $danger;
+  infoColor: $info;
+  lightColor: $light;
+  darkColor: $dark;
+}

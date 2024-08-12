@@ -150,6 +150,7 @@
 
 <script>
 
+import bsColors from '../assets/scss/variables.scss'
 import { calcPercentage, calcNum } from '../helpers/utils'
 import { mitigationDataByCategory } from '../helpers/categories'
 import TabHeader from "./TabHeader"
@@ -258,9 +259,10 @@ export default {
       const categoryCodes = this.categories.map(c => c.categoryCode)
       
       const categorySubkeys = ['good', 'some', 'not', 'over']
+      const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor]
 
       const stackedChartData = []
-      categorySubkeys.forEach(csk => {
+      categorySubkeys.forEach((csk, cskIdx) => {
         const xArr = [], customdata = []
         categoryCodes.forEach(ck => {
           const nQs = jsondata['categories'][ck].count
@@ -268,10 +270,14 @@ export default {
           xArr.push(percentInCat)
           customdata.push(`${percentInCat}% of ${nQs} question${nQs == 1 ? '' : 's'}`)
         })
+        console.log(bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor)
         stackedChartData.push({
           x: xArr,
           y: categoryNames,
           customdata: customdata,
+          marker: {
+            color: colorMapping[cskIdx]
+          },
           hovertemplate: '%{customdata}', // See e.g. https://codepen.io/etpinard/pen/zXLEXJ?editors=0010
           name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
           type: 'bar',

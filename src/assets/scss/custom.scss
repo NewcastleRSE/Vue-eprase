@@ -1,23 +1,4 @@
-$primary: #07818e;
-$dark: #2c3e50;
-$light: #c4c4c4;
-/* Checkbox outlines are so light by default they are difficult to see */
-$form-check-input-border: 2px solid rgba($dark, .50);
-/* Size of radio/checkbox */
-$form-check-input-width: 1.5em;
-/* Height between */
-$form-check-min-height: 2.5em;
-/* Increase the width of tooltips */
-$tooltip-max-width: 350px;
-/* Increase the width and visibility of navigation tabs */
-$nav-tabs-border-color: $primary;
-$nav-tabs-border-width: 2px;
-$nav-tabs-link-active-border-color: $primary;
-$nav-tabs-link-hover-border-color: $primary;
-$nav-tabs-link-active-bg: $primary;
-$nav-tabs-link-active-color: white;
-$nav-link-font-weight: "bold";
-
+@import "./variables.scss";
 @import "~bootstrap/scss/bootstrap";
 
 #app {
@@ -90,8 +71,8 @@ a {
 .pills-banner img {
   object-fit: cover;  
   width: 100%;
-  border-top-left-radius: 25px;
-  border-top-right-radius: 25px;
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
   height: 80px;
   margin-bottom: 1rem;
 }
