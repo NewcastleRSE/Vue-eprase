@@ -6,10 +6,8 @@
       <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
       <h2 class="mt-4">Log-in to ePRaSE</h2>
       <p class="pb-2">
-        Please enter your login details below, or click 'Register' to create a
-        new user account. You will need a valid
-        <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to
-        register with ePRaSE successfully.
+        Please enter your login details below, or click 'Register' to create a new user account. You will need a valid
+        <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
       </p>
 
       <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
@@ -48,6 +46,9 @@
           </button>
           <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
             Cancel
+          </button>
+          <button v-if="$route.query.loggedOut != '1'" type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
+            Register
           </button>         
         </div>
       </Form>
@@ -130,6 +131,9 @@ export default {
     },
     onResetClick() {
       this.$refs.loginForm.resetForm()
+    },
+    onRegisterClick() {
+      this.$router.push('/register')
     }
   }
 }

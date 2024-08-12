@@ -8,10 +8,10 @@
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
       <div class="py-4" v-if="appOpen">
-        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick()">
+        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
           Login
         </button>
-        <button v-if="isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onResumeClick()">
+        <button v-if="isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onResumeClick">
           Resume assessment
         </button>
         <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
