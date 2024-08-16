@@ -105,7 +105,7 @@
 
             <div v-if="extremeRiskFails.length != 0">
               
-              <table class="table table-striped bg-warning-subtle">
+              <table class="table table-striped bg-warning-subtle mt-4">
                 <thead>
                   <tr>
                     <th colspan="2">

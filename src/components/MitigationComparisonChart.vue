@@ -1,7 +1,15 @@
 <template>
   <h3>Institution Mitigation Comparison</h3>
-  <p>This chart gives an overview of each institutions mitigation results</p>
-  <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4"></div>  
+
+  <div v-if="! chartDataEmpty">
+    <p>This chart gives an overview of each institutions mitigation results</p>
+    <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4"></div> 
+  </div>
+
+  <div v-if="chartDataEmpty">
+    <p>No assessments currently available</p>
+  </div>
+   
 </template>
 
 <script>
@@ -20,6 +28,9 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
+    chartDataEmpty() {
+      return !Array.isArray(this.chartData) || this.chartData.length == 0
+    }
   }, 
   emits: ['get-mitigation-fail'],
   methods: {
@@ -38,7 +49,7 @@ export default {
     },
     async getMitigationResultsByInstitution() {
       this.chartData = rootStore().mitigationChartData
-      if (this.chartData == null) {
+      if (this.chartDataEmpty) {
         const response = await rootStore().getAllMitigationResults()
         if (response.status < 400) {
           this.chartData = []
@@ -58,8 +69,10 @@ export default {
             chartBlock.y = response.data.map(d => d[mk])            
             this.chartData.push(chartBlock)
           })
-          rootStore().storeMitigationChartData(this.chartData)
-          this.renderChart()
+          if (!this.chartDataEmpty) {
+            rootStore().storeMitigationChartData(this.chartData)
+            this.renderChart()
+          }           
         } else {
           this.$emit('get-mitigation-fail', response.message)
         }
