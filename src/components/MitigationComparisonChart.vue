@@ -29,6 +29,7 @@ export default {
   computed: {
     ...mapStores(rootStore),
     chartDataEmpty() {
+      console.log('Check', this.chartData, 'is empty...')
       return !Array.isArray(this.chartData) || this.chartData.length == 0
     }
   }, 
