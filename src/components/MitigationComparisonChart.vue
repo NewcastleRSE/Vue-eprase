@@ -90,7 +90,8 @@ export default {
       } else {
         console.debug('Rendering chart...')
         this.renderChart()
-      }      
+      } 
+      console.groupEnd()     
     }
   },
   mounted() {
