@@ -48,10 +48,20 @@ export default {
       console.groupEnd()
     },
     async getMitigationResultsByInstitution() {
+
+      console.group('getMitigationResultsByInstitution()')
+
       this.chartData = rootStore().mitigationChartData
+      console.debug('Stored mitigation chart data is', this.chartData)
+
       if (this.chartDataEmpty) {
+
+        console.debug('Data is deemed empty - calling API...')
         const response = await rootStore().getAllMitigationResults()
+        console.debug('Done')
+
         if (response.status < 400) {
+          console.debug('API response', response.data)
           this.chartData = []
           const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
           const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
@@ -70,6 +80,7 @@ export default {
             this.chartData.push(chartBlock)
           })
           if (!this.chartDataEmpty) {
+            console.debug('Storing mitigation data', this.chartData)
             rootStore().storeMitigationChartData(this.chartData)
             this.renderChart()
           }           
@@ -77,6 +88,7 @@ export default {
           this.$emit('get-mitigation-fail', response.message)
         }
       } else {
+        console.debug('Rendering chart...')
         this.renderChart()
       }      
     }

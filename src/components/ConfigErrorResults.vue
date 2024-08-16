@@ -45,28 +45,6 @@
                 </tr>
               </table>
             </td>
-
-            <!-- <td class="align-content-center">
-              <span>{{ report.configErrorDataList[0].result === 0 ? "N" : "Y" }}</span>
-            </td>
-
-            <td class="align-content-center">
-              <img v-if="report.configErrorDataList[0].result === 0" src="../assets/images/green-tick.png" alt="tick"
-                class="smallimg" />
-              <img v-show="report.configErrorDataList[0].result === 1" src="../assets/images/cross.png" alt="cross"
-                class="smallimg" />
-            </td>
-
-            <td class="align-content-center">
-              <span>{{ report.configErrorDataList[1].result === 0 ? "N" : "Y" }}</span>
-            </td>
-
-            <td class="align-content-center">
-              <img v-if="report.configErrorDataList[1].result === 0" src="../assets/images/green-tick.png" alt="tick"
-                class="smallimg" />
-              <img v-if="report.configErrorDataList[1].result === 1" src="../assets/images/cross.png" alt="cross"
-                class="smallimg" />
-            </td> -->
           </tr>
         </tbody>
       </table>

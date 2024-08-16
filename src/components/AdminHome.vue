@@ -118,7 +118,7 @@ export default {
       if (allRepResponse.status < 400) {
         const ceDetailsResponse = await rootStore().getConfigErrors()
         if (ceDetailsResponse.status < 400) {
-          // Additional details about the config errpors that report viewers want to know
+          // Additional details about the config errors that report viewers want to know
           const ceObjects = Object.fromEntries(ceDetailsResponse.data.map(ce => [ce.configErrorCode, { question: ce.description, good_answer: ce.good_answer }]))
           this.reportDataLoading = false
           this.reports = allRepResponse.data
