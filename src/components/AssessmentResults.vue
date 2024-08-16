@@ -37,30 +37,56 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
-          <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
-            :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
+          <h4>System Overall Mitigation Result</h4>
+          <div class="row">
+            <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
+              :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
+          </div>
+          <div class="row">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mitigation Response</th>
+                  <th>Description</th>
+                </tr>                
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-success">Good mitigation</td>
+                  <td>If a system response is to 'prevent prescribing' and the tool user records this has happened</td>
+                </tr>
+                <tr>
+                  <td class="text-warning">Some mitigation</td>
+                  <td>If a system response (alert or advisory) was recorded rather than prescribing prevented</td>
+                </tr>
+                <tr>
+                  <td class="text-danger">Not mitigated</td>
+                  <td>If a system has no intervention provided</td>
+                </tr>
+                <tr>
+                  <td class="text-info">Over mitigated</td>
+                  <td>If a system has an intervention recorded where none is expected e.g. with a control test</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">
-          <section>
-            <div>Total valid tests (not including configuration tests): {{ totalValidTests }}</div>
-            <div>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</div>
-          </section>
-
+        <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">          
           <div class="results-summary">
             <table class="table table-striped">
               <thead>
                 <tr>
+                  <th colspan="2">
+                    <h4>Total valid tests (not including configuration tests): {{ totalValidTests }}</h4>
+                    <h4>Total of tests that were excluded due to medication not being available: {{ totalNulls }}</h4>
+                  </th>                
+                </tr>                
+              </thead>
+              <tbody class="table-group-divider">
+                <tr>
                   <th>Category</th>
                   <th>Outcome</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Extreme risk scenarios</th>
-                  <td>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
-                    (extremeRiskScenarios.length != 1 ? 's' : '') }}. Out of these, {{ extremeRiskMitigations + ' ' +
-                      (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
-                </tr>
+                </tr>               
                 <tr>
                   <th>High risk scenarios</th>
                   <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
@@ -73,25 +99,28 @@
                     totalValidTests }} total valid tests, where a system/user intervention was selected. This would be
                     considered a {{ getInterventionTypeResult() }}. A high level of alerts
                     can indicate an over-reliance on alerting within a system.</td>
-                </tr>
-                <tr>
-                  <th>Config Errors</th>
-                  <td>You were questioned about {{ totalConfigTests }} configuration errors.</td>
-                </tr>
+                </tr>              
               </tbody>
             </table>
 
             <div v-if="extremeRiskFails.length != 0">
-
-              <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
+              
               <table class="table table-striped bg-warning-subtle">
                 <thead>
+                  <tr>
+                    <th colspan="2">
+                      <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
+                      <h5>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
+                        (extremeRiskScenarios.length != 1 ? 's' : '') }}. Of these, {{ extremeRiskMitigations + ' ' +
+                          (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated</h5>
+                    </th>
+                  </tr>                  
+                </thead>
+                <tbody class="table-group-divider">
                   <tr>
                     <th>Drug name</th>
                     <th>Scenario description</th>
                   </tr>
-                </thead>
-                <tbody>
                   <tr v-for="test in extremeRiskFails" :key="test">
                     <td>{{ test.prescription.drug_name }}</td>
                     <td>{{ test.prescription.indicator.description }}</td>
@@ -101,17 +130,22 @@
             </div>
 
             <div v-if="configErrorResults.length != 0">
-
-              <h4>Configuration Error Results</h4>
-              <table class="table table-striped extreme-risk-table">
+              
+              <table class="table table-striped extreme-risk-table mt-4">
                 <thead>
+                  <tr>
+                    <th colspan="2">
+                      <h4>Configuration Error Results</h4>
+                      <h5>You were questioned about {{ totalConfigTests }} configuration errors</h5>
+                    </th>                 
+                  </tr>                  
+                </thead>
+                <tbody class="table-group-divider">
                   <tr>
                     <th>Question</th>
                     <th>Result</th>
                     <th>Outcome</th>
                   </tr>
-                </thead>
-                <tbody>
                   <tr v-for="test in configErrorResults" :key="test">
                     <td>{{ test.question }}</td>
                     <td>
@@ -131,7 +165,13 @@
           </div>
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
+          <h4>Clinical Decision Support Category - Mitigation Results</h4>
+          <div class="row">
+            <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
+          </div>
+          <div class="row">
+            Explanation of what chart shows - details to follow...
+          </div>
         </div>
 
       </div>

@@ -6,6 +6,7 @@ $danger: #ff3b33;
 $info: #66b4ea;
 $light: #808080;
 $dark: #2c3e50;
+$invalid: #6f42c1;
 
 /* Checkbox outlines are so light by default they are difficult to see */
 $form-check-input-border: 2px solid rgba($dark, .50);
@@ -33,4 +34,5 @@ $nav-link-font-weight: "bold";
   infoColor: $info;
   lightColor: $light;
   darkColor: $dark;
+  invalidColor: $invalid;
 }

@@ -92,6 +92,10 @@ a {
   font-weight: bold;
 }
 
+.text-invalid {
+  color: $invalid;
+}
+
 span.required-field {
   color: $primary;
 }

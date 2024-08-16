@@ -44,7 +44,7 @@ export default {
           this.chartData = []
           const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
           const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
-          const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.lightColor]
+          const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
           mkeys.forEach((mk, mkIdx) => {
             const chartBlock = {
               x: orgNamesSystems,

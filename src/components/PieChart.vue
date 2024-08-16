@@ -58,7 +58,7 @@ export default {
           'Good mitigation', 'Some mitigation', 'Not mitigated', 'Over mitigated', 'Invalid tests'
         ],
         marker: {
-          colors: [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.lightColor]
+          colors: [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
         },
         type: 'pie'
       }], {

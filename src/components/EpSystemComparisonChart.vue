@@ -110,7 +110,7 @@ export default {
         'SomeMitigation': bsColors.warningColor,
         'NotMitigated': bsColors.dangerColor,
         'OverMitigated': bsColors.infoColor,
-        'InvalidTests': bsColors.lightColor
+        'InvalidTests': bsColors.invalidColor
       }
       this.filteredChartData = []
 
