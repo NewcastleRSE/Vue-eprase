@@ -39,13 +39,16 @@ export default {
 
       console.group('MitigationComparisonChart - renderChart()')
 
-      console.debug('Chart data', this.chartData)
-      Plotly.newPlot(this.$refs.allMitigationsChartContainer, this.chartData, {
-        barmode: 'stack',
-        width: 900,
-        height: 700
-      }, {displayModeBar: false})
-
+      const renderElement = this.$refs.allMitigationsChartContainer
+      if (renderElement) {
+        console.debug('Chart data', this.chartData)
+        Plotly.newPlot(this.$refs.allMitigationsChartContainer, this.chartData, {
+          barmode: 'stack',
+          width: 900,
+          height: 700
+        }, {displayModeBar: false})
+      }    
+      
       console.groupEnd()
     },
     async getMitigationResultsByInstitution() {
@@ -63,28 +66,29 @@ export default {
 
         if (response.status < 400) {
           console.debug('API response', response.data)
-          this.chartData = []
-          const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
-          const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
-          const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
-          mkeys.forEach((mk, mkIdx) => {
-            const chartBlock = {
-              x: orgNamesSystems,
-              y: [],
-              name: mk.substring(0, 1).toUpperCase() + mk.substring(1),
-              type: 'bar',
-              marker: {
-                color: colorMapping[mkIdx]
+          if (response.data.length > 0) {
+            this.chartData = []
+            const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
+            const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
+            const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
+            mkeys.forEach((mk, mkIdx) => {
+              const chartBlock = {
+                x: orgNamesSystems,
+                y: [],
+                name: mk.substring(0, 1).toUpperCase() + mk.substring(1),
+                type: 'bar',
+                marker: {
+                  color: colorMapping[mkIdx]
+                }
               }
-            }
-            chartBlock.y = response.data.map(d => d[mk])            
-            this.chartData.push(chartBlock)
-          })
-          if (!this.chartDataEmpty) {
+              chartBlock.y = response.data.map(d => d[mk])            
+              this.chartData.push(chartBlock)
+            })
             console.debug('Storing mitigation data', this.chartData)
             rootStore().storeMitigationChartData(this.chartData)
             this.renderChart()
-          }           
+          }
+          
         } else {
           this.$emit('get-mitigation-fail', response.message)
         }

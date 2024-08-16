@@ -22,7 +22,6 @@
 
 <script>
 
-import { setVisible } from '../helpers/modal'
 import { Dropdown } from 'bootstrap'
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
