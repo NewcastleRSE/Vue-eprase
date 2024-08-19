@@ -70,6 +70,9 @@ export default {
     },
     epSystemOptions() {
       return appSettingsStore().epSystemOptions
+    },
+    chartDataEmpty() {
+      return !Array.isArray(this.chartData) || this.chartData.length == 0
     }
   },
   emits: ['get-mitigation-fail'],
@@ -150,7 +153,7 @@ export default {
     }, 
     async getMitigationResults() {
       this.chartData = rootStore().mitigationChartData
-      if (this.chartData == null) {
+      if (this.chartDataEmpty) {
         const response = await rootStore().getAllMitigationResults()
         if (response.status < 400) {
           this.chartData = []

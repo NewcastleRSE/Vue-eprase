@@ -94,7 +94,6 @@ export default {
       const catResponse = await rootStore().getCategories()
       if (catResponse.status < 400) {
         this.categories = catResponse.data
-        console.log('### Categories', this.categories)
         const patientResponse = await this.patientService.getCompletePatientDetails(true)
         if (patientResponse.status < 400) {
           if (this.myTestList.length == 0) {

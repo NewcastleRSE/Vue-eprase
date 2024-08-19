@@ -1,15 +1,9 @@
 <template>
   <h3>Institution Mitigation Comparison</h3>
-
-  <div v-if="! chartDataEmpty">
-    <p>This chart gives an overview of each institutions mitigation results</p>
-    <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4"></div> 
-  </div>
-
-  <div v-if="chartDataEmpty">
-    <p>No assessments currently available</p>
-  </div>
-   
+  <p>This chart gives an overview of each institutions mitigation results</p>
+  <div ref="allMitigationsChartContainer" id="allMitigationsChartContainer" class="mb-4">
+    <p v-if="chartDataEmpty">No assessments currently available</p>
+  </div>   
 </template>
 
 <script>
@@ -29,7 +23,6 @@ export default {
   computed: {
     ...mapStores(rootStore),
     chartDataEmpty() {
-      console.log('Check', this.chartData, 'is empty...')
       return !Array.isArray(this.chartData) || this.chartData.length == 0
     }
   }, 
@@ -40,6 +33,7 @@ export default {
       console.group('MitigationComparisonChart - renderChart()')
 
       const renderElement = this.$refs.allMitigationsChartContainer
+      console.debug('renderElement', renderElement)
       if (renderElement) {
         console.debug('Chart data', this.chartData)
         Plotly.newPlot(this.$refs.allMitigationsChartContainer, this.chartData, {
