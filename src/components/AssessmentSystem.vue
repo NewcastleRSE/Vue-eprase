@@ -465,7 +465,7 @@ export default {
           const local_ep_system_name = this.results.local_ep_system_name
           const ep_service_implemented = `${prependZero(this.results.ep_service_implemented.month + 1)}-${this.results.ep_service_implemented.year}`
           const ep_service_updated = `${prependZero(this.results.ep_service_updated.month + 1)}-${this.results.ep_service_updated.year}`
-          const ep_version = this.results.ep_version  // Note: no longer used as of July 2024
+          const ep_version = '0'  // Note: no longer used as of July 2024
           const num_maintainers = this.results.num_maintainers
           const other_ep_system = this.results.other_ep_system
           const ep_usage = this.results.ep_usage
