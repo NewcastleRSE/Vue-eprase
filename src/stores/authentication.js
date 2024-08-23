@@ -160,21 +160,38 @@ export const authenticationStore = defineStore('authentication', {
 
       console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
       console.groupEnd()
-    },    
-    async requestNewPassword(email) {
+    },
+    // User management methods, only accessible to an admin
+    async findUsers(identifier, institution_id) {
       try {
-        const res = await axios.post('auth/newPassword', { email })
-        console.error('Not implemented!')
+        const params = new URLSearchParams()
+        if (identifier) {
+          params.set('identifier', identifier)
+        }
+        if (institution_id) {
+          params.set('institution_id', institution_id)
+        }
+        const query = params.toString()
+        const res = await axios.get('auth/findUsers?' + query, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        return { status: res.status, data: res.data }
       } catch (err) {
-        console.error('authentication/requestNewPassword : the following error occurred', err)
+        this.triageError(err)
       }
     },
-    async resetPassword(password, token) {
+    async updateUserPassword(id, password, confirmPassword) {
       try {
-        const res = await axios.post('auth/resetPassword?token=' + token, { password })
-        console.error('Not implemented!')
+        const res = await axios.post('auth/updatePassword', { id, password, confirmPassword }, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        return { status: res.status, data: res.data }
       } catch (err) {
-        console.error('authentication/requestNewPassword : the following error occurred', err)
+        this.triageError(err)
+      }
+    },
+    async enableUser(id, enable) {
+      try {
+        const res = await axios.post('auth/enableUser', { id, enable }, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        return { status: res.status, data: res.data }
+      } catch (err) {
+        this.triageError(err)
       }
     }
   }

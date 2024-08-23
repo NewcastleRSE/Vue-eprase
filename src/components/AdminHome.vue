@@ -33,6 +33,9 @@
           <li class="nav-item" role="presentation" title="View extreme risk results for institutions" data-bs-toggle="tooltip" data-bs-placement="top">
             <a class="nav-link" data-bs-toggle="tab" href="#view-ex-risk-comp-tab" role="tab">Extreme Risk Comparison</a>
           </li>
+          <li class="nav-item" role="presentation" title="User management" data-bs-toggle="tooltip" data-bs-placement="top">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-user-management-tab" role="tab">Manage Users</a>
+          </li>
         </ul>
       </nav>
 
@@ -54,6 +57,9 @@
         </div>
         <div class="tab-pane fade" id="view-ex-risk-comp-tab" role="tabpanel">
           <HighRiskComparison :reports="reports" :loading="reportDataLoading" />
+        </div>
+        <div class="tab-pane fade" id="view-user-management-tab" role="tabpanel">
+          <UserManager />
         </div>
       </div>
     </div>
@@ -78,6 +84,7 @@ import EpSystemComparisonChart from "./EpSystemComparisonChart"
 import EpmaStatistics from "./EpmaStatistics"
 import ConfigErrorResults from "./ConfigErrorResults"
 import HighRiskComparison from "./HighRiskComparison"
+import UserManager from "./UserManager"
 
 export default {
   name: 'AdminHome',
@@ -90,7 +97,8 @@ export default {
     EpSystemComparisonChart,
     EpmaStatistics,
     ConfigErrorResults,
-    HighRiskComparison
+    HighRiskComparison,
+    UserManager
   },
   computed: {
     ...mapStores(rootStore),

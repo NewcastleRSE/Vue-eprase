@@ -11,8 +11,6 @@ import AssessmentPatients from "../components/AssessmentPatients"
 import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
 import AssessmentResults from "../components/AssessmentResults"
-import ResetPassword from "../components/ResetPassword"
-import RequestPassword from "../components/RequestPassword"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
 
@@ -59,15 +57,7 @@ export const router = createRouter({
     {
       path: "/assessmentresults/:ID?",
       component: AssessmentResults
-    },
-    {
-      path: "/resetpassword/:token?",
-      component: ResetPassword,
-    },
-    {
-      path: "/requestpassword",
-      component: RequestPassword,
-    },
+    },    
     {
       path: "/adminhome",
       component: AdminHome,
