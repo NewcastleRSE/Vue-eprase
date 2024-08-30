@@ -159,7 +159,7 @@
             <div class="mb-4 row" v-if="results.lab_results === 'true'">
               <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i> Are you able to manually enter laboratory
                 results into your patient admin and/ or e-prescribing test system that you are using to do this
-                assessments? <span class="required-field">*</span></p>
+                assessments?</p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
                   <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
@@ -205,7 +205,7 @@
 
             <div v-if="results.med_history === 'true'" class="mb-4 row">
               <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities
-                into your test system that you are using to do this assessment? <span class="required-field">*</span>
+                into your test system that you are using to do this assessment?
               </p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
@@ -226,6 +226,43 @@
                 </div>
               </div>
             </div>
+
+            <div class="row">
+              <p>Nationally there have been several patient safety incidents relating to mis-recording of Penicillin allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert failure. We are hoping to learn more about contributory factors to this issue with the following two questions.</p>
+              <p class="col-sm-8 fw-bold">When you enter Penicillin in your allergy recording function is Penicillamine a visible drug in your drop-down list? <span class="required-field">*</span>
+              </p>
+              <div class="col-sm-4">
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
+                    id="penicillin-results-yes" value="true">
+                    <input v-bind="field" type="radio" name="penicillin-results" value="true" class="form-check-input"
+                      autocomplete="off">
+                  </Field>
+                  <label class="form-check-label" for="penicillin-results-yes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
+                    id="penicillin-results-no" value="false">
+                    <input v-bind="field" type="radio" name="penicillin-results" value="false" class="form-check-input"
+                      autocomplete="off">
+                  </Field>
+                  <label class="form-check-label" for="penicillin-results-no">No</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to tell us about this issue, please record it here.</label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment" id="penicillin-comment">
+                  <input v-bind="field" type="text" class="form-control" 
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="Information relating to Penicillin and Penicillimine prescribing ">
+                </Field>
+              </div> 
+              <ErrorMessage name="penicillin-comment" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>             
+            </div>
+
 
             <div class="mb-4 row">
               <p class="fw-bold">Is the e-prescribing system used to prescribe the following?</p>
@@ -346,14 +383,19 @@ export default {
         'lab-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
-        'man-results': (value) => {
-          return (this.results.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
-        },
+        // not required responses
+        // 'man-results': (value) => {
+        //   return (this.results.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        // },
         'med-history': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
-        'diagnosis-results': (value) => {
-          return (this.results.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        // not required responses
+        // 'diagnosis-results': (value) => {
+        //   return (this.results.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        // },
+        'penicillin-results': (value) => {
+          return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
         'other-clinical-area': (value) => {
           return this.results.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
@@ -374,6 +416,8 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
+        penicillin_results: '',
+        penicillin_comment: '',
         high_risk_meds: [],
         options: [
           // { text: 'Warfarin', value: 'Warfarin' },
@@ -474,6 +518,8 @@ export default {
           const lab_results = this.results.lab_results
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
+          const penicillin_results = this.results.penicillin_results
+          const penicillin_comment = this.results.penicillin_comment
           const med_history = this.results.med_history
           const high_risk_meds = this.results.high_risk_meds.toString()
           const clinical_areas = this.results.clinical_areas
@@ -481,7 +527,7 @@ export default {
             clinical_areas.push(this.results.other_clinical_area)
           }
           const final_clinical_areas = clinical_areas.toString()
-          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_results, penicillin_comment, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
