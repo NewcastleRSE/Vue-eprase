@@ -257,7 +257,10 @@
                   <input v-bind="field" type="text" class="form-control" 
                     data-bs-toggle="tooltip" data-bs-placement="top" title="Information relating to Penicillin and Penicillimine prescribing ">
                 </Field>
-              </div>              
+              </div> 
+              <ErrorMessage name="penicillin-comment" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>             
             </div>
 
 
