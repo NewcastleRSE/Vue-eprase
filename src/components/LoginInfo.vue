@@ -8,9 +8,17 @@
             <i class="bi me-2" :class="isLoggedIn ? 'bi-person-fill-check' : 'bi-person-fill-x'"></i>{{ isLoggedIn ?
             'Logged in as ' + user : 'Not logged in' }}
           </button>
-          <ul class="dropdown-menu">
+          <ul v-if="! isAdmin" class="dropdown-menu">
             <li>
-              <a class="dropdown-item" href="Javascript:void(0)" @click="menuSelect()">{{ isLoggedIn ? 'Save progress and log out' : 'Log in ' }}</a>
+              <a class="dropdown-item" href="Javascript:void(0)" @click="saveProgress">{{ isLoggedIn ? 'Save progress and log out' : 'Log in ' }}</a>
+            </li>
+          </ul>
+          <ul v-if="isAdmin" class="dropdown-menu">
+            <li v-if="$router.currentRoute.value.path != '/adminhome'">
+              <a class="dropdown-item" href="Javascript:void(0)" @click="$router.push('/adminhome')">Admin Reports Home</a>
+            </li>
+            <li v-if="$router.currentRoute.value.path != '/usermanager'">
+              <a class="dropdown-item" href="Javascript:void(0)" @click="$router.push('/usermanager')">Manage Users</a>
             </li>
           </ul>
         </div>
@@ -33,14 +41,15 @@ export default {
     ExitModal
   },
   computed: {
-    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn']),
+    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn', 'checkIsAdminUser']),
     exitModal() {
       return this.$refs.exitModal
     }
   },
   data() {
     return {
-      loginInfoDd: null
+      loginInfoDd: null,
+      isAdmin: false
     }
   },
   methods: {
@@ -50,16 +59,20 @@ export default {
     toggleDropdownMenu() {
       this.loginInfoDd.toggle()
     },
-    menuSelect() {
+    saveProgress() {
       if (this.isLoggedIn) {
         this.exitModal.show()
       } else {
         this.$router.push('/login')
       }
+    },    
+    async checkAdmin() {
+      this.isAdmin = await (async () => { return await this.checkIsAdminUser() })()
     }
-  },
+  },  
   mounted() {
     this.loginInfoDd = new Dropdown(this.$refs.loginInfoBtn)
+    this.checkAdmin()
   }
 }
 

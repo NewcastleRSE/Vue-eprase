@@ -364,6 +364,9 @@ export default {
     },
     epSystemOptions() {
       return appSettingsStore().epSystemOptions
+    },
+    legalCharacterMatcher() {
+      return /^[A-Za-z0-9-.,_()]+$/
     }
   },
   data() {
@@ -371,34 +374,69 @@ export default {
       validationSchema: {
         'ep-service': 'required',
         'other': (value) => {
-          return (this.results.ep_service == 'Other') ? (value != '' ? true : 'Please give details') : true
+          if (this.results.ep_service == 'Other') {
+            if (!value) {
+              return 'Please give details'
+            } else if (value.length > 255) {
+              return 'Input is restricted to 255 characters'
+            } else if (!value.match(this.legalCharacterMatcher)) {
+              return 'Input contains illegal characters'
+            } else {
+              return true
+            }
+          } else {
+            return true
+          }
+        },
+        'local-ep-system-name': (value) => {
+          if (!value) {
+            return true
+          } else if (value.length > 255) {
+            return 'Input is restricted to 255 characters'
+          } else if (!value.match(this.legalCharacterMatcher)) {
+            return 'Input contains illegal characters'
+          } else {
+            return true
+          }
         },
         'ep-service-implemented': 'required|validMonthYearDateBefore:@ep-service-updated',
         'ep-service-updated': 'required',        
         'num-maintainers': (value) => {
-          const re = new RegExp('^\\d*(\\.\\d)?$')
-          return re.test(value) ? true : 'Should be a number with at most one decimal place'        
+          if (!value || !value.match(/^\d*(\.\d)?$/)) {
+            return 'Should be a number with at most one decimal place'
+          } 
+          return true          
         },
         'ep-usage': 'required',
         'lab-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
-        // not required responses
-        // 'man-results': (value) => {
-        //   return (this.results.lab_results ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
-        // },
+        'man-results': (value) => {
+          return (this.results.lab_results =='true' ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        },
         'med-history': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
-        // not required responses
-        // 'diagnosis-results': (value) => {
-        //   return (this.results.med_history ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
-        // },
+        'diagnosis-results': (value) => {
+          return (this.results.med_history =='true' ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
+        },
         'penicillin-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
         'other-clinical-area': (value) => {
-          return this.results.clinical_areas.includes('Other') ? (value != '' ? true : 'Please give details') : true
+          if (this.results.clinical_areas.includes('Other')) {
+            if (!value) {
+              return 'Please give details'
+            } else if (value.length > 255) {
+              return 'Input is restricted to 255 characters'
+            } else if (!value.match(this.legalCharacterMatcher)) {
+              return 'Input contains illegal characters'
+            } else {
+              return true
+            }
+          } else {
+            return true
+          }
         }
       },
       results: {
