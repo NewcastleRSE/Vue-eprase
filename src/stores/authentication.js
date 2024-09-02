@@ -35,7 +35,7 @@ export const authenticationStore = defineStore('authentication', {
         const user = await axios.post('auth/signin', { username, password })
         const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
         console.debug('User', user, 'institution details', institutionDetails)
-        this.updateUser(user, institutionDetails)
+        this.storeUserData(user, institutionDetails)
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -139,9 +139,9 @@ export const authenticationStore = defineStore('authentication', {
 
       return payload
     },
-    updateUser(user, institution) {
+    storeUserData(user, institution) {
 
-      console.group('updateUser()')
+      console.group('storeUserData()')
       console.debug('User data', user.data, 'institution', institution)
 
       const csPayload = {
@@ -178,21 +178,29 @@ export const authenticationStore = defineStore('authentication', {
         this.triageError(err)
       }
     },
-    async updateUserPassword(id, password, confirmPassword) {
+    async updateUser(id, email, password, enable, institution_id) {
       try {
-        const res = await axios.post('auth/updatePassword', { id, password, confirmPassword }, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        const res = await axios.post('auth/updateUser', 
+          { id, email, password, enable, institution_id }, 
+          { headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'multipart/form-data' } }
+        )
         return { status: res.status, data: res.data }
       } catch (err) {
         this.triageError(err)
       }
     },
-    async enableUser(id, enable) {
+    async deleteUser(id) {
       try {
-        const res = await axios.post('auth/enableUser', { id, enable }, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        const res = await axios.delete('auth/deleteUser', { id }, 
+          { headers: { 'Authorization': 'Bearer ' + this.token } }
+        )
         return { status: res.status, data: res.data }
       } catch (err) {
         this.triageError(err)
       }
+    },
+    isValidNHSEmail(value) {
+      value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
     }
   }
 })

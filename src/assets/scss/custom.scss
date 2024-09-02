@@ -66,6 +66,17 @@ li {
 a {
     color: $dark;
     text-decoration: none;
+    cursor: pointer;
+}
+
+a:disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
+
+a.disabled {
+  cursor: not-allowed !important;
+  pointer-events: all !important;
 }
 
 .pills-banner img {
@@ -110,4 +121,8 @@ span.note {
 
 ul.dropdown-menu {
   width: 100%;
+}
+
+ul.dropdown-menu li {
+  display: block;
 }
