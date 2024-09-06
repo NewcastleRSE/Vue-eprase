@@ -1,5 +1,5 @@
 <template>
-  <GenericModal :modalName="'ConfirmDeleteModal'" :modalId="'confirmDeleteModal'" :title="'Confirm delete'"
+  <GenericModal :modalName="'ConfirmDeleteModal'" :modalId="'confirmDeleteModal'" :title="'Confirm delete?'"
     :actionBtnText="'Yes'" :actionBtnCls="'btn-danger'" :closeBtnText="'No'">
     Records deleted cannot be recovered
   </GenericModal>

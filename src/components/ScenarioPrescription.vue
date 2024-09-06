@@ -338,7 +338,7 @@ export default {
         'High': {
           'no-intervention': 'No Mitigation/Fail',
           'order-prevented': 'Over Mitigation',
-          'order-set-overridden': 'Good Mitigation/Pass',
+          'order-set-overridden': 'Some Mitigation',
           'intervention': 'Good Mitigation/Pass'
         },
         'Low': {

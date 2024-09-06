@@ -24,6 +24,8 @@ $nav-tabs-link-hover-border-color: $primary;
 $nav-tabs-link-active-bg: $primary;
 $nav-tabs-link-active-color: white;
 $nav-link-font-weight: "bold";
+/* Better padding for dropdown items */
+$dropdown-item-padding-x: 0.5rem;
 
 /* Webpack magic - see https://github.com/alexanderweigelt/ExportSassVarsToJS */
 :export {

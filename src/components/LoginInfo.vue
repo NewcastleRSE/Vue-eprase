@@ -10,7 +10,7 @@
           </button>
           <ul v-if="! isAdmin" class="dropdown-menu">
             <li>
-              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress and log out' : 'Log in ' }}</a>
+              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress &amp; log out' : 'Log in ' }}</a>
             </li>
           </ul>
           <ul v-if="isAdmin" class="dropdown-menu">

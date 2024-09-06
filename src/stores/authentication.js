@@ -191,8 +191,8 @@ export const authenticationStore = defineStore('authentication', {
     },
     async deleteUser(id) {
       try {
-        const res = await axios.delete('auth/deleteUser', { id }, 
-          { headers: { 'Authorization': 'Bearer ' + this.token } }
+        const res = await axios.delete('auth/deleteUser', 
+          { headers: { 'Authorization': 'Bearer ' + this.token }, params: { id: id } }
         )
         return { status: res.status, data: res.data }
       } catch (err) {
