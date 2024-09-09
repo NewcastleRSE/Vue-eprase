@@ -366,7 +366,7 @@ export default {
       return appSettingsStore().epSystemOptions
     },
     legalCharacterMatcher() {
-      return /^[A-Za-z0-9-.,_()]+$/
+      return /^[A-Za-z0-9-.,_() ]+$/
     }
   },
   data() {
