@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const appSettingsStore = defineStore('appSettings', {
   state: () => {
     return {
-      version: '2.5.3',
+      version: '3.0.0',
       debugMode: false,
       appOpen: true,
       year: new Date().getFullYear(),     
@@ -11,7 +11,7 @@ export const appSettingsStore = defineStore('appSettings', {
       passwordMaxLength: 50,
       assessmentNumPatients: 15,
       numConfigError: 5,
-      numPrescriptions: 50,
+      numPrescriptions: 45,
       epSystemOptions: [
         { value: 'Altera (Sunrise, Allscripts)', text: 'Altera (Sunrise, Allscripts)' },
         { value: 'Better', text: 'Better' },

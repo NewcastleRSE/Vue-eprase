@@ -109,7 +109,7 @@
                 <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector">
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                    <option value="" disabled>Select Percentage...</option>
+                    <option value="" disabled>Select percentage...</option>
                     <option value="76-100">76-100%</option>
                     <option value="51-75">51-75%</option>
                     <option value="26-50">26-50%</option>
@@ -228,8 +228,29 @@
             </div>
 
             <div class="row">
-              <p>Nationally there have been several patient safety incidents relating to mis-recording of Penicillin allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert failure. We are hoping to learn more about contributory factors to this issue with the following two questions.</p>
-              <p class="col-sm-8 fw-bold">When you enter Penicillin in your allergy recording function is Penicillamine a visible drug in your drop-down list? <span class="required-field">*</span>
+              <p>Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert failure. We are hoping to learn more about contributory factors to this issue with the following three questions.</p>
+              
+              <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label fw-bold" for="penicillin-selector">How do you describe Penicillin V in your system?<span
+                  class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.penicillin_description" name="penicillin-description" id="penicillin-selector">
+                  <select v-bind="field" class="form-select"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Select description...</option>
+                    <option value="penicillin_v">Penicillin V</option>
+                    <option value="phenoxymethylpenicillin">Phenoxymethylpenicillin</option>
+                    <option value="phenoxymethylpenicillin_tablets">Phenoxymethylpenicillin 250mg Tablets</option>
+                    <option value="other">Other</option>
+                  </select>
+                </Field>
+              </div>
+              <ErrorMessage name="penicillin-description" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div>
+              
+              <p class="col-sm-8 fw-bold">Thinking about when you enter Penicill (exactly as stated) in your allergy recording function is Penicillamine visible as an option to select? <span class="required-field">*</span>
               </p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
@@ -251,7 +272,7 @@
               </div>
             </div>
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to tell us about this issue, please record it here.</label>
+              <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to tell us about this issue in your organisation, please record it here.</label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment" id="penicillin-comment">
                   <input v-bind="field" type="text" class="form-control" 
@@ -454,6 +475,7 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
+        penicillin_description: '',
         penicillin_results: '',
         penicillin_comment: '',
         high_risk_meds: [],
@@ -556,6 +578,7 @@ export default {
           const lab_results = this.results.lab_results
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
+          const penicillin_description = this.results.penicillin_description
           const penicillin_results = this.results.penicillin_results
           const penicillin_comment = this.results.penicillin_comment
           const med_history = this.results.med_history
@@ -565,7 +588,7 @@ export default {
             clinical_areas.push(this.results.other_clinical_area)
           }
           const final_clinical_areas = clinical_areas.toString()
-          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_results, penicillin_comment, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_description, penicillin_results, penicillin_comment, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
