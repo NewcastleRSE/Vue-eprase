@@ -37,7 +37,7 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
-          <h4>System Overall Mitigation Result</h4>
+          <h4>Overall risk mitigation performance results</h4>
           <div class="row">
             <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
               :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
@@ -165,12 +165,13 @@
           </div>
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <h4>Clinical Decision Support Category - Mitigation Results</h4>
+          <h4>Overview of mitigation scores within clinical decision support (CDS) categories</h4>
           <div class="row">
             <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
           </div>
           <div class="row">
-            Explanation of what chart shows - details to follow...
+            The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
+            This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
           </div>
         </div>
 

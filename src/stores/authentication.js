@@ -35,7 +35,7 @@ export const authenticationStore = defineStore('authentication', {
         const user = await axios.post('auth/signin', { username, password })
         const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
         console.debug('User', user, 'institution details', institutionDetails)
-        this.updateUser(user, institutionDetails)
+        this.storeUserData(user, institutionDetails)
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -139,9 +139,9 @@ export const authenticationStore = defineStore('authentication', {
 
       return payload
     },
-    updateUser(user, institution) {
+    storeUserData(user, institution) {
 
-      console.group('updateUser()')
+      console.group('storeUserData()')
       console.debug('User data', user.data, 'institution', institution)
 
       const csPayload = {
@@ -160,22 +160,47 @@ export const authenticationStore = defineStore('authentication', {
 
       console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
       console.groupEnd()
-    },    
-    async requestNewPassword(email) {
+    },
+    // User management methods, only accessible to an admin
+    async findUsers(identifier, institution_id) {
       try {
-        const res = await axios.post('auth/newPassword', { email })
-        console.error('Not implemented!')
+        const params = new URLSearchParams()
+        if (identifier) {
+          params.set('identifier', identifier)
+        }
+        if (institution_id) {
+          params.set('institution_id', institution_id)
+        }
+        const query = params.toString()
+        const res = await axios.get('auth/findUsers?' + query, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        return { status: res.status, data: res.data }
       } catch (err) {
-        console.error('authentication/requestNewPassword : the following error occurred', err)
+        this.triageError(err)
       }
     },
-    async resetPassword(password, token) {
+    async updateUser(id, email, password, enable, institution_id) {
       try {
-        const res = await axios.post('auth/resetPassword?token=' + token, { password })
-        console.error('Not implemented!')
+        const res = await axios.post('auth/updateUser', 
+          { id, email, password, enable, institution_id }, 
+          { headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'multipart/form-data' } }
+        )
+        return { status: res.status, data: res.data }
       } catch (err) {
-        console.error('authentication/requestNewPassword : the following error occurred', err)
+        this.triageError(err)
       }
+    },
+    async deleteUser(id) {
+      try {
+        const res = await axios.delete('auth/deleteUser', 
+          { headers: { 'Authorization': 'Bearer ' + this.token }, params: { id: id } }
+        )
+        return { status: res.status, data: res.data }
+      } catch (err) {
+        this.triageError(err)
+      }
+    },
+    isValidNHSEmail(value) {
+      value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
     }
   }
 })

@@ -269,6 +269,7 @@ export default {
       console.group('prevPatient()')
       
       if (this.patientIndex > 0) {
+        this.patientQualData = ''
         this.patient = this.patientList[--this.patientIndex]
         console.debug('Now viewing patient', this.patientIndex)
       }      
@@ -307,6 +308,7 @@ export default {
             // On to the next one
             this.nextUnsaved++
             this.patient = this.patientList[++this.patientIndex]
+            this.patientQualData = ''
             console.debug('Advanced to', this.patientIndex, 'now processed', this.nextUnsaved)
           }
         } else {

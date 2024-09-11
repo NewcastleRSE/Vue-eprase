@@ -156,7 +156,12 @@ export default {
               this.$router.push('/login')
             } else {
               console.debug('Setting errors...')
-              const message = response.message == 'email-taken' ? 'This email address is already in use' : response.message
+              let message = response.message
+              if (response.message == 'too-many-users') {
+                message = 'Maximum quota of users (4) exceeded for this organisation'
+              } else if (response.message == 'email-taken') {
+                message = 'This email address is already in use'
+              }
               this.$refs.regForm.setFieldError('email', message)
             }
           } catch (err) {

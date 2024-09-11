@@ -2,19 +2,11 @@
   <GenericModal :modalName="'ContactModal'" :modalId="'contactModal'" :title="'Contacts for ePRaSE'"
     :closeBtnText="'Close'">
     <p> Contacts for the ePrase project are:</p>
-    <ul class="list-group">
+    <ul class="list-group">      
       <li class="list-group-item">
         <i class="bi bi-envelope pe-2"></i>
-        rseteam@newcastle.ac.uk (for technical queries relating to the tool website)
-      </li>
-      <li class="list-group-item">
-        <i class="bi bi-envelope pe-2"></i>
-        stephanie.klein@nhs.net
-      </li>
-      <li class="list-group-item">
-        <i class="bi bi-envelope pe-2"></i>
-        jude.heed@newcastle.ac.uk
-      </li>
+        nuth.eprase@nhs.net
+      </li>     
     </ul>
   </GenericModal>
 </template>

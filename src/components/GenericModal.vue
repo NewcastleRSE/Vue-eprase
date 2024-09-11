@@ -11,9 +11,9 @@
           <slot></slot>
         </div>
         <div class="modal-footer">
-          <button v-if="showActionBtn" type="button" class="btn btn-primary" data-bs-dismiss="modal"
+          <button v-if="showActionBtn" type="button" class="btn" :class="actionBtnCls" data-bs-dismiss="modal"
             @click="$emit('modalActioned')">{{ actionBtnText }}</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="$emit('modalClosed')">{{
+          <button type="button" class="btn" :class="closeBtnCls" data-bs-dismiss="modal" @click="$emit('modalClosed')">{{
             closeBtnText }}</button>
         </div>
       </div>
@@ -32,8 +32,22 @@ export default {
     modalId: '',
     title: '',
     showActionBtn: false,
-    actionBtnText: 'Ok',
-    closeBtnText: 'Close'
+    actionBtnText: { 
+      type: String,
+      default: 'Ok'
+    },
+    actionBtnCls: {
+      type: String,
+      default: 'btn-primary'
+    },
+    closeBtnText: {
+      type: String,
+      default: 'Close'
+    },
+    closeBtnCls: {
+      type: String,
+      default: 'btn-secondary'
+    }
   }
 }
 </script>
