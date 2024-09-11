@@ -11,7 +11,7 @@ export const appSettingsStore = defineStore('appSettings', {
       passwordMaxLength: 50,
       assessmentNumPatients: 15,
       numConfigError: 5,
-      numPrescriptions: 50,
+      numPrescriptions: 45,
       epSystemOptions: [
         { value: 'Altera (Sunrise, Allscripts)', text: 'Altera (Sunrise, Allscripts)' },
         { value: 'Better', text: 'Better' },
