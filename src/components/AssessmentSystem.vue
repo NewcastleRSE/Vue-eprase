@@ -234,7 +234,7 @@
               <label class="col-sm-8 col-form-label fw-bold" for="penicillin-selector">How do you describe Penicillin V in your system?<span
                   class="required-field">*</span></label>
               <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.penicillin_desc" name="penicillin-desc" id="penicillin-selector">
+                <Field v-slot="{ field, meta }" v-model="results.penicillin_description" name="penicillin-description" id="penicillin-selector">
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Select description...</option>
@@ -245,12 +245,12 @@
                   </select>
                 </Field>
               </div>
-              <ErrorMessage name="penicillin_desc" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+              <ErrorMessage name="penicillin-description" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
                 {{ message }}
               </ErrorMessage>
             </div>
               
-              <p class="col-sm-8 fw-bold">When you enter Penicillin in your allergy recording function is Penicillamine a visible drug in your drop-down list? <span class="required-field">*</span>
+              <p class="col-sm-8 fw-bold">Thinking about when you enter Penicill (exactly as stated) in your allergy recording function is Penicillamine visible as an option to select? <span class="required-field">*</span>
               </p>
               <div class="col-sm-4">
                 <div class="form-check form-check-inline">
@@ -272,7 +272,7 @@
               </div>
             </div>
             <div class="mb-4 row">
-              <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to tell us about this issue, please record it here.</label>
+              <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to tell us about this issue in your organisation, please record it here.</label>
               <div class="col-sm-4">
                 <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment" id="penicillin-comment">
                   <input v-bind="field" type="text" class="form-control" 
