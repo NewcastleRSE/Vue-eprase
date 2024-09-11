@@ -475,6 +475,7 @@ export default {
         med_history: '',
         man_results: '',
         diagnosis_results: '',
+        penicillin_description: '',
         penicillin_results: '',
         penicillin_comment: '',
         high_risk_meds: [],
@@ -577,6 +578,7 @@ export default {
           const lab_results = this.results.lab_results
           const man_results = this.results.man_results
           const diagnosis_results = this.results.diagnosis_results
+          const penicillin_description = this.results.penicillin_description
           const penicillin_results = this.results.penicillin_results
           const penicillin_comment = this.results.penicillin_comment
           const med_history = this.results.med_history
@@ -586,7 +588,7 @@ export default {
             clinical_areas.push(this.results.other_clinical_area)
           }
           const final_clinical_areas = clinical_areas.toString()
-          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_results, penicillin_comment, med_history, high_risk_meds, final_clinical_areas, time_taken)
+          const response = await rootStore().saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_description, penicillin_results, penicillin_comment, med_history, high_risk_meds, final_clinical_areas, time_taken)
           if (response.status < 400) {
             rootStore().audit('Save system data', '/assessmentSystem')
             this.$router.push('/assessmentpatients/' + patient_type)
