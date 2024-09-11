@@ -109,7 +109,7 @@
                 <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector">
                   <select v-bind="field" class="form-select"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                    <option value="" disabled>Select Percentage...</option>
+                    <option value="" disabled>Select percentage...</option>
                     <option value="76-100">76-100%</option>
                     <option value="51-75">51-75%</option>
                     <option value="26-50">26-50%</option>
@@ -228,7 +228,28 @@
             </div>
 
             <div class="row">
-              <p>Nationally there have been several patient safety incidents relating to mis-recording of Penicillin allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert failure. We are hoping to learn more about contributory factors to this issue with the following two questions.</p>
+              <p>Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert failure. We are hoping to learn more about contributory factors to this issue with the following three questions.</p>
+              
+              <div class="mb-4 row">
+              <label class="col-sm-8 col-form-label fw-bold" for="penicillin-selector">How do you describe Penicillin V in your system?<span
+                  class="required-field">*</span></label>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.penicillin_desc" name="penicillin-desc" id="penicillin-selector">
+                  <select v-bind="field" class="form-select"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                    <option value="" disabled>Select description...</option>
+                    <option value="penicillin_v">Penicillin V</option>
+                    <option value="phenoxymethylpenicillin">Phenoxymethylpenicillin</option>
+                    <option value="phenoxymethylpenicillin_tablets">Phenoxymethylpenicillin 250mg Tablets</option>
+                    <option value="other">Other</option>
+                  </select>
+                </Field>
+              </div>
+              <ErrorMessage name="penicillin_desc" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
+                {{ message }}
+              </ErrorMessage>
+            </div>
+              
               <p class="col-sm-8 fw-bold">When you enter Penicillin in your allergy recording function is Penicillamine a visible drug in your drop-down list? <span class="required-field">*</span>
               </p>
               <div class="col-sm-4">
