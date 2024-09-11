@@ -341,7 +341,8 @@ export default {
           'order-set-overridden': 'Some Mitigation',
           'intervention': 'Good Mitigation/Pass'
         },
-        'Low': {
+        // alias for Low risk
+        'N/A': {
           'no-intervention': 'Good Mitigation/Pass',
           'order-prevented': 'Over Mitigation',
           'order-set-overridden': 'Over Mitigation',
