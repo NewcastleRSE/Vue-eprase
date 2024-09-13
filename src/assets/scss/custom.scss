@@ -126,3 +126,19 @@ ul.dropdown-menu {
 ul.dropdown-menu li {
   display: block;
 }
+
+td.no-mitigation {
+  background-color: $danger;
+}
+
+td.good-mitigation {
+  background-color: $success;
+}
+
+td.some-mitigation {
+  background-color: $warning;
+}
+
+td.over-mitigation {
+  background-color: $info;
+}

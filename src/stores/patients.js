@@ -231,32 +231,34 @@ export const patientStore = defineStore('patients', {
       const poolOfType = type == 'Both' ? this.patientPool : this.patientPool.filter(p => (type == 'Adults' && p.is_adult))
       const requiredPatients = this[typeToLsMapping[type]] || []
       patientList = requiredPatients.map(p => ({...p}))
-      console.debug('Required patient list', patientList)
+      console.debug('Required patient codes', patientList.map(p => p.code))
 
-      let added = {}
-      patientList.forEach(p => added[p.id] = true)
+      // Initialise the pool of ids 
+      let availablePatients = poolOfType.filter(avp => !patientList.map(p => p.code).includes(avp.code))
+      console.debug('Initial pool of available patient codes', availablePatients.map(p => p.code))
+
       while(patientList.length < requiredLength) {
-        const patient = poolOfType.shift()
-        if (!added[patient.id]) {
-          patientList.push(patient)
-          added[patient.id] = true
-        }
+        const patient = availablePatients[Math.floor(Math.random() * availablePatients.length)]
+        console.debug('Chosen patient with code', patient.code)
+        patientList.push(patient)
+        availablePatients = availablePatients.filter(p => p.code != patient.code)
+        console.debug('Updated pool of available patient codes', availablePatients.map(p => p.code))
       }      
       this.shuffle(patientList)
 
-      console.debug('Return', patientList)
+      console.debug('Return final patient code list', patientList.map(p => p.code))
       console.groupEnd()
 
       return patientList
     },
     shuffle(a) {
       // Durstenfeld shuffle in-place - see https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-      console.dir('List before shuffle', a)
+      console.debug('List before shuffle', a)
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
       }
-      console.dir('List after shuffle', a)
+      console.debug('List after shuffle', a)
     },
     formatPatientData(patient) {
       return Object.assign({}, patient, {

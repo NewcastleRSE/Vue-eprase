@@ -83,7 +83,7 @@
                   <tr v-if="patient.medication_histories.length != 0">
                     <th>Name</th>
                     <th>Dose</th>
-                    <th>Form/route</th>
+                    <th>Route</th>
                     <th>Form</th>
                     <th>Frequency</th>                   
                   </tr>

@@ -27,7 +27,7 @@
           <tr>
             <th>Drug</th>
             <th>Dose</th>
-            <th>Route</th>
+            <th>Form / route</th>
             <th>Frequency</th>
             <th>Duration</th>
             <th>Indication</th>
@@ -320,9 +320,9 @@ export default {
           }
           return true
         },
-        'patient-intervention': (value) => {
-          return this.response.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
-        }
+        // 'patient-intervention': (value) => {
+        //   return this.response.outcomes == 'intervention' ? (value ? true : 'Please give more details of system response') : true
+        // }
       }
     }
   },

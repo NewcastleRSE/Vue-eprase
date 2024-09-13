@@ -155,8 +155,8 @@
                     </td>
                     <td>
                       <span v-if="test.result == 2">Question not applicable</span>
-                      <span v-if="test.result == test.good_answer">This is good system behaviour</span>
-                      <span v-if="test.result == ! test.good_answer">This is undesirable system behaviour</span>                                            
+                      <span v-if="test.result == test.good_answer">{{ test.good_answer_response }}</span>
+                      <span v-if="test.result == ! test.good_answer">{{ test.undesirable_answer_response }}</span>                                            
                     </td>
                   </tr>
                 </tbody>
@@ -169,9 +169,56 @@
           <div class="row">
             <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
           </div>
-          <div class="row">
+          <div class="row mb-4">
             The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
             This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
+          </div>
+          <div class="row">
+            <p>
+              Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
+              The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
+            </p>
+            <table class="table w-50">
+              <thead>
+                <tr>
+                  <th>
+                    <div class="d-flex">
+                      <div class="p-2 flex-fill">Prescribing User scenarios recorded risk level system response <i class="bi bi-caret-down-fill fs-4"></i></div>
+                      <div class="p-2 flex-fill">Prescribing scenarios risk level <i class="bi bi-caret-right-fill fs-4"></i></div>
+                    </div>
+                  </th>
+                  <th>Extreme risk</th>
+                  <th>High risk</th>
+                  <th>Low / no risk (control)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed with no-intervention</span></td>
+                  <td class="no-mitigation">No Mitigation</td>
+                  <td class="no-mitigation">No Mitigation</td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription order-prevented</span></td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed, but user had to override 'order-set / order sentence'</span></td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed, with system/ user intervention such as alerts or advisory pop-ups</span></td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -411,6 +458,8 @@ export default {
             if (cdDataResponse.status < 400) {
               cd.question = cdDataResponse.data.description
               cd.good_answer = cdDataResponse.data.good_answer
+              cd.good_answer_response = cdDataResponse.data.good_answer_response
+              cd.undesirable_answer_response = cdDataResponse.data.undesirable_answer_response
             } else {
               // Pretty minor - don't bomb the whole thing for this
               cd.question = cdDataResponse.message
