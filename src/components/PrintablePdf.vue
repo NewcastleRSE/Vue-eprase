@@ -1,6 +1,6 @@
 <template>
-  <main>
-    <div ref="printableReportHeading"></div>
+  <main class="leftalign p-4">
+    <div class="centered-heading" ref="printableReportHeading"></div>
     <div ref="printableReportContainer" id="printableReportContainer"></div>
     <button type="button" class="btn btn-primary m-1" @click="printablePdfHandler">
       <i class="bi bi-printer-fill pe-1"></i>{{ buttonCaption }}
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     printablePdfHandler() {      
-      PrintJS({ printable: 'printableReportContainer', type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 2000 })
+      PrintJS({ printable: 'printableReportContainer', type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 4096 })
     }
   },
   mounted( ){

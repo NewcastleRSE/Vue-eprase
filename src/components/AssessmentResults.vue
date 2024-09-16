@@ -7,9 +7,8 @@
 
       <LoginInfo />
 
-      <h3>Assessment Report</h3>
-
-      <div id="reportHeading">
+      <div id="reportHeading" class="centered-heading">
+        <h3>Assessment Report</h3>
         <h4><span class="fw-bold me-2">Institution:</span><span class="fw-normal">{{ institution }}</span></h4>
         <h4><span class="fw-bold me-2">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system
             }}</span></h4>
@@ -170,23 +169,25 @@
             <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
           </div>
           <div class="row mb-4">
-            The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
-            This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
+            <p>
+              The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
+              This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
+            </p>            
           </div>
-          <div class="row">
+          <div class="row mb-4" style="page-break-before:always">
             <p>
               Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
               The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
             </p>
-            <table class="table w-50">
+            <img class="img-fluid" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
+            <!-- <table class="table w-75">
               <thead>
                 <tr>
-                  <th>
-                    <div class="d-flex">
-                      <div class="p-2 flex-fill">Prescribing User scenarios recorded risk level system response <i class="bi bi-caret-down-fill fs-4"></i></div>
-                      <div class="p-2 flex-fill">Prescribing scenarios risk level <i class="bi bi-caret-right-fill fs-4"></i></div>
-                    </div>
-                  </th>
+                  <th class="bg-info-subtle align-content-center">Prescribing User scenarios recorded risk level system response</th>
+                  <th  class="bg-warning-subtle align-content-center" colspan="3">Prescribing scenarios risk level</th>
+                </tr>
+                <tr>
+                  <th>&nbsp;</th>
                   <th>Extreme risk</th>
                   <th>High risk</th>
                   <th>Low / no risk (control)</th>
@@ -218,7 +219,7 @@
                   <td class="over-mitigation">Over Mitigation</td>
                 </tr>
               </tbody>
-            </table>
+            </table> -->
           </div>
         </div>
 

@@ -31,6 +31,13 @@ body {
   padding: 2rem;
 }
 
+div.centered-heading {
+  margin: auto auto auto auto;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
 div.modal-backdrop {
   display: none;
 }
