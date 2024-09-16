@@ -33,10 +33,31 @@ export default {
 
       Plotly.newPlot(this.$refs.stackedChartContainer, this.mydata, {
         barmode: 'stack',
-        width: 900,
-        height: 700,
+        width: 1280,
+        height: 800,
+        showlegend: true,
+        legend: {
+          entrywidth: 400
+        },
         // https://stackoverflow.com/questions/36596947/long-tick-labels-getting-cut-off-in-plotly-js-chart
+        xaxis: {
+          title: {
+            text: 'Tests completed (%)',
+            font: {
+              size: 16,
+              weight: 700
+            }  
+          }                  
+        },
         yaxis: {
+          title: {
+            text: 'CDS Category',
+            standoff: 50,
+            font: {
+              size: 16,
+              weight: 700
+            }  
+          },        
           automargin: true
         }
       }, {displayModeBar: false})

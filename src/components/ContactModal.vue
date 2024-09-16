@@ -1,15 +1,13 @@
 <template>
   <GenericModal :modalName="'ContactModal'" :modalId="'contactModal'" :title="'Contact email for ePRaSE'"
     :closeBtnText="'Close'">
-    <p> Contact for the ePrase project is via email only. Eprase is a reseach project, please allow up to 2 working days for a response.</p>
+    <p> Contact for the ePRaSE project is via email only. ePRaSE is a research project, please allow up to 2 working days for a response.</p>
     <ul class="list-group">      
       <li class="list-group-item">
         <i class="bi bi-envelope pe-2"></i>
         nuth.eprase@nhs.net
       </li>     
     </ul>
-
-  
   </GenericModal>
 </template>
 

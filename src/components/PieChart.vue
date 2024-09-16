@@ -62,8 +62,8 @@ export default {
         },
         type: 'pie'
       }], {
-        width: 900,
-        height: 500
+        width: 1100,
+        height: 600
       }, {displayModeBar: false})
 
       console.groupEnd()
