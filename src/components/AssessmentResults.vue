@@ -36,12 +36,13 @@
 
       <div class="tab-content">
         <div class="tab-pane fade show active" id="view-pie-chart-tab" role="tabpanel">
-          <h4>Overall risk mitigation performance results</h4>
+          <h4 class="fw-bold mt-4" style="display: flex; justify-content: center">Overall risk mitigation performance results</h4>
           <div class="row">
             <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
               :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
           </div>
-          <div class="row">
+          <!-- Commented out 20/09/2024 David - no longer required -->
+          <!-- <div class="row">
             <table class="table">
               <thead>
                 <tr>
@@ -68,6 +69,54 @@
                 </tr>
               </tbody>
             </table>
+          </div> -->
+          <div class="row mb-4" style="page-break-before:always">
+            <p>
+              Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
+              The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
+            </p>
+            <img class="img-fluid" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
+            <!-- Old table-based version - fails to reproduce background colours in printed version so replaced by image above 16/09/2024 -->
+            <!-- <table class="table w-75">
+              <thead>
+                <tr>
+                  <th class="bg-info-subtle align-content-center">Prescribing User scenarios recorded risk level system response</th>
+                  <th  class="bg-warning-subtle align-content-center" colspan="3">Prescribing scenarios risk level</th>
+                </tr>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>Extreme risk</th>
+                  <th>High risk</th>
+                  <th>Low / no risk (control)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed with no-intervention</span></td>
+                  <td class="no-mitigation">No Mitigation</td>
+                  <td class="no-mitigation">No Mitigation</td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription order-prevented</span></td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed, but user had to override 'order-set / order sentence'</span></td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+                <tr>
+                  <td><span class="fw-bold">Prescription completed, with system/ user intervention such as alerts or advisory pop-ups</span></td>
+                  <td class="some-mitigation">Some Mitigation</td>
+                  <td class="good-mitigation">Good Mitigation</td>
+                  <td class="over-mitigation">Over Mitigation</td>
+                </tr>
+              </tbody>
+            </table> -->
           </div>
         </div>
         <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">          
@@ -164,7 +213,7 @@
           </div>
         </div>
         <div class="tab-pane fade" id="view-stacked-chart-tab" role="tabpanel">
-          <h4>Overview of mitigation scores within clinical decision support (CDS) categories</h4>
+          <!-- <h4>Overview of mitigation scores within clinical decision support (CDS) categories</h4> -->
           <div class="row">
             <StackedChart :dataLoading="!stackedDataComplete" :mydata="chartCategoryData" :heading="getHeading()" />
           </div>
@@ -173,54 +222,7 @@
               The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
               This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
             </p>            
-          </div>
-          <div class="row mb-4" style="page-break-before:always">
-            <p>
-              Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
-              The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
-            </p>
-            <img class="img-fluid" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
-            <!-- <table class="table w-75">
-              <thead>
-                <tr>
-                  <th class="bg-info-subtle align-content-center">Prescribing User scenarios recorded risk level system response</th>
-                  <th  class="bg-warning-subtle align-content-center" colspan="3">Prescribing scenarios risk level</th>
-                </tr>
-                <tr>
-                  <th>&nbsp;</th>
-                  <th>Extreme risk</th>
-                  <th>High risk</th>
-                  <th>Low / no risk (control)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed with no-intervention</span></td>
-                  <td class="no-mitigation">No Mitigation</td>
-                  <td class="no-mitigation">No Mitigation</td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription order-prevented</span></td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed, but user had to override 'order-set / order sentence'</span></td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed, with system/ user intervention such as alerts or advisory pop-ups</span></td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-              </tbody>
-            </table> -->
-          </div>
+          </div>          
         </div>
 
       </div>

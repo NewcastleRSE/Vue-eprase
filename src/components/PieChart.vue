@@ -50,7 +50,7 @@ export default {
 
       console.group('PieChart - renderChart()')
 
-      Plotly.newPlot(this.$refs.pieChartContainer, [{
+      const piePlot = Plotly.newPlot(this.$refs.pieChartContainer, [{
         values: [
           this.roundedGood, this.roundedSome, this.roundedNot, this.roundedOver, this.roundedNull
         ],
@@ -59,12 +59,22 @@ export default {
         ],
         marker: {
           colors: [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
-        },
+        },        
         type: 'pie'
       }], {
-        width: 1100,
+        width: 1200,
         height: 600
       }, {displayModeBar: false})
+
+      this.$refs.pieChartContainer.on('plotly_afterplot', () => {
+        // Desperate attempt to get round the plotly legend label cutoff problem - see final contribution at
+        // https://community.plotly.com/t/legend-text-is-being-truncated-cut-off/41207/9
+        this.$refs.pieChartContainer.querySelectorAll('g.traces').forEach(entry => {         
+          entry.setAttribute('transform', entry.getAttribute('transform').replace('(0', '(-25'))
+          // Adjust the swatch
+          entry.querySelector('path.legendpie').setAttribute('transform', 'translate(30,0)')
+        })
+      })
 
       console.groupEnd()
     }
