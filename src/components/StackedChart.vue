@@ -31,7 +31,9 @@ export default {
 
       console.group('StackedChart - renderChart()')
 
-      Plotly.newPlot(this.$refs.stackedChartContainer, this.mydata, {
+      const plotDiv = this.$refs.stackedChartContainer
+
+      Plotly.newPlot(plotDiv, this.mydata, {
         barmode: 'stack',
         width: 1280,
         height: 800,
@@ -68,6 +70,21 @@ export default {
           automargin: true
         }
       }, {displayModeBar: false})
+
+      // Disable nonsense events clicking on the legend
+      plotDiv.on('plotly_legendclick', () => { return false })
+      plotDiv.on('plotly_legenddoubleclick', () => { return false })
+
+      plotDiv.on('plotly_afterplot', () => {
+        // Desperate attempt to get round the plotly legend label cutoff problem - see final contribution at
+        // https://community.plotly.com/t/legend-text-is-being-truncated-cut-off/41207/9
+        plotDiv.querySelectorAll('g.traces').forEach(entry => {
+          console.debug(entry.getAttribute('transform'))         
+          entry.setAttribute('transform', entry.getAttribute('transform').replace('(0', '(-25'))
+          // Adjust the swatch
+          entry.querySelector('path.legendundefined').setAttribute('transform', 'translate(30,0)')
+        })
+      })
        
       console.groupEnd()
     }
