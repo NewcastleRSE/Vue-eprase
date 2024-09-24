@@ -53,7 +53,7 @@ Once all this is done, you should be sent a certificate via an email with an att
 
 IMPORTANT - you will get a temporary cert first, the full cert will be sent inside an email as shown below. Unzip into a suitable folder - it contains multiple files. The .crt file within the zip archive is your cert. You may get emailed an intermediate and full certificate. SSL2buy have an excellent online chat line if you hit difficulties with this process. They will liaise with Sectigo.
 
-![Sectigo email](/readme-images/full-cert.png)
+![Sectigo email](/readme-images/Full-cert.png)
 
 Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. Navigate to the directory where your .crt file is located and connect to the server using sftp.
 
