@@ -6,7 +6,7 @@
       complete. Once the assessment is complete, you will be able to view your results.</p>
     <div class="instructions">
       <h4>Step 1: Enter Patient Information</h4>
-      <p>You will be asked to admit the test patients into your ePrescription system.</p>
+      <p>You will be asked to admit the test patients into your ePrescribing system.</p>
     </div>
     <div class="instructions">
       <h4>Step 2: Prescribe Medication</h4>

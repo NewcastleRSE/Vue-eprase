@@ -4,7 +4,7 @@
     <div class="pb-3">
       <h1>Welcome to ePRaSE 2024</h1>
       <p class="service-description mx-auto">
-        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescription systems,
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
       <div class="py-4" v-if="appOpen">
