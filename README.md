@@ -204,34 +204,6 @@ This last action rebuilds the app with the environment variable APP_OPEN=false. 
 
 ## SSL cert renewal
 
-SSL certificates are bought through [https://www.ssl2buy.com/](https://www.ssl2buy.com/) and need to be renewed at regular intervals. When a certificate expires SSL2buy will send an email with a link incorporating a unique pin. This can be used to login to the SSL wizard.
+SSL certificates are bought through [https://www.ssl2buy.com/](https://www.ssl2buy.com/) and need to be renewed at regular intervals. When a certificate expires SSL2buy will send an email with a link incorporating a unique pin. This can be used to login to the SSL wizard. Ask Mark Turner or Becky Osselton for the login credentials.
 
-Firstly a Certificate Signing Request (CSR) file must be created on the server to paste into the SSL wizard. This requires using the Pulse Secure login and then running a command at login root.
-
-```openssl req –new –newkey rsa:2048 –nodes –keyout eprase.nhs.uk.key –out eprase.nhs.uk.csr```
-
-A eprase.nhs.uk.csr file is generated. Open the generated file and copy the contents into the wizard. The address used to authenticate the Cert is :
-
-+	Company Name : Newcastle University
-+	Street Address : 2nd Floor Armstrong Building, Queen Victoria Road, Newcastle Upon Tyne
-+	City : Newcastle upon Tyne
-+	State / Province : Tyne and Wear
-+	Country : United Kingdom
-+	Zip Code : NE1 7RU
-
-Once the wizard has been updated with the file contents, you must specify how to authenticate yourself as the domain owner. Choose CNAME hash rather than an email address @eprase.nhs.uk. The wizard will generate a CNAME hash code snippet that you can use to validate yourself as domain owner. The CNAME records are managed by NHS Digital (not SCC who manage the server).
-
-Email: dnsteam@nhs.net
-
-Email them and ask them to add the code snippet to the DNS records for eprase.nhs.uk. The hash has the following format:
-
-
-xxxxxxxxxxxxxxxxxxx.eprase.nhs.uk
-CNAME
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-Once this is done, you should be sent a certificate via an email with an attached zip from Sectigo Certification Authority. The .crt file within the zip archive is your cert. You may get emailed an intermediate and full certificate. SSL2buy have an excellent online chat line if you hit difficulties with this process. They will liaise with Sectigo.
-
-Once you have the new full cert from an email labelled 'InstantSSL Pro Certificate', transfer it onto the server using SFTP. You will need to use Pulse Secure with your soft token. From there, rename it from eprase_nhs_uk.crt to eprase.nhs.uk-new.crt. Then move it into the ./client/certs directory. Rename the existing cert file to old before renaming your new file to the correct name ie. `eprase.nhs.uk.crt`.
-
-The certificate path is coded in the docker-compose.yml file.
+See [SSL Certificate Renewal](SSL.md)
