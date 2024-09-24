@@ -48,7 +48,7 @@
 
       <div class="mx-auto">
         <div class="buttons">
-          <p>When all of the patients have been admitted to your ePrescription System, click <span
+          <p>When all of the patients have been admitted to your ePrescribing System, click <span
               class="fw-bold">Done</span>.</p>
 
           <p><span class="fw-bold">Please ensure you click the Done button to save your progress</span></p>

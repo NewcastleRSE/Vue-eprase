@@ -177,7 +177,7 @@
 
       <div class="my-2">
         <h5 v-if="patientIndex < totalNumPatients - 1">
-          When the patient has been admitted to the ePrescription System, click <span class="fw-bold">Next</span>
+          When the patient has been admitted to the ePrescribing System, click <span class="fw-bold">Next</span>
           or use <span class="fw-bold">Previous</span> to view already entered items
         </h5>
         <h5 v-if="patientIndex == totalNumPatients - 1">

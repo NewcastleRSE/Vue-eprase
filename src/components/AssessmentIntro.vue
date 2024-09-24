@@ -24,7 +24,7 @@
           The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's
           admissions
           system and then to prescribe a series of medications to those patients. You will then be asked to provide
-          feedback mabout any advice or intervention from the system.
+          feedback about any advice or intervention from the system.
         </p>
 
         <p>The patient build has 2 parts, which may take up to an hour depending on your system.</p>

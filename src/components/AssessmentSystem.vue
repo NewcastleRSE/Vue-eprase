@@ -303,7 +303,7 @@
               <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment"
                 id="penicillin-comment">
                 <input v-bind="field" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
-                  title="Information relating to Penicillin and Penicillimine prescribing ">
+                  title="Information relating to Penicillin and Penicillamine prescribing ">
               </Field>
             </div>
             <ErrorMessage name="penicillin-comment" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
