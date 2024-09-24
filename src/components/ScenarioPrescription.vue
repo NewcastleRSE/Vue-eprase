@@ -148,26 +148,6 @@
                   <label class="category-label" for="intType.id">{{ intType.label }}</label>
                 </td>
                 <td class="pt-4">
-                  <!-- <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio"
-                      :name="'intervention-select-' + intType.id + '-alert'"
-                      :id="'intervention-select-' + intType.id + '-alert'" value="alert">
-                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
-                        value="alert" class="form-check-input" @change="onSelectedInterventionTypeChange()">
-                    </Field>
-                    <label class="form-check-label"
-                      :for="'intervention-select-' + intType.id + '-alert'">Alert</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="radio"
-                      :name="'intervention-select-' + intType.id + '-alert'"
-                      :id="'intervention-select-' + intType.id + '-advisory'" value="advisory">
-                      <input v-bind="field" type="radio" :name="'intervention-select-' + intType.id + '-alert'"
-                        value="advisory" class="form-check-input" @change="onSelectedInterventionTypeChange()">
-                    </Field>
-                    <label class="form-check-label"
-                      :for="'intervention-select-' + intType.id + '-advisory'">Advisory</label>
-                  </div> -->
                   <div class="form-check form-check-inline">
                     <Field v-slot="{ field }" v-model="response.selected_type[intType.id]" type="checkbox"
                       :name="'intervention-select-' + intType.id + '-alert'"
@@ -281,21 +261,6 @@ export default {
     }
   },
   data() {
-    const interventionTypeTips = [
-      'Tip: Drug contraindication (or dose adjustment) based on patient age',
-      'Tip: Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low)',
-      'Tip: Drug is not recommended for prescribing according to local guidance',
-      'Tip: Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm',
-      'Tip: Allergy or intolerance to prescribed drug (or another drug in the same category) documented',
-      'Tip: Specified drug prescribed more than once for the same patient',
-      'Tip: Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities',
-      'Tip: Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication',
-      'Tip: Two different medicines prescribed simultaneously with the same or similar therapeutic aims',
-      'Tip: Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, direct notification/ display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request)',
-      'Tip: Drug that must be prescribed by BRAND rather than using generic name',
-      'Tip: Specified route is contraindicated for drug and/or dose prescribed',
-      'Tip: Unable to complete prescription as information provided incomplete (e.g. indication or duration of treatment omitted)'
-    ]
     return {
       response: {
         outcomes: '',
@@ -307,8 +272,8 @@ export default {
       result: null,
       result_score: '',
       startTime: '',
-      interventionTypeOptions: this.categories.map((c, i) => {
-        return { id: c.categoryCode, label: c.categoryName, tip: interventionTypeTips[i] }
+      interventionTypeOptions: this.categories.map((c) => {
+        return { id: c.categoryCode, label: c.categoryName, tip: c.categoryTip }
       }),
       validationSchema: {
         'outcome-radios': (value) => {
