@@ -17,8 +17,8 @@
             <label class="col-sm-8 col-form-label" for="ep-system-selector">Which electronic prescribing (eP) system
               are you using? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" id="ep-system-selector">
-                <select v-bind="field" class="form-select"
+              <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" >
+                <select v-bind="field" id="ep-system-selector" class="form-select"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                   <option value="" disabled>Select system...</option>
                   <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{ epSystem.text }}</option>
@@ -34,8 +34,8 @@
             <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span
                 class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" id="other-ep-system">
-                <input v-bind="field" type="text" class="form-control"
+              <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" >
+                <input v-bind="field" id="other-ep-system" type="text" class="form-control"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter system...">
               </Field>
             </div>
@@ -45,12 +45,10 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for eP system?</label>
+            <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for the e-Prescribing system, if different from the official name?</label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name"
-                id="local-ep-system-name">
-                <input v-bind="field" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
-                  title="Local name for the e-Prescribing system, if different from the official name">
+              <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name">
+                <input v-bind="field" id="local-ep-system-name" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top">
               </Field>
             </div>
           </div>
@@ -59,8 +57,8 @@
             <label class="col-sm-8 col-form-label" for="ep-service-implemented">When (month/year) was current eP system
               implemented? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-implemented" id="ep-service-implemented">
-                <VueDatePicker ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented"
+              <Field v-slot="{ field, meta }" name="ep-service-implemented" >
+                <VueDatePicker id="ep-service-implemented" ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented"
                   month-picker auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
                   :max-date="new Date()" />
               </Field>
@@ -76,8 +74,8 @@
               last
               updated? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-updated" id="ep-service-updated">
-                <VueDatePicker ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker
+              <Field v-slot="{ field, meta }" name="ep-service-updated" >
+                <VueDatePicker id="ep-service-updated" ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker
                   auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
                   :max-date="new Date()" />
               </Field>
@@ -91,9 +89,8 @@
             <label class="col-sm-8 col-form-label" for="num-maintainers">How many WTE maintain the drug catalogue and
               prescribing decision support for this system? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num-maintainers"
-                id="num-maintainers">
-                <input v-bind="field" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
+              <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num-maintainers">
+                <input v-bind="field" id="num-maintainers" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
                   title="How many people (FTEs) across your trust do you have who maintain your drug catalogue and associated decision support for the electronic prescribing system you are using for this assessment?"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
               </Field>
@@ -108,8 +105,8 @@
               prescription orders are prescribed through the eP system across your organisation? <span
                 class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" id="usage-selector">
-                <select v-bind="field" class="form-select"
+              <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" >
+                <select v-bind="field" id="usage-selector" class="form-select"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                   <option value="" disabled>Select percentage...</option>
                   <option value="76-100">76-100%</option>
@@ -128,8 +125,8 @@
             <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in
               the organisation? if so, please provide their names.</label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" id="add-ep-system">
-                <input v-bind="field" type="text" class="form-control" placeholder="Other...">
+              <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" >
+                <input v-bind="field" id="add-ep-system" type="text" class="form-control" placeholder="Other...">
               </Field>
             </div>
             <ErrorMessage name="add-ep-system" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
@@ -143,15 +140,15 @@
             <div class="col-sm-4">
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
-                  id="lab-results-yes" value="true">
-                  <input v-bind="field" type="radio" name="lab-results" value="true" class="form-check-input">
+                  value="true">
+                  <input v-bind="field" id="lab-results-yes" type="radio" name="lab-results" value="true" class="form-check-input">
                 </Field>
                 <label class="form-check-label" for="lab-results-yes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
-                  id="lab-results-no" value="false">
-                  <input v-bind="field" type="radio" name="lab-results" value="false" class="form-check-input">
+                value="false">
+                  <input v-bind="field" id="lab-results-no" type="radio" name="lab-results" value="false" class="form-check-input">
                 </Field>
                 <label class="form-check-label" for="lab-results-no">No</label>
               </div>
@@ -165,16 +162,16 @@
             <div class="col-sm-4">
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
-                  id="man-results-yes" value="true">
-                  <input v-bind="field" type="radio" name="man-results" value="true" class="form-check-input"
+                value="true">
+                  <input v-bind="field"   id="man-results-yes"  type="radio" name="man-results" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="man-results-yes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
-                  id="man-results-no" value="false">
-                  <input v-bind="field" type="radio" name="man-results" value="false" class="form-check-input"
+                 value="false">
+                  <input v-bind="field" id="man-results-no" type="radio" name="man-results" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="man-results-no">No</label>
@@ -188,16 +185,16 @@
             <div class="col-sm-4">
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
-                  id="med-history-yes" value="true">
-                  <input v-bind="field" type="radio" name="med-history" value="true" class="form-check-input"
+                  value="true">
+                  <input v-bind="field"  id="med-history-yes" type="radio" name="med-history" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="med-history-yes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
-                  id="med-history-no" value="false">
-                  <input v-bind="field" type="radio" name="med-history" value="false" class="form-check-input"
+                  value="false">
+                  <input v-bind="field"  id="med-history-no" type="radio" name="med-history" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="med-history-no">No</label>
@@ -212,16 +209,16 @@
             <div class="col-sm-4">
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
-                  id="diagnosis-results-yes" value="true">
-                  <input v-bind="field" type="radio" name="diagnosis-results" value="true" class="form-check-input"
+                 value="true">
+                  <input v-bind="field" id="diagnosis-results-yes" type="radio" name="diagnosis-results" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="diagnosis-results-yes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
-                  id="diagnosis-results-no" value="false">
-                  <input v-bind="field" type="radio" name="diagnosis-results" value="false" class="form-check-input"
+                 value="false">
+                  <input v-bind="field"  id="diagnosis-results-no"  type="radio" name="diagnosis-results" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="diagnosis-results-no">No</label>
@@ -237,9 +234,8 @@
             <label class="col-sm-8 col-form-label fw-bold" for="penicillin-selector">How do you describe Penicillin
               V in your system?<span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.penicillin_description" name="penicillin-description"
-                id="penicillin-selector">
-                <select v-bind="field" class="form-select"
+              <Field v-slot="{ field, meta }" v-model="results.penicillin_description" name="penicillin-description">
+                <select v-bind="field" id="penicillin-selector" class="form-select"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                   <option value="" disabled>Select description...</option>
                   <option value="penicillin_v">Penicillin V</option>
@@ -260,8 +256,8 @@
                 class="required-field">*</span></label>
             <div class="col-sm-4">
               <Field v-slot="{ field, meta }" v-model="results.penicillin_description_other"
-                name="penicillin-description-other" id="penicillin-description-other">
-                <input v-bind="field" type="text" class="form-control"
+                name="penicillin-description-other" >
+                <input v-bind="field" id="penicillin-description-other" type="text" class="form-control"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"
                   placeholder="Enter description...">
               </Field>
@@ -279,16 +275,16 @@
             <div class="col-sm-4">
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-                  id="penicillin-results-yes" value="true">
-                  <input v-bind="field" type="radio" name="penicillin-results" value="true" class="form-check-input"
+              value="true">
+                  <input v-bind="field" type="radio" id="penicillin-results-yes" name="penicillin-results" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="penicillin-results-yes">Yes</label>
               </div>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-                  id="penicillin-results-no" value="false">
-                  <input v-bind="field" type="radio" name="penicillin-results" value="false" class="form-check-input"
+                  value="false">
+                  <input v-bind="field" type="radio"  id="penicillin-results-no" name="penicillin-results" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="penicillin-results-no">No</label>
@@ -297,13 +293,11 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="local-ep-system-name">If there is anything you would like to
-              tell us about this issue in your organisation, please record it here.</label>
+            <label class="col-sm-8 col-form-label" for="penicillin-comment">If there is anything you would like to
+              tell us about penicillin prescribing in your organisation, please record it here.</label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment"
-                id="penicillin-comment">
-                <input v-bind="field" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
-                  title="Information relating to Penicillin and Penicillamine prescribing ">
+              <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment">
+                <input v-bind="field" id="penicillin-comment" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top">
               </Field>
             </div>
             <ErrorMessage name="penicillin-comment" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
@@ -314,9 +308,8 @@
           <div class="mb-4 row">
             <p class="fw-bold">Is the e-prescribing system used to prescribe the following?</p>
             <div v-for="(option, index) in results.options" class="form-check ms-2">
-              <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox"
-                :id="'id_high_risk_meds_' + index" name="high_risk_meds" :value="option.value">
-                <input v-bind="field" type="checkbox" class="form-check-input" name="high_risk_meds"
+              <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
+                <input v-bind="field"  :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
                   :value="option.value">
               </Field>
               <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
@@ -327,8 +320,8 @@
             <p class="fw-bold">Is the e-prescribing system used in the following areas?</p>
             <div v-for="(option, index) in results.area_options" class="form-check ms-2">
               <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
-                :id="'id_clinical_areas_' + index" name="clinical_areas" :value="option.value">
-                <input v-bind="field" type="checkbox" class="form-check-input" name="clinical_areas"
+                name="clinical_areas" :value="option.value">
+                <input v-bind="field"  :id="'id_clinical_areas_' + index" type="checkbox" class="form-check-input" name="clinical_areas"
                   :value="option.value">
               </Field>
               <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
@@ -339,9 +332,8 @@
             <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span
                 class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area"
-                id="other-clinical-area">
-                <input v-bind="field" type="text" class="form-control"
+              <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area">
+                <input v-bind="field" id="other-clinical-area" type="text" class="form-control"
                   :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
               </Field>
             </div>
