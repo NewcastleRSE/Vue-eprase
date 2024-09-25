@@ -18,9 +18,9 @@
       </div>
       
       <div class="mx-auto" v-if="test != null">
-        <h5>Test {{ noTestsDone + 1 }} of {{ totalNumTests }}</h5>
+        <h3>Test {{ noTestsDone + 1 }} of {{ totalNumTests }}</h3>
         <component @test-save-ok="nextTest" @test-save-fail="reportError" :is="currentForm" :categories="categories" :testPayload="test" :isLast="this.testIndex == this.myTestList.length - 1" ref="currentDisplayForm"></component>
-        <h5 v-if="noTestsDone == totalNumTests">Congratulations, you have reached the end of the scenarios!</h5>
+        <h3 v-if="noTestsDone == totalNumTests">Congratulations, you have reached the end of the scenarios!</h3>
       </div>      
     </div>
     <ErrorAlertModal ref="errorAlertModal" />
