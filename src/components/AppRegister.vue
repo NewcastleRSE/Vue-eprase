@@ -20,8 +20,8 @@
             <div class="mb-4 row">
               <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email">
-                  <input v-bind="field" type="email" class="form-control"
+                <Field v-slot="{ field, meta }" v-model="user.email" name="email">
+                  <input v-bind="field" id="email" type="email" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
               </div>
@@ -33,8 +33,8 @@
             <div class="mb-4 row">
               <label for="institution" class="col-sm-4 form-label">Your NHS Trust:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.institution" id="institution" name="institution">
-                  <select v-bind="field" class="form-select" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
+                <Field v-slot="{ field, meta }" v-model="user.institution" name="institution">
+                  <select v-bind="field" id="institution" class="form-select" :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
                     <option value="" disabled>Please select...</option>
                     <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
                   </select>                  
@@ -49,8 +49,8 @@
             <div class="mb-4 row">
               <label for="password" class="col-sm-4 form-label">Password:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password">
-                  <input v-bind="field" type="password" class="form-control"
+                <Field v-slot="{ field, meta }" v-model="user.password" name="password">
+                  <input v-bind="field" id="password" type="password" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
               </div>
@@ -62,8 +62,8 @@
             <div class="mb-4 row">
               <label for="confirmPassword" class="col-sm-4 form-label">Confirm password:</label>
               <div class="col-sm-8">
-                <Field v-slot="{ field, meta }" v-model="user.confirmPassword" id="confirmPassword" name="confirmPassword">
-                  <input v-bind="field" type="password" class="form-control"
+                <Field v-slot="{ field, meta }" v-model="user.confirmPassword" name="confirmPassword">
+                  <input v-bind="field" id="confirmPassword"  type="password" class="form-control"
                     :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
                 </Field>
               </div>
