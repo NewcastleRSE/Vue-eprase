@@ -19,7 +19,7 @@
 
         <p>The ePRaSE assessment will be repeated annually.</p>
 
-        <h4>Instructions</h4>
+        <h2>Instructions</h2>
         <p>
           The assessment comprises 4 parts. You will be asked to admit a series of test patients to hospital's
           admissions

@@ -19,8 +19,8 @@
         <div class="mb-4 row">
           <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
           <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.email" id="email" name="email">
-              <input v-bind="field" type="email" class="form-control"
+            <Field v-slot="{ field, meta }" v-model="user.email" name="email">
+              <input v-bind="field" id="email" type="email" class="form-control"
                 :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
             </Field>
           </div>
@@ -31,8 +31,8 @@
         <div class="mb-4 row">
           <label for="password" class="col-sm-4 form-label">Password:</label>
           <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.password" id="password" name="password">
-              <input v-bind="field" type="password" class="form-control"
+            <Field v-slot="{ field, meta }" v-model="user.password" name="password">
+              <input v-bind="field"  id="password"  type="password" class="form-control"
                 :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
             </Field>
           </div>
