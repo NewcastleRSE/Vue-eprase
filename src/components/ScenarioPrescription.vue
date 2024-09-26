@@ -5,12 +5,12 @@
     <div class="patient-details my-3">
       <div class="card">
         <div class="card-body">
-          <h4 class="card-title">Patient: {{ getCurrentPatientName }}
+          <h3 class="card-title">Patient: {{ getCurrentPatientName }}
             <span class="patient-image">
               <img v-if="getCurrentPatientGender === 'male'" src="../assets/images/anon-male.png" />
               <img v-if="getCurrentPatientGender === 'female'" src="../assets/images/anon-female.png" />
             </span>
-          </h4>
+          </h3>
           <p class="card-text">Age: {{ testPayload.patient.age }}</p>
         </div>
       </div>
@@ -54,70 +54,69 @@
           <h5 class="my-4">Which of the following best describes the response from the system when you attempted
             to prescribe the specified drug? <span class="required-field">*</span></h5>
 
-          <div class="form-check mb-2">
-            <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios"
-              id="no-intervention" value="no-intervention">
-              <input v-bind="field" id="no-intervention" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
-            </Field>
-            <label class="form-check-label" for="no-intervention">
-              You were able to complete the prescription (includes followed order sentence) s
-              <span class="fw-bold">without any additional user or system input</span>
-              <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
-                data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
-                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
-            </span>
-            </label>
-          </div>
-
-          <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
-              id="order-set-overridden" value="order-set-overridden">
-              <input v-bind="field" type="radio" id="order-set-overridden" name="outcome-radios" value="order-set-overridden"
-                class="form-check-input">
-            </Field>
-            <label class="form-check-label" for="order-set-overridden">
-              You were able to complete the prescription, <span class="fw-bold">but had to override components of the
-                order sentence</span>
-              <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
-                data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
-                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
+          <fieldset>
+            <legend style="display: none">e-prescribing question options</legend>
+            <div class="form-check mb-2">
+          
+              <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios" value="no-intervention">
+                <input v-bind="field" id="no-intervention" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
+              </Field>
+              <label class="form-check-label" for="no-intervention">
+                You were able to complete the prescription (includes followed order sentence) s
+                <span class="fw-bold">without any additional user or system input</span>
+                <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
+                  data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
+                  <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
               </span>
-            </label>
-          </div>
+              </label>
+            </div>
 
-          <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" id="intervention"
-              value="intervention">
-              <input v-bind="field" id="intervention" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
-            </Field>
-            <label class="form-check-label" for="intervention">
-              You were able to complete the prescription, <span class="fw-bold">with system/user intervention</span>
-              <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
-                data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
-                <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
-            </span>
-            </label>
-          </div>
+            <div class="form-check mb-2">
+              <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" value="order-set-overridden">
+                <input v-bind="field" type="radio" id="order-set-overridden" name="outcome-radios" value="order-set-overridden"
+                  class="form-check-input">
+              </Field>
+              <label class="form-check-label" for="order-set-overridden">
+                You were able to complete the prescription, <span class="fw-bold">but had to override components of the
+                  order sentence</span>
+                <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
+                  data-bs-title="Tip: You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it">
+                  <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
+                </span>
+              </label>
+            </div>
 
-          <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios"
-              id="order-prevented" value="order-prevented">
-              <input v-bind="field" type="radio" id="order-prevented" name="outcome-radios" value="order-prevented" class="form-check-input">
-            </Field>
-            <label class="form-check-label" for="order-prevented">
-              Prevented from prescribing
-            </label>
-          </div>
+            <div class="form-check mb-2">
+              <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" value="intervention">
+                <input v-bind="field" id="intervention" type="radio" name="outcome-radios" value="intervention" class="form-check-input">
+              </Field>
+              <label class="form-check-label" for="intervention">
+                You were able to complete the prescription, <span class="fw-bold">with system/user intervention</span>
+                <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
+                  data-bs-title="Tip: You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select  this response option">
+                  <i class="bi bi-info-circle-fill link-primary ms-2 fs-5"></i>
+              </span>
+              </label>
+            </div>
 
-          <div class="form-check mb-2">
-            <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" id="not-available"
-              value="not-available">
-              <input v-bind="field" type="radio" id="not-available" name="outcome-radios" value="not-available" class="form-check-input">
-            </Field>
-            <label class="form-check-label" for="not-available">
-              Medicine or formulary alternative not available in the system
-            </label>
-          </div>
+            <div class="form-check mb-2">
+              <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" value="order-prevented">
+                <input v-bind="field" type="radio" id="order-prevented" name="outcome-radios" value="order-prevented" class="form-check-input">
+              </Field>
+              <label class="form-check-label" for="order-prevented">
+                Prevented from prescribing
+              </label>
+            </div>
+
+            <div class="form-check mb-2">
+              <Field v-slot="{ field }" v-model="response.outcomes" type="radio" name="outcome-radios" value="not-available">
+                <input v-bind="field" type="radio" id="not-available" name="outcome-radios" value="not-available" class="form-check-input">
+              </Field>
+              <label class="form-check-label" for="not-available">
+                Medicine or formulary alternative not available in the system
+              </label>
+            </div>
+          </fieldset>
 
           <ErrorMessage name="outcome-radios" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
             {{ message }}

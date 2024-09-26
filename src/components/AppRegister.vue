@@ -5,7 +5,7 @@
 
       <AppLogo cls="banner" />
       <div class="register-text">
-        <h2 class="mt-4">Register</h2>
+        <h1 class="mt-4">Register</h1>
 
         <div v-if="!appOpen">
           <span class="fw-bold">This application is currently closed</span>
