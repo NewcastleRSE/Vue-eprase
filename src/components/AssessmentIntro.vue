@@ -1,7 +1,7 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="banner graphic"></div>
+    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="image showing white pills"></div>
 
     <div class="content p-4">
 
@@ -59,7 +59,7 @@
 
       <div class="px-4" v-if="assessmentComplete">
 
-        <h2>Assessment Complete</h2>
+        <h3>Assessment Complete</h3>
         <div class="pt-4">
           <p>Thank you for taking part in the {{ year }} ePRaSE Assessment.</p>
           <p>To view the results of this assessment, click the 'Reports' button below.</p>

@@ -1,4 +1,5 @@
 <template>
+  <div class="py-2">The User Guide button below links to a PDF file.</div>
   <div>
     <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#aboutModal"><i
         class="bi bi-info-circle pe-1"></i>About</button>

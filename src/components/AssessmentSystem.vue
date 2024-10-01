@@ -7,8 +7,8 @@
 
       <LoginInfo />
 
-      <h3>EP System Information</h3>
-      <h4>Please answer the following questions about your ePrescribing system:</h4>
+      <h1>EP System Information</h1>
+      <h2>Please answer the following questions about your ePrescribing system:</h2>
 
       <div class="p-4">
         <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
@@ -57,7 +57,7 @@
             <label class="col-sm-8 col-form-label" for="ep-service-implemented">When (month/year) was current eP system
               implemented? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-implemented" >
+              <Field v-slot="{ field, meta }" name="ep-service-implemented">
                 <VueDatePicker id="ep-service-implemented" ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented"
                   month-picker auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
                   :max-date="new Date()" />
@@ -70,11 +70,9 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="ep-service-updated">When (month/year) was current eP system
-              last
-              updated? <span class="required-field">*</span></label>
+            <label class="col-sm-8 col-form-label" for="ep-service-updated">When (month/year) was current eP system last updated? <span class="required-field">*</span></label>
             <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-updated" >
+              <Field v-slot="{ field, meta }" name="ep-service-updated">
                 <VueDatePicker id="ep-service-updated" ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker
                   auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
                   :max-date="new Date()" />
@@ -138,6 +136,8 @@
             <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
               e-prescribing system? <span class="required-field">*</span></p>
             <div class="col-sm-4">
+              <fieldset>
+              <legend style="display: none;">Lab results integration question options</legend>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
                   value="true">
@@ -152,6 +152,7 @@
                 </Field>
                 <label class="form-check-label" for="lab-results-no">No</label>
               </div>
+            </fieldset>
             </div>
           </div>
 
@@ -160,10 +161,12 @@
               results into your patient admin and/ or e-prescribing test system that you are using to do this
               assessments?</p>
             <div class="col-sm-4">
+            <fieldset>
+              <legend style="display: none;">Lab result manual entry options</legend>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
                 value="true">
-                  <input v-bind="field"   id="man-results-yes"  type="radio" name="man-results" value="true" class="form-check-input"
+                  <input v-bind="field" id="man-results-yes"  type="radio" name="man-results" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="man-results-yes">Yes</label>
@@ -176,6 +179,7 @@
                 </Field>
                 <label class="form-check-label" for="man-results-no">No</label>
               </div>
+            </fieldset>
             </div>
           </div>
 
@@ -183,10 +187,12 @@
             <p class="col-sm-8 fw-bold">Are you able to manually enter diagnosis and medical history into your test
               system? <span class="required-field">*</span></p>
             <div class="col-sm-4">
+            <fieldset>
+              <legend style="display: none;">Test system question options</legend>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
                   value="true">
-                  <input v-bind="field"  id="med-history-yes" type="radio" name="med-history" value="true" class="form-check-input"
+                  <input v-bind="field" id="med-history-yes" type="radio" name="med-history" value="true" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="med-history-yes">Yes</label>
@@ -194,11 +200,12 @@
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
                   value="false">
-                  <input v-bind="field"  id="med-history-no" type="radio" name="med-history" value="false" class="form-check-input"
+                  <input v-bind="field" id="med-history-no" type="radio" name="med-history" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="med-history-no">No</label>
               </div>
+            </fieldset>
             </div>
           </div>
 
@@ -207,6 +214,8 @@
               into your test system that you are using to do this assessment?
             </p>
             <div class="col-sm-4">
+            <fieldset>
+              <legend style="display: none;">Test system manual entry question options</legend>
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
                  value="true">
@@ -218,11 +227,12 @@
               <div class="form-check form-check-inline">
                 <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
                  value="false">
-                  <input v-bind="field"  id="diagnosis-results-no"  type="radio" name="diagnosis-results" value="false" class="form-check-input"
+                  <input v-bind="field" id="diagnosis-results-no"  type="radio" name="diagnosis-results" value="false" class="form-check-input"
                     autocomplete="off">
                 </Field>
                 <label class="form-check-label" for="diagnosis-results-no">No</label>
               </div>
+            </fieldset>
             </div>
           </div>
 
@@ -273,22 +283,25 @@
               recording function is Penicillamine visible as an option to select? <span class="required-field">*</span>
             </p>
             <div class="col-sm-4">
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-              value="true">
-                  <input v-bind="field" type="radio" id="penicillin-results-yes" name="penicillin-results" value="true" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="penicillin-results-yes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-                  value="false">
-                  <input v-bind="field" type="radio"  id="penicillin-results-no" name="penicillin-results" value="false" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="penicillin-results-no">No</label>
-              </div>
+              <fieldset>
+                <legend style="display: none;">Penicill question options</legend>
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
+                value="true">
+                    <input v-bind="field" type="radio" id="penicillin-results-yes" name="penicillin-results" value="true" class="form-check-input"
+                      autocomplete="off">
+                  </Field>
+                  <label class="form-check-label" for="penicillin-results-yes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
+                    value="false">
+                    <input v-bind="field" type="radio" id="penicillin-results-no" name="penicillin-results" value="false" class="form-check-input"
+                      autocomplete="off">
+                  </Field>
+                  <label class="form-check-label" for="penicillin-results-no">No</label>
+                </div>
+              </fieldset>
             </div>
           </div>
 
@@ -307,36 +320,45 @@
 
           <div class="mb-4 row">
             <p class="fw-bold">Is the e-prescribing system used to prescribe the following?</p>
-            <div v-for="(option, index) in results.options" class="form-check ms-2">
-              <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
-                <input v-bind="field"  :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
-                  :value="option.value">
-              </Field>
-              <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
-            </div>
+            <fieldset>
+              <legend style="display: none;">E-prescribing system prescription question options</legend>
+              <div v-for="(option, index) in results.options" class="form-check ms-2">
+                <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
+                  <input v-bind="field" :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
+                    :value="option.value">
+                </Field>
+                <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
+              </div>
+            </fieldset>
           </div>
 
           <div class="mb-4 row">
             <p class="fw-bold">Is the e-prescribing system used in the following areas?</p>
-            <div v-for="(option, index) in results.area_options" class="form-check ms-2">
-              <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
-                name="clinical_areas" :value="option.value">
-                <input v-bind="field"  :id="'id_clinical_areas_' + index" type="checkbox" class="form-check-input" name="clinical_areas"
-                  :value="option.value">
-              </Field>
-              <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
-            </div>
+            <fieldset>
+              <legend style="display: none;">e-prescribing area question options</legend>
+              <div v-for="(option, index) in results.area_options" class="form-check ms-2">
+                <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
+                  name="clinical_areas" :value="option.value">
+                  <input v-bind="field" :id="'id_clinical_areas_' + index" type="checkbox" class="form-check-input" name="clinical_areas"
+                    :value="option.value">
+                </Field>
+                <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
+              </div>
+            </fieldset>
           </div>
 
           <div v-if="results.clinical_areas.includes('Other')" class="mb-4 row">
             <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span
                 class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area">
-                <input v-bind="field" id="other-clinical-area" type="text" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
-              </Field>
-            </div>
+            <fieldset>
+              <legend style="display: none;">Clinical area question options</legend>
+              <div class="col-sm-4">
+                <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area">
+                  <input v-bind="field" id="other-clinical-area" type="text" class="form-control"
+                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
+                </Field>
+              </div>
+            </fieldset>
             <ErrorMessage name="other-clinical-area" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
               {{ message }}
             </ErrorMessage>
