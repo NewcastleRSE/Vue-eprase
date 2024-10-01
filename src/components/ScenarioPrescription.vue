@@ -62,7 +62,7 @@
                 <input v-bind="field" id="no-intervention" type="radio" name="outcome-radios" value="no-intervention" class="form-check-input">
               </Field>
               <label class="form-check-label" for="no-intervention">
-                You were able to complete the prescription (includes followed order sentence) s
+                You were able to complete the prescription (includes followed order sentence) 
                 <span class="fw-bold">without any additional user or system input</span>
                 <span class="icon-link" data-bs-toggle="tooltip" data-bs-placement="right" href="javascript:void(0)"
                   data-bs-title="Tip: You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system">
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <h5 class="my-3">Please discontinue the prescription order before proceeding to the next scenario</h5>
+        <h5 class="my-3 fw-bold">Please discontinue the prescription order before proceeding to the next scenario</h5>
 
         <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id" />
         <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level" />
