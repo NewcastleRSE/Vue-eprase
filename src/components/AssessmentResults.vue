@@ -219,8 +219,10 @@
           </div>
           <div class="row mb-4">
             <p>
-              The stacked histogram above provides the number of tests completed in each CDS category in brackets at the end of each stack. 
-              This helps to provide the user with context when reviewing the results. Empty columns reflect that the user did not receive any questions in this category.
+              Please hover over each coloured section of the stacked bar chart to see the 
+              mitigation result and number of questions completed within each CDS category. 
+              This helps to provide the user with context when reviewing the results. Empty 
+              rows reflect that the user did not receive any questions in this category.
             </p>            
           </div>          
         </div>
