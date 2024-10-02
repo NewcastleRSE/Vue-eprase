@@ -55,7 +55,7 @@
             to prescribe the specified drug? <span class="required-field">*</span></h5>
 
           <fieldset>
-            <legend style="display: none">e-prescribing question options</legend>
+            <legend style="display: none">ePrescribing question options</legend>
             <div class="form-check mb-2">
           
               <Field v-slot="{ field, meta }" v-model="response.outcomes" type="radio" name="outcome-radios" value="no-intervention">
