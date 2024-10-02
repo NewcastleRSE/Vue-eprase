@@ -306,7 +306,7 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="penicillin-comment">If there is anything you would like to
+            <label class="col-sm-8 col-form-label fw-bold" for="penicillin-comment">If there is anything you would like to
               tell us about penicillin prescribing in your organisation, please record it here.</label>
             <div class="col-sm-4">
               <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment">
@@ -534,14 +534,15 @@ export default {
           // { text: 'Enteral nutrition', value: 'Enteral nutrition' },
           // { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements' },
           // { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines' }
-          // Updates 2024-07-01
+          // Updates 2024-07-01 & 2024-10-02 (chemo => 2 options)
           { text: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
           { text: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
           { text: 'Warfarin', value: 'Warfarin' },
           { text: 'Heparin', value: 'Heparin' },
           { text: 'Insulin', value: 'Insulin' },
           { text: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
-          { text: 'Chemotherapy', value: 'Chemotherapy' },
+          { text: 'Chemotherapy oral', value: 'Chemotherapy oral' },
+          { text: 'Chemotherapy IV', value: 'Chemotherapy IV'},
           { text: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
           { text: 'Antimicrobials', value: 'Antimicrobials' },
           { text: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
