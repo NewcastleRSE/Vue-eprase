@@ -12,7 +12,7 @@
       <div class="px-4" v-if="!assessmentComplete">
 
         <p>
-          The following assessment is designed to evaluate the performance of an e-prescription system against a range
+          The following assessment is designed to evaluate the performance of an ePrescribing system against a range
           of
           indicators.
         </p>

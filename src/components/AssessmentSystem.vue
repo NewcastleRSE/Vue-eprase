@@ -45,7 +45,7 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for the e-Prescribing system, if different from the official name?</label>
+            <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for the ePrescribing system, if different from the official name?</label>
             <div class="col-sm-4">
               <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name">
                 <input v-bind="field" id="local-ep-system-name" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top">
@@ -120,7 +120,7 @@
           </div>
 
           <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other e-prescribing systems in use in
+            <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other ePrescribing systems in use in
               the organisation? if so, please provide their names.</label>
             <div class="col-sm-4">
               <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" >
@@ -134,7 +134,7 @@
 
           <div class="mb-4 row">
             <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
-              e-prescribing system? <span class="required-field">*</span></p>
+              ePrescribing system? <span class="required-field">*</span></p>
             <div class="col-sm-4">
               <fieldset>
               <legend style="display: none;">Lab results integration question options</legend>
@@ -158,7 +158,7 @@
 
           <div class="mb-4 row" v-if="results.lab_results === 'true'">
             <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i> Are you able to manually enter laboratory
-              results into your patient admin and/ or e-prescribing test system that you are using to do this
+              results into your patient admin and/ or ePrescribing test system that you are using to do this
               assessments?</p>
             <div class="col-sm-4">
             <fieldset>
@@ -319,9 +319,9 @@
           </div>
 
           <div class="mb-4 row">
-            <p class="fw-bold">Is the e-prescribing system used to prescribe the following? <span class="required-field">*</span></p>
+            <p class="fw-bold">Is the ePrescribing system used to prescribe the following? <span class="required-field">*</span></p>
             <fieldset>
-              <legend style="display: none;">E-prescribing system prescription question options</legend>
+              <legend style="display: none;">ePrescribing system prescription question options</legend>
               <div v-for="(option, index) in results.options" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
                   <input v-bind="field" :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
@@ -333,9 +333,9 @@
           </div>
 
           <div class="mb-4 row">
-            <p class="fw-bold">Is the e-prescribing system used in the following areas? <span class="required-field">*</span></p>
+            <p class="fw-bold">Is the ePrescribing system used in the following areas? <span class="required-field">*</span></p>
             <fieldset>
-              <legend style="display: none;">e-prescribing area question options</legend>
+              <legend style="display: none;">ePrescribing area question options</legend>
               <div v-for="(option, index) in results.area_options" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
                   name="clinical_areas" :value="option.value">
