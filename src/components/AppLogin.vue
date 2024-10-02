@@ -53,8 +53,8 @@
         </div>
       </Form>
       <p>
-        If you have forgotten your password, please contact the RSE team at:
-        <a href="mailto:rseteam@newcastle.ac.uk">rseteam@newcastle.ac.uk</a>
+        If you have forgotten your password, please contact the ePRaSE team at:
+        <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
       </p>
 
       <!--<p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>-->
