@@ -319,7 +319,7 @@
           </div>
 
           <div class="mb-4 row">
-            <p class="fw-bold">Is the e-prescribing system used to prescribe the following?</p>
+            <p class="fw-bold">Is the e-prescribing system used to prescribe the following? <span class="required-field">*</span></p>
             <fieldset>
               <legend style="display: none;">E-prescribing system prescription question options</legend>
               <div v-for="(option, index) in results.options" class="form-check ms-2">
@@ -333,7 +333,7 @@
           </div>
 
           <div class="mb-4 row">
-            <p class="fw-bold">Is the e-prescribing system used in the following areas?</p>
+            <p class="fw-bold">Is the e-prescribing system used in the following areas? <span class="required-field">*</span></p>
             <fieldset>
               <legend style="display: none;">e-prescribing area question options</legend>
               <div v-for="(option, index) in results.area_options" class="form-check ms-2">
@@ -487,6 +487,8 @@ export default {
         'penicillin-results': (value) => {
           return ['true', 'false'].includes(value) ? true : 'Please select one'
         },
+        'high_risk_meds': 'required',
+        'clinical_areas': 'required',
         'other-clinical-area': (value) => {
           if (this.results.clinical_areas.includes('Other')) {
             if (!value) {
