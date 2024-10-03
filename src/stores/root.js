@@ -67,6 +67,10 @@ export const rootStore = defineStore('root', {
         const response = await this.apiCall('categories', 'GET')
         if (response.status < 400) {
           this.categories = response.data
+          // remove the control category, leaves an empty element
+          delete this.categories[0]
+          // remove the emtpy element 
+          this.categories.splice(0, 1)
         }
         return response
       } else {

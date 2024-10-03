@@ -78,7 +78,9 @@ export default {
     return {
       validationSchema: {        
         'config-err-radios': (value) => {         
-          return (this.result ? ([0, 1, 2].includes(parseInt(value)) ? true : 'Please select one') : true)
+          return value ? true : 'Please select one'
+          //this one wasn't working for some reason
+          //return (this.result ? ([0, 1, 2].includes(parseInt(value)) ? true : 'Please select one') : true)
         }
       },
       response: {

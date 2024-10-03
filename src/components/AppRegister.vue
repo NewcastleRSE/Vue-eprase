@@ -13,7 +13,8 @@
 
         <div v-if="appOpen">
 
-          <p class="pb-2">To register with the ePRaSE system, please provide the following information.</p>
+          <p class="pb-2">To register with the ePRaSE system, please provide the following information. You will need a valid <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
+      </p>
 
           <Form ref="regForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 

@@ -11,7 +11,7 @@
     <div class="instructions">
       <h4>Step 2: Prescribe Medication</h4>
       <p>You will be asked to prescribe a number of medicines to the test patient. You will be asked a short series of
-        questions about any feedback or intervention from the e-Prescribing System.</p>
+        questions about any feedback or intervention from the ePrescribing System.</p>
     </div>
   </GenericModal>
 </template>
