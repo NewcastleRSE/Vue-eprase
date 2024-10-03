@@ -13,7 +13,7 @@
       <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
         <div v-if="serverError" class="mb-4 row">
           <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
-            If your login details continue to fail, please contact the ePRaSE team at: <a href="mailto:nuth.eprase@nhs.net">rseteam@newcastle.ac.uk</a>
+            If your login details continue to fail, please contact the ePRaSE team at: <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
           </p>
         </div>
         <div class="mb-4 row">
