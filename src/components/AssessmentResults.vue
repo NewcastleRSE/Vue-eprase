@@ -8,10 +8,10 @@
       <LoginInfo />
 
       <div id="reportHeading" class="centered-heading">
-        <h3>Assessment Report</h3>
-        <h4><span class="fw-bold me-2">Institution:</span><span class="fw-normal">{{ institution }}</span></h4>
-        <h4><span class="fw-bold me-2">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system
-            }}</span></h4>
+        <h1>Assessment Report</h1>
+        <h2><span class="fw-bold me-2">Institution:</span><span class="fw-normal">{{ institution }}</span></h2>
+        <h3><span class="fw-bold me-2">EP System:</span><span>{{ ep_service !== 'Other' ? ep_service : other_ep_system
+            }}</span></h3>
       </div>
 
       <nav class="mt-4">

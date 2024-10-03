@@ -5,7 +5,7 @@
     <div class="patient-details my-3">
       <div class="card">
         <div class="card-body">
-          <h3 class="card-title">Patient: {{ getCurrentPatientName }}
+          <h3 class="card-title h4">Patient: {{ getCurrentPatientName }}
             <span class="patient-image">
               <img v-if="getCurrentPatientGender === 'male'" src="../assets/images/anon-male.png" />
               <img v-if="getCurrentPatientGender === 'female'" src="../assets/images/anon-female.png" />
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <h5 class="my-3 fw-bold">Please discontinue the prescription order before proceeding to the next scenario</h5>
+        <div class="h4 my-3 fw-bold">Please discontinue the prescription order before proceeding to the next scenario</div>
 
         <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id" />
         <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level" />
