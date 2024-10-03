@@ -15,7 +15,7 @@ export const appSettingsStore = defineStore('appSettings', {
       epSystemOptions: [
         { value: 'Altera (Sunrise, Allscripts)', text: 'Altera (Sunrise, Allscripts)' },
         { value: 'Better', text: 'Better' },
-        { value: 'Cerner', text: 'Cerner' },
+        { value: 'Cerner (Oracle)', text: 'Cerner (Oracle)' },
         { value: 'CIS Chemocare', text: 'CIS Chemocare' },
         { value: 'Civica', text: 'Civica' },
         { value: 'CMM System C (JAC, Wellsky)', text: 'CMM System C (JAC, Wellsky)' },
