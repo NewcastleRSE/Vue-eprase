@@ -34,7 +34,7 @@ defineRule('nhsEmail', value => {
   console.debug('Validate NHS email', value)
   if (
     value &&
-    value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
+    value.match(/^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/)
   ) {
     console.debug('Ok')
     return true

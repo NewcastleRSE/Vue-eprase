@@ -144,7 +144,7 @@
             <tbody>
               <tr v-for="intType in interventionTypeOptions">
                 <td class="align-middle">
-                  <label class="category-label" for="intType.id">{{ intType.label }}</label>
+                  {{ intType.label }}
                 </td>
                 <td class="pt-4">
                   <div class="form-check form-check-inline">
