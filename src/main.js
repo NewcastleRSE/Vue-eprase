@@ -20,6 +20,14 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import arraySupport from 'dayjs/plugin/arraySupport'
 
+// Strip out most debugging information in production version (leaves console.warn and console.error)
+if (process.env.NODE_ENV === 'production') {
+  console.log = function() {}
+  console.debug = function() {}
+  console.group = function() {}
+  console.groupEnd = function() {}
+}
+
 const app = createApp(App)
 const pinia = createPinia()
 pinia.use(createPersistedState({storage: localStorage}))
