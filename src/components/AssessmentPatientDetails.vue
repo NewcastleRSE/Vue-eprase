@@ -7,7 +7,7 @@
 
       <LoginInfo />
 
-      <h1>Patient Information</h1>
+      <h1 class="h2">Patient Information</h1>
       <div v-if="nextUnsaved == 0">
         <p>Please enter the following {{ totalNumPatients }} sets of patient details into your EP system</p>
       </div>
@@ -21,7 +21,7 @@
       <div v-if="patient != null" class="mx-auto card">
 
         <div class="card-header">
-          <h2>{{ patient.first_name }} {{ patient.surname }}</h2>
+          <h2 class="h3">{{ patient.first_name }} {{ patient.surname }}</h2>
           <span class="patient-image">
             <img v-if="patient.gender === 'male' && patient.is_adult === true" src="../assets/images/anon-male.png" />
             <img v-if="patient.gender === 'female' && patient.is_adult === true"
@@ -39,7 +39,7 @@
                 <thead>
                   <tr>
                     <th colspan="2" class="card-title bg-primary-subtle">
-                      <h3>Demographics</h3>
+                      <h3 class="h4">Demographics</h3>
                     </th>
                   </tr>
                 </thead>
@@ -58,7 +58,7 @@
                 <thead>
                   <tr>
                     <th class="card-title bg-primary-subtle">
-                      <h3>Allergies</h3>
+                      <h3 class="h4">Allergies</h3>
                     </th>
                   </tr>
                 </thead>
@@ -75,7 +75,7 @@
                 <thead>
                   <tr>
                     <th colspan="5" class="card-title bg-primary-subtle">
-                      <h3>Current Medication</h3>
+                      <h3 class="h4">Current Medication</h3>
                     </th>
                   </tr>
                 </thead>
@@ -106,7 +106,7 @@
                 <thead>
                   <tr>
                     <th colspan="3" class="card-title bg-primary-subtle">
-                      <h3>Clinical Data</h3>
+                      <h3 class="h4">Clinical Data</h3>
                     </th>
                   </tr>
                 </thead>
@@ -130,7 +130,7 @@
                 <thead>
                   <tr>
                     <th class="card-title bg-primary-subtle">
-                      <h3>Presenting Complaint</h3>
+                      <h3 class="h4">Presenting Complaint</h3>
                     </th>
                   </tr>
                 </thead>
@@ -147,7 +147,7 @@
                 <thead>
                   <tr>
                     <th class="card-title bg-primary-subtle">
-                      <h3>Comorbidities</h3>
+                      <h3 class="h4">Comorbidities</h3>
                     </th>
                   </tr>
                 </thead>
@@ -165,7 +165,7 @@
             <div class="alert alert-warning fw-bold" role="alert">
               To optimise the use of this tool please record ALL types of guidance that appears on your system screen
             </div>
-            <label class="py-2" for="patient_intervention">System interventions</label>
+            <label class="py-2 fw-bold" for="patient_intervention">System interventions</label>
             <textarea class="form-control" ref="patientIntervention" v-model="patientQualData" id="patient_intervention" rows="5"
               placeholder="Please note any interventions from the system..."></textarea>
           </div>
@@ -177,7 +177,7 @@
       </div>
 
       <div class="my-2">
-        <h3 v-if="patientIndex < totalNumPatients - 1">
+        <h3 class="h5 py-4" v-if="patientIndex < totalNumPatients - 1">
           When the patient has been admitted to the ePrescribing System, click <span class="fw-bold">Next</span>
           or use <span class="fw-bold">Previous</span> to view already entered items
         </h3>

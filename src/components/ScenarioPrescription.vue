@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <h5 v-if="debugMode"> {{ testPayload.id }} - Risk: {{ testPayload.risk_level }}</h5>
+    <h4 v-if="debugMode"> {{ testPayload.id }} - Risk: {{ testPayload.risk_level }}</h4>
 
     <div>
       <p class="py-2">Prescribe the following medication to the specified patient using your normal prescribing
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <div class="h4 my-3 fw-bold">Please discontinue the prescription order before proceeding to the next scenario</div>
+        <div class="h5 my-3 fw-bold text-danger pb-4">Please discontinue the prescription order before proceeding to the next scenario</div>
 
         <input ref="test_id" type="hidden" id="test_id" :value="testPayload.id" />
         <input ref="risk_level" type="hidden" id="risk_level" :value="testPayload.risk_level" />

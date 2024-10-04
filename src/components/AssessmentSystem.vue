@@ -7,8 +7,8 @@
 
       <LoginInfo />
 
-      <h1>EP System Information</h1>
-      <h2>Please answer the following questions about your ePrescribing system:</h2>
+      <h1 class="h2">EP System Information</h1>
+      <h2 class="h3">Please answer the following questions about your ePrescribing system:</h2>
 
       <div class="p-4">
         <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">

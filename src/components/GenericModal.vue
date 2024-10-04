@@ -3,7 +3,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ title }}</h5>
+          <h3 class="h5 modal-title">{{ title }}</h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeBtnText }}"
             @click="$emit('modalClosed')"></button>
         </div>

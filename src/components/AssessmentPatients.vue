@@ -7,12 +7,12 @@
 
       <LoginInfo />
 
-      <h1>Assessment Patient Preparation</h1>
+      <h1 class="h2">Assessment Patient Preparation</h1>
       <p>In preparation for the assessment, please complete the following tasks:</p>
 
       <div class="p-4">
         <div>
-          <h2>Patient Data</h2>
+          <h2 class="h3">Patient Data</h2>
           <p>Please admit the following test patients into your hospital's patient admissions system (or a test
             environment).</p>
           <p>Populate any other mandatory fields with appropriate self-generated information. When you are done, click
