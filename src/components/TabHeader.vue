@@ -1,7 +1,7 @@
 <template>
 
   <div class="tabbed-header">
-    <div v-for="(heading, index) in headings" class="tab-section bg-primary" :class="index == showIndex ? 'opacity-100' : 'opacity-50'">
+    <div v-for="(heading, index) in headings" class="tab-section bg-primary" :class="index == showIndex ? 'opacity-100' : 'opacity-75'">
       <i class="bi bi-check2-circle" v-if="index < showIndex"></i>{{  heading }}
     </div>   
   </div>

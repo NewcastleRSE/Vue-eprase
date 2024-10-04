@@ -75,7 +75,7 @@
               Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
               The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
             </p>
-            <img class="img-fluid" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
+            <img class="img-fluid" style="max-width:1280px" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
             <!-- Old table-based version - fails to reproduce background colours in printed version so replaced by image above 16/09/2024 -->
             <!-- <table class="table w-75">
               <thead>

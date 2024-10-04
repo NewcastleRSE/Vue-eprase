@@ -67,10 +67,11 @@ export const rootStore = defineStore('root', {
         const response = await this.apiCall('categories', 'GET')
         if (response.status < 400) {
           this.categories = response.data
+          // Removed 04/10/2024 David - this attempted to suppress the 'control' category in the scenario input, but had undesired side-effects
           // remove the control category, leaves an empty element
-          delete this.categories[0]
+          //delete this.categories[0]
           // remove the emtpy element 
-          this.categories.splice(0, 1)
+          //this.categories.splice(0, 1)
         }
         return response
       } else {

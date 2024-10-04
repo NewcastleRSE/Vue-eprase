@@ -270,7 +270,7 @@ export default {
       startTime: '',
       interventionTypeOptions: this.categories.map((c) => {
         return { id: c.categoryCode, label: c.categoryName, tip: c.categoryTip }
-      }),
+      }).filter(elt => elt.id != 'control'),  // David 04/10/2024 - now filters out the 'control' entry
       validationSchema: {
         'outcome-radios': (value) => {
           return value ? true : 'Please select one of the outcomes'
