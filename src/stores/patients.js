@@ -196,8 +196,13 @@ export const patientStore = defineStore('patients', {
                   console.debug('Test list before', this.testList)
                   this.testList.splice(randInsertPoint, 0, ce)
                   console.debug('Test list after', this.testList)
+                  doneConfIds.push(ce.configErrorCode)  // Strictly don't need this, but added defensively to guard against duplicate config errors inserted - David 07/10/2024
                 }                
               })
+              // 07/10/2024 - check we have all the config errors once only - no duplicates!
+              const onlyConfErrors = this.testList.filter(test => typeof test.configErrorCode == 'string')
+              const confDuplicates = onlyConfErrors.filter((item, index) => onlyConfErrors.indexOf(item) !== index)
+              console.assert(confDuplicates.length == 0, 'Should not have duplicate config errors but see ' + confDuplicates.toString() + ' are duplicated')
             } else {
               throw new Error(doneConfErrorsResponse.message)
             }            

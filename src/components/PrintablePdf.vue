@@ -2,6 +2,9 @@
   <main class="leftalign p-4">
     <div class="centered-heading" ref="printableReportHeading"></div>
     <div ref="printableReportContainer" id="printableReportContainer"></div>
+    <div class="bg-warning-subtle p-3 my-4">
+      <span class="fw-bold">Please ensure that you print the PDF in landscape format</span>
+    </div>
     <button type="button" class="btn btn-primary m-1" @click="printablePdfHandler">
       <i class="bi bi-printer-fill pe-1"></i>{{ buttonCaption }}
     </button>
