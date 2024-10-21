@@ -40,83 +40,13 @@
           <div class="row">
             <PieChart :dataLoading="!pieDataComplete" :goodMitigation="totalGood" :someMitigation="totalSome"
               :notMitigated="totalNot" :overMitigated="totalOver" :nullTests="totalNulls" :heading="getHeading()" />
-          </div>
-          <!-- Commented out 20/09/2024 David - no longer required -->
-          <!-- <div class="row">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Mitigation Response</th>
-                  <th>Description</th>
-                </tr>                
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-success">Good mitigation</td>
-                  <td>If a system response is to 'prevent prescribing' and the tool user records this has happened</td>
-                </tr>
-                <tr>
-                  <td class="text-warning">Some mitigation</td>
-                  <td>If a system response (alert or advisory) was recorded rather than prescribing prevented</td>
-                </tr>
-                <tr>
-                  <td class="text-danger">Not mitigated</td>
-                  <td>If a system has no intervention provided</td>
-                </tr>
-                <tr>
-                  <td class="text-info">Over mitigated</td>
-                  <td>If a system has an intervention recorded where none is expected e.g. with a control test</td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
+          </div>        
           <div class="row mb-4" style="page-break-before:always">
             <p>
               Good mitigation relates to Electronic Prescribing systems correctly identifying and responding to risk of error during the process of prescribing. 
               The matrix below illustrates how the outcome of a user system response is scored against each prescribing test which has a pre-defined risk level in the ePRaSE tool.
             </p>
-            <img class="img-fluid" style="max-width:1280px" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">
-            <!-- Old table-based version - fails to reproduce background colours in printed version so replaced by image above 16/09/2024 -->
-            <!-- <table class="table w-75">
-              <thead>
-                <tr>
-                  <th class="bg-info-subtle align-content-center">Prescribing User scenarios recorded risk level system response</th>
-                  <th  class="bg-warning-subtle align-content-center" colspan="3">Prescribing scenarios risk level</th>
-                </tr>
-                <tr>
-                  <th>&nbsp;</th>
-                  <th>Extreme risk</th>
-                  <th>High risk</th>
-                  <th>Low / no risk (control)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed with no-intervention</span></td>
-                  <td class="no-mitigation">No Mitigation</td>
-                  <td class="no-mitigation">No Mitigation</td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription order-prevented</span></td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed, but user had to override 'order-set / order sentence'</span></td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-                <tr>
-                  <td><span class="fw-bold">Prescription completed, with system/ user intervention such as alerts or advisory pop-ups</span></td>
-                  <td class="some-mitigation">Some Mitigation</td>
-                  <td class="good-mitigation">Good Mitigation</td>
-                  <td class="over-mitigation">Over Mitigation</td>
-                </tr>
-              </tbody>
-            </table> -->
+            <img class="img-fluid" style="max-width:1280px" src="../assets/images/mitigation_matrix.png" alt="Mitigation matrix">            
           </div>
         </div>
         <div class="tab-pane fade" id="view-test-summary-tab" role="tabpanel">          
@@ -303,7 +233,8 @@ export default {
       other_ep_system: '',
       // Flags to indicate chart data present in its entirety 
       stackedDataComplete: false,
-      pieDataComplete: false
+      pieDataComplete: false,
+      institution: ''
     }
   },
   computed: {
@@ -312,10 +243,7 @@ export default {
       return this.$refs.errorAlertModal
     },
     assessmentId() {
-      return rootStore().assessmentId
-    },
-    institution() {
-      return authenticationStore().orgName
+      return this.$route.query.ID || rootStore().assessmentId
     }
   },
   methods: {
@@ -339,15 +267,7 @@ export default {
 
       console.group('createStackedChartData()')
       console.debug('#### jsondata', jsondata)
-
-      // Categories now created as an object rather than an array
-      // const categories = [
-      //   'Drug Age', 'Drug Dose', 'Drug Interaction', 'Drug Allergy', 'Drug Duplication', 'Drug Disease', 'Drug Omissions',
-      //   'Theraputic Duplication', 'Drug Lab', 'Drug Brand', 'Drug Route', 'Drug Overdose', 'Drug Frequency'
-      // ]
-      // const categoryKeys = categories.map(c => {
-      //   return c.substring(0, 1).toLowerCase() + c.substring(1).replace(' ', '')
-      // })
+     
       const categoryNames = this.categories.map(c => c.categoryName)
       const categoryCodes = this.categories.map(c => c.categoryCode)
       
@@ -428,6 +348,8 @@ export default {
         console.debug('Getting assessment details...')
         const detailsResponse = await rootStore().getAssessmentById(this.assessmentId)
         if (detailsResponse.status < 400) {
+          // Institution name
+          this.institution = detailsResponse.data.institution.orgName || authenticationStore().orgName
           // System-level data
           this.ep_service = detailsResponse.data.system.ep_service
           this.other_ep_system = detailsResponse.data.system.other_ep_system

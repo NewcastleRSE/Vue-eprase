@@ -57,6 +57,7 @@ export const router = createRouter({
     },   
     {
       path: "/assessmentresults/:ID?",
+      name: "assessmentresults",
       component: AssessmentResults
     },    
     {

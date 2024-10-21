@@ -7,7 +7,7 @@
       <p>You currently have no reports available.</p>
     </div>
 
-    <div v-if="reports.length > 0">
+    <div v-if="reports.length != 0">
       <table class="table table-striped mb-4">
         <thead>
           <tr>
@@ -46,8 +46,10 @@ export default {
   },
   methods: {
     onReportClick(assessmentId) {
-      const routeData = this.$router.resolve({ path: '/assessmentresults', params: { 'ID': assessmentId } })
+      const routeData = this.$router.resolve({ path: '/assessmentresults', query: { 'ID': assessmentId } })
+      console.log(routeData)
       window.open(routeData.href, '_blank')
+      //this.$router.push('/assessmentresults/' + assessmentId, )
     }
   }
 }
