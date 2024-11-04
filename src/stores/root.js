@@ -90,6 +90,10 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('getAllMitigationResults', 'GET')
       return response       
     },
+    async getAllInstitutionAssessments() {
+      const response = await this.apiCall('getAllInstitutionAssessments', 'GET')
+      return response
+    },
     async getConfigErrors() {
       const response = await this.apiCall('configerrors', 'GET')
       return response      
