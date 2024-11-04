@@ -31,7 +31,7 @@
             <thead>
               <tr>
                 <th>Institution</th>
-                <th>Year</th>
+                <th>Complete date</th>
               </tr>
             </thead>
             <tbody>
@@ -39,7 +39,7 @@
                 data-bs-title="Click on row to view details (in a new tab)" data-bs-placement="top" data-bs-toggle="tooltip"
                 style="cursor:pointer">
                 <td>{{ report.institution.orgName }}</td>
-                <td>{{ report.system.time_created.split('/')[2] }}</td>
+                <td>{{ report.system.time_created }}</td>
               </tr>
             </tbody>
           </table>
@@ -114,21 +114,18 @@ export default {
   computed: {
     ...mapStores(rootStore, authenticationStore),
     getSystemNotComplete() {  // Registered, but not yet completed system page
-      return this.partialAssessments.filter(pa => pa.system.id == null)
+      return this.partialAssessments.filter(pa => pa.system == null || pa.system.id == null).sort((a, b) => a.institution.orgName.localeCompare(b.institution.orgName))
     },
     getSystemComplete() { // Done system page, but not yet completed patient data
-      return this.partialAssessments.filter(pa => pa.system.id != null && pa.patientDataCreated === false)
+      return this.partialAssessments.filter(pa => pa.system != null && pa.system.id != null && pa.patientDataCreated === false).sort((a, b) => a.institution.orgName.localeCompare(b.institution.orgName))
     },
     getPatientDataCreated() { // Done patient data entry, but not completed scenarios
-      return this.partialAssessments.filter(pa => pa.patientDataCreated === true && pa.assessmentComplete === false)
+      return this.partialAssessments.filter(pa => pa.patientDataCreated === true && pa.assessmentComplete === false).sort((a, b) => a.institution.orgName.localeCompare(b.institution.orgName))
     }
   },
   methods: {
     onReportClick(assessmentId) {
-      const routeData = this.$router.resolve({ path: '/assessmentresults', params: { 'ID': assessmentId } })
-      console.log(routeData)
-      window.open(routeData.href, '_blank')
-      //this.$router.push('/assessmentresults/' + assessmentId, )
+      window.open('/assessmentresults?ID=' + assessmentId, '_blank')
     }
   }
 }
