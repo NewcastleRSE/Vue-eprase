@@ -11,7 +11,7 @@
           <select v-bind="field" class="form-select"
             :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
             <option value="" disabled>Select system...</option>
-            <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{  epSystem.text }}</option>           
+            <option v-for="epSystem in epSystemOptions" :value="epSystem.value" :disabled="sysdata[epSystem.value] == 0">{{ `${epSystem.text} ${sysdata[epSystem.value] != 0 ? ' (' + sysdata[epSystem.value] + ')' : ''}` }}</option>           
           </select>
         </Field>
       </div>
@@ -58,8 +58,8 @@ import { Form, Field, ErrorMessage } from 'vee-validate'
 export default {
   name: "EpSystemComparisonChart",
   props: {
-    mydata: {
-      type: Array
+    sysdata: {
+      type: Object
     }
   },
   computed: {

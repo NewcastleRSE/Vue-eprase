@@ -55,7 +55,7 @@
             <MitigationComparisonChart @get-mitigation-fail="reportError" />
           </div>
           <div class="tab-pane fade" id="view-ep-comp-tab" role="tabpanel">
-            <EpSystemComparisonChart @get-mitigation-fail="reportError" />
+            <EpSystemComparisonChart :sysdata="reportCountPerSystem" @get-mitigation-fail="reportError" />
           </div>
           <div class="tab-pane fade" id="view-epma-stats-tab" role="tabpanel">
             <EpmaStatistics :reports="reports" :loading="reportDataLoading" />
@@ -89,6 +89,7 @@ import EpSystemComparisonChart from "./EpSystemComparisonChart"
 import EpmaStatistics from "./EpmaStatistics"
 import ConfigErrorResults from "./ConfigErrorResults"
 import HighRiskComparison from "./HighRiskComparison"
+import { appSettingsStore } from "../stores/appSettings"
 
 export default {
   name: 'AdminHome',
@@ -115,6 +116,7 @@ export default {
   data() {
     return {
       reports: [],
+      reportCountPerSystem: {},
       partialAssessments: [],
       chartData: [],
       epmaStatsData: [],
@@ -127,6 +129,7 @@ export default {
     },
     async getReports() {
       const allRepResponse = await rootStore().getAllReports()
+      this.reportCountPerSystem = Object.fromEntries(appSettingsStore().epSystemOptions.map(ep => [ep.value, 0]))
       if (allRepResponse.status < 400) {
         const ceDetailsResponse = await rootStore().getConfigErrors()
         if (ceDetailsResponse.status < 400) {
@@ -139,6 +142,7 @@ export default {
               cedElt.question = ceObjects[cedElt.test_id].question
               cedElt.good_answer = ceObjects[cedElt.test_id].good_answer
             })
+            this.reportCountPerSystem[rep.system.ep_service]++
           })
           // Additional details of partially completed assessments
           const partialsResponse = await rootStore().getAllInstitutionAssessments()
