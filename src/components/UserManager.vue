@@ -62,6 +62,7 @@
 
           <div v-if="searchResults.length != 0">
             <h4>Search results</h4>
+            <h5>Found {{ `${searchResults.length} user${searchResults.length != 1 ? 's' : ''} from ${this.noRepresentedInstitutions} institution${this.noRepresentedInstitutions != 1 ? 's' : ''}` }}</h5>
             <Form ref="userEditForm" v-slot="{ meta: formMeta }" :validation-schema="editValidationSchema">
               <input type="hidden" name="current-edit-id" v-model="currentEdit.id">
               <table class="table table-bordered table-striped mb-4">
@@ -270,6 +271,7 @@ export default {
       institutions: [],
       searchLive: false,
       searchResults: [],
+      noRepresentedInstitutions: 0,
       currentEdit: null,
       deleteId: null
     }
@@ -324,10 +326,14 @@ export default {
 
       console.group('onSearchClick()')
 
+      const instHash = {}
+
       this.searchLive = true
       this.currentEdit = this.unsetEdit
       const response = await authenticationStore().findUsers(this.user, this.institution)
       this.searchResults = response.data
+      this.searchResults.forEach(sr => instHash[sr.institution.id] = 1)
+      this.noRepresentedInstitutions = Object.keys(instHash).length
 
       console.groupEnd()
     },

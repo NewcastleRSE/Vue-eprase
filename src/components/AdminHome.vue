@@ -49,7 +49,7 @@
 
         <div class="tab-content">
           <div class="tab-pane fade show active" id="view-all-inst-tab" role="tabpanel">
-            <AllAssessmentReports :reports="reports" :loading="reportDataLoading" />
+            <AllAssessmentReports :reports="reports" :partialAssessments="partialAssessments" :loading="reportDataLoading" />
           </div>
           <div class="tab-pane fade" id="view-mit-comp-tab" role="tabpanel">
             <MitigationComparisonChart @get-mitigation-fail="reportError" />
@@ -115,6 +115,7 @@ export default {
   data() {
     return {
       reports: [],
+      partialAssessments: [],
       chartData: [],
       epmaStatsData: [],
       reportDataLoading: true
@@ -130,8 +131,7 @@ export default {
         const ceDetailsResponse = await rootStore().getConfigErrors()
         if (ceDetailsResponse.status < 400) {
           // Additional details about the config errors that report viewers want to know
-          const ceObjects = Object.fromEntries(ceDetailsResponse.data.map(ce => [ce.configErrorCode, { question: ce.description, good_answer: ce.good_answer }]))
-          this.reportDataLoading = false
+          const ceObjects = Object.fromEntries(ceDetailsResponse.data.map(ce => [ce.configErrorCode, { question: ce.description, good_answer: ce.good_answer }]))          
           this.reports = allRepResponse.data
           this.reports.forEach(rep => {
             rep.system.time_created = getFormattedDate(rep.system.time_created)
@@ -140,6 +140,14 @@ export default {
               cedElt.good_answer = ceObjects[cedElt.test_id].good_answer
             })
           })
+          // Additional details of partially completed assessments
+          const partialsResponse = await rootStore().getAllInstitutionAssessments()
+          if (partialsResponse.status < 400) {            
+            this.partialAssessments = partialsResponse.data
+            this.reportDataLoading = false
+          } else {
+            this.errorAlertModal.show(partialsResponse.message)
+          }
         } else {
           this.errorAlertModal.show(ceDetailsResponse.message)
         }

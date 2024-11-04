@@ -67,9 +67,8 @@
                 </tr>               
                 <tr>
                   <th>High risk scenarios</th>
-                  <td>You have completed {{ highRiskScenarios.length + ' high risk scenario' + (highRiskScenarios.length
-                    != 1 ? 's' : '') }}. Out of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' :
-                      'were') }} mitigated. </td>
+                  <td>You have completed {{ `${highRiskScenarios.length} high risk scenario${highRiskScenarios.length != 1 ? 's' : ''}` }}. 
+                    Of these, {{ highRiskMitigations + ' ' + (highRiskMitigations == 1 ? 'was' : 'were') }} mitigated. </td>
                 </tr>
                 <tr>
                   <th>Alerts/Advisory interventions</th>
@@ -88,9 +87,8 @@
                   <tr>
                     <th colspan="2">
                       <h4 class="bg-warning-subtle p-2">Extreme risk scenarios with no mitigation</h4>
-                      <h5>You have completed {{ extremeRiskScenarios.length + ' extreme risk scenario' +
-                        (extremeRiskScenarios.length != 1 ? 's' : '') }}. Of these, {{ extremeRiskMitigations + ' ' +
-                          (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated</h5>
+                      <h5>You have completed {{ `${extremeRiskScenarios.length} extreme risk scenario${extremeRiskScenarios.length != 1 ? 's' : ''}` }}. 
+                        Of these, {{ extremeRiskMitigations + ' ' + (extremeRiskMitigations == 1 ? 'was' : 'were') }} mitigated</h5>
                     </th>
                   </tr>                  
                 </thead>
@@ -251,7 +249,7 @@ export default {
       return `<h2>Assessment Report</h2><h3>Institution: ${this.institution}</h3><h4>EP System: ${this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system}</h4>`
     },
     assemblePrintableReport() {
-      const tpl = document.createElement('tmeplate')
+      const tpl = document.createElement('template')
       document.querySelectorAll('div[role="tabpanel"]').forEach(tbp => {
         const article = document.createElement('article')
         article.setAttribute('style', 'page-break-after: always')
@@ -281,7 +279,7 @@ export default {
           const nQs = jsondata['categories'][ck].count
           const percentInCat = calcNum(jsondata['categories'][ck][csk], nQs)
           xArr.push(percentInCat)
-          customdata.push(`${percentInCat}% of ${nQs} question${nQs == 1 ? '' : 's'}`)
+          customdata.push(`${percentInCat}% of ${nQs} question${nQs != 1 ? 's' : ''}`)
         })
         console.log(bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor)
         stackedChartData.push({
