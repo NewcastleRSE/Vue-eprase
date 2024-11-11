@@ -140,6 +140,7 @@ if (process.env.NODE_ENV === "production") {
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       "process.env": {
+        DEBUG: false,
         NODE_ENV: '"production"',
         BASE_URL: baseURL,
       },
@@ -155,6 +156,7 @@ if (process.env.NODE_ENV === "production") {
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       "process.env": {
+        DEBUG: true,
         NODE_ENV: '"development"',
         BASE_URL: '"http://localhost:6001/api/"',
       },

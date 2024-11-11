@@ -14,6 +14,7 @@ import AssessmentResults from "../components/AssessmentResults"
 import UserManager from "../components/UserManager"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
+import TestDb from "../components/TestDb"
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -71,7 +72,7 @@ export const router = createRouter({
     {
       path: "/printablepdf",
       component: PrintablePdf,
-    },
+    },  
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ],
@@ -85,6 +86,13 @@ export const router = createRouter({
     return { x: 0, y: 0 }
   }
 })
+
+if (process.env.DEBUG) {
+  router.addRoute({
+    path: "/testdb",
+    component: TestDb
+  })
+}
 
 // Hook to disable browser back button (pretty desperate stuff)
 router.afterEach((to, from) => {
@@ -109,7 +117,7 @@ router.beforeEach(async (to, from, next) => {
 
   const auth = authenticationStore()
   const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
-  const adminPages = ['/adminhome']
+  const adminPages = ['/adminhome', '/testdb']
   const authRequired = !publicPages.includes(to.path)
   const adminRequired = adminPages.includes(to.path)
   console.debug('Authentication required', authRequired)
