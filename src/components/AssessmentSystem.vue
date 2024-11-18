@@ -322,7 +322,7 @@
             <p class="fw-bold">Is the ePrescribing system used to prescribe the following? <span class="required-field">*</span></p>
             <fieldset>
               <legend style="display: none;">ePrescribing system prescription question options</legend>
-              <div v-for="(option, index) in results.options" class="form-check ms-2">
+              <div v-for="(option, index) in highRiskMedsOptions" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
                   <input v-bind="field" :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
                     :value="option.value">
@@ -336,7 +336,7 @@
             <p class="fw-bold">Is the ePrescribing system used in the following areas? <span class="required-field">*</span></p>
             <fieldset>
               <legend style="display: none;">ePrescribing area question options</legend>
-              <div v-for="(option, index) in results.area_options" class="form-check ms-2">
+              <div v-for="(option, index) in clinicalAreasOptions" class="form-check ms-2">
                 <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
                   name="clinical_areas" :value="option.value">
                   <input v-bind="field" :id="'id_clinical_areas_' + index" type="checkbox" class="form-check-input" name="clinical_areas"
@@ -415,12 +415,18 @@ export default {
   },
   computed: {
     ...mapStores(rootStore),
-    ...mapState(appSettingsStore, ['epSystemOptions']),
+    ...mapState(appSettingsStore, ['epSystemOptions', 'highRiskMeds', 'clinicalAreas']),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
     epSystemOptions() {
       return appSettingsStore().epSystemOptions
+    },
+    highRiskMedsOptions() {
+      return appSettingsStore().highRiskMeds
+    },
+    clinicalAreasOptions() {
+      return appSettingsStore().clinicalAreas
     },
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
@@ -524,78 +530,9 @@ export default {
         penicillin_description_other: '',
         penicillin_results: '',
         penicillin_comment: '',
-        high_risk_meds: [],
-        options: [
-          // { text: 'Warfarin', value: 'Warfarin' },
-          // { text: 'Insulin', value: 'Insulin' },
-          // { text: 'Fluids', value: 'Fluids' },
-          // { text: 'Oxygen', value: 'Oxygen' },
-          // { text: 'Patient controlled analgesia (PCA)', value: 'PCA' },
-          // { text: 'Continuous infusions', value: 'Continuous infusions' },
-          // { text: 'Parenteral nutrition', value: 'Parenteral nutrition' },
-          // { text: 'Enteral nutrition', value: 'Enteral nutrition' },
-          // { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements' },
-          // { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines' }
-          // Updates 2024-07-01 & 2024-10-02 (chemo => 2 options)
-          { text: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
-          { text: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
-          { text: 'Warfarin', value: 'Warfarin' },
-          { text: 'Heparin', value: 'Heparin' },
-          { text: 'Insulin', value: 'Insulin' },
-          { text: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
-          { text: 'Chemotherapy oral', value: 'Chemotherapy oral' },
-          { text: 'Chemotherapy IV', value: 'Chemotherapy IV'},
-          { text: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
-          { text: 'Antimicrobials', value: 'Antimicrobials' },
-          { text: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
-          { text: 'Controlled Drugs', value: 'Controlled Drugs' },
-          { text: 'Patient Controlled Analgesia', value: 'PCA' },
-          { text: 'Multi-Ingredient Infusions (e.g Morphine, Cyclizine, Water for Injection)', value: 'MII' },
-          { text: 'Pharmacogenomics', value: 'Pharmacogenomics' },
-          { text: 'Fluids', value: 'Fluids' },
-          { text: 'Blood Products / Components (e.g. red cells, platelets, fresh frozen plasma and cryoprecipitate, or plasma derivatives)', value: 'Blood Products' },
-          { text: 'Medical Gases (e.g. Oxygen, Medical Air, Nitrous Oxide)', value: 'Medical Gases' },
-          { text: 'Parenteral Nutrition', value: 'Parenteral Nutrition' },
-          { text: 'Other Nutrition', value: 'Other Nutrition' },
-          { text: 'Linked Therapeutic Drug Monitoring (e.g. Gentamicin / Vancomycin)', value: 'LTDM' },
-          { text: 'Ability to prescribe dose titration', value: 'Dose Titration' }
-        ],
+        high_risk_meds: [],        
         clinical_areas: [],
-        other_clinical_area: '',
-        area_options: [
-          // { text: 'Adult Critical Care', value: 'ACC' },
-          // { text: 'Paediatric Critical Care', value: 'PCC' },
-          // { text: 'Paediatric Wards', value: 'Paediatric Wards' },
-          // { text: 'A & E', value: 'A&E' },
-          // { text: 'Chemotherapy', value: 'Chemotherapy' },
-          // { text: 'Outpatients', value: 'Outpatients' },
-          // { text: 'Community Beds', value: 'Community beds' },
-          // { text: 'Day Cases', value: 'Day cases' },
-          // { text: 'Clinical Trials', value: 'Clinical trials' },
-          // { text: 'Intermediate Care', value: 'Intermediate care' }
-          // Updates 2024-07-01
-          { text: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
-          { text: 'Accident and Emergency EPMA being used for prescribing (A&E) ', value: 'A&E EPMA Prescribing' },
-          { text: 'Inpatient (e.g. Ambulatory unit, Care of the Elderly, Orthopaedics)', value: 'Inpatient' },
-          { text: 'Intensive Care Unit (ICU)', value: 'ICU' },
-          { text: 'Theatre', value: 'Theatre' },
-          { text: 'Day Cases ( e.g. procedures)', value: 'Day Cases' },
-          { text: 'Outpatients', value: 'Outpatients' },
-          { text: 'Special Clinics (e.g. Dialysis / Renal)', value: 'Special Clinics' },
-          { text: 'Sexual and Reproductive Health (SRH) services or Genitourinary Medicine Clinics (GUM)', value: 'SRH' },
-          { text: 'Maternity', value: 'Maternity' },
-          { text: 'Neonatal', value: 'Neonatal' },
-          { text: 'Special Care Baby Unit (SCBU) / Neonatal Intensive Care (NICU)', value: 'SCBU' },
-          { text: 'Paediatrics', value: 'Paediatrics' },
-          { text: 'Paediatric Intensive Care (PICU)', value: 'PICU' },
-          { text: 'Cancer Services', value: 'Cancer Services' },
-          { text: 'Community', value: 'Community' },
-          { text: 'Intermediate Care', value: 'Intermediate Care' },
-          { text: 'Virtual Wards', value: 'Virtual Wards' },
-          { text: 'Homecare medicines service', value: 'HMS' },
-          { text: 'Clinical Trials ', value: 'Clinical Trials' },
-          { text: 'Other (please specify)', value: 'Other' }
-        ]
+        other_clinical_area: ''        
       },
       startTime: ''
     }

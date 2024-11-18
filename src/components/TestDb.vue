@@ -47,10 +47,13 @@
 <script>
 
 import { faker } from '@faker-js/faker'
+import { prependZero } from '../helpers/utils'
 import { Form, Field } from 'vee-validate'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
+import { appSettingsStore } from '../stores/appSettings'
+import { patientStore } from '../stores/patients'
 
 export default {
   name: "TestDb",
@@ -59,7 +62,7 @@ export default {
     Field
   },
   computed: {
-    ...mapStores(rootStore, authenticationStore),
+    ...mapStores(rootStore, authenticationStore, appSettingsStore, patientStore),
     isDebug() {
       return process.env.DEBUG === true
     }
@@ -76,31 +79,131 @@ export default {
     }
   },
   methods: {  
-    generateData() {
+    async generateData() {
 
+      console.group('generateData()')
+
+      // Some initialisation on patientStore
+      const response = await patientStore().getRequiredTests()
+      if (response.status >= 400) {
+        console.error(response.message)
+        return
+      }
+
+      let processStage = ''
       this.generating = true
+      authenticationStore().setSimulationMode(true)
 
       // Generate the required number of random users
       for (let i = 0; i < this.nusers; i++) {
 
-        this.currentGenProgress.push(this.initProgressRecord())
+        console.debug('Generating assessment record', i)
 
-        // Basic user data = user signup
-        let inst = this.randomInstitition()
-        this.setProgressRecord(i, 'userInst', inst.orgName)
-        let email = this.randomEmail()
-        this.setProgressRecord(i, 'userName', email.split('@').shift())
-        this.setProgressRecord(i, 'createUser', 'in progress')
-        let ret = authenticationStore().signup(this.readProgressRecord(i, 'userName'), inst.id, email, faker.internet.password({length: 12}))
+        try {
+          this.currentGenProgress.push(this.initProgressRecord())
 
-        if (ret.status == 'ok') {
-          console.debug('Status ok')
-          this.setProgressRecord(i, 'createUser', 'completed')
-        } else {
-          this.setProgressRecord(i, 'createUser', 'error')
+          // Basic user data => user signup
+          console.debug('Creating user...')
+          processStage = 'createUser'
+          let inst = this.randomInstitition()
+          this.setProgressRecord(i, 'userInst', inst.orgName)
+          let email = this.randomEmail()
+          let userName = email.split('@').shift()
+          let password = faker.internet.password({length: 12})
+          this.setProgressRecord(i, 'userName', userName)
+          this.setProgressRecord(i, processStage, 'in progress')
+          const signupRet = await authenticationStore().signup(userName, inst.id, email, password)
+          if (signupRet.status != 'ok') {
+            throw new Error(signupRet.message)
+          }
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('User', userName, 'created')
+
+          // Log user in
+          console.debug('Logging user in...')
+          processStage = 'loggingInUser'
+          this.setProgressRecord(i, processStage, 'in progress')
+          const loginRet = await authenticationStore().login(userName, password)
+          if (loginRet.status >= 400) {
+            throw new Error(loginRet.message)
+          }
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('Login successful')
+
+          // System information page
+          console.debug('Filling out system info...')
+          processStage = 'genSystem'
+          this.setProgressRecord(i, processStage, 'in progress')
+          const impDate = this.randomDateBetween(new Date('2020-01-01'), new Date('2023-12-31'))
+          const updDate = this.randomDateBetween(impDate, new Date())
+          const systemRet = await rootStore().saveSystemData(
+            this.randomEpSystem(),
+            `${prependZero(impDate.getMonth() + 1)}-${impDate.getFullYear()}`,
+            `${prependZero(updDate.getMonth() + 1)}-${updDate.getFullYear()}`,
+            '',       // other_ep_system
+            '',       // local_ep_system_name
+            0,        // version (not used),
+            this.randomEpUsage(),
+            Math.floor(Math.random() * 3) + 0.5,  // num_maintainers
+            '',       // add_ep_system
+            'Adults', // patient_type
+            true,     // lab_results 
+            true,     // man_results
+            true,     // diagnosis_results
+            this.randomPenicillinDescription(), 
+            '',       // penicillin_description_other
+            true,     // penicillin_results
+            '',       // penicillin_comment
+            true,     // med_history
+            this.randomHighRiskMeds(),
+            this.randomClinicalAreas(),
+            this.randomTimeTaken()
+          )
+          if (systemRet.status >= 400) {
+            throw new Error(systemRet.message)
+          }
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('System info saved')
+
+          // Patients and details
+          console.debug('Filling out system info...')
+          processStage = 'genPatients'
+          this.setProgressRecord(i, processStage, 'in progress')
+
+          const cpdRet = await patientStore().getCompletePatientDetails(false, 'Adults')
+          if (cpdRet.status >= 400) {
+            throw new Error(cpdRet.message)
+          }
+          const patientIds = cpdRet.data.map(p => p.id)
+          const saveIdsRet = await patientStore().savePatientList(patientIds.join(','))
+          if (saveIdsRet.status >= 400) {
+            throw new Error(saveIdsRet.message)
+          }
+          cpdRet.data.forEach(async pdata => {
+            const spdRet = await patientStore().savePatientData(
+              '',   // qualitative_data
+              pdata.code, 
+              this.randomTimeTaken()
+            )
+            if (spdRet.status >= 400) {
+              throw new Error(spdRet.message)
+            }
+          })
+
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('Patient data saved')
+
+        } catch(err) {
+          this.setProgressRecord(i, processStage, 'error')
+          console.error(err.message)
         }
+
         this.genIdx++
       }
+
+      authenticationStore().setSimulationMode(false)
+
+      console.groupEnd()
     }, 
     initProgressRecord() {
       return {
@@ -166,6 +269,63 @@ export default {
         return 'nhs.net'
       }
       return 'nhs.uk'
+    },
+    randomEpSystem() {
+      const epSystems = appSettingsStore().epSystemOptions
+      return epSystems[Math.floor(Math.random() * (epSystems.length - 1))].value
+    },
+    randomDateBetween(start, end) {
+      return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    },
+    randomEpUsage() {
+      const options = ['76-100', '51-75', '26-50', '0-25']
+      return options[Math.floor(Math.random() * options.length)]
+    },
+    randomPenicillinDescription() {
+      const options = ['penicillin_v', 'phenoxymethylpenicillin', 'phenoxymethylpenicillin_tablets']
+      return options[Math.floor(Math.random() * options.length)]
+    },
+    randomHighRiskMeds() {
+
+      console.group('randomHighRiskMeds()')
+
+      const hrms = []
+      const options = appSettingsStore().highRiskMeds.map(hrm => hrm.value)
+      const nMeds = Math.floor(3 + Math.random() * (options.length - 3))  // Random number of meds, at least 3
+      for (let i = 0; i < nMeds; i++) {
+        // Generate a random index in the current options array
+        const idx = Math.floor(Math.random() * options.length)
+        hrms.push(options[idx])
+        options.splice(idx, 1)  // Remove this element so not chosen again
+      }
+
+      console.debug(hrms)
+      console.groupEnd()
+
+      return hrms.toString()
+    },
+    randomClinicalAreas() {
+
+      console.group('randomHighRiskMeds()')
+
+      const cas = []
+      const options = appSettingsStore().clinicalAreas.map(ca => ca.value)
+      options.pop() // Remove the 'other' option from the end
+      const nCa = Math.floor(3 + Math.random() * (options.length - 3))  // Random number of areas, at least 3
+      for (let i = 0; i < nCa; i++) {
+        // Generate a random index in the current options array
+        const idx = Math.floor(Math.random() * options.length)
+        cas.push(options[idx])
+        options.splice(idx, 1)  // Remove this element so not chosen again
+      }
+
+      console.debug(cas)
+      console.groupEnd()
+
+      return cas.toString()
+    },
+    randomTimeTaken() {
+      return Math.floor(100 * Math.random()) + 30
     },
     async getInstitutions() {
       const response = await rootStore().getInstitutions()

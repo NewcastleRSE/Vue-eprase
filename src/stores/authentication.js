@@ -10,7 +10,9 @@ export const authenticationStore = defineStore('authentication', {
     orgCode: null,
     orgName: null,
     trust: null,
-    token: null
+    token: null,
+    simulationMode: false,   // true => allow admins to simulate less privileged user logins to generate test data, without destroying local login data in storage
+    simulatedUser: null
   }),
   persist: true,
   getters: {   
@@ -35,7 +37,7 @@ export const authenticationStore = defineStore('authentication', {
         const user = await axios.post('auth/signin', { username, password })
         const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
         console.debug('User', user, 'institution details', institutionDetails)
-        this.storeUserData(user, institutionDetails)
+        this.storeUserData(user, institutionDetails)        
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -57,6 +59,9 @@ export const authenticationStore = defineStore('authentication', {
       this.clear()
 
       console.groupEnd()
+    },
+    setSimulationMode(value) {
+      this.simulationMode = value
     },
     async signup(username, institution, email, password) {
 
@@ -95,6 +100,9 @@ export const authenticationStore = defineStore('authentication', {
         console.groupEnd()
         return false
       }
+    },
+    getInstitutionId() {
+      return this.simulationMode ? this.simulatedUser.institutionId : this.institutionId
     },
     async getInstitutionDetails(institutionId) {
 
@@ -154,11 +162,17 @@ export const authenticationStore = defineStore('authentication', {
         token: user.data.jwt.accessToken
       }
 
-      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
-
-      this.$patch(csPayload)      
-
-      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
+      if (this.simulationMode) {
+        console.debug('*** SIMULATION MODE ***')
+        console.debug('Storing user data', csPayload, 'in simulated user area...')
+        this.simulatedUser = csPayload
+        console.debug('Done')
+      } else {
+        console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
+        this.$patch(csPayload)      
+        console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
+      }
+      
       console.groupEnd()
     },
     // User management methods, only accessible to an admin

@@ -34,7 +34,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = { headers: { Authorization: `Bearer ${auth.token}` } }
+      const config = { headers: { Authorization: `Bearer ${auth.simulationMode ? auth.simulatedUser.token : auth.token}` } }
 
       try {
         if (method == 'GET') {
@@ -104,7 +104,7 @@ export const rootStore = defineStore('root', {
     },
     async getAssessmentProgress() {
       let ret = null
-      const instId = authenticationStore().institutionId
+      const instId = authenticationStore().getInstitutionId()
       const response1 = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + instId, 'GET') 
       const response2 = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + instId, 'GET')
       if (response1.status < 400 && response2.status < 400) {
@@ -122,7 +122,7 @@ export const rootStore = defineStore('root', {
       return ret   
     },
     async updateAssessmentProgress() {
-      const instId = authenticationStore().institutionId
+      const instId = authenticationStore().getInstitutionId()
       const response = await this.apiCall('updateInstitutionAssessment?INSTITUTION_ID=' + instId, 'POST') 
       return response      
     },
@@ -172,7 +172,7 @@ export const rootStore = defineStore('root', {
       return(response)   
     },
     async saveMitigationResults(assessmentId, epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests) {
-      const institutionId = authenticationStore().institutionId
+      const institutionId = authenticationStore().getInstitutionId()
       const response = await this.apiCall('saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, 'POST', { epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests })   
       if (response.status < 400) {
         this.storeMitigationData(goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests)

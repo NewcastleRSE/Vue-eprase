@@ -66,7 +66,7 @@ export const patientStore = defineStore('patients', {
       return response
     },
     async getPatientIds() {
-      const instId = authenticationStore().institutionId
+      const instId = authenticationStore().getInstitutionId()
       const response = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
       return response
     },
@@ -79,7 +79,7 @@ export const patientStore = defineStore('patients', {
       return response      
     },   
     async savePatientList(patient_list) {
-      const institutionId = authenticationStore().institutionId
+      const institutionId = authenticationStore().getInstitutionId()
       const response = await rootStore().apiCall('savepatientlist?INSTITUTION_ID=' + institutionId, 'POST', patient_list)      
       return(response)
     },    
@@ -130,7 +130,7 @@ export const patientStore = defineStore('patients', {
           }
         }
           
-        const instId = authenticationStore().institutionId
+        const instId = authenticationStore().getInstitutionId()
         const idsResponse = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
         if (idsResponse.status < 400) {
           if (idsResponse.data == 'No patient ids') {
