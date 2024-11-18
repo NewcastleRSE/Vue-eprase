@@ -8,12 +8,14 @@ import { Tooltip } from 'bootstrap'
 
 export default {
   name: "app",
-  components: {}, 
+  components: {
+    RouterView
+  }, 
   mounted() {
     new Tooltip(document.body, {
       selector: "[data-bs-toggle='tooltip']",
       trigger: 'hover'
-    })
+    })    
   }
 }
 </script>
