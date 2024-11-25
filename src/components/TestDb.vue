@@ -75,6 +75,7 @@ export default {
       institutions: [],
       generating: false,
       currentGenProgress: [],
+      categories: [],
       usersPerInstitution: {}
     }
   },
@@ -166,7 +167,7 @@ export default {
           console.debug('System info saved')
 
           // Patients and details
-          console.debug('Filling out system info...')
+          console.debug('Filling out patient info...')
           processStage = 'genPatients'
           this.setProgressRecord(i, processStage, 'in progress')
 
@@ -192,6 +193,56 @@ export default {
 
           this.setProgressRecord(i, processStage, 'completed')
           console.debug('Patient data saved')
+
+          // Scenarios
+          console.debug('Filling out scenarios...')
+          processStage = 'genScenarios'
+          this.setProgressRecord(i, processStage, 'in progress')
+
+          const catRet = await rootStore().getCategories()
+          if (catRet.status >= 400) {
+            throw new Error(catRet.message)
+          }
+          this.categories = catRet.data
+
+          const scenRet = await patientStore().getCompletePatientDetails(true, 'Adults')
+          if (scenRet.status >= 400) {
+            throw new Error(scenRet.message)
+          }
+
+          patientStore().testList.forEach(t => {
+            if (t.configErrorCode) {
+              // Generate random config error response
+              const cfgErrRet = await patientStore().saveConfigError(t.configErrorCode, Math.floor(Math.random() * 3), this.randomTimeTaken())
+              if (cfgErrRet.status >= 400) {
+                throw new Error(cfgErrRet.message)
+              }
+            } else {
+              // Generate random scenario response
+              const outcome = this.randomOutcome()
+              const checkboxValues = this.checkboxValues(outcome)
+              const prDataRet = await patientStore().savePrescriptionData(
+                t.id,   // prescription id
+                outcome, 
+                '',     // other 
+                checkboxValues.intervention_type, 
+                checkboxValues.selected_type, 
+                t.risk_level, 
+                result, 
+                result_score, 
+                this.randomTimeTaken(), 
+                qualitative_data, 
+                completed
+              )
+              if (prDataRet.status >= 400) {
+                throw new Error(prDataRet.message)
+              }
+            }
+          })
+
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('Scenario data saved')
+
 
         } catch(err) {
           this.setProgressRecord(i, processStage, 'error')
@@ -250,6 +301,16 @@ export default {
       console.debug('Returning', ret)
       console.groupEnd()
 
+      return ret
+    },
+    checkboxValues(outcome) {
+      const ret = {
+        intervention_type: '',
+        selected_type: ''
+      }
+      if (outcome == 'intervention') {
+
+      }
       return ret
     },
     randomEmail() {
@@ -323,6 +384,10 @@ export default {
       console.groupEnd()
 
       return cas.toString()
+    },
+    randomOutcome() {
+      const outcomeValues = ['no-intervention', 'order-set-overridden', 'intervention', 'order-prevented', 'not-available']
+      return outcomeValues[Math.floor(Math.random() * outcomeValues.length)]
     },
     randomTimeTaken() {
       return Math.floor(100 * Math.random()) + 30
