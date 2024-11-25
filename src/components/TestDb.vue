@@ -32,6 +32,7 @@
             <li class="list-group-item" :class="progressBackground(ntest - 1, 'genSystem')">Fill in system info</li>
             <li class="list-group-item" :class="progressBackground(ntest - 1, 'genPatients')">Enter patients</li>
             <li class="list-group-item" :class="progressBackground(ntest - 1, 'genScenarios')">Generate scenarios</li>
+            <li class="list-group-item" :class="progressBackground(ntest - 1, 'calcMitigations')">Calculate mitigations</li>
           </ul>
         </div>
       </div>
@@ -210,7 +211,7 @@ export default {
             throw new Error(scenRet.message)
           }
 
-          patientStore().testList.forEach(t => {
+          patientStore().testList.forEach(async t => {
             if (t.configErrorCode) {
               // Generate random config error response
               const cfgErrRet = await patientStore().saveConfigError(t.configErrorCode, Math.floor(Math.random() * 3), this.randomTimeTaken())
@@ -221,6 +222,8 @@ export default {
               // Generate random scenario response
               const outcome = this.randomOutcome()
               const checkboxValues = this.checkboxValues(outcome)
+              const result = this.getResult(t.risk_level, outcome)
+              const resultScore = this.getResultScore(result)
               const prDataRet = await patientStore().savePrescriptionData(
                 t.id,   // prescription id
                 outcome, 
@@ -229,10 +232,9 @@ export default {
                 checkboxValues.selected_type, 
                 t.risk_level, 
                 result, 
-                result_score, 
+                resultScore, 
                 this.randomTimeTaken(), 
-                qualitative_data, 
-                completed
+                ''      // qualitative_data
               )
               if (prDataRet.status >= 400) {
                 throw new Error(prDataRet.message)
@@ -243,6 +245,15 @@ export default {
           this.setProgressRecord(i, processStage, 'completed')
           console.debug('Scenario data saved')
 
+          // Mitigations
+          console.debug('Calculating mitigations...')
+          processStage = 'calcMitigations'
+          this.setProgressRecord(i, processStage, 'in progress')
+
+          //TODO
+
+          this.setProgressRecord(i, processStage, 'completed')
+          console.debug('Mitigation data saved')
 
         } catch(err) {
           this.setProgressRecord(i, processStage, 'error')
@@ -309,7 +320,25 @@ export default {
         selected_type: ''
       }
       if (outcome == 'intervention') {
-
+        const itypes = []
+        const stypes = []
+        this.categories.forEach(c => {
+          if (Math.random() > 0.5) {
+            itypes.push(c.id)
+            stypes.push('alert')
+          }
+          if (Math.random() > 0.5) {
+            itypes.push(c.id)
+            stypes.push('advisory')
+          }
+        })
+        if (itypes.length == 0) {
+          // Vanishingly small probability of ending up here...
+          itypes.push(this.categories[0])
+          stypes.push('alert')
+        }
+        ret.intervention_type = itypes.toString()
+        ret.selected_type = stypes.toString()
       }
       return ret
     },
@@ -400,6 +429,41 @@ export default {
         this.institutions = [response.message]
         console.error(response.message)
       }      
+    },
+    // Culled from ScenarioPrescription.vue, indicating these constants need to be in settings...
+    getResult(risk_level, outcome) {
+      const resultMatrix = {
+        'Extreme': {
+          'no-intervention': 'No Mitigation/Fail',
+          'order-prevented': 'Good Mitigation/Pass',
+          'order-set-overridden': 'Some Mitigation',
+          'intervention': 'Some Mitigation'
+        },
+        'High': {
+          'no-intervention': 'No Mitigation/Fail',
+          'order-prevented': 'Over Mitigation',
+          'order-set-overridden': 'Some Mitigation',
+          'intervention': 'Good Mitigation/Pass'
+        },
+        // alias for Low risk
+        'N/A': {
+          'no-intervention': 'Good Mitigation/Pass',
+          'order-prevented': 'Over Mitigation',
+          'order-set-overridden': 'Over Mitigation',
+          'intervention': 'Over Mitigation'
+        }
+      }
+      return resultMatrix[risk_level] ? (resultMatrix[risk_level][outcome] || 'Null') : 'Null'
+    },
+    // Culled from ScenarioPrescription.vue, indicating these constants need to be in settings...
+    getResultScore(result) {
+      const scoreMatrix = {
+        'Over Mitigation': 15,
+        'Good Mitigation/Pass': 10,
+        'Some Mitigation': 5,
+        'No Mitigation/Fail': 1
+      }
+      return scoreMatrix[result] || 0
     }
   },
   mounted() {
