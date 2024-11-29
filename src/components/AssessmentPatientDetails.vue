@@ -1,25 +1,33 @@
 <template>
   <main class="leftalign">
-
     <TabHeader :showIndex="1" />
 
     <div class="content p-4">
-
       <LoginInfo />
 
       <h1 class="h2">Patient Information</h1>
       <div v-if="nextUnsaved == 0">
-        <p>Please enter the following {{ totalNumPatients }} sets of patient details into your EP system</p>
+        <p>
+          Please enter the following {{ totalNumPatients }} sets of patient details into
+          your EP system
+        </p>
       </div>
       <div v-if="nextUnsaved < totalNumPatients">
-        <p>You have a further {{ totalNumPatients - nextUnsaved }} sets of patient details to enter ({{ nextUnsaved }} have already been entered)</p>
+        <p>
+          You have a further {{ totalNumPatients - nextUnsaved }} sets of patient details
+          to enter ({{ nextUnsaved }} have already been entered)
+        </p>
       </div>
-      <p>Prescribe any medication listed below using your usual prescribing process. Populate any other mandatory fields
-        with appropriate self-generated information.</p>
-      <p class="pb-4">When you are done, click <span class="fw-bold">Next</span> to continue or <span class="fw-bold">Previous</span> to view already entered items</p>
+      <p>
+        Prescribe any medication listed below using your usual prescribing process.
+        Populate any other mandatory fields with appropriate self-generated information.
+      </p>
+      <p class="pb-4">
+        When you are done, click <span class="fw-bold">Next</span> to continue or
+        <span class="fw-bold">Previous</span> to view already entered items
+      </p>
 
       <div v-if="patient != null" class="mx-auto card">
-
         <div class="card-header">
           <h2 class="h3">{{ patient.first_name }} {{ patient.surname }}</h2>
           <span class="patient-image">
@@ -28,11 +36,12 @@
               src="../assets/images/anon-female.png" />
             <img v-if="!patient.is_adult" src="../assets/images/child.png" />
           </span>
-          <p class="subtitle">(Patient {{ patientIndex + 1 }} of {{ totalNumPatients }})</p>
+          <p class="subtitle">
+            (Patient {{ patientIndex + 1 }} of {{ totalNumPatients }})
+          </p>
         </div>
 
         <div class="card-body p-4">
-
           <div class="row mb-4">
             <div class="patient-demographics col-auto col-xl-4 pt-lg-0 pt-2">
               <table class="table table-striped">
@@ -45,12 +54,14 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th>Height (m)</th><td>{{ patient.height || 'unavailable' }}</td>
+                    <th>Height (m)</th>
+                    <td>{{ patient.height || "unavailable" }}</td>
                   </tr>
                   <tr>
-                    <th>Weight (kg)</th><td>{{ patient.weight || 'unavailable' }}</td>
+                    <th>Weight (kg)</th>
+                    <td>{{ patient.weight || "unavailable" }}</td>
                   </tr>
-                </tbody>                  
+                </tbody>
               </table>
             </div>
             <div class="patient-allergies col-auto col-xl-4 pt-lg-0 pt-2">
@@ -66,7 +77,9 @@
                   <tr v-if="patient.allergy.length > 0" v-for="allergy in patient.allergy" :key="allergy">
                     <td>{{ allergy.allergy }}</td>
                   </tr>
-                  <tr v-if="patient.allergy.length == 0"><td>No Known Drug Allergies</td></tr>
+                  <tr v-if="patient.allergy.length == 0">
+                    <td>No Known Drug Allergies</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -85,18 +98,21 @@
                     <th>Dose</th>
                     <th>Route</th>
                     <th>Form</th>
-                    <th>Frequency</th>                   
+                    <th>Frequency</th>
                   </tr>
-                  <tr v-if="patient.medication_histories.length != 0" v-for="history in patient.medication_histories" :key="history">
+                  <tr v-if="patient.medication_histories.length != 0" v-for="history in patient.medication_histories"
+                    :key="history">
                     <td>{{ history.name }}</td>
                     <td>{{ history.dose }} {{ history.units }}</td>
                     <td>{{ history.route }}</td>
                     <td>{{ history.form }}</td>
                     <td>{{ history.frequency }}</td>
                   </tr>
-                  <tr v-if="patient.medication_histories.length == 0"><td>None</td></tr>
-                </tbody>                  
-              </table>                
+                  <tr v-if="patient.medication_histories.length == 0">
+                    <td>None</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -116,13 +132,16 @@
                     <th>Value</th>
                     <th>Unit</th>
                   </tr>
-                  <tr v-if="patient.clinical_data.length != 0" v-for="clinical in patient.clinical_data" :key="clinical">
+                  <tr v-if="patient.clinical_data.length != 0" v-for="clinical in patient.clinical_data"
+                    :key="clinical">
                     <td>{{ clinical.investigation }}</td>
                     <td>{{ clinical.value }}</td>
                     <td>{{ clinical.unit }}</td>
                   </tr>
-                  <tr v-if="patient.clinical_data.length == 0"><td>None</td></tr>
-                </tbody>                  
+                  <tr v-if="patient.clinical_data.length == 0">
+                    <td>None</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div class="patient-diagnosis col-auto col-xl-4 pt-lg-0 pt-2">
@@ -138,8 +157,10 @@
                   <tr v-if="patient.diagnosis.length != 0" v-for="diagnosis in patient.diagnosis" :key="diagnosis">
                     <td>{{ diagnosis.diagnosis }}</td>
                   </tr>
-                  <tr v-if="patient.diagnosis.length == 0"><td>None</td></tr>
-                </tbody>                  
+                  <tr v-if="patient.diagnosis.length == 0">
+                    <td>None</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div class="patient-comorbidities col-auto col-xl-4 pt-lg-0 pt-2">
@@ -152,65 +173,69 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="patient.comorbidity.length != 0" v-for="comorbidity in patient.comorbidity" :key="comorbidity">
+                  <tr v-if="patient.comorbidity.length != 0" v-for="comorbidity in patient.comorbidity"
+                    :key="comorbidity">
                     <td>{{ comorbidity.comorbidity }}</td>
                   </tr>
-                  <tr v-if="patient.comorbidity.length == 0"><td>None</td></tr>
+                  <tr v-if="patient.comorbidity.length == 0">
+                    <td>None</td>
+                  </tr>
                 </tbody>
-              </table>                
+              </table>
             </div>
           </div>
 
           <div v-if="patientIndex >= nextUnsaved" class="row mb-4">
             <div class="alert alert-warning fw-bold" role="alert">
-              To optimise the use of this tool please record ALL types of guidance that appears on your system screen
+              To optimise the use of this tool please record ALL types of guidance that
+              appears on your system screen
             </div>
             <label class="py-2 fw-bold" for="patient_intervention">System interventions</label>
-            <textarea class="form-control" ref="patientIntervention" v-model="patientQualData" id="patient_intervention" rows="5"
-              placeholder="Please note any interventions from the system..."></textarea>
+            <textarea class="form-control" ref="patientIntervention" v-model="patientQualData" id="patient_intervention"
+              rows="5" placeholder="Please note any interventions from the system..."></textarea>
           </div>
-          
         </div>
 
         <input type="hidden" ref="patientId" id="patient_id" v-model="patient.code" />
-
       </div>
 
       <div class="my-2">
         <h3 class="h5 py-4" v-if="patientIndex < totalNumPatients - 1">
-          When the patient has been admitted to the ePrescribing System, click <span class="fw-bold">Next</span>
-          or use <span class="fw-bold">Previous</span> to view already entered items
+          When the patient has been admitted to the ePrescribing System, click
+          <span class="fw-bold">Next</span> or use
+          <span class="fw-bold">Previous</span> to view already entered items
         </h3>
         <h3 v-if="patientIndex == totalNumPatients - 1">
-          Please ensure you click the <span class="fw-bold">Done</span> button to save your progress
+          Please ensure you click the <span class="fw-bold">Done</span> button to save
+          your progress
         </h3>
         <button type="button" class="btn btn-primary me-2" @click="prevPatient()" :disabled="patientIndex == 0">
-          <i class='bi bi-arrow-left-circle'></i>
-            Previous
-        </button>     
-        <button type="button" class="btn btn-primary" @click="nextPatient()">
-          <i :class="patientIndex < totalNumPatients - 1 ? 'bi bi-arrow-right-circle' : 'bi bi-check2-circle'"></i>
-            {{ patientIndex < totalNumPatients - 1 ? 'Next' : 'Done' }}
+          <i class="bi bi-arrow-left-circle"></i>
+          Previous
         </button>
+        <button type="button" class="btn btn-primary" @click="nextPatient()">
+          <i :class="patientIndex < totalNumPatients - 1
+              ? 'bi bi-arrow-right-circle'
+              : 'bi bi-check2-circle'
+            "></i>
+          {{ patientIndex < totalNumPatients - 1 ? "Next" : "Done" }} </button>
       </div>
     </div>
 
     <ErrorAlertModal ref="errorAlertModal" />
     <AppLogo cls="bottomright" />
-    
   </main>
 </template>
 
 <script>
-
-import dayjs from 'dayjs'
+import dayjs from "dayjs"
 import AppLogo from "./AppLogo"
-import TabHeader from './TabHeader'
-import LoginInfo from './LoginInfo'
-import { mapStores } from 'pinia'
-import { rootStore } from '../stores/root'
-import { patientStore } from '../stores/patients'
-import ErrorAlertModal from './ErrorAlertModal'
+import TabHeader from "./TabHeader"
+import LoginInfo from "./LoginInfo"
+import { mapStores } from "pinia"
+import { rootStore } from "../stores/root"
+import { patientStore } from "../stores/patients"
+import ErrorAlertModal from "./ErrorAlertModal"
 
 export default {
   name: "AssessmentPatientDetails",
@@ -218,7 +243,7 @@ export default {
     TabHeader,
     LoginInfo,
     AppLogo,
-    ErrorAlertModal
+    ErrorAlertModal,
   },
   computed: {
     ...mapStores(patientStore, rootStore),
@@ -227,81 +252,103 @@ export default {
     },
     patientService() {
       return patientStore()
-    },    
+    },
     patientList() {
       return this.patientService.patientList
     },
     nextEditablePatient() {
       return this.patientService.nextEditablePatientIndex
-    },    
+    },
     totalNumPatients() {
       return this.patientList.length
-    }
+    },
   },
   data() {
     return {
-      startTime: '',
+      startTime: "",
       patient: null,
-      patientQualData: '',
+      patientQualData: "",
       patientIndex: 0,
-      nextUnsaved: 0
+      nextUnsaved: 0,
     }
   },
   methods: {
     async savePatient() {
-
-      console.group('savePatient()')
+      console.group("savePatient()")
 
       const qualitative_data = this.patientQualData
       const code = this.patient.code
 
-      console.debug('Attempt save of patient at index', this.patientIndex)
-      console.debug('Qualitative data', qualitative_data, 'patient code', code)
+      console.debug("Attempt save of patient at index", this.patientIndex)
+      console.debug("Qualitative data", qualitative_data, "patient code", code)
 
-      const time_taken = dayjs().diff(this.startTime, 'seconds')
-      const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken)
-      
-      console.debug('Returning', saveResponse)
+      const time_taken = dayjs().diff(this.startTime, "seconds")
+      const saveResponse = await this.patientService.savePatientData(
+        qualitative_data,
+        code,
+        time_taken
+      )
+
+      console.debug("Returning", saveResponse)
 
       return saveResponse
     },
     prevPatient() {
+      console.group("prevPatient()")
 
-      console.group('prevPatient()')
-      
       if (this.patientIndex > 0) {
-        this.patientQualData = ''
+        this.patientQualData = ""
         this.patient = this.patientList[--this.patientIndex]
-        console.debug('Now viewing patient', this.patientIndex)
-      }      
+        console.debug("Now viewing patient", this.patientIndex)
+      }
 
       console.groupEnd()
-    }, 
+    },
     async nextPatient() {
-
-      console.group('nextPatient()')
+      console.group("nextPatient()")
 
       if (this.patientIndex >= this.nextUnsaved) {
-
-        console.debug('Attempt save of patient at index', this.patientIndex, 'already saved', this.nextUnsaved, 'patients')
-        console.debug('qd', this.$refs.patientIntervention.value, 'code', this.$refs.patientId.value)
+        console.debug(
+          "Attempt save of patient at index",
+          this.patientIndex,
+          "already saved",
+          this.nextUnsaved,
+          "patients"
+        )
+        console.debug(
+          "qd",
+          this.$refs.patientIntervention.value,
+          "code",
+          this.$refs.patientId.value
+        )
 
         const completed = this.nextUnsaved == this.totalNumPatients - 1
-        const time_taken = dayjs().diff(this.startTime, 'seconds')
+        const time_taken = dayjs().diff(this.startTime, "seconds")
         const qualitative_data = this.$refs.patientIntervention.value
         const code = this.$refs.patientId.value
-        console.debug('Completed', completed, 'patient code', code, 'qualitative data', qualitative_data)
+        console.debug(
+          "Completed",
+          completed,
+          "patient code",
+          code,
+          "qualitative data",
+          qualitative_data
+        )
 
         const dataService = rootStore()
 
-        const saveResponse = await this.patientService.savePatientData(qualitative_data, code, time_taken)
+        const saveResponse = await this.patientService.savePatientData(
+          qualitative_data,
+          code,
+          time_taken
+        )
         if (saveResponse.status < 400) {
           if (completed) {
             // All patient details now entered
             const updateResponse = await dataService.updateAssessmentProgress()
             if (updateResponse.status < 400) {
-              dataService.audit('Completed patient details', '/assessmentpatientdetails')
-              this.$router.push('/assessmentscenarios')
+              dataService.audit("Completed patient details", "/assessmentpatientdetails")
+              this.$router.push("/assessmentscenarios")
             } else {
               this.errorAlertModal.show(updateResponse.message)
             }
@@ -309,42 +356,51 @@ export default {
             // On to the next one
             this.nextUnsaved++
             this.patient = this.patientList[++this.patientIndex]
-            this.patientQualData = ''
-            console.debug('Advanced to', this.patientIndex, 'now processed', this.nextUnsaved)
+            this.patientQualData = ""
+            console.debug(
+              "Advanced to",
+              this.patientIndex,
+              "now processed",
+              this.nextUnsaved
+            )
           }
         } else {
           this.errorAlertModal.show(saveResponse.message)
         }
       } else {
         this.patient = this.patientList[++this.patientIndex]
-        console.debug('Advanced to', this.patientIndex, '(without additional save), now processed', this.nextUnsaved)
+        console.debug(
+          "Advanced to",
+          this.patientIndex,
+          "(without additional save), now processed",
+          this.nextUnsaved
+        )
       }
-      
+
       console.groupEnd()
     },
     async getPatientsToDo() {
+      console.group("getPatientsToDo()")
 
-      console.group('getPatientsToDo()')
-      
       const patientResponse = await this.patientService.getCompletePatientDetails()
       if (patientResponse.status < 400) {
         this.nextUnsaved = this.nextEditablePatient
         this.patientIndex = this.nextUnsaved
         this.patient = this.patientList[this.patientIndex]
-        console.debug('Initialising patient list at position', this.patientIndex)
+        console.debug("Initialising patient list at position", this.patientIndex)
       } else {
         this.errorAlertModal.show(patientResponse.message)
       }
 
       console.groupEnd()
-    }
+    },
   },
   mounted() {
-    this.getPatientsToDo()    
+    this.getPatientsToDo()
   },
   created: function () {
     this.startTime = dayjs()
-  }
+  },
 }
 </script>
 

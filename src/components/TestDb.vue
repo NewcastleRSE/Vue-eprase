@@ -48,7 +48,8 @@
 <script>
 
 import { faker } from '@faker-js/faker'
-import { prependZero } from '../helpers/utils'
+import { mitigationDataByCategory } from '../helpers/categories'
+import { prependZero, calcPercentage } from '../helpers/utils'
 import { Form, Field } from 'vee-validate'
 import { mapStores } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -84,6 +85,8 @@ export default {
     async generateData() {
 
       console.group('generateData()')
+
+      const numTests = appSettingsStore().numPrescriptions
 
       // Some initialisation on patientStore
       const response = await patientStore().getRequiredTests()
@@ -138,8 +141,9 @@ export default {
           this.setProgressRecord(i, processStage, 'in progress')
           const impDate = this.randomDateBetween(new Date('2020-01-01'), new Date('2023-12-31'))
           const updDate = this.randomDateBetween(impDate, new Date())
+          const epSystem = this.randomEpSystem()
           const systemRet = await rootStore().saveSystemData(
-            this.randomEpSystem(),
+            epSystem,
             `${prependZero(impDate.getMonth() + 1)}-${impDate.getFullYear()}`,
             `${prependZero(updDate.getMonth() + 1)}-${updDate.getFullYear()}`,
             '',       // other_ep_system
@@ -191,6 +195,10 @@ export default {
               throw new Error(spdRet.message)
             }
           })
+          const assessProgRet = await rootStore().updateAssessmentProgress()
+          if (assessProgRet.status >= 400) {
+            throw new Error(assessProgRet.message)
+          }
 
           this.setProgressRecord(i, processStage, 'completed')
           console.debug('Patient data saved')
@@ -211,10 +219,19 @@ export default {
             throw new Error(scenRet.message)
           }
 
+          const prescriptionCats = {}
+          const testOutcomes = []
+          const cfgOutcomes = []
           patientStore().testList.forEach(async t => {
             if (t.configErrorCode) {
               // Generate random config error response
-              const cfgErrRet = await patientStore().saveConfigError(t.configErrorCode, Math.floor(Math.random() * 3), this.randomTimeTaken())
+              const outcomeObj = Object.fromEntries([
+                ['test_id', t.configErrorCode],
+                ['result', Math.floor(Math.random() * 3)],
+                ['time_taken', this.randomTimeTaken()]
+              ])
+              cfgOutcomes.push(outcomeObj)
+              const cfgErrRet = await patientStore().saveConfigError(...Object.values(outcomeObj))
               if (cfgErrRet.status >= 400) {
                 throw new Error(cfgErrRet.message)
               }
@@ -224,18 +241,21 @@ export default {
               const checkboxValues = this.checkboxValues(outcome)
               const result = this.getResult(t.risk_level, outcome)
               const resultScore = this.getResultScore(result)
-              const prDataRet = await patientStore().savePrescriptionData(
-                t.id,   // prescription id
-                outcome, 
-                '',     // other 
-                checkboxValues.intervention_type, 
-                checkboxValues.selected_type, 
-                t.risk_level, 
-                result, 
-                resultScore, 
-                this.randomTimeTaken(), 
-                ''      // qualitative_data
-              )
+              const outcomeObj = Object.fromEntries([
+                ['prescription_id', t.id],
+                ['outcome', outcome],
+                ['other', ''],
+                ['intervention_type', checkboxValues.intervention_type], 
+                ['selected_type', checkboxValues.selected_type], 
+                ['risk_level', t.risk_level], 
+                ['result', result], 
+                ['result_score', resultScore], 
+                ['time_taken', this.randomTimeTaken()], 
+                ['qualitative_data', '']
+              ])
+              testOutcomes.push(outcomeObj)
+              prescriptionCats[t.id] = t.indicator.category.categoryCode
+              const prDataRet = await patientStore().savePrescriptionData(...Object.values(outcomeObj))
               if (prDataRet.status >= 400) {
                 throw new Error(prDataRet.message)
               }
@@ -250,7 +270,28 @@ export default {
           processStage = 'calcMitigations'
           this.setProgressRecord(i, processStage, 'in progress')
 
-          //TODO
+          const mitigationData = mitigationDataByCategory(this.categories, testOutcomes.map(ptd => {
+            return {
+              categoryCode: prescriptionCats[ptd.prescription_id],
+              mitigation: ptd.result,
+              outcome: ptd.outcome,
+              intervention_type: ptd.intervention_type,
+              selected_type: ptd.selected_type
+            }
+          }))
+      
+          const saveMitRet = await rootStore().saveMitigationResults(
+            rootStore().assessmentId, 
+            epSystem, 
+            calcPercentage(mitigationData.totals.totalGood, numTests), 
+            calcPercentage(mitigationData.totals.totalSome, numTests), 
+            calcPercentage(mitigationData.totals.totalNot, numTests),
+            calcPercentage(mitigationData.totals.totalOver, numTests), 
+            calcPercentage(mitigationData.totals.totalNulls, numTests)
+          )
+          if (saveMitRet.status >= 400) {
+            throw new Error(saveMitRet.message)
+          }
 
           this.setProgressRecord(i, processStage, 'completed')
           console.debug('Mitigation data saved')
@@ -293,7 +334,7 @@ export default {
     },
     progressBackground(i, k) {  
 
-      console.group('prpogressBackground()')
+      console.group('progressBackground()')
       console.debug('Received index', i, 'key', k)
 
       let ret = 'bg-light'
