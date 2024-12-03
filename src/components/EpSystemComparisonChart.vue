@@ -53,6 +53,7 @@ import Plotly from 'plotly.js-cartesian-dist-min'
 import { mapStores, mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { appSettingsStore } from '../stores/appSettings'
+import { authenticationStore } from '../stores/authentication'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 
 export default {
@@ -63,7 +64,7 @@ export default {
     }
   },
   computed: {
-    ...mapStores(rootStore),
+    ...mapStores(rootStore, authenticationStore),
     ...mapState(appSettingsStore, ['epSystemOptions']),
     heading() {
       return 'Results by EP System : ' + this.searchfield == 'Other' ? this.other : this.searchfield
@@ -72,7 +73,7 @@ export default {
       return appSettingsStore().epSystemOptions
     },
     chartDataEmpty() {
-      return !Array.isArray(this.chartData) || this.chartData.length == 0
+      return authenticationStore().simulationMode || (!Array.isArray(this.chartData) || this.chartData.length == 0)
     }
   },
   emits: ['get-mitigation-fail'],
