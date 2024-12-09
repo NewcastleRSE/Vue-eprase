@@ -71,9 +71,6 @@ export default {
     },
     epSystemOptions() {
       return appSettingsStore().epSystemOptions
-    },
-    chartDataEmpty() {
-      return authenticationStore().simulationMode || (!Array.isArray(this.chartData) || this.chartData.length == 0)
     }
   },
   emits: ['get-mitigation-fail'],
@@ -91,6 +88,7 @@ export default {
         },           
       },
       chartData: [],
+      chartDataEmpty: true,
       filteredChartData: [],
       searchfield: '',
       other: '',
@@ -152,12 +150,12 @@ export default {
 
       console.groupEnd()
     }, 
-    async getMitigationResults() {
-      this.chartData = rootStore().mitigationChartData
-      if (this.chartDataEmpty) {
-        const response = await rootStore().getAllMitigationResults()
-        if (response.status < 400) {
+    async getMitigationResults() {     
+      const response = await rootStore().getAllMitigationResults()
+      if (response.status < 400) {
+        if (response.data.length > 0) {
           this.chartData = []
+          this.chartDataEmpty = false
           const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
           const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
           const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
@@ -174,10 +172,11 @@ export default {
             chartBlock.y = response.data.map(d => d[mk])            
             this.chartData.push(chartBlock)
           })
-          rootStore().storeMitigationChartData(this.chartData)
         } else {
-          this.$emit('get-mitigation-fail', response.message)
-        }
+          this.chartDataEmpty = true
+        }        
+      } else {
+        this.$emit('get-mitigation-fail', response.message)
       }
     }
   },

@@ -1,47 +1,55 @@
 <template>
-<div v-if="isDebug" class="w-50">
-  <h4 class="pb-2">This page is for developers to generate test data</h4>
-  <p>It should NOT be visible on the live system under any circumstances!</p>
-  <Form ref="testDbForm">
-    <div class="mb-4 row">
-      <label for="nusers" class="col-sm-4 form-label">Number of test users:</label>
-      <div class="col-sm-8">
-        <Field v-slot="{ field }" v-model="nusers" name="nusers">
-          <select v-bind="field" id="nusers" class="form-select">
-            <option v-for="ntest in nuserOptions" :value="ntest">{{ ntest }}</option>
-          </select>                  
-        </Field>
-      </div>      
-    </div>
-    <div class="mb-4">
-      <button type="button" class="btn btn-lg btn-primary me-3" @click="generateData">Generate test data</button>      
-    </div>
-  </Form>
-  <div v-show="generating == true" class="accordion" id="progressRecord">
-    <div class="accordion-item" v-for="ntest in nusers" v-show="showProgressRecord(ntest)">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#rec' + ntest">
-          {{ `User : ${readProgressRecord(ntest - 1, 'userName') || 'unset'} at ${readProgressRecord(ntest - 1, 'userInst') || 'unset'}` }}
-        </button>
-      </h2>
-      <div :id="'rec' + ntest" :class="genIdx == ntest - 1 ? 'accordion-collapse collapse show' : 'accordion-collapse collapse'" data-bs-parent="#progressRecord">
-        <div class="accordion-body">
-          <ul class="list-group">
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'createUser')">User creation</li>
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'loggingInUser')">Logging in user</li>
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'genSystem')">Fill in system info</li>
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'genPatients')">Enter patients</li>
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'genScenarios')">Generate scenarios</li>
-            <li class="list-group-item" :class="progressBackground(ntest - 1, 'calcMitigations')">Calculate mitigations</li>
-          </ul>
+  <div v-if="isDebug">
+    <LoginInfo />
+    <div class="w-50">
+      <h4 class="pb-2">This page is for developers to generate test data</h4>
+      <p>It should NOT be visible on the live system under any circumstances!</p>
+      <Form ref="testDbForm">
+        <div class="mb-4 row">
+          <label for="nusers" class="col-sm-4 form-label">Number of test users:</label>
+          <div class="col-sm-8">
+            <Field v-slot="{ field }" v-model="nusers" name="nusers">
+              <select v-bind="field" id="nusers" class="form-select">
+                <option v-for="ntest in nuserOptions" :value="ntest">{{ ntest }}</option>
+              </select>
+            </Field>
+          </div>
+        </div>
+        <div class="mb-4">
+          <button type="button" class="btn btn-lg btn-primary me-3" @click="generateData">Generate test data</button>
+        </div>
+      </Form>
+      <div v-show="generating == true" class="accordion" id="progressRecord">
+        <div class="accordion-item" v-for="ntest in nusers" v-show="showProgressRecord(ntest)">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="'#rec' + ntest">
+              {{ `User : ${readProgressRecord(ntest - 1, 'userName') || 'unset'} at ${readProgressRecord(ntest - 1,
+                'userInst') || 'unset'}` }}
+            </button>
+          </h2>
+          <div :id="'rec' + ntest"
+            :class="genIdx == ntest - 1 ? 'accordion-collapse collapse show' : 'accordion-collapse collapse'"
+            data-bs-parent="#progressRecord">
+            <div class="accordion-body">
+              <ul class="list-group">
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'createUser')">User creation</li>
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'loggingInUser')">Logging in user</li>
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'genSystem')">Fill in system info</li>
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'genPatients')">Enter patients</li>
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'genScenarios')">Generate scenarios
+                </li>
+                <li class="list-group-item" :class="progressBackground(ntest - 1, 'calcMitigations')">Calculate
+                  mitigations</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </div>  
+    </div>
   </div>
-</div>
-<div v-if="! isDebug">
-  404 : Not found
-</div>
+  <div v-if="!isDebug">
+    404 : Not found
+  </div>
 
 </template>
 
@@ -56,19 +64,21 @@ import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { appSettingsStore } from '../stores/appSettings'
 import { patientStore } from '../stores/patients'
+import LoginInfo from './LoginInfo'
 
 export default {
   name: "TestDb",
   components: {
     Form,
-    Field
+    Field,
+    LoginInfo
   },
   computed: {
     ...mapStores(rootStore, authenticationStore, appSettingsStore, patientStore),
     isDebug() {
       return process.env.DEBUG === true
     }
-  },  
+  },
   data() {
     return {
       genIdx: 0,
@@ -78,10 +88,10 @@ export default {
       generating: false,
       currentGenProgress: [],
       categories: [],
-      usersPerInstitution: {}
+      availableInstitutions: {}
     }
   },
-  methods: {  
+  methods: {
     async generateData() {
 
       console.group('generateData()')
@@ -100,7 +110,9 @@ export default {
       authenticationStore().setSimulationMode(true)
 
       // Generate the required number of random users
-      for (let i = 0; i < this.nusers; i++) {
+      this.genIdx = 0
+      const nUsersToGenerate = Math.min(Object.keys(this.availableInstitutions).length, this.nusers)
+      for (let i = 0; i < nUsersToGenerate; i++) {
 
         console.debug('Generating assessment record', i)
 
@@ -114,7 +126,7 @@ export default {
           this.setProgressRecord(i, 'userInst', inst.orgName)
           let email = this.randomEmail()
           let userName = email.split('@').shift()
-          let password = faker.internet.password({length: 12})
+          let password = faker.internet.password({ length: 12 })
           this.setProgressRecord(i, 'userName', userName)
           this.setProgressRecord(i, processStage, 'in progress')
           const signupRet = await authenticationStore().signup(userName, inst.id, email, password)
@@ -156,7 +168,7 @@ export default {
             true,     // lab_results 
             true,     // man_results
             true,     // diagnosis_results
-            this.randomPenicillinDescription(), 
+            this.randomPenicillinDescription(),
             '',       // penicillin_description_other
             true,     // penicillin_results
             '',       // penicillin_comment
@@ -188,7 +200,7 @@ export default {
           cpdRet.data.forEach(async pdata => {
             const spdRet = await patientStore().savePatientData(
               '',   // qualitative_data
-              pdata.code, 
+              pdata.code,
               this.randomTimeTaken()
             )
             if (spdRet.status >= 400) {
@@ -245,12 +257,12 @@ export default {
                 ['prescription_id', t.id],
                 ['outcome', outcome],
                 ['other', ''],
-                ['intervention_type', checkboxValues.intervention_type], 
-                ['selected_type', checkboxValues.selected_type], 
-                ['risk_level', t.risk_level], 
-                ['result', result], 
-                ['result_score', resultScore], 
-                ['time_taken', this.randomTimeTaken()], 
+                ['intervention_type', checkboxValues.intervention_type],
+                ['selected_type', checkboxValues.selected_type],
+                ['risk_level', t.risk_level],
+                ['result', result],
+                ['result_score', resultScore],
+                ['time_taken', this.randomTimeTaken()],
                 ['qualitative_data', '']
               ])
               testOutcomes.push(outcomeObj)
@@ -279,14 +291,14 @@ export default {
               selected_type: ptd.selected_type
             }
           }))
-      
+
           const saveMitRet = await rootStore().saveMitigationResults(
-            rootStore().assessmentId, 
-            epSystem, 
-            calcPercentage(mitigationData.totals.totalGood, numTests), 
-            calcPercentage(mitigationData.totals.totalSome, numTests), 
+            rootStore().assessmentId,
+            epSystem,
+            calcPercentage(mitigationData.totals.totalGood, numTests),
+            calcPercentage(mitigationData.totals.totalSome, numTests),
             calcPercentage(mitigationData.totals.totalNot, numTests),
-            calcPercentage(mitigationData.totals.totalOver, numTests), 
+            calcPercentage(mitigationData.totals.totalOver, numTests),
             calcPercentage(mitigationData.totals.totalNulls, numTests)
           )
           if (saveMitRet.status >= 400) {
@@ -296,7 +308,7 @@ export default {
           this.setProgressRecord(i, processStage, 'completed')
           console.debug('Mitigation data saved')
 
-        } catch(err) {
+        } catch (err) {
           this.setProgressRecord(i, processStage, 'error')
           console.error(err.message)
         }
@@ -307,7 +319,7 @@ export default {
       authenticationStore().setSimulationMode(false)
 
       console.groupEnd()
-    }, 
+    },
     initProgressRecord() {
       return {
         userName: '',
@@ -318,7 +330,7 @@ export default {
         genPatients: 'not started',
         genScenarios: 'not started'
       }
-    }, 
+    },
     showProgressRecord(idx) {
       return this.genIdx >= idx
     },
@@ -328,11 +340,11 @@ export default {
       } else {
         return this.currentGenProgress[i][k]
       }
-    }, 
+    },
     setProgressRecord(i, k, value) {
       this.currentGenProgress[i][k] = value
     },
-    progressBackground(i, k) {  
+    progressBackground(i, k) {
 
       console.group('progressBackground()')
       console.debug('Received index', i, 'key', k)
@@ -342,7 +354,7 @@ export default {
       console.debug('rec', rec)
 
       if (rec != false) {
-        switch(rec) {
+        switch (rec) {
           case 'completed': ret = 'bg-success'; break
           case 'in progress': ret = 'bg-warning'; break
           case 'error': ret = 'bg-danger'; break
@@ -384,16 +396,16 @@ export default {
       return ret
     },
     randomEmail() {
-      return faker.internet.email({provider: this.randomNhsDomain(), allowSpecialCharacters: false}).replace('_', '.')
-    },  
+      return faker.internet.email({ provider: this.randomNhsDomain(), allowSpecialCharacters: false }).replace('_', '.')
+    },
     randomInstitition() {
-      let inst = {}
-      // Ensure we never have > 4 users for any given institution and we don't use ZZZTesting
-      do {
-        inst = this.institutions[Math.floor(Math.random() * (this.institutions.length + 1)) + 1]
-      } while (this.usersPerInstitution[inst.id] == 4 || inst.orgName == 'ZZZTesting')
-      this.usersPerInstitution[inst.id]++
-      return inst
+      // Will only use each institution once - too complicated to generate part assessments for 
+      // multiple users in the same institution
+      const availableIds = Object.keys(this.availableInstitutions)
+      const instId = availableIds[Math.floor(Math.random() * availableIds.length)]
+      const instName = this.availableInstitutions[instId]
+      delete this.availableInstitutions[instId]
+      return { id: instId, orgName: instName }
     },
     randomNhsDomain() {
       if (Math.random() < 0.5) {
@@ -406,7 +418,7 @@ export default {
       return epSystems[Math.floor(Math.random() * (epSystems.length - 1))].value
     },
     randomDateBetween(start, end) {
-      return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+      return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
     },
     randomEpUsage() {
       const options = ['76-100', '51-75', '26-50', '0-25']
@@ -464,12 +476,22 @@ export default {
     },
     async getInstitutions() {
       const response = await rootStore().getInstitutions()
-      if (response.status == 200) {
+      if (response.status < 400) {
         this.institutions = response.data
+        // Get all currently defined users (only a total of 200 users, one per institution, can be generated)
+        const fuResponse = await authenticationStore().findUsers()
+        if (fuResponse.status < 400) {
+          // Determine ids of institutions with existing assessments
+          const instsWithAssessments = fuResponse.data.map(elt => elt.institution.id)
+          this.availableInstitutions = Object.fromEntries(this.institutions.map(inst => [inst.id, inst.orgName]).filter(elt => elt[1] != 'ZZZTesting').filter(elt => !instsWithAssessments.includes(elt[0])))
+        } else {
+          console.error(fuResponse.message)
+        }
+
       } else {
         this.institutions = [response.message]
         console.error(response.message)
-      }      
+      }
     },
     // Culled from ScenarioPrescription.vue, indicating these constants need to be in settings...
     getResult(risk_level, outcome) {
@@ -509,7 +531,6 @@ export default {
   },
   mounted() {
     this.getInstitutions()
-    this.usersPerInstitution = Object.fromEntries(this.institutions.map(inst => [inst.id, 0]))
   }
 }
 </script>

@@ -21,7 +21,7 @@
               <a :class="$router.currentRoute.value.path == '/usermanager' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/usermanager')">Manage Users</a>
             </li>
             <li v-if="isDebug">
-              <a class="dropdown-item" @click="$router.push('/testdb')">Generate test data</a>
+              <a :class="$router.currentRoute.value.path == '/testdb' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/testdb')">Generate test data</a>
             </li>
             <li>
               <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Log out' : 'Log in' }}</a>

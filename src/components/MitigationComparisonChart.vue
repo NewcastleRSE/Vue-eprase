@@ -17,14 +17,12 @@ export default {
   name: "MitigationComparisonChart", 
   data() {
     return {
-      chartData: []
+      chartData: [],
+      chartDataEmpty: true
     }
   },
   computed: {
-    ...mapStores(rootStore),
-    chartDataEmpty() {
-      return !Array.isArray(this.chartData) || this.chartData.length == 0
-    }
+    ...mapStores(rootStore)
   }, 
   emits: ['get-mitigation-fail'],
   methods: {
@@ -49,47 +47,35 @@ export default {
 
       console.group('getMitigationResultsByInstitution()')
 
-      this.chartData = rootStore().mitigationChartData
-      console.debug('Stored mitigation chart data is', this.chartData)
-
-      if (this.chartDataEmpty) {
-
-        console.debug('Data is deemed empty - calling API...')
-        const response = await rootStore().getAllMitigationResults()
-        console.debug('Done')
-
-        if (response.status < 400) {
-          console.debug('API response', response.data)
-          if (response.data.length > 0) {
-            this.chartData = []
-            const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
-            const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
-            const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
-            mkeys.forEach((mk, mkIdx) => {
-              const chartBlock = {
-                x: orgNamesSystems,
-                y: [],
-                name: mk.substring(0, 1).toUpperCase() + mk.substring(1),
-                type: 'bar',
-                marker: {
-                  color: colorMapping[mkIdx]
-                }
+      const response = await rootStore().getAllMitigationResults()
+      if (response.status < 400) {
+        console.debug('API response', response.data)
+        if (response.data.length > 0) {
+          this.chartData = []
+          this.chartDataEmpty = false
+          const orgNamesSystems = response.data.map(d => `${d.institution.orgName} (${d.epSystem})`)
+          const mkeys = ['goodMitigation', 'someMitigation', 'notMitigated', 'overMitigated', 'invalidTests']
+          const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
+          mkeys.forEach((mk, mkIdx) => {
+            const chartBlock = {
+              x: orgNamesSystems,
+              y: [],
+              name: mk.substring(0, 1).toUpperCase() + mk.substring(1),
+              type: 'bar',
+              marker: {
+                color: colorMapping[mkIdx]
               }
-              chartBlock.y = response.data.map(d => d[mk])            
-              this.chartData.push(chartBlock)
-            })
-            console.debug('Storing mitigation data', this.chartData)
-            rootStore().storeMitigationChartData(this.chartData)
-            this.renderChart()
-          }
-          
+            }
+            chartBlock.y = response.data.map(d => d[mk])            
+            this.chartData.push(chartBlock)
+          })         
+          this.renderChart()
         } else {
-          this.$emit('get-mitigation-fail', response.message)
-        }
+          this.chartDataEmpty = true
+        }        
       } else {
-        console.debug('Rendering chart...')
-        this.renderChart()
-      } 
+        this.$emit('get-mitigation-fail', response.message)
+      }      
       console.groupEnd()     
     }
   },
