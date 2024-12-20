@@ -431,7 +431,7 @@ export default {
           this.pieDataComplete = true
           // Calculate number of valid tests, ignoring null results
           this.totalValidTests = this.numPrescriptions - this.totalNulls
-          this.getInterventionTypeResult()
+          //this.getInterventionTypeResult()
           const smrResponse = await this.saveMitigationResult(this.assessmentId)
           if (smrResponse.status < 400) {
             this.stackedDataComplete = true
