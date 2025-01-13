@@ -18,6 +18,7 @@
 
 <script>
 
+import { faker } from '@faker-js/faker'
 import { mapStores } from 'pinia'
 import AppLogo from "./AppLogo"
 import LoginInfo from "./LoginInfo"
@@ -31,32 +32,41 @@ import 'handsontable/styles/ht-theme-main.css';
 const contextMenuSettings = {
   callback(key, selection, clickEvent) {
     // Common callback for all options
-    console.debug(key, selection, clickEvent);
+    console.debug('Common callback', key, selection, clickEvent);
   },
-  items: {
-    row_above: {
-      disabled() {
-        // `disabled` can be a boolean or a function
-        // Disable option when first row was clicked
-        return this.getSelectedLast()?.[0] === 0; // `this` === hot
-      },
-    },    
+  items: {     
     new_male_adult_patient: {
       name: 'Add new male adult patient',
-      callback() {
-        console.log('Add new male', this)
+      callback(key, selection, clickEvent) {
+        // Generate field values where possible
+        console.debug('New male adult patient', key, selection, clickEvent);
+        const row = selection[0].start.row + 1
+        this.alter('insert_row_below', row - 1)
+        this.setDataAtRowProp(row, 'first_name', faker.person.firstName('male'))
+        this.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName('male'))
+        this.setDataAtRowProp(row, 'gender', 'male')
+        this.setDataAtRowProp(row, 'is_adult', true)
+        this.selectCell(row, 'age')              
       }
     },
     new_female_adult_patient: {
       name: 'Add new female adult patient',
-      callback() {
-        console.log('Add new female', this)
+      callback(key, selection, clickEvent) {
+        // Generate field values where possible
+        console.debug('New female adult patient', key, selection, clickEvent);        
+        const row = selection[0].start.row + 1
+        this.alter('insert_row_below', row - 1)
+        this.setDataAtRowProp(row, 'first_name', faker.person.firstName('female'))
+        this.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName('female'))
+        this.setDataAtRowProp(row, 'gender', 'female')
+        this.setDataAtRowProp(row, 'is_adult', true)
+        this.selectCell(row, 'age')
       }
     },
-    remove_row: {
+    remove_patient: {
+      name: 'Remove patient',
       disabled() {
-        const row = this.getSelectedLast()?.[0]
-        return row && this.getDataAtCell(row, 0) != null
+        return true
       }
     }
   }
@@ -112,7 +122,6 @@ export default {
           'filter_action_bar'
         ],
         contextMenu: contextMenuSettings,
-        minSpareRows: 1,
         licenseKey: 'non-commercial-and-evaluation'
       }
     }
