@@ -69,10 +69,10 @@
                 <thead>
                   <tr>
                     <th scope="col" class="col-3">Email</th>
-                    <th scope="col" class="col-4">Institution</th>
+                    <th scope="col" class="col-3">Institution</th>
                     <th scope="col" class="col-3">Password</th>
                     <th scope="col" class="col-1">Enabled</th>
-                    <th scope="col" class="col-1">Actions</th>
+                    <th scope="col" class="col-2">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -133,7 +133,7 @@
                     </td>
                     <td v-if="currentEdit.id != userData.id">
                       <i class="fs-3"
-                        :class="userData.enabled ? 'bi bi-check-square-fill text-success' : 'bi bi-x-square-fill text-danger'"></i>
+                        :class="userData.enabled ? 'bi bi-check-lg text-success fw-bold' : 'bi bi-x-lg text-danger fw-bold'"></i>
                     </td>
                     <td v-if="currentEdit.id == userData.id">
                       <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch"
@@ -187,7 +187,7 @@ import { rootStore } from '../stores/root'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
-  name: "AppRegister",
+  name: "UserManager",
   components: {
     Form,
     Field,

@@ -12,6 +12,7 @@ import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
 import AssessmentResults from "../components/AssessmentResults"
 import UserManager from "../components/UserManager"
+import PatientManager from "../components/PatientManager"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
 import TestDb from "../components/TestDb"
@@ -68,7 +69,11 @@ export const router = createRouter({
     {
       path: "/usermanager",
       component: UserManager,
-    },       
+    }, 
+    {
+      path: "/patientmanager",
+      component: PatientManager,
+    },        
     {
       path: "/printablepdf",
       component: PrintablePdf,

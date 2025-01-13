@@ -1,24 +1,147 @@
-import "./assets/scss/custom.scss"
-import "../node_modules/print-js/dist/print.css"
-import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-import "../node_modules/bootstrap-icons/font/bootstrap-icons.min.css"
-import VueDatePicker from "@vuepic/vue-datepicker"
-import "@vuepic/vue-datepicker/dist/main.css"
-import { createApp } from "vue"
-import { createPinia } from "pinia"
+import './assets/scss/custom.scss'
+import '../node_modules/print-js/dist/print.css'
+import '../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'
+import '../node_modules/bootstrap-icons/font/bootstrap-icons.min.css'
+import '../node_modules/handsontable/styles/handsontable.min.css'
+//import '../node_modules/handsontable/styles/ht-theme-main.min.css'
+import '../node_modules/handsontable/styles/ht-theme-horizon.min.css'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import { createPersistedState } from 'pinia-plugin-persistedstate'
-import App from "./App.vue"
-import axios from "axios"
-import VueAxios from "vue-axios"
-import { configure, defineRule } from "vee-validate"
+import App from './App.vue'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+import { configure, defineRule } from 'vee-validate'
 import { min_value, required } from '@vee-validate/rules'
-import { router } from "./router"
-import * as Sentry from "@sentry/vue"
+import { router } from './router'
+import * as Sentry from '@sentry/vue'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import arraySupport from 'dayjs/plugin/arraySupport'
+
+// the base module
+import Handsontable from 'handsontable/base';
+
+// cell type modules
+import {
+  AutocompleteCellType,
+  CheckboxCellType,
+  DateCellType,
+  DropdownCellType,
+  HandsontableCellType,
+  NumericCellType,
+  PasswordCellType,
+  TextCellType,
+  TimeCellType
+} from 'handsontable/cellTypes';
+
+// renderer modules
+import {
+  baseRenderer,
+  autocompleteRenderer,
+  checkboxRenderer,
+  dropdownRenderer,
+  htmlRenderer,
+  numericRenderer,
+  passwordRenderer,
+  textRenderer
+} from 'handsontable/renderers';
+
+// editor modules
+import {
+  AutocompleteEditor,
+  BaseEditor,
+  CheckboxEditor,
+  DateEditor,
+  DropdownEditor,
+  HandsontableEditor,
+  NumericEditor,
+  PasswordEditor,
+  SelectEditor,
+  TextEditor
+} from 'handsontable/editors';
+
+// validator modules
+import {
+  autocompleteValidator,
+  dateValidator,
+  dropdownValidator,
+  numericValidator,
+  timeValidator,
+} from 'handsontable/validators';
+
+// plugin modules
+import {
+  AutoColumnSize,
+  AutoRowSize,
+  Autofill,
+  BasePlugin,
+  BindRowsWithHeaders,
+  CollapsibleColumns,
+  ColumnSorting,
+  ColumnSummary,
+  Comments,
+  ContextMenu,
+  CopyPaste,
+  CustomBorders,
+  DragToScroll,
+  DropdownMenu,
+  ExportFile,
+  Filters,
+  Formulas,
+  HiddenColumns,
+  HiddenRows,
+  ManualColumnFreeze,
+  ManualColumnMove,
+  ManualColumnResize,
+  ManualRowMove,
+  ManualRowResize,
+  MergeCells,
+  MultiColumnSorting,
+  MultipleSelectionHandles,
+  NestedHeaders,
+  NestedRows,
+  PersistentState,
+  Search,
+  StretchColumns,
+  TouchScroll,
+  TrimRows,
+  UndoRedo
+} from 'handsontable/plugins'
+
+// translation modules
+import {
+  enUS
+} from 'handsontable/i18n'
+
+// registering functions that let you quickly register all modules at once
+import {
+  registerAllCellTypes,
+  registerAllRenderers,
+  registerAllEditors,
+  registerAllValidators,
+  registerAllPlugins
+} from 'handsontable/registry'
+
+// register all cell types at once
+registerAllCellTypes()
+
+// register all renderers at once
+registerAllRenderers()
+
+// register all editors at once
+registerAllEditors()
+
+// register all validators at once
+registerAllValidators()
+
+// register all plugins at once
+registerAllPlugins()
+
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
 if (process.env.NODE_ENV === 'production') {

@@ -20,6 +20,9 @@
             <li>
               <a :class="$router.currentRoute.value.path == '/usermanager' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/usermanager')">Manage Users</a>
             </li>
+            <li>
+              <a :class="$router.currentRoute.value.path == '/patientmanager' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/patientmanager')">Manage Patients</a>
+            </li>
             <li v-if="isDebug">
               <a :class="$router.currentRoute.value.path == '/testdb' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/testdb')">Generate test data</a>
             </li>

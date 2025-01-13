@@ -65,6 +65,10 @@ export const patientStore = defineStore('patients', {
       const response = await rootStore().apiCall('patientdetails', 'GET')
       return response
     },
+    async getPatients() {
+      const response = await rootStore().apiCall('patients', 'GET')
+      return response
+    },
     async getPatientIds() {
       const instId = authenticationStore().getInstitutionId()
       const response = await rootStore().apiCall('getPatientIds?INSTITUTION_ID=' + instId, 'GET')
