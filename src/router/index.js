@@ -11,11 +11,11 @@ import AssessmentPatients from "../components/AssessmentPatients"
 import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
 import AssessmentScenarios from "../components/AssessmentScenarios"
 import AssessmentResults from "../components/AssessmentResults"
-import UserManager from "../components/UserManager"
-import PatientManager from "../components/PatientManager"
+import UserManager from "../components/admin/UserManager"
+import PatientManager from "../components/admin/PatientManager"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
-import TestDb from "../components/TestDb"
+import TestDb from "../components/admin/TestDb"
 
 export const router = createRouter({
   history: createWebHistory(),

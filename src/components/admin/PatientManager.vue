@@ -1,15 +1,20 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="banner graphic"></div>
+    <div class="pills-banner"><img src="../../assets/images/pills-bw.png" alt="banner graphic"></div>
 
     <div class="content p-4">
 
       <LoginInfo />
 
       <h1 class="px-4">Patient Management</h1>
-      <div v-if="dataLoaded" class="px-4 w-100 ht-theme-horizon">       
-        <hot-table ref="tableCpt" :settings="patientTableSettings"></hot-table>
+      <div v-if="dataLoaded && !dataError" class="px-4 w-100 ht-theme-horizon">       
+        <hot-table ref="patientTableCpt" :settings="patientTableSettings"></hot-table>
+      </div>
+      <div v-if="dataError">
+        <p class="p-4 bg-danger-subtle">
+          The following error occurred while fetching patient data : {{ dataError }}
+        </p>
       </div>
     </div>
     <AppLogo cls="bottomright" />
@@ -20,11 +25,11 @@
 
 import { faker } from '@faker-js/faker'
 import { mapStores } from 'pinia'
-import AppLogo from "./AppLogo"
-import LoginInfo from "./LoginInfo"
+import AppLogo from "../AppLogo"
+import LoginInfo from "../LoginInfo"
 import { HotTable } from '@handsontable/vue3'
-import { patientStore } from "../stores/patients"
-import { authenticationStore } from "../stores/authentication"
+import { patientStore } from "../../stores/patients"
+import { authenticationStore } from "../../stores/authentication"
 
 import 'handsontable/styles/handsontable.css';
 import 'handsontable/styles/ht-theme-main.css';
@@ -42,6 +47,7 @@ export default {
   data() {
     return {
       dataLoaded: false,
+      dataError: false,
       nextPatientNum: null,
       patientData: null,
       patientTableSettings: {
@@ -76,42 +82,36 @@ export default {
         ],
         contextMenu: {
           callback: (key, selection, clickEvent) => {
-            // Common callback for all options
+            // Common callback for all options - not sure we need this
             console.debug('Common callback', key, selection, clickEvent);
           },
           items: {     
             new_male_adult_patient: {
-              name: 'Add new male adult patient',
-              callback: (key, selection, clickEvent) => {    
+              name: 'Insert new adult male patient below',
+              callback: (key, selection) => {    
                 this.createNewPatient('Male', true, selection)()  
               }
             },
             new_female_adult_patient: {
-              name: 'Add new female adult patient',
-              callback: (key, selection, clickEvent) => {                
+              name: 'Insert new adult female patient below',
+              callback: (key, selection) => {                
                 this.createNewPatient('Female', true, selection)()
+              }
+            },
+            manage_diagnoses: {
+              name: 'Manage diagnoses',
+              callback: (key, selection) => {
+                console.log(key, selection)
               }
             },
             remove_patient: {
               name: 'Remove patient',
-              disabled() {
+              disabled: () => {
                 return true
               }
             }
           }
         },
-        licenseKey: 'non-commercial-and-evaluation'
-      },
-      diagnosisTableSettings: {
-        data: [],
-        columns: [
-          { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
-          { title: 'Diagnosis', type: 'autocomplete', data: 'code' }        
-        ],
-        hiddenColumns: { columns: [0] },
-        autoWrapRow: true,
-        autoWrapCol: true,
-        manualColumnResize: true,
         licenseKey: 'non-commercial-and-evaluation'
       }
     }
@@ -126,11 +126,9 @@ export default {
           return { id, code, first_name, surname, age, gender, height, weight, dob, is_adult }
         })
         console.debug(this.patientTableSettings.data)
-        
-        this.nextPatientCode = 
         this.dataLoaded = true
       } else {
-        this.patients = [response.message]
+        this.dataError = [response.message]
         console.error(response.message)
       }
     },
@@ -147,7 +145,7 @@ export default {
       return function() {
         // Generate field values where possible
         console.debug('New patient, gender', gender, 'is adult', isAdult, 'selection', selection, this)
-        const hot = this.$refs.tableCpt.hotInstance
+        const hot = this.$refs.patientTableCpt.hotInstance
         const row = selection[0].start.row + 1
         hot.alter('insert_row_below', row - 1)
         hot.setDataAtRowProp(row, 'code', this.nextAvailablePatientCode())
@@ -163,7 +161,8 @@ export default {
       td.classList.add('non-editable-cell')
       td.innerText = value
       return td
-    }
+    },
+    
   },
   mounted() {
     this.getPatients()    

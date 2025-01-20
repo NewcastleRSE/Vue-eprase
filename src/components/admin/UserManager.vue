@@ -1,7 +1,7 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="banner graphic"></div>
+    <div class="pills-banner"><img src="../../assets/images/pills-bw.png" alt="banner graphic"></div>
 
     <div class="content p-4">
 
@@ -175,16 +175,16 @@
 
 <script>
 
-import AppLogo from "./AppLogo"
-import LoginInfo from "./LoginInfo"
-import ErrorAlertModal from "./ErrorAlertModal"
-import ConfirmCancelEditModal from "./ConfirmCancelEditModal"
-import ConfirmDeleteModal from "./ConfirmDeleteModal"
+import AppLogo from "../AppLogo"
+import LoginInfo from "../LoginInfo"
+import ErrorAlertModal from "../ErrorAlertModal"
+import ConfirmCancelEditModal from "../ConfirmCancelEditModal"
+import ConfirmDeleteModal from "../ConfirmDeleteModal"
 import { mapStores, mapState } from 'pinia'
 import { Form, Field, ErrorMessage } from 'vee-validate'
-import { authenticationStore } from '../stores/authentication'
-import { rootStore } from '../stores/root'
-import { appSettingsStore } from '../stores/appSettings'
+import { authenticationStore } from '../../stores/authentication'
+import { rootStore } from '../../stores/root'
+import { appSettingsStore } from '../../stores/appSettings'
 
 export default {
   name: "UserManager",

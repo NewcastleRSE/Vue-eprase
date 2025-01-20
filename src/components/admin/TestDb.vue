@@ -56,15 +56,15 @@
 <script>
 
 import { faker } from '@faker-js/faker'
-import { mitigationDataByCategory } from '../helpers/categories'
-import { prependZero, calcPercentage } from '../helpers/utils'
+import { mitigationDataByCategory } from '../../helpers/categories'
+import { prependZero, calcPercentage } from '../../helpers/utils'
 import { Form, Field } from 'vee-validate'
 import { mapStores } from 'pinia'
-import { rootStore } from '../stores/root'
-import { authenticationStore } from '../stores/authentication'
-import { appSettingsStore } from '../stores/appSettings'
-import { patientStore } from '../stores/patients'
-import LoginInfo from './LoginInfo'
+import { rootStore } from '../../stores/root'
+import { authenticationStore } from '../../stores/authentication'
+import { appSettingsStore } from '../../stores/appSettings'
+import { patientStore } from '../../stores/patients'
+import LoginInfo from '../LoginInfo'
 
 export default {
   name: "TestDb",
