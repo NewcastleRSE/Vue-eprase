@@ -9,7 +9,7 @@
 
       <h1 class="px-4">Patient Management</h1>
       <div v-if="dataLoaded" class="px-4 w-100 ht-theme-horizon">       
-        <hot-table ref="tableCpt" :settings="tableSettings"></hot-table>
+        <hot-table ref="tableCpt" :settings="patientTableSettings"></hot-table>
       </div>
     </div>
     <AppLogo cls="bottomright" />
@@ -29,55 +29,6 @@ import { authenticationStore } from "../stores/authentication"
 import 'handsontable/styles/handsontable.css';
 import 'handsontable/styles/ht-theme-main.css';
 
-function createNewPatient(gender, isAdult, selection) {
-  return function() {
-    // Generate field values where possible
-    console.debug('New patient, gender', gender, 'is adult', isAdult, 'selection', selection, this)
-    const row = selection[0].start.row + 1
-    this.alter('insert_row_below', row - 1)
-    this.setDataAtRowProp(row, 'first_name', faker.person.firstName(gender.toLowerCase()))
-    this.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()))
-    this.setDataAtRowProp(row, 'gender', gender)
-    this.setDataAtRowProp(row, 'is_adult', isAdult)
-    this.selectCell(row, 'age')
-  }  
-}
-
-const noEditRenderer = function(_instance, td, _row, _col, _prop, value) {
-  console.debug(_instance, td, _row, _col, _prop, value)
-  td.setAttribute('title', 'This value cannot be edited')
-  td.classList.add('non-editable-cell')
-  td.innerText = value
-  return td
-}
-
-const contextMenuSettings = {
-  callback(key, selection, clickEvent) {
-    // Common callback for all options
-    console.debug('Common callback', key, selection, clickEvent);
-  },
-  items: {     
-    new_male_adult_patient: {
-      name: 'Add new male adult patient',
-      callback(key, selection, clickEvent) {        
-        createNewPatient('Male', true, selection).bind(this)()  
-      }
-    },
-    new_female_adult_patient: {
-      name: 'Add new female adult patient',
-      callback(key, selection, clickEvent) {
-        createNewPatient('Female', true, selection).bind(this)()
-      }
-    },
-    remove_patient: {
-      name: 'Remove patient',
-      disabled() {
-        return true
-      }
-    }
-  }
-}
-
 export default {
   name: "PatientManager",
   components: {
@@ -91,49 +42,30 @@ export default {
   data() {
     return {
       dataLoaded: false,
-      tableSettings: {
+      nextPatientNum: null,
+      patientData: null,
+      patientTableSettings: {
         data: [],
         width: 'auto',
         height: 'auto',
         columnSorting: true,
-        nestedHeaders: [
-          [ 
-            { label: 'Personal', colspan: 7 },
-            { label: 'Clinical', colspan: 5 }
-          ],
-          [
-            'First name', 'Surname', 'Age', 'Gender', 'Height', 'Weight', 'Adult', 'Diagnosis', 'Allergy', 'Comorbidity', 'Medication history', 'Clinical data'
-          ]
-        ],
-        collapsibleColumns: true,
         columns: [
-          { title: 'ID', type: 'numeric', data: 'id' },
-          { title: 'Code', type: 'text', data: 'code' },
-          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: noEditRenderer },
-          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: noEditRenderer },
+          { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
+          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: this.noEditRenderer },
+          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: this.noEditRenderer },
+          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: this.noEditRenderer },
           { title: 'Age', type: 'numeric', data: 'age', className: 'htRight' },
-          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: noEditRenderer },
+          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: this.noEditRenderer },
           { title: 'Height', type: 'numeric', data: 'height', className: 'htRight' },
-          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight' },
-          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob' },
-          { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', readOnly: true },
-          { title: 'Diagnosis', type: 'handsontable', data: 'diagnosis', className: 'htCenter' },
-          { title: 'Allergy', type: 'handsontable', data: 'allergy', className: 'htCenter' },
-          { title: 'Comorbidity', type: 'handsontable', data: 'comorbidity', className: 'htCenter' },
-          { title: 'Medication history', type: 'handsontable', data: 'medication_histories', className: 'htCenter' },
-          { title: 'Clinical data', type: 'handsontable', data: 'clinical_data', className: 'htCenter' }
+          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150 },
+          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: this.noEditRenderer },
+          { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', width: 120, readOnly: true }       
         ],
-        // NOTE: hidden columns and nesting doesn't work - known bug, still to be resolved by developers
-        hiddenColumns: {
-          columns: [0, 1, 8]
-        },
+        hiddenColumns: { columns: [0, 8] },
         autoWrapRow: true,
         autoWrapCol: true,
         manualColumnResize: true,
-        filters: true,
-        copyPaste: {
-          copyColumnHeaders: true
-        },
+        filters: true,        
         dropdownMenu: [
           'alignment',
           '---------',  
@@ -142,7 +74,44 @@ export default {
           'filter_by_value',
           'filter_action_bar'
         ],
-        contextMenu: contextMenuSettings,
+        contextMenu: {
+          callback: (key, selection, clickEvent) => {
+            // Common callback for all options
+            console.debug('Common callback', key, selection, clickEvent);
+          },
+          items: {     
+            new_male_adult_patient: {
+              name: 'Add new male adult patient',
+              callback: (key, selection, clickEvent) => {    
+                this.createNewPatient('Male', true, selection)()  
+              }
+            },
+            new_female_adult_patient: {
+              name: 'Add new female adult patient',
+              callback: (key, selection, clickEvent) => {                
+                this.createNewPatient('Female', true, selection)()
+              }
+            },
+            remove_patient: {
+              name: 'Remove patient',
+              disabled() {
+                return true
+              }
+            }
+          }
+        },
+        licenseKey: 'non-commercial-and-evaluation'
+      },
+      diagnosisTableSettings: {
+        data: [],
+        columns: [
+          { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
+          { title: 'Diagnosis', type: 'autocomplete', data: 'code' }        
+        ],
+        hiddenColumns: { columns: [0] },
+        autoWrapRow: true,
+        autoWrapCol: true,
+        manualColumnResize: true,
         licenseKey: 'non-commercial-and-evaluation'
       }
     }
@@ -150,17 +119,50 @@ export default {
   methods: {
     async getPatients() {
       const response = await patientStore().getPatients()
+      this.patientData = response.data
       if (response.status == 200) {
-        this.tableSettings.data = response.data.map(p => {
-          const { id, code, first_name, surname, age, gender, height, weight, dob, is_adult, diagnosis, allergy, comorbidity, medication_histories, clinical_data } = p
-          return { id, code, first_name, surname, age, gender, height, weight, dob, is_adult, diagnosis, allergy, comorbidity, medication_histories, clinical_data }
+        this.patientTableSettings.data = this.patientData.map(p => {
+          const { id, code, first_name, surname, age, gender, height, weight, dob, is_adult } = p
+          return { id, code, first_name, surname, age, gender, height, weight, dob, is_adult }
         })
-        console.log(this.tableSettings.data)
+        console.debug(this.patientTableSettings.data)
+        
+        this.nextPatientCode = 
         this.dataLoaded = true
       } else {
         this.patients = [response.message]
         console.error(response.message)
       }
+    },
+    nextAvailablePatientCode() {
+      // Get the next available patient code Pxxxx
+      if (this.nextPatientNum == null) {
+        this.nextPatientNum = parseInt(this.patientData.map(p => p.code).sort().pop().substr(1)) + 1
+      } else {
+        this.nextPatientNum++ 
+      }
+      return 'P' + this.nextPatientNum.toString().padStart(3, '0')
+    },
+    createNewPatient(gender, isAdult, selection) {
+      return function() {
+        // Generate field values where possible
+        console.debug('New patient, gender', gender, 'is adult', isAdult, 'selection', selection, this)
+        const hot = this.$refs.tableCpt.hotInstance
+        const row = selection[0].start.row + 1
+        hot.alter('insert_row_below', row - 1)
+        hot.setDataAtRowProp(row, 'code', this.nextAvailablePatientCode())
+        hot.setDataAtRowProp(row, 'first_name', faker.person.firstName(gender.toLowerCase()))
+        hot.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()))
+        hot.setDataAtRowProp(row, 'gender', gender)
+        hot.setDataAtRowProp(row, 'is_adult', isAdult)
+        hot.selectCell(row, 'age')
+      }.bind(this)  
+    },
+    noEditRenderer(_instance, td, _row, _col, _prop, value) {
+      td.setAttribute('title', 'This value cannot be edited')
+      td.classList.add('non-editable-cell')
+      td.innerText = value
+      return td
     }
   },
   mounted() {
