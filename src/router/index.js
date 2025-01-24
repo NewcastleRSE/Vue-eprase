@@ -122,7 +122,7 @@ router.beforeEach(async (to, from, next) => {
 
   const auth = authenticationStore()
   const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
-  const adminPages = ['/adminhome', '/testdb']
+  const adminPages = ['/adminhome', '/testdb', '/usermanager', '/patientmanager']
   const authRequired = !publicPages.includes(to.path)
   const adminRequired = adminPages.includes(to.path)
   console.debug('Authentication required', authRequired)

@@ -2,15 +2,15 @@
   <GenericModal 
     :modalName="'ManageDiagnosesModal'" 
     :modalId="'manageDiagnosesModal'" 
-    :title="'Diagnosis Manager'" 
-    :closeBtnText="'Close'"
-    :showActionBtn="true"
+    :title="'Diagnosis Manager'"
+    :sizeClass="'modal-xl'"
+    :closeBtnText="'Done'"
+    :showActionBtn="false"
   >
-    <h1 class="px-4">Diagnosis Management</h1>
-    <p class="p-4 bg-info-subtle">
-      
+    <p class="p-3 rounded bg-info-subtle">
+      Info here TODO
     </p>
-    <div v-if="dataLoaded" class="px-4 w-100 ht-theme-horizon">       
+    <div class="px-4 w-100 ht-theme-horizon">       
       <hot-table ref="diagnosisTableCpt" :settings="diagnosisTableSettings"></hot-table>
     </div>
   </GenericModal>
@@ -18,35 +18,54 @@
 
 <script>
 
+import { handsontableRegistrations, noEditRenderer } from '../../helpers/handsontable'
+import { mapStores } from 'pinia'
+import { patientStore } from "../../stores/patients"
+import { authenticationStore } from "../../stores/authentication"
 import { HotTable } from '@handsontable/vue3'
-import { setVisible } from '../../helpers/modal'
 import GenericModal from '../GenericModal'
+import { setVisible } from '../../helpers/modal'
 
 export default {
   name: "ManageDiagnosesModal",
+  extends: GenericModal,
   components: {
     GenericModal,
     HotTable
   },
   props: {
-    patientCode: null
+    patientCode: {
+      type: String,
+      default: ''
+    }
   },
   computed: {    
     ...mapStores(authenticationStore, patientStore)
   },
   data() {
     return {
+      spreadsheet: null,
       dataLoaded: false,
       dataError: false,
+      patientDiagnoses: null,
+      allDiagnoses: null,
       diagnosisTableSettings: {
         data: [],
         width: 'auto',
         height: 'auto',
-        columnSorting: true,
+        columnSorting: {
+          headerAction: true,
+          sortEmptyCells: false,
+          indicator: true,
+          initialConfig: {
+            column: 1,
+            sortOrder: 'asc',
+          }
+        },
         columns: [
           { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
-          { title: 'Diagnosis', type: 'text', data: 'diagnosis' },
-          { title: 'Assigned', type: 'checkbox', data: 'assigned' }
+          { title: 'Diagnosis', type: 'text', data: 'diagnosis', editor: false, renderer: noEditRenderer },
+          { title: 'Assigned', type: 'checkbox', className: 'htCenter', data: 'assigned' }
         ],
         hiddenColumns: { columns: [0] },
         autoWrapRow: true,
@@ -81,33 +100,47 @@ export default {
             }
           }
         },
+        afterUpdateData(...args) {
+          console.debug('After update', args)
+          this.dataLoaded = true
+        },
         licenseKey: 'non-commercial-and-evaluation'
       }
     }
   }, 
-  methods: {
+  methods: {    
     close() {
-      this.errorText = ''
-      setVisible('errorAlertModal', false)
+      setVisible('manageDiagnosesModal', false)
     },
-    show(text) {
-      this.errorText = text || 'No message was returned by the backend API'
-      setVisible('errorAlertModal', true)
+    show() {     
+      setVisible('manageDiagnosesModal', true)
     },
-    async getPatientDiagnoses() {
-      const response = await patientStore().getPatientByCode(patientCode)
-      this.patientData = response.data
-      if (response.status == 200) {        
-        //TODO
-        this.dataLoaded = true
-      } else {
-        this.dataError = [response.message]
-        console.error(response.message)
-      }
-    }    
+    async getDiagnosisData() {
+      //try {
+        const responseAll = await patientStore().getAllDiagnoses()
+        if (responseAll.status >= 400) {               
+          throw new Error(responseAll.message)
+        }
+        const responsePatient = await patientStore().getPatientByCode(this.patientCode)      
+        if (responsePatient.status >= 400) {        
+          throw new Error(responsePatient.message)
+        }        
+        this.patientDiagnoses = responsePatient.data.diagnosis.map(pd => pd.id)
+        this.allDiagnoses = responseAll.data.map(d => Object.assign(d, { assigned: this.patientDiagnoses.includes(d.id) }))
+        console.debug(this.allDiagnoses, this.spreadsheet)  
+        this.spreadsheet.updateData(this.allDiagnoses)        
+      //} catch(e) {
+      //  this.dataError = [e.message]  
+      //  console.error(e.message)    
+      //}
+    }   
   },
   mounted() {
-
+    handsontableRegistrations()
+    document.querySelector('#manageDiagnosesModal').addEventListener('shown.bs.modal', evt => {
+      this.getDiagnosisData()
+    })
+    this.spreadsheet = this.$refs.diagnosisTableCpt.hotInstance 
   }
 }
 </script>

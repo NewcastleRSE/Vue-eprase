@@ -1,9 +1,9 @@
 <template>
   <div class="modal fade" :id="modalId" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable" :class="sizeClass">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="h5 modal-title">{{ title }}</h3>
+          <h3 class="h3 modal-title">{{ title }}</h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ closeBtnText }}"
             @click="$emit('modalClosed')"></button>
         </div>
@@ -32,6 +32,10 @@ export default {
     modalId: '',
     title: '',
     showActionBtn: false,
+    sizeClass: {
+      type: String,
+      default: ''
+    },
     actionBtnText: { 
       type: String,
       default: 'Ok'

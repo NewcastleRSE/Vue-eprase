@@ -17,32 +17,36 @@
         </p>
       </div>
     </div>
+    <component :is="currentManager" :patientCode="selectedPatientCode" ref="currentManager"></component>
     <AppLogo cls="bottomright" />
   </main>
 </template>
 
 <script>
 
+import { handsontableRegistrations, noEditRenderer } from '../../helpers/handsontable'
 import { faker } from '@faker-js/faker'
 import { mapStores } from 'pinia'
-import AppLogo from "../AppLogo"
-import LoginInfo from "../LoginInfo"
+import AppLogo from '../AppLogo'
+import LoginInfo from '../LoginInfo'
 import { HotTable } from '@handsontable/vue3'
-import { patientStore } from "../../stores/patients"
-import { authenticationStore } from "../../stores/authentication"
-
-import 'handsontable/styles/handsontable.css';
-import 'handsontable/styles/ht-theme-main.css';
+import { patientStore } from '../../stores/patients'
+import { authenticationStore } from '../../stores/authentication'
+import ManageDiagnosesModal from './ManageDiagnosesModal'
 
 export default {
   name: "PatientManager",
   components: {
     HotTable,
     LoginInfo,
-    AppLogo
+    AppLogo,
+    ManageDiagnosesModal
   },
   computed: {    
-    ...mapStores(authenticationStore, patientStore)
+    ...mapStores(authenticationStore, patientStore),
+    manageDiagnosesModal() {
+      return this.$refs.manageDiagnosesModal
+    }
   },
   data() {
     return {
@@ -50,21 +54,32 @@ export default {
       dataError: false,
       nextPatientNum: null,
       patientData: null,
+      selectedPatientCode: '',
+      currentManager: 'ManageDiagnosesModal',
       patientTableSettings: {
+        persistentState: true,
         data: [],
         width: 'auto',
         height: 'auto',
-        columnSorting: true,
+        columnSorting: {
+          headerAction: true,
+          sortEmptyCells: false,
+          indicator: true,
+          initialConfig: {
+            column: 1,
+            sortOrder: 'asc',
+          },
+        },
         columns: [
           { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
-          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: this.noEditRenderer },
-          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: this.noEditRenderer },
-          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: this.noEditRenderer },
+          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: noEditRenderer },
+          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: noEditRenderer },
+          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: noEditRenderer },
           { title: 'Age', type: 'numeric', data: 'age', className: 'htRight' },
-          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: this.noEditRenderer },
+          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: noEditRenderer },
           { title: 'Height', type: 'numeric', data: 'height', className: 'htRight' },
           { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150 },
-          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: this.noEditRenderer },
+          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: noEditRenderer },
           { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', width: 120, readOnly: true }       
         ],
         hiddenColumns: { columns: [0, 8] },
@@ -101,7 +116,9 @@ export default {
             manage_diagnoses: {
               name: 'Manage diagnoses',
               callback: (key, selection) => {
-                console.log(key, selection)
+                console.log(key, selection, this)
+                this.selectedPatientCode = this.$refs.patientTableCpt.hotInstance.getDataAtCell(selection[0].start.row, 1)               
+                this.$refs.currentManager.show()
               }
             },
             remove_patient: {
@@ -125,7 +142,6 @@ export default {
           const { id, code, first_name, surname, age, gender, height, weight, dob, is_adult } = p
           return { id, code, first_name, surname, age, gender, height, weight, dob, is_adult }
         })
-        console.debug(this.patientTableSettings.data)
         this.dataLoaded = true
       } else {
         this.dataError = [response.message]
@@ -151,20 +167,19 @@ export default {
         hot.setDataAtRowProp(row, 'code', this.nextAvailablePatientCode())
         hot.setDataAtRowProp(row, 'first_name', faker.person.firstName(gender.toLowerCase()))
         hot.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()))
+        hot.setDataAtRowProp(row, 'age', isAdult ? 18 : 0)        
         hot.setDataAtRowProp(row, 'gender', gender)
+        hot.setDataAtRowProp(row, 'height', isAdult ? 1.6 : 1.0)
+        hot.setDataAtRowProp(row, 'weight', '0')
+        hot.setDataAtRowProp(row, 'dob', '01/01/1971')
         hot.setDataAtRowProp(row, 'is_adult', isAdult)
+        //TODO save this row to get an id
         hot.selectCell(row, 'age')
       }.bind(this)  
-    },
-    noEditRenderer(_instance, td, _row, _col, _prop, value) {
-      td.setAttribute('title', 'This value cannot be edited')
-      td.classList.add('non-editable-cell')
-      td.innerText = value
-      return td
-    },
-    
+    }    
   },
   mounted() {
+    handsontableRegistrations()
     this.getPatients()    
   }
 }
