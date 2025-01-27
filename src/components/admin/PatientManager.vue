@@ -12,19 +12,19 @@
         <hot-table ref="patientTableCpt" :settings="patientTableSettings"></hot-table>
       </div>
       <div v-if="dataError">
-        <p class="p-4 bg-danger-subtle">
+        <p class="p-3 bg-danger-subtle">
           The following error occurred while fetching patient data : {{ dataError }}
         </p>
       </div>
     </div>
-    <component :is="currentManager" :patientCode="selectedPatientCode" ref="currentManager"></component>
+    <component :is="currentManager" :patientRecord="selectedPatientData" ref="currentManager"></component>
     <AppLogo cls="bottomright" />
   </main>
 </template>
 
 <script>
 
-import { handsontableRegistrations, noEditRenderer } from '../../helpers/handsontable'
+import { patientCodeValidator, patientWeightValidator, noEditRenderer, rowDataArrayToColumnObject } from '../../helpers/handsontable'
 import { faker } from '@faker-js/faker'
 import { mapStores } from 'pinia'
 import AppLogo from '../AppLogo'
@@ -46,6 +46,9 @@ export default {
     ...mapStores(authenticationStore, patientStore),
     manageDiagnosesModal() {
       return this.$refs.manageDiagnosesModal
+    },
+    hot() {
+      return this.$refs.patientTableCpt.hotInstance
     }
   },
   data() {
@@ -54,10 +57,9 @@ export default {
       dataError: false,
       nextPatientNum: null,
       patientData: null,
-      selectedPatientCode: '',
+      selectedPatientData: {},
       currentManager: 'ManageDiagnosesModal',
       patientTableSettings: {
-        persistentState: true,
         data: [],
         width: 'auto',
         height: 'auto',
@@ -72,13 +74,13 @@ export default {
         },
         columns: [
           { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
-          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: noEditRenderer },
+          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: noEditRenderer, validator: patientCodeValidator },
           { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: noEditRenderer },
           { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: noEditRenderer },
           { title: 'Age', type: 'numeric', data: 'age', className: 'htRight' },
           { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: noEditRenderer },
           { title: 'Height', type: 'numeric', data: 'height', className: 'htRight' },
-          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150 },
+          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150, validator: patientWeightValidator },
           { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: noEditRenderer },
           { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', width: 120, readOnly: true }       
         ],
@@ -95,6 +97,23 @@ export default {
           'filter_by_value',
           'filter_action_bar'
         ],
+        afterCreateRow(index, amount, source) {
+
+        },
+        afterChange: (changes, source) => {
+          if (changes != null) {
+            const changedRowHash = {}          
+            changes?.forEach(([row, prop, oldValue, newValue]) => {
+              console.debug('afterChange called with', row, prop, oldValue, newValue, source)
+              //TODO save this row to get an id
+              changedRowHash[row] = 1
+            })
+            console.debug(Object.keys(changedRowHash))//TODO these are strings
+            this.hot.validateRows(Object.keys(changedRowHash), (valid) => {
+              console.log('VALID = ', valid)
+            })
+          }          
+        },
         contextMenu: {
           callback: (key, selection, clickEvent) => {
             // Common callback for all options - not sure we need this
@@ -103,13 +122,15 @@ export default {
           items: {     
             new_male_adult_patient: {
               name: 'Insert new adult male patient below',
-              callback: (key, selection) => {    
+              callback: (key, selection) => {
+                console.log('Male patient create', key)    
                 this.createNewPatient('Male', true, selection)()  
               }
             },
             new_female_adult_patient: {
               name: 'Insert new adult female patient below',
-              callback: (key, selection) => {                
+              callback: (key, selection) => {   
+                console.log('Female patient create', key)                 
                 this.createNewPatient('Female', true, selection)()
               }
             },
@@ -117,7 +138,7 @@ export default {
               name: 'Manage diagnoses',
               callback: (key, selection) => {
                 console.log(key, selection, this)
-                this.selectedPatientCode = this.$refs.patientTableCpt.hotInstance.getDataAtCell(selection[0].start.row, 1)               
+                this.selectedPatientData = rowDataArrayToColumnObject(this.hot.getDataAtRow(selection[0].start.row), this.patientTableSettings.columns)
                 this.$refs.currentManager.show()
               }
             },
@@ -134,6 +155,9 @@ export default {
     }
   },
   methods: {
+    async spreadsheetSetup() {
+      await import('../../helpers/handsontable.js')
+    },
     async getPatients() {
       const response = await patientStore().getPatients()
       this.patientData = response.data
@@ -158,28 +182,28 @@ export default {
       return 'P' + this.nextPatientNum.toString().padStart(3, '0')
     },
     createNewPatient(gender, isAdult, selection) {
-      return function() {
+      return () => {
         // Generate field values where possible
         console.debug('New patient, gender', gender, 'is adult', isAdult, 'selection', selection, this)
-        const hot = this.$refs.patientTableCpt.hotInstance
         const row = selection[0].start.row + 1
-        hot.alter('insert_row_below', row - 1)
-        hot.setDataAtRowProp(row, 'code', this.nextAvailablePatientCode())
-        hot.setDataAtRowProp(row, 'first_name', faker.person.firstName(gender.toLowerCase()))
-        hot.setDataAtRowProp(row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()))
-        hot.setDataAtRowProp(row, 'age', isAdult ? 18 : 0)        
-        hot.setDataAtRowProp(row, 'gender', gender)
-        hot.setDataAtRowProp(row, 'height', isAdult ? 1.6 : 1.0)
-        hot.setDataAtRowProp(row, 'weight', '0')
-        hot.setDataAtRowProp(row, 'dob', '01/01/1971')
-        hot.setDataAtRowProp(row, 'is_adult', isAdult)
-        //TODO save this row to get an id
-        hot.selectCell(row, 'age')
-      }.bind(this)  
+        this.hot.alter('insert_row_below', row - 1)
+        this.hot.setDataAtRowProp([
+          [row, 'code', this.nextAvailablePatientCode(), 'new_patient_start'],
+          [row, 'first_name', faker.person.firstName(gender.toLowerCase()), 'new_patient'],
+          [row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()), 'new_patient'],
+          [row, 'age', isAdult ? 18 : 0, 'new_patient'],        
+          [row, 'gender', gender, 'new_patient'],
+          [row, 'height', isAdult ? 1.6 : 1.0, 'new_patient'],
+          [row, 'weight', '0', 'new_patient'],
+          [row, 'dob', '01/01/1971', 'new_patient'],
+          [row, 'is_adult', isAdult, 'new_patient_end']
+        ])        
+        this.hot.selectCell(row, 'age')
+      } 
     }    
   },
   mounted() {
-    handsontableRegistrations()
+    this.spreadsheetSetup()
     this.getPatients()    
   }
 }

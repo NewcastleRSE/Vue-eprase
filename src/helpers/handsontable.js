@@ -46,8 +46,7 @@ import {
   dateValidator,
   dropdownValidator,
   numericValidator,
-  timeValidator,
-  registerValidator
+  timeValidator
 } from 'handsontable/validators';
 
 // plugin modules
@@ -103,21 +102,38 @@ import {
   registerAllPlugins
 } from 'handsontable/registry'
 
-export function handsontableRegistrations() {
-  // register all cell types at once
-  registerAllCellTypes()
+registerAllCellTypes()
 
-  // register all renderers at once
-  registerAllRenderers()
+// register all renderers at once
+registerAllRenderers()
 
-  // register all editors at once
-  registerAllEditors()
+// register all editors at once
+registerAllEditors()
 
-  // register all validators at once
-  registerAllValidators()
+// register all validators at once
+registerAllValidators()
 
-  // register all plugins at once
-  registerAllPlugins()
+// register all plugins at once
+registerAllPlugins()
+
+export function patientCodeValidator(query, callback) {
+  console.debug('patientCodeValidator on', query)
+  callback(true)
+}
+
+export function patientWeightValidator(query, callback) {
+  console.debug('patientWeightValidator on', query)
+  callback(query > 10)
+}
+
+// Does the equivalent of HoT API method getSourceDataAtRow but works when sorting applied
+export function rowDataArrayToColumnObject(rowArr, colDefs) {
+  console.assert(Array.isArray(rowArr) && Array.isArray(colDefs) && rowArr.length == colDefs.length)
+  const colObj = {}
+  rowArr.forEach((elt, idx) => {
+    colObj[colDefs[idx].data] = elt
+  })
+  return colObj
 }
 
 export function noEditRenderer(_instance, td, _row, _col, _prop, value) {

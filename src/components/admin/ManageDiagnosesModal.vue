@@ -2,7 +2,7 @@
   <GenericModal 
     :modalName="'ManageDiagnosesModal'" 
     :modalId="'manageDiagnosesModal'" 
-    :title="'Diagnosis Manager'"
+    :title="`Diagnosis Manager for ${patientRecord.code} (${patientRecord.first_name} ${patientRecord.surname})`"
     :sizeClass="'modal-xl'"
     :closeBtnText="'Done'"
     :showActionBtn="false"
@@ -10,15 +10,20 @@
     <p class="p-3 rounded bg-info-subtle">
       Info here TODO
     </p>
-    <div class="px-4 w-100 ht-theme-horizon">       
+    <div v-if="dataLoaded && !dataError" class="px-3 w-100 ht-theme-horizon">       
       <hot-table ref="diagnosisTableCpt" :settings="diagnosisTableSettings"></hot-table>
+    </div>
+    <div v-if="dataError">
+      <p class="p-3 rounded bg-danger-subtle">
+        The following error occurred while fetching patient data : {{ dataError }}
+      </p>
     </div>
   </GenericModal>
 </template>
 
 <script>
 
-import { handsontableRegistrations, noEditRenderer } from '../../helpers/handsontable'
+import { noEditRenderer } from '../../helpers/handsontable'
 import { mapStores } from 'pinia'
 import { patientStore } from "../../stores/patients"
 import { authenticationStore } from "../../stores/authentication"
@@ -34,9 +39,9 @@ export default {
     HotTable
   },
   props: {
-    patientCode: {
-      type: String,
-      default: ''
+    patientRecord: {
+      type: Object,
+      default: {}
     }
   },
   computed: {    
@@ -44,7 +49,6 @@ export default {
   },
   data() {
     return {
-      spreadsheet: null,
       dataLoaded: false,
       dataError: false,
       patientDiagnoses: null,
@@ -115,32 +119,35 @@ export default {
     show() {     
       setVisible('manageDiagnosesModal', true)
     },
+    async spreadsheetSetup() {
+      await import('../../helpers/handsontable.js')
+    },
     async getDiagnosisData() {
-      //try {
+      console.log('### patient record is', this.patientRecord)
+      try {
         const responseAll = await patientStore().getAllDiagnoses()
         if (responseAll.status >= 400) {               
           throw new Error(responseAll.message)
         }
-        const responsePatient = await patientStore().getPatientByCode(this.patientCode)      
+        const responsePatient = await patientStore().getPatientByCode(this.patientRecord['code'])      
         if (responsePatient.status >= 400) {        
           throw new Error(responsePatient.message)
         }        
         this.patientDiagnoses = responsePatient.data.diagnosis.map(pd => pd.id)
         this.allDiagnoses = responseAll.data.map(d => Object.assign(d, { assigned: this.patientDiagnoses.includes(d.id) }))
-        console.debug(this.allDiagnoses, this.spreadsheet)  
-        this.spreadsheet.updateData(this.allDiagnoses)        
-      //} catch(e) {
-      //  this.dataError = [e.message]  
-      //  console.error(e.message)    
-      //}
+        this.dataLoaded = true
+        this.diagnosisTableSettings.data = this.allDiagnoses
+      } catch(e) {
+       this.dataError = [e.message]  
+       console.error(e.message)    
+      }
     }   
   },
   mounted() {
-    handsontableRegistrations()
+    this.spreadsheetSetup()
     document.querySelector('#manageDiagnosesModal').addEventListener('shown.bs.modal', evt => {
       this.getDiagnosisData()
-    })
-    this.spreadsheet = this.$refs.diagnosisTableCpt.hotInstance 
+    })     
   }
 }
 </script>
