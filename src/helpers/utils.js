@@ -25,3 +25,7 @@ export function prependZero(month) {
 export function getFormattedDate(time){
   return new Date(time * 1000).toLocaleDateString("en-GB")
 }
+
+export function removeDuplicates(arr) {
+  return [...new Set(arr)]
+}

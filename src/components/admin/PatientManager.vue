@@ -24,7 +24,10 @@
 
 <script>
 
-import { patientCodeValidator, patientWeightValidator, noEditRenderer, rowDataArrayToColumnObject } from '../../helpers/handsontable'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import * as hothelp from '../../helpers/handsontable'
+import { removeDuplicates } from '../../helpers/utils.js'
 import { faker } from '@faker-js/faker'
 import { mapStores } from 'pinia'
 import AppLogo from '../AppLogo'
@@ -58,6 +61,19 @@ export default {
       nextPatientNum: null,
       patientData: null,
       selectedPatientData: {},
+      unsavedRowNum: -1,                  // Set when a new patient is created, and only unset when record is saved
+      validationSchema: {
+        'id': (value) => value == null || (Number.isInteger(value) && value > 0),
+        'code': ( value) => value != null && value.match(/^P\d{3}$/) != null,
+        'first_name': (value) => value != null && value.length > 0,
+        'surname': (value) => value != null && value.length > 0,
+        'age': (value) => value != null && Number.isInteger(value) && value > 0,
+        'gender': (value) => value == 'Male' || value == 'Female',
+        'height': (value) => !Number.isNaN(value) && value >= 0,
+        'weight': (value) => value != null && value.length > 0,
+        'dob': (value) => value != null && dayjs(value, 'DD-MM-YYYY', true).isValid(),
+        'is_adult': (value) => value === true || value === false
+      },
       currentManager: 'ManageDiagnosesModal',
       patientTableSettings: {
         data: [],
@@ -72,17 +88,18 @@ export default {
             sortOrder: 'asc',
           },
         },
+        copyPaste: false,
         columns: [
-          { title: 'ID', type: 'numeric', data: 'id', readOnly: true },
-          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: noEditRenderer, validator: patientCodeValidator },
-          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: noEditRenderer },
-          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: noEditRenderer },
-          { title: 'Age', type: 'numeric', data: 'age', className: 'htRight' },
-          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: noEditRenderer },
-          { title: 'Height', type: 'numeric', data: 'height', className: 'htRight' },
-          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150, validator: patientWeightValidator },
-          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: noEditRenderer },
-          { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', width: 120, readOnly: true }       
+          { title: 'ID', type: 'numeric', data: 'id', editor: false, validator: false },
+          { title: 'Code', type: 'text', data: 'code', editor: false, renderer: hothelp.noEditRenderer, validator: false },
+          { title: 'First name', type: 'text', data: 'first_name', editor: false, renderer: hothelp.noEditRenderer, validator: false },
+          { title: 'Surname', type: 'text', data: 'surname', editor: false, renderer: hothelp.noEditRenderer, validator: false },
+          { title: 'Age', type: 'numeric', data: 'age', className: 'htRight', validator: false },
+          { title: 'Gender', type: 'dropdown', source: ['Male', 'Female'], strict: true, data: 'gender', editor: false, renderer: hothelp.noEditRenderer, validator: false },
+          { title: 'Height', type: 'numeric', data: 'height', className: 'htRight', validator: false },
+          { title: 'Weight', type: 'text', data: 'weight', className: 'htRight', width: 150, validator: false},
+          { title: 'DOB', type: 'date', dateFormat: 'DD/MM/YYYY', data: 'dob', className: 'htRight', editor: false, renderer: hothelp.noEditRenderer, validator: false },
+          { title: 'Adult', type: 'checkbox', data: 'is_adult', className: 'htCenter', width: 120, readOnly: true, validator: false }       
         ],
         hiddenColumns: { columns: [0, 8] },
         autoWrapRow: true,
@@ -97,23 +114,9 @@ export default {
           'filter_by_value',
           'filter_action_bar'
         ],
-        afterCreateRow(index, amount, source) {
-
-        },
-        afterChange: (changes, source) => {
-          if (changes != null) {
-            const changedRowHash = {}          
-            changes?.forEach(([row, prop, oldValue, newValue]) => {
-              console.debug('afterChange called with', row, prop, oldValue, newValue, source)
-              //TODO save this row to get an id
-              changedRowHash[row] = 1
-            })
-            console.debug(Object.keys(changedRowHash))//TODO these are strings
-            this.hot.validateRows(Object.keys(changedRowHash), (valid) => {
-              console.log('VALID = ', valid)
-            })
-          }          
-        },
+        afterCreateRow: this.afterCreateRowHook,
+        afterChange: this.afterChangeHook,
+        afterValidate: this.afterValidateHook,
         contextMenu: {
           callback: (key, selection, clickEvent) => {
             // Common callback for all options - not sure we need this
@@ -123,30 +126,28 @@ export default {
             new_male_adult_patient: {
               name: 'Insert new adult male patient below',
               callback: (key, selection) => {
-                console.log('Male patient create', key)    
                 this.createNewPatient('Male', true, selection)()  
-              }
+              },
+              disabled: this.unsavedDataExists
             },
             new_female_adult_patient: {
               name: 'Insert new adult female patient below',
               callback: (key, selection) => {   
-                console.log('Female patient create', key)                 
                 this.createNewPatient('Female', true, selection)()
-              }
+              },
+              disabled: this.unsavedDataExists
             },
             manage_diagnoses: {
               name: 'Manage diagnoses',
               callback: (key, selection) => {
-                console.log(key, selection, this)
-                this.selectedPatientData = rowDataArrayToColumnObject(this.hot.getDataAtRow(selection[0].start.row), this.patientTableSettings.columns)
+                this.selectedPatientData = hothelp.rowDataArrayToColumnObject(this.hot.getDataAtRow(selection[0].start.row), this.patientTableSettings.columns)
                 this.$refs.currentManager.show()
-              }
+              },
+              disabled: this.unsavedDataExists
             },
-            remove_patient: {
+            remove_row: {
               name: 'Remove patient',
-              disabled: () => {
-                return true
-              }
+              disabled: this.patientDeletionPrevented
             }
           }
         },
@@ -172,6 +173,37 @@ export default {
         console.error(response.message)
       }
     },
+    afterCreateRowHook(index) {
+      this.unsavedRowNum = index
+    },
+    afterChangeHook(changes, source) {
+
+      console.group('afterChangeHook')
+      console.debug('After change hook called with', changes, source)
+
+      if (changes != null) {
+        const rowsToSave = removeDuplicates(changes.map(c => c[0]))
+        rowsToSave.forEach(row => {
+          if (this.validatePatientRecord(row)) {
+            //TODO save the data
+            console.debug('### TODO - save the data here ###')
+            console.debug('### TODO - data end ###')
+            if (row == this.unsavedRowNum) {
+              this.unsavedRowNum = -1
+            }
+          }          
+        })        
+      }
+      console.groupEnd()
+    },
+    unsavedDataExists() {      
+      return this.unsavedRowNum >= 0
+    },
+    patientDeletionPrevented() {
+      //TODO - should check patient record not used anywhere else (database foreign keys will prevent deletion)
+      // We can, however, delete an unsaved row, as this will have no repercussions elsewhere in the database
+      return this.hot.getSelectedLast()?.[0] != this.unsavedRowNum
+    },
     nextAvailablePatientCode() {
       // Get the next available patient code Pxxxx
       if (this.nextPatientNum == null) {
@@ -181,24 +213,62 @@ export default {
       }
       return 'P' + this.nextPatientNum.toString().padStart(3, '0')
     },
+    validatePatientRecord(row) {
+
+      let valid = true
+
+      console.group('validatePatientRecord()')
+      console.debug('Validating record at', row)
+
+      const rec = hothelp.rowDataArrayToColumnObject(this.hot.getDataAtRow(row), this.patientTableSettings.columns)
+      for (const [key, value] of Object.entries(rec)) {        
+        let td = this.hot.getCell(row, this.hot.propToCol(key))
+        let meta = this.hot.getCellMeta(row, this.hot.propToCol(key))
+        console.debug('Cell at', row, this.hot.propToCol(key), 'is', td)            
+        if (!this.validationSchema[key](value)) { 
+          console.debug(key, 'with value', value, 'is invalid')         
+          if (td != null) {
+            matchMedia.valid = false
+            console.debug('Classlist before', td.classList)
+            td.classList.add('bg-danger-subtle')
+            console.debug('Classlist after', td.classList)
+          }          
+          valid = false          
+        } else {
+          console.debug(key, 'with value', value, 'is valid')
+          if (td != null) {
+            meta.valid = true
+            console.debug('Classlist before', td.classList)
+            td.classList.remove('bg-danger-subtle')
+            console.debug('Classlist after', td.classList)
+          }
+        }
+      }
+
+      console.debug('Returning', valid)
+      console.groupEnd()
+
+      return valid
+    },
     createNewPatient(gender, isAdult, selection) {
       return () => {
         // Generate field values where possible
         console.debug('New patient, gender', gender, 'is adult', isAdult, 'selection', selection, this)
         const row = selection[0].start.row + 1
+        const data = [
+          [row, 'code', this.nextAvailablePatientCode()],
+          [row, 'first_name', faker.person.firstName(gender.toLowerCase())],
+          [row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase())],
+          [row, 'age', isAdult ? 18 : 0],        
+          [row, 'gender', gender],
+          [row, 'height', isAdult ? 1.6 : 1.0],
+          [row, 'weight', '0'],
+          [row, 'dob', '01/01/1971'],
+          [row, 'is_adult', isAdult]
+        ]
         this.hot.alter('insert_row_below', row - 1)
-        this.hot.setDataAtRowProp([
-          [row, 'code', this.nextAvailablePatientCode(), 'new_patient_start'],
-          [row, 'first_name', faker.person.firstName(gender.toLowerCase()), 'new_patient'],
-          [row, 'surname', 'zzz' + faker.person.lastName(gender.toLowerCase()), 'new_patient'],
-          [row, 'age', isAdult ? 18 : 0, 'new_patient'],        
-          [row, 'gender', gender, 'new_patient'],
-          [row, 'height', isAdult ? 1.6 : 1.0, 'new_patient'],
-          [row, 'weight', '0', 'new_patient'],
-          [row, 'dob', '01/01/1971', 'new_patient'],
-          [row, 'is_adult', isAdult, 'new_patient_end']
-        ])        
-        this.hot.selectCell(row, 'age')
+        this.hot.setDataAtRowProp(data)    
+        this.hot.selectRows(row)    
       } 
     }    
   },

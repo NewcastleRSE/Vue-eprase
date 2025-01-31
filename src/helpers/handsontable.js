@@ -116,16 +116,41 @@ registerAllValidators()
 // register all plugins at once
 registerAllPlugins()
 
+export function patientIdValidator(query, callback) {
+  console.debug('patientIdValidator on', query)
+  callback(query == null || (Number.isInteger(query) && query > 0))
+}
+
 export function patientCodeValidator(query, callback) {
   console.debug('patientCodeValidator on', query)
-  callback(true)
+  callback(query.match(/^P\d{3}$/) != null)
+}  
+
+export function patientFirstNameValidator(query, callback) {
+  console.debug('patientFirstNameValidator on', query)
+  callback(query != null && query.length > 0)
+}  
+
+export function patientSurnameValidator(query, callback) {
+  console.debug('patientSurnameValidator on', query)
+  callback(query != null && query.length > 0)
+}  
+
+export function patientHeightValidator(query, callback) {
+  console.debug('patientHeightValidator on', query)
+  callback(query != null && query > 0.5)
 }
 
 export function patientWeightValidator(query, callback) {
   console.debug('patientWeightValidator on', query)
-  callback(query > 10)
+  callback(query != null && query.length > 0)
 }
 
+export function patientIsAdultValidator(query, callback) {
+  console.debug('patientIsAdultValidator on', query)
+  callback(query === true || query === false)
+}
+  
 // Does the equivalent of HoT API method getSourceDataAtRow but works when sorting applied
 export function rowDataArrayToColumnObject(rowArr, colDefs) {
   console.assert(Array.isArray(rowArr) && Array.isArray(colDefs) && rowArr.length == colDefs.length)
