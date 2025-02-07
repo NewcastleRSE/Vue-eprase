@@ -2,6 +2,11 @@ import { defineStore } from 'pinia'
 import axios from "axios"
 import { jwtDecode } from 'jwt-decode'
 
+const API = process.env.BASE_URL
+
+// Strapi's "authenticated" role - need more granularity for ePRaSE eventually...
+const ROLE_AUTHENTICATED = 1
+
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
@@ -32,10 +37,11 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Username', username, 'password', password)
 
       try {
-        const user = await axios.post('auth/signin', { username, password })
-        const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
-        console.debug('User', user, 'institution details', institutionDetails)
-        this.storeUserData(user, institutionDetails)
+        const res = await axios.post(API + 'auth/local', { identifier: username, password: password })
+        const userDetails = res.data
+        const institutionDetails = await this.getInstitutionDetails(userDetails.user.id, res.data.jwt)
+        console.debug('User', userDetails, 'institution details', institutionDetails)
+        this.storeUserData(userDetails, institutionDetails)
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -66,7 +72,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
 
       try {
-        await axios.post('auth/signup/user', { username, institution, email, password, role:['user'] })
+        await axios.post('auth/local/register', { username, institution, email, password, role: ROLE_AUTHENTICATED })
         ret = { status: 'ok', data: '' }
       } catch (err) {
         ret = this.triageError(err)
@@ -96,18 +102,20 @@ export const authenticationStore = defineStore('authentication', {
         return false
       }
     },
-    async getInstitutionDetails(institutionId) {
+    async getInstitutionDetails(userId, token) {
 
       console.group('getInstitutionDetails()')
-
-      institutionId = institutionId || this.institutionId
-      console.debug('Institution ID', institutionId)
+      console.debug('Determining institution for user', userId, 'logged in with token', token)
 
       try {
-        const res = await axios.get('auth/institutionDetails?institutionId=' + institutionId)
-        console.debug('Details', res.data)
+        const res = await axios.get(`${API}users?filters[id][$eq]=${userId}&populate=institution`, { headers: { 'Authorization': `Bearer ${token}` } })   
+        if ((Array.isArray(res) && res.length == 0) || Object.keys(res).length == 0) {
+          throw new Error('No user found with id', userId)
+        }
+        const details = Array.isArray(res.data) ? res.data[0].institution : res.data.institution
+        console.debug('Details', details)
         console.groupEnd()
-        return res.data
+        return details
       } catch (err) {
         console.error('Error getting user institution details:', err)
         console.groupEnd()
@@ -139,19 +147,19 @@ export const authenticationStore = defineStore('authentication', {
 
       return payload
     },
-    storeUserData(user, institution) {
+    storeUserData(userDetails, institutionDetails) {
 
       console.group('storeUserData()')
-      console.debug('User data', user.data, 'institution', institution)
+      console.debug('User data', userDetails, 'institution', institutionDetails)
 
       const csPayload = {
-        user: user.data.username,
-        userId: user.data.user_id,
-        institutionId: user.data.institution_id,
-        orgCode: institution.orgCode,
-        orgName: institution.orgName,
-        trust: institution.trust,
-        token: user.data.jwt.accessToken
+        user: userDetails.user.username,
+        userId: userDetails.user.id,
+        institutionId: institutionDetails.id,
+        orgCode: institutionDetails.code,
+        orgName: institutionDetails.name,
+        trust: institutionDetails.trust_type,
+        token: userDetails.jwt
       }
 
       console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)

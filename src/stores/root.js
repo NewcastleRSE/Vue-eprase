@@ -59,7 +59,7 @@ export const rootStore = defineStore('root', {
       return response
     },
     async getInstitutions() {
-      const response = await this.apiCall('auth/institutions', 'GET')
+      const response = await this.apiCall('institutions', 'GET')
       return response
     },
     async getCategories() {

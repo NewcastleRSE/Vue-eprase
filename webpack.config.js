@@ -124,7 +124,7 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === "production") {
-  let baseURL = '"http://localhost:6001/api/"'
+  let baseURL = '"http://localhost:1337/api/"'
   let sentryENV = "development"
 
   if (process.env.TARGET === "staging") {
@@ -156,7 +156,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "process.env": {
         NODE_ENV: '"development"',
-        BASE_URL: '"http://localhost:6001/api/"',
+        BASE_URL: '"http://localhost:1337/api/"',
       },
     }),
     new webpack.LoaderOptionsPlugin({
