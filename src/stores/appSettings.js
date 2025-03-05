@@ -5,7 +5,7 @@ export const appSettingsStore = defineStore('appSettings', {
     return {
       version: '3.0.0',
       debugMode: false,
-      appOpen: true,
+      appOpen: false,
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
       passwordMaxLength: 50,
