@@ -37,11 +37,26 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Username', username, 'password', password)
 
       try {
-        const res = await axios.post(API + 'auth/local', { identifier: username, password: password })
-        const userDetails = res.data
-        const institutionDetails = await this.getInstitutionDetails(userDetails.user.id, res.data.jwt)
-        console.debug('User', userDetails, 'institution details', institutionDetails)
-        this.storeUserData(userDetails, institutionDetails)
+        const signinRes = await axios.post(API + 'auth/local', { identifier: username, password: password })
+        const userDetails = signinRes.data
+        console.debug('User details from signin', userDetails)
+        this.$patch({token: signinRes.data.jwt})  // Store the JWT
+
+        const instRes = await axios.get(`${API}users?filters[id][$eq]=${userDetails.user.id}&populate=institution`, { headers: { 'Authorization': `Bearer ${this.token}` } })   
+        if ((Array.isArray(instRes) && instRes.length == 0) || Object.keys(instRes).length == 0) {
+          throw new Error('No user found with id', userId)
+        }
+        const instDetails = Array.isArray(instRes.data) ? instRes.data[0].institution : instRes.data.institution
+        console.debug('Institution details for user', details)
+        
+        this.$patch({
+          user: userDetails.user.username,
+          userId: userDetails.user.id,
+          institutionId: instDetails.id,
+          orgCode: instDetails.code,
+          orgName: instDetails.name,
+          trust: instDetails.trust_type
+        })
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -102,26 +117,6 @@ export const authenticationStore = defineStore('authentication', {
         return false
       }
     },
-    async getInstitutionDetails(userId, token) {
-
-      console.group('getInstitutionDetails()')
-      console.debug('Determining institution for user', userId, 'logged in with token', token)
-
-      try {
-        const res = await axios.get(`${API}users?filters[id][$eq]=${userId}&populate=institution`, { headers: { 'Authorization': `Bearer ${token}` } })   
-        if ((Array.isArray(res) && res.length == 0) || Object.keys(res).length == 0) {
-          throw new Error('No user found with id', userId)
-        }
-        const details = Array.isArray(res.data) ? res.data[0].institution : res.data.institution
-        console.debug('Details', details)
-        console.groupEnd()
-        return details
-      } catch (err) {
-        console.error('Error getting user institution details:', err)
-        console.groupEnd()
-        return false
-      }
-    },
     triageError(err) {
 
       console.group('triageError()')
@@ -146,69 +141,6 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return payload
-    },
-    storeUserData(userDetails, institutionDetails) {
-
-      console.group('storeUserData()')
-      console.debug('User data', userDetails, 'institution', institutionDetails)
-
-      const csPayload = {
-        user: userDetails.user.username,
-        userId: userDetails.user.id,
-        institutionId: institutionDetails.id,
-        orgCode: institutionDetails.code,
-        orgName: institutionDetails.name,
-        trust: institutionDetails.trust_type,
-        token: userDetails.jwt
-      }
-
-      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
-
-      this.$patch(csPayload)      
-
-      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
-      console.groupEnd()
-    },
-    // User management methods, only accessible to an admin
-    async findUsers(identifier, institution_id) {
-      try {
-        const params = new URLSearchParams()
-        if (identifier) {
-          params.set('identifier', identifier)
-        }
-        if (institution_id) {
-          params.set('institution_id', institution_id)
-        }
-        const query = params.toString()
-        const res = await axios.get('auth/findUsers?' + query, { headers: { 'Authorization': 'Bearer ' + this.token } })
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    async updateUser(id, email, password, enable, institution_id) {
-      try {
-        const res = await axios.post('auth/updateUser', 
-          { id, email, password, enable, institution_id }, 
-          { headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'multipart/form-data' } }
-        )
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    async deleteUser(id) {
-      try {
-        const res = await axios.delete('auth/deleteUser', 
-          { headers: { 'Authorization': 'Bearer ' + this.token }, params: { id: id } }
-        )
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    isValidNHSEmail(value) {
-      value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
     }
   }
 })
