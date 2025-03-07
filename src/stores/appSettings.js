@@ -5,7 +5,7 @@ export const appSettingsStore = defineStore('appSettings', {
     return {
       version: '3.0.0',
       debugMode: false,
-      appOpen: false, 
+      appOpen: false, // Closed tool again 07-03-2025
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
       passwordMaxLength: 50,
