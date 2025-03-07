@@ -5,7 +5,7 @@ export const appSettingsStore = defineStore('appSettings', {
     return {
       version: '3.0.0',
       debugMode: false,
-      appOpen: true, // temp opened 07-03-2025 for testing again
+      appOpen: true, // temp opened 07-03-2025 for testing admin dash
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
       passwordMaxLength: 50,
