@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import axios from "axios"
-import { jwtDecode } from 'jwt-decode'
 
 const API = process.env.BASE_URL
 
@@ -17,17 +16,7 @@ export const authenticationStore = defineStore('authentication', {
     trust: null,
     token: null
   }),
-  persist: true,
-  getters: {   
-    isLoggedIn: (state) => {
-      if (state.user && state.userId && state.institutionId && state.token) {
-        // Check token expiry date
-        const decodedToken = jwtDecode(state.token)
-        return decodedToken && (decodedToken.exp * 1000) > new Date().getTime()
-      }
-      return false
-    }
-  },
+  persist: true, 
   actions: {
     async login(username, password) {
 
@@ -79,6 +68,27 @@ export const authenticationStore = defineStore('authentication', {
 
       console.groupEnd()
     },
+    async isLoggedIn() {
+
+      let ret = {}
+
+      console.group('isLoggedIn()')
+
+      if (!this.token) {
+        ret = { status: }
+      }
+
+      try {
+        const res = await axios.get(API + 'users/me', { headers: { 'Authorization': 'Bearer ' + this.token } })
+        console.debug('Admin user', res.data)
+        console.groupEnd()
+        return res.data
+      } catch (err) {
+        console.error('Error checking if user is admin:', err)
+        console.groupEnd()
+        return false
+      }
+    },
     async signup(username, institution, email, password) {
 
       let ret = {}
@@ -87,8 +97,8 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
 
       try {
-        await axios.post('auth/local/register', { username, institution, email, password, role: ROLE_AUTHENTICATED })
-        ret = { status: 'ok', data: '' }
+        const signupRes = await axios.post('auth/local/register', { username, institution, email, password, role: ROLE_AUTHENTICATED })
+        ret = { status: 200, data: signupRes }
       } catch (err) {
         ret = this.triageError(err)
       }
@@ -98,16 +108,12 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },    
-    async checkIsAdminUser(userId) {
+    async checkIsAdminUser() {
 
       console.group('checkIsAdminUser()')
 
-      userId = userId || this.userId
-      console.debug('User ID', userId)
-      if (!userId) return false
-
       try {
-        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.token } })
+        const res = await axios.get(API + 'users/me', { headers: { 'Authorization': 'Bearer ' + this.token } })
         console.debug('Admin user', res.data)
         console.groupEnd()
         return res.data
