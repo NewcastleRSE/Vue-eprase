@@ -16,27 +16,34 @@ export const authenticationStore = defineStore('authentication', {
     trust: null,
     token: null
   }),
+  getters: {
+    authTokenHeader() {
+      return { 'Authorization': `Bearer ${this.token}` }
+    }
+  },
   persist: true, 
   actions: {
-    async login(username, password) {
+    async login(identifier, password) {
 
       let ret = {}
+      const payload = { identifier, password }
 
       console.group('login()')
-      console.debug('Username', username, 'password', password)
+      console.debug('Data payload', payload)
 
       try {
-        const signinRes = await axios.post(API + 'auth/local', { identifier: username, password: password })
+        const signinRes = await axios.post(API + 'auth/local', payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
         this.$patch({token: signinRes.data.jwt})  // Store the JWT
 
-        const instRes = await axios.get(`${API}users?filters[id][$eq]=${userDetails.user.id}&populate=institution`, { headers: { 'Authorization': `Bearer ${this.token}` } })   
+        console.debug('Determining user institution...')
+        const instRes = await axios.get(`${API}users?filters[id][$eq]=${userDetails.user.id}&populate=institution`, { headers: this.authTokenHeader })   
         if ((Array.isArray(instRes) && instRes.length == 0) || Object.keys(instRes).length == 0) {
-          throw new Error('No user found with id', userId)
+          throw new Error('No institution found for user id', userId)
         }
         const instDetails = Array.isArray(instRes.data) ? instRes.data[0].institution : instRes.data.institution
-        console.debug('Institution details for user', details)
+        console.debug('Institution details for user', instDetails)
         
         this.$patch({
           user: userDetails.user.username,
@@ -61,11 +68,8 @@ export const authenticationStore = defineStore('authentication', {
       localStorage.clear()
     },
     logout() {
-
       console.group('logout()')
-
       this.clear()
-
       console.groupEnd()
     },
     async isLoggedIn() {
@@ -74,31 +78,48 @@ export const authenticationStore = defineStore('authentication', {
 
       console.group('isLoggedIn()')
 
-      if (!this.token) {
-        ret = { status: }
-      }
+      // Example return from /users/me API call (not in Strapi documentation!)
+      // {
+      //   "id": 1,
+      //   "documentId": "r6oyijabsyw5sifgjm0xuz7j",
+      //   "username": "david",
+      //   "email": "david.herbert@ncl.ac.uk",
+      //   "provider": "local",
+      //   "confirmed": true,
+      //   "blocked": false,
+      //   "createdAt": "2025-03-17T15:03:20.739Z",
+      //   "updatedAt": "2025-03-17T15:03:20.739Z",
+      //   "publishedAt": "2025-03-17T15:03:20.739Z"
+      // }
 
-      try {
-        const res = await axios.get(API + 'users/me', { headers: { 'Authorization': 'Bearer ' + this.token } })
-        console.debug('Admin user', res.data)
-        console.groupEnd()
-        return res.data
-      } catch (err) {
-        console.error('Error checking if user is admin:', err)
-        console.groupEnd()
-        return false
+      if (!this.token) {
+        console.debug('No JWT present => cannot be logged in')
+        ret = { status: 200, data: false }        
+      } else {
+        try {
+          const res = await axios.get(API + 'users/me', { headers: this.authTokenHeader })
+          ret = { status: res.status, data: true}
+        } catch (err) {
+          ret = this.triageError(err)
+        }
       }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
     },
     async signup(username, institution, email, password) {
 
       let ret = {}
+      const payload = { username, institution, email, password, role: ROLE_AUTHENTICATED }
 
       console.group('signup()')
-      console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
+      console.debug('Data payload', payload)
 
       try {
-        const signupRes = await axios.post('auth/local/register', { username, institution, email, password, role: ROLE_AUTHENTICATED })
-        ret = { status: 200, data: signupRes }
+        const signupRes = await axios.post('auth/local/register', payload)
+        ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
       }
@@ -107,22 +128,7 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return ret
-    },    
-    async checkIsAdminUser() {
-
-      console.group('checkIsAdminUser()')
-
-      try {
-        const res = await axios.get(API + 'users/me', { headers: { 'Authorization': 'Bearer ' + this.token } })
-        console.debug('Admin user', res.data)
-        console.groupEnd()
-        return res.data
-      } catch (err) {
-        console.error('Error checking if user is admin:', err)
-        console.groupEnd()
-        return false
-      }
-    },
+    },        
     triageError(err) {
 
       console.group('triageError()')

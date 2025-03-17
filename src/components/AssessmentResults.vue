@@ -335,8 +335,7 @@ export default {
       return rootStore().saveMitigationResults(id, this.ep_service, this.goodMitigation, this.someMitigation, this.notMitigated, this.overMitigated, this.percentageNulls)
     },     
     async onHomeClick() {
-      const isAdmin = await authenticationStore().checkIsAdminUser()
-      this.$router.push(isAdmin ? '/adminhome' : '/assessmentintro')
+      this.$router.push('/assessmentintro')
     },
     async getAllDetails() {
 

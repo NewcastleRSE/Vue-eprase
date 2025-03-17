@@ -8,22 +8,11 @@
             <i class="bi me-2" :class="isLoggedIn ? 'bi-person-fill-check' : 'bi-person-fill-x'"></i>{{ isLoggedIn ?
             'Logged in as ' + user : 'Not logged in' }}
           </button>
-          <ul v-if="! isAdmin" class="dropdown-menu">
+          <ul class="dropdown-menu">
             <li>
               <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress &amp; log out' : 'Log in ' }}</a>
             </li>
-          </ul>
-          <ul v-if="isAdmin" class="dropdown-menu">
-            <li>
-              <a :class="$router.currentRoute.value.path == '/adminhome'? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/adminhome')">Admin Reports Home</a>
-            </li>
-            <li>
-              <a :class="$router.currentRoute.value.path == '/usermanager' ? {'disabled': 'disabled'} : ''" class="dropdown-item" @click="$router.push('/usermanager')">Manage Users</a>
-            </li>
-            <li>
-              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Log out' : 'Log in' }}</a>
-            </li>
-          </ul>
+          </ul>          
         </div>
       </div>
     </div>
@@ -44,15 +33,14 @@ export default {
     ExitModal
   },
   computed: {
-    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn', 'checkIsAdminUser']),
+    ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn']),
     exitModal() {
       return this.$refs.exitModal
     }
   },
   data() {
     return {
-      loginInfoDd: null,
-      isAdmin: false
+      loginInfoDd: null
     }
   },
   methods: {
@@ -68,14 +56,10 @@ export default {
       } else {
         this.$router.push('/login')
       }
-    },    
-    async checkAdmin() {
-      this.isAdmin = await (async () => { return await this.checkIsAdminUser() })()
     }
   },  
   mounted() {
     this.loginInfoDd = new Dropdown(this.$refs.loginInfoBtn)
-    this.checkAdmin()
   }
 }
 

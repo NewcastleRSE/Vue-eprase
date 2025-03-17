@@ -1,16 +1,22 @@
 <template>
   <main>
     <div class="loginpage">
+
       <AppLogo cls="banner" />
-      <h3 v-if="$route.query.requiresAdmin === '1'" class="text-danger">You need to be an admin to access this page</h3>
+
       <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
+
       <h1 class="mt-4">Log-in to ePRaSE</h1>
       <p class="pb-2">
         Please enter your login details below, or click 'Register' to create a new user account. You will need a valid
         <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
+      <Vueform v-model="user" sync>
+        <TextElement name="email" label="Email address"></TextElement>
+        <TextElement name="password" label="Password"></TextElement>
+      </Vueform>
+      <!-- <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
         <div v-if="serverError" class="mb-4 row">
           <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
             If your login details continue to fail, please contact the ePRaSE team at: <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
@@ -51,7 +57,7 @@
             Register
           </button>         
         </div>
-      </Form>
+      </Form> -->
       <p>
         If you have forgotten your password, please contact the ePRaSE team at:
         <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
@@ -70,11 +76,17 @@ import AppLogo from "./AppLogo"
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
+import { Vueform } from '@vueform/vueform'
+import { TextElement } from '@vueform/vueform'
 
+
+// HERE
 export default {
   name: "AppLogin",
   components: {
     AppLogo,
+    Vueform,
+    TextElement,
     Form,
     Field,
     ErrorMessage,
@@ -114,13 +126,8 @@ export default {
           const response = await this.authenticationStore.login(username, password)
           if (response.status == 200) {
             const userId = response.data
-            rootStore().audit('Successful login', '/login')            
-            const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
-            if (isAdmin) {
-              this.$router.push('/adminhome')
-            } else {
-              this.$router.push('/assessmentintro')
-            }     
+            rootStore().audit('Successful login', '/login')                        
+            this.$router.push('/assessmentintro')
           } else { 
             this.serverError = true
             rootStore().failedLoginAudit('Failed login', '/login')

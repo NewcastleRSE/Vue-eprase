@@ -10,6 +10,8 @@ import { createPersistedState } from 'pinia-plugin-persistedstate'
 import App from "./App.vue"
 import axios from "axios"
 import VueAxios from "vue-axios"
+import Vueform from '@vueform/vueform'
+import vueformConfig from './../vueform.config'
 import { configure, defineRule } from "vee-validate"
 import { min_value, required } from '@vee-validate/rules'
 import { router } from "./router"

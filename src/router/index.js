@@ -74,31 +74,7 @@ export const router = createRouter({
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
-  ],
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    }
-    if (to.hash) {
-      return { selector: to.hash }
-    }
-    return { x: 0, y: 0 }
-  }
-})
-
-// Hook to disable browser back button (pretty desperate stuff)
-router.afterEach((to, from) => {
-
-  console.group('router.afterEach()')
-  console.debug('Navigated to', to, 'from', from)
-
-  console.debug('Replacing history state...')
-  history.replaceState(history.state, '', to.fullPath)
-  console.debug('Assign onpopstate handler...')
-  window.onpopstate = () => history.go(1)
-
-  console.debug('Done')
-  console.groupEnd()
+  ]
 })
 
 // Hook to ensure user logged in for all non-public pages
@@ -107,31 +83,18 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  const auth = authenticationStore()
-  const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
-  const adminPages = ['/adminhome']
+  const publicPages = ['/', '/login', '/register', '/requestpassword', '/resetpassword']
   const authRequired = !publicPages.includes(to.path)
-  const adminRequired = adminPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
-  const loggedIn = auth.isLoggedIn
-  if (!loggedIn) {
-    // Clear all local storage, e.g. sessions where JWT has expired
+  const loggedInRes = await authenticationStore().isLoggedIn()
+  if (!loggedInRes.data !== true) {
+    // Clear all local storage, e.g. wipe sessions with expired JWTs
     auth.clear()
   }
-  console.debug('Logged in user', loggedIn)
+  console.debug('Logged in user', loggedInRes.data)
 
-  const isAdmin = await (async () => { return await auth.checkIsAdminUser() })()
-  console.debug('Admin required', adminRequired, 'user is admin', isAdmin)
-
-  if (adminRequired && !isAdmin) {
-
-    console.debug('Routing to login page for admin')
-    console.groupEnd()
-
-    return next('/login?requiresAdmin=1')
-
-  } else if (authRequired && !loggedIn) {
+  if (authRequired && !loggedInRes.data) {
 
     console.debug('Routing to login page...')
     console.groupEnd()
