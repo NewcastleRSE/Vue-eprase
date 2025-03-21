@@ -32,6 +32,8 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
+        // NOTE: this uses the standard authentication pathway which doesn't restrict institutions to one logged-in user at a time
+        // Will need to develop a plugin to do the signin in order to implement this - David 21/03/2025
         const signinRes = await axios.post(API + 'auth/local', payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)

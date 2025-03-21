@@ -8,4 +8,7 @@ export default defineConfig({
   theme: bootstrap,
   locales: { en },
   locale: 'en',
+  displayErrors: false,
+  displayMmessages: false,
+  floatPlaceholders: false
 })

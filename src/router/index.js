@@ -14,10 +14,16 @@ import AssessmentResults from "../components/AssessmentResults"
 import UserManager from "../components/UserManager"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
+import VueformTest from "../components/VueformTest"
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: "/test",
+      name: "test",
+      component: VueformTest
+    },
     {
       path: "/login/:loggedOut?",
       name: "login",
@@ -83,7 +89,7 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  const publicPages = ['/', '/login', '/register', '/requestpassword', '/resetpassword']
+  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword']
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
@@ -94,7 +100,7 @@ router.beforeEach(async (to, from, next) => {
   }
   console.debug('Logged in user', loggedInRes.data)
 
-  if (authRequired && !loggedInRes.data) {
+  if (authRequired && loggedInRes.data !== true) {
 
     console.debug('Routing to login page...')
     console.groupEnd()

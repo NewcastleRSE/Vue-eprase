@@ -11,7 +11,7 @@ import App from "./App.vue"
 import axios from "axios"
 import VueAxios from "vue-axios"
 import Vueform from '@vueform/vueform'
-import vueformConfig from './../vueform.config'
+import vueformConfig from '../vueform.config'
 import { configure, defineRule } from "vee-validate"
 import { min_value, required } from '@vee-validate/rules'
 import { router } from "./router"
@@ -113,7 +113,7 @@ axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 
-app.use(pinia).use(VueAxios, axios).use(router).use(VueDatePicker)
+app.use(pinia).use(VueAxios, axios).use(router).use(VueDatePicker).use(Vueform, vueformConfig)
 
 // hides default console message
 app.config.productionTip = false
