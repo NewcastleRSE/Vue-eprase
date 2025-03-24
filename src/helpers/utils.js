@@ -32,3 +32,7 @@ export function validateNHSEmail(value) {
   console.debug('Return', isValid)
   return isValid
 }
+
+export function usernameFromEmail(email) {
+  return email.split('@').shift()
+}

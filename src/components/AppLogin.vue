@@ -5,6 +5,7 @@
       <AppLogo cls="banner" />
 
       <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
+      <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
       <h1 class="mt-4">Log-in to ePRaSE</h1>
 
@@ -14,14 +15,27 @@
       </p>
 
       <div class="mb-4">
-        <Vueform :endpoint="false" @submit="onLoginClick" v-model="user" sync>
-          <TextElement name="email" label="Email address" placeholder="Valid NHS email address" :debounce="1000" :messages="{required: 'Email is required'}" :rules="['required', nhsEmail]" />
-          <TextElement name="password" label="Password" :debounce="1000" :messages="{required: 'Password is required'}" :rules="['required']" />
-          <GroupElement name="buttonBar" :columns="12">
-            <ButtonElement name="submit" :columns="3" full :submits="true">Log in</ButtonElement>
-            <ButtonElement name="reset" :columns="3" full :resets="true">Clear form</ButtonElement>
-            <ButtonElement name="register" :columns="3" full @click="onRegisterClick">Register</ButtonElement>
-            <ButtonElement name="forgotpassword" :columns="3" full @click="onForgotPasswordClick">Forgot password?</ButtonElement>
+        <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
+          <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
+            :debounce="1000" 
+            :messages="{required: 'Email is required'}" 
+            :rules="['required', nhsEmail]" />
+          <TextElement name="password" label="Password" autocomplete="on"
+            :input-type="showPassword ? 'text' : 'password'"            
+            :debounce="1000" 
+            :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
+            :rules="['required', 'between:6,50']">
+            <template #addon-after="scope">
+              <i style="cursor:pointer" @click="togglePasswordVisibility"
+                :class="showPassword ? 'bi bi-eye-slash' : 'bi-eye'" 
+                :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
+            </template>
+          </TextElement>
+          <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+            <ButtonElement name="submit" :columns="3" full :add-class="'mr-2'" :submits="true">Log in</ButtonElement>
+            <ButtonElement name="reset" :columns="3" full :add-class="'mx-2'" :resets="true">Clear form</ButtonElement>
+            <ButtonElement name="register" :columns="3" full :add-class="'mx-2'" @click="onRegisterClick">Register</ButtonElement>
+            <ButtonElement name="forgotpassword" :columns="3" full :add-class="'ml-2'" @click="onForgotPasswordClick">Forgot password?</ButtonElement>
           </GroupElement>
         </Vueform>
       </div>
@@ -30,12 +44,11 @@
 </template>
 
 <script>
-import { mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { validateNHSEmail } from '../helpers/utils'
-import { rootStore } from '../stores/root'
+import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
-import { Vueform, TextElement, Validator, GroupElement } from '@vueform/vueform'
+import { Validator } from '@vueform/vueform'
 
 const nhsEmail = class extends Validator {
   get msg( ){ 
@@ -53,49 +66,42 @@ export default {
     AppLogo
   },
   computed: {
-    ...mapStores(rootStore, authenticationStore)
+    ...mapState(authenticationStore, ['login'])
   },
   data() {
     return {
-      nhsEmail,
-      // validationSchema: {
-      //   'email': 'required|nhsEmail',
-      //   'password': 'required|lengthBetween:6,50'
-      // },
+      nhsEmail,    
       user: {
         email: '',
         username: '',
         password: '',
       },
-      serverError: false,
-      loggedOut: false
+      showPassword: false,
+      serverError: false
     }
   },
   methods: {
-    onLoginClick(FormData, form$) {
+    async onLoginClick() {
 
       console.group('onLoginClick()')
+      console.debug('Form', form$)
 
       this.serverError = false
-
-      // this.user.username = this.user.email.split('@').shift()
-      // this.$refs.loginForm.validate().then(async (valid) => {
-      //   console.log('Form submission valid', valid)
-      //   if (valid) {
-      //     const username = this.user.username
-      //     const password = this.user.password
-      //     console.debug('Username', username, 'password', password)
-      //     const response = await this.authenticationStore.login(username, password)
-      //     if (response.status == 200) {
-      //       const userId = response.data
-      //       rootStore().audit('Successful login', '/login')                        
-      //       this.$router.push('/assessmentintro')
-      //     } else { 
-      //       this.serverError = true
-      //       rootStore().failedLoginAudit('Failed login', '/login')
-      //     }              
-      //   }
-      // })
+  
+      form$.validate().then(async () => {
+        if (!form$.hasErrors) {
+          // Do the signin
+          console.debug('Validation completed successfully')
+          const signinResponse = await authenticationStore().login(usernameFromEmail(this.email), this.password)
+          if (signinResponse.status < 400) {
+            console.debug('Successful signin')
+            // Audit login ok TODO
+          } else {
+            this.serverError = 'An error occured during signin:' + signinResponse.message
+            // Audit login failed
+          }
+        }
+      })      
       console.groupEnd()
     },
     onForgotPasswordClick() {
@@ -103,6 +109,9 @@ export default {
     },
     onRegisterClick() {
       this.$router.push('/register')
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword
     }
   }
 }
