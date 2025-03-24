@@ -4,87 +4,59 @@
     <div class="registerpage">
 
       <AppLogo cls="banner" />
-      <div class="register-text">
+
+        <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
+
         <h1 class="mt-4">Register</h1>
 
-        <p class="pb-2">To register with the ePRaSE system, please provide the following information.
+        <p class="pb-2">To register with the ePRaSE system, please provide the following information.<br>
           You will need a valid <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email
           account to register with ePRaSE successfully.
         </p>
 
-        <Form ref="regForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
-
-          <div class="mb-4 row">
-            <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
-            <div class="col-sm-8">
-              <Field v-slot="{ field, meta }" v-model="user.email" name="email">
-                <input v-bind="field" id="email" type="email" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
-              </Field>
-            </div>
-            <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label for="institution" class="col-sm-4 form-label">Your NHS Trust:</label>
-            <div class="col-sm-8">
-              <Field v-slot="{ field, meta }" v-model="user.institution" name="institution">
-                <select v-bind="field" id="institution" class="form-select"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                  <option value="" disabled>Please select...</option>
-                  <option v-for="inst in institutions" :key="inst.id" :value="inst.id">{{ inst.orgName }}</option>
-                </select>
-              </Field>
-            </div>
-            <ErrorMessage name="institution" as="div" class="mt-2 text-danger text-center col-sm-12"
-              v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label for="password" class="col-sm-4 form-label">Password:</label>
-            <div class="col-sm-8">
-              <Field v-slot="{ field, meta }" v-model="user.password" name="password">
-                <input v-bind="field" id="password" type="password" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
-              </Field>
-            </div>
-            <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label for="confirmPassword" class="col-sm-4 form-label">Confirm password:</label>
-            <div class="col-sm-8">
-              <Field v-slot="{ field, meta }" v-model="user.confirmPassword" name="confirmPassword">
-                <input v-bind="field" id="confirmPassword" type="password" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
-              </Field>
-            </div>
-            <ErrorMessage name="confirmPassword" as="div" class="mt-2 text-danger text-center col-sm-12"
-              v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4">
-            <button type="button" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3"
-              @click="onRegisterClick">
-              Register
-            </button>
-            <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
-              Cancel
-            </button>
-          </div>
-        </Form>
+        <div class="mb-4">
+          <Vueform ref="registerForm" :endpoint="false" @submit="onRegisterClick" v-model="user" sync>
+            <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
+              :debounce="1000" 
+              :messages="{required: 'Email is required'}" 
+              :rules="['required', nhsEmail]" />
+            <SelectElement name="institution" label="Your NHS Trust"
+              :native="false" 
+              :search="true"
+              :track-by="['label', 'value']"
+              :items="getInstitutionCodesNames" 
+              :messages="{required: 'Institution is required'}" 
+              :rules="['required']" />
+            <TextElement name="password" label="Password" autocomplete="on"
+              :input-type="showPassword ? 'text' : 'password'"            
+              :debounce="1000" 
+              :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long', confirmed: 'Password and confirmation must be the same'}" 
+              :rules="['required', 'between:6,50', 'confirmed']">
+              <template #addon-after="scope">
+                <i style="cursor:pointer" @click="togglePasswordVisibility(false)"
+                  :class="showPassword ? 'bi bi-eye-slash' : 'bi-eye'" 
+                  :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
+              </template>
+            </TextElement>
+            <TextElement name="password_confirmation" label="Confirm password" autocomplete="on"
+              :input-type="showPasswordConfirm ? 'text' : 'password'"            
+              :debounce="1000" 
+              :messages="{required: 'Password confirmation is required', between: 'Password confirmation must be between 6 and 50 characters long'}" 
+              :rules="['required', 'between:6,50']">
+              <template #addon-after="scope">
+                <i style="cursor:pointer" @click="togglePasswordVisibility(true)"
+                  :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi-eye'" 
+                  :title="(showPasswordConfirm ? 'Hide' : 'Show') + ' password'"></i>
+              </template>
+            </TextElement>
+            <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+              <ButtonElement name="submit" :columns="3" full :add-class="'mr-2'" :submits="true">Register</ButtonElement>
+              <ButtonElement name="reset" :columns="3" full :add-class="'mx-2'" :resets="true">Clear form</ButtonElement>
+            </GroupElement>
+          </Vueform>
+        </div>
 
       </div>
-
-    </div>
   </main>
 </template>
 
@@ -92,32 +64,32 @@
 
 import AppLogo from './AppLogo'
 import { mapState } from 'pinia'
-import { Form, Field, ErrorMessage } from 'vee-validate'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
-import { appSettingsStore } from '../stores/appSettings'
+import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
+import { Validator } from '@vueform/vueform'
+
+const nhsEmail = class extends Validator {
+  get msg( ){ 
+    return 'Must be a valid nhs.net or nhs.uk email address'
+  }
+  check(value) {
+    return validateNHSEmail(value)
+  }
+}
 
 export default {
   name: "AppRegister",
   components: {
-    AppLogo,
-    Form,
-    Field,
-    ErrorMessage,
+    AppLogo
   },
   computed: {
-    ...mapState(appSettingsStore, ['appOpen']),
     ...mapState(authenticationStore, ['signup']),
     ...mapState(rootStore, ['getInstitutions'])
   },
   data() {
-    return {
-      validationSchema: {
-        'email': 'required|nhsEmail',
-        'institution': 'required',
-        'password': 'required|lengthBetween:6,50',
-        'confirmPassword': 'required|lengthBetween:6,50|passwordConfirmationEqual:@password'
-      },
+    return {   
+      nhsEmail,   
       user: {
         username: '',
         institution: '',
@@ -125,61 +97,55 @@ export default {
         password: '',
         confirmPassword: '',
       },
-      institutions: []
+      serverError: false,
+      showPassword: false,
+      showPasswordConfirm: false
     }
   },
-  methods: {
-    onResetClick() {
-      this.$refs.regForm.resetForm()
-    },
-    onRegisterClick() {
+  methods: {    
+    onRegisterClick(form$) {
 
       console.group('onRegisterClick()')
+      console.debug('Form', form$)
 
-      this.user.username = this.user.email.split('@').shift()
-      this.$refs.regForm.validate().then(async (valid) => {
-        console.log('Form submission valid', valid)
-        if (valid) {
-          const username = this.user.username
-          const institution = this.user.institution
-          const email = this.user.email
-          const password = this.user.password
-
-          console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
-          try {
-            const response = await authenticationStore().signup(username, institution, email, password)
-            if (response.status == 'ok') {
-              console.log(response)
-              this.$router.push('/login')
-            } else {
-              console.debug('Setting errors...')
-              let message = response.message
-              if (response.message == 'too-many-users') {
-                message = 'Maximum quota of users (4) exceeded for this organisation'
-              } else if (response.message == 'email-taken') {
-                message = 'This email address is already in use'
-              }
-              this.$refs.regForm.setFieldError('email', message)
-            }
-          } catch (err) {
-            console.error(err)
+      this.serverError = false
+  
+      form$.validate().then(async () => {
+        if (!form$.hasErrors) {
+          // Do the signup
+          console.debug('Validation completed successfully')
+          this.user.username = usernameFromEmail(this.user.email)
+          const { username, institution, email, password } = this.user
+          const signupResponse = await authenticationStore().signup(username, institution, email, password)
+          if (signupResponse.status < 400) {
+            console.debug('Successful registration')
+            // Audit login ok TODO
+          } else {
+            this.serverError = 'An error occured during registration:' + signupResponse.message
+            // Audit login failed
           }
         }
-      })
+      })      
       console.groupEnd()
     },
-    async getInstitutions() {
+    async getInstitutionCodesNames() {
+      let institutions = []
       const response = await rootStore().getInstitutions()
-      if (response.status == 200) {
-        this.institutions = response.data
+      if (response.status < 400) {
+        institutions = response.data.data.map(inst => { return { value: inst.id, label: inst.name } })
+        institutions.unshift({value: '', label: 'Please select...', disabled: true})        
       } else {
-        this.institutions = [response.message]
-        console.error(response.message)
+        this.serverError = [response.message]
       }
+      return institutions
+    },
+    togglePasswordVisibility(isConfirm) {
+      if (isConfirm) {
+        this.showPasswordConfirm = !this.showPasswordConfirm
+      } else {
+        this.showPassword = !this.showPassword
+      }      
     }
-  },
-  mounted() {
-    this.getInstitutions()
   }
 }
 

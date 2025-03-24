@@ -34,7 +34,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = { headers: { Authorization: `Bearer ${auth.token}` } }
+      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
 
       try {
         if (method == 'GET') {
@@ -59,7 +59,7 @@ export const rootStore = defineStore('root', {
       return response
     },
     async getInstitutions() {
-      const response = await this.apiCall('institutions', 'GET')
+      const response = await this.apiCall('institutions?fields[0]=code&fields[1]=name&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
     async getCategories() {

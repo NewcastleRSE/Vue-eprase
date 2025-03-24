@@ -3,9 +3,6 @@ import axios from "axios"
 
 const API = process.env.BASE_URL
 
-// Strapi's "authenticated" role - need more granularity for ePRaSE eventually...
-const ROLE_AUTHENTICATED = 1
-
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
@@ -114,13 +111,13 @@ export const authenticationStore = defineStore('authentication', {
     async signup(username, institution, email, password) {
 
       let ret = {}
-      const payload = { username, institution, email, password, role: ROLE_AUTHENTICATED }
-
+      const payload = { username, email, password }
+      
       console.group('signup()')
       console.debug('Data payload', payload)
 
       try {
-        const signupRes = await axios.post('auth/local/register', payload)
+        const signupRes = await axios.post('auth/local/register', payload)        
         ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
@@ -140,7 +137,7 @@ export const authenticationStore = defineStore('authentication', {
       if (err.response) {
         console.debug('err.response set')
         console.debug(err.response)
-        payload = { status: err.response.status, message: err.response.data.message || err.response.data }
+        payload = { status: err.response.status, message: err.response.data.error.message || err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
         console.debug(err.request)
@@ -148,7 +145,7 @@ export const authenticationStore = defineStore('authentication', {
       } else {
         console.debug('Catch-all')
         console.error(err)
-        payload =  { status: 500, message: err }
+        payload =  { status: err.status, message: err.message }
       }
 
       console.debug('Payload', payload)

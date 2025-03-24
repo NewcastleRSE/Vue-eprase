@@ -59,7 +59,6 @@ const nhsEmail = class extends Validator {
   }
 }
 
-// HERE
 export default {
   name: "AppLogin",
   components: {
@@ -81,10 +80,10 @@ export default {
     }
   },
   methods: {
-    async onLoginClick() {
+    onLoginClick(form$) {
 
       console.group('onLoginClick()')
-      console.debug('Form', form$)
+      console.debug('Login form', form$)
 
       this.serverError = false
   
@@ -92,7 +91,7 @@ export default {
         if (!form$.hasErrors) {
           // Do the signin
           console.debug('Validation completed successfully')
-          const signinResponse = await authenticationStore().login(usernameFromEmail(this.email), this.password)
+          const signinResponse = await authenticationStore().login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
             // Audit login ok TODO
