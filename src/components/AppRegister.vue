@@ -120,6 +120,7 @@ export default {
           if (signupResponse.status < 400) {
             console.debug('Successful registration')
             // Audit login ok TODO
+            this.$router.push('/login?action=registered')
           } else {
             this.serverError = 'An error occured during registration:' + signupResponse.message
             // Audit login failed

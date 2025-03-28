@@ -4,7 +4,8 @@
 
       <AppLogo cls="banner" />
 
-      <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
+      <h3 v-if="$route.query.action === 'loggedOut'" class="text-danger">You have successfully logged out</h3>
+      <h3 v-if="$route.query.action === 'registered'" class="text-danger">Registration successful, please sign in</h3>
       <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
       <h1 class="mt-4">Log-in to ePRaSE</h1>
@@ -48,6 +49,7 @@ import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
 import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
+import { rootStore } from '../stores/root'
 import { Validator } from '@vueform/vueform'
 
 const nhsEmail = class extends Validator {
@@ -65,7 +67,8 @@ export default {
     AppLogo
   },
   computed: {
-    ...mapState(authenticationStore, ['login'])
+    ...mapState(authenticationStore, ['login', 'clear']),
+    ...mapState(rootStore, ['audit'])
   },
   data() {
     return {
@@ -94,10 +97,11 @@ export default {
           const signinResponse = await authenticationStore().login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            // Audit login ok TODO
+            await rootStore().audit('login', '/login')
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message
-            // Audit login failed
+            await rootStore().audit('loginfail', '/login')
+            authenticationStore().clear()
           }
         }
       })      

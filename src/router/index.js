@@ -25,7 +25,7 @@ export const router = createRouter({
       component: VueformTest
     },
     {
-      path: "/login/:loggedOut?",
+      path: "/login/:action?",
       name: "login",
       component: AppLogin,
     },
@@ -96,7 +96,7 @@ router.beforeEach(async (to, from, next) => {
   const loggedInRes = await authenticationStore().isLoggedIn()
   if (!loggedInRes.data !== true) {
     // Clear all local storage, e.g. wipe sessions with expired JWTs
-    auth.clear()
+    authenticationStore().clear()
   }
   console.debug('Logged in user', loggedInRes.data)
 

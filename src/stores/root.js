@@ -58,6 +58,7 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('resultByAssessmentId?ID=' + assessment_id, 'GET')
       return response
     },
+    // Get list of institutions (UPDATED Strapi)
     async getInstitutions() {
       const response = await this.apiCall('institutions?fields[0]=code&fields[1]=name&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
@@ -180,17 +181,11 @@ export const rootStore = defineStore('root', {
       return(response)
     },
     async audit(action, uri) {
-      const response = await this.apiCall('audit', 'POST', { action, uri })
+      const response = await this.apiCall('audits', 'POST', { data: { action, uri } })
       if (response.status >= 400) {
         console.error(response.message)
       }
-    },
-    async failedLoginAudit(action, uri) {
-      const response = await this.apiCall('failedLoginAudit', 'POST', { action, uri })
-      if (response.status >= 400) {
-        console.error(response.message)
-      }
-    },   
+    },    
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
     storeAssessmentComplete(complete) { this.assessmentComplete = complete },    

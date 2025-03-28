@@ -37,20 +37,15 @@ export const authenticationStore = defineStore('authentication', {
         this.$patch({token: signinRes.data.jwt})  // Store the JWT
 
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users?filters[id][$eq]=${userDetails.user.id}&populate=institution`, { headers: this.authTokenHeader })   
-        if ((Array.isArray(instRes) && instRes.length == 0) || Object.keys(instRes).length == 0) {
-          throw new Error('No institution found for user id', userId)
-        }
-        const instDetails = Array.isArray(instRes.data) ? instRes.data[0].institution : instRes.data.institution
-        console.debug('Institution details for user', instDetails)
+        const instRes = await axios.get(`${API}users/me?populate=institution`, { headers: this.authTokenHeader }) 
         
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
-          institutionId: instDetails.id,
-          orgCode: instDetails.code,
-          orgName: instDetails.name,
-          trust: instDetails.trust_type
+          institutionId: instRes.data.institution.id,
+          orgCode: instRes.data.institution.code,
+          orgName: instRes.data.institution.name,
+          trust: instRes.data.institution.trust_type
         })
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
@@ -96,7 +91,7 @@ export const authenticationStore = defineStore('authentication', {
         ret = { status: 200, data: false }        
       } else {
         try {
-          const res = await axios.get(API + 'users/me', { headers: this.authTokenHeader })
+          const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
           ret = { status: res.status, data: true}
         } catch (err) {
           ret = this.triageError(err)
@@ -111,7 +106,7 @@ export const authenticationStore = defineStore('authentication', {
     async signup(username, institution, email, password) {
 
       let ret = {}
-      const payload = { username, email, password }
+      const payload = { username, institution, email, password }
       
       console.group('signup()')
       console.debug('Data payload', payload)
