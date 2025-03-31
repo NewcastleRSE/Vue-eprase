@@ -50,8 +50,17 @@
               </template>
             </TextElement>
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
-              <ButtonElement name="submit" :columns="3" full :add-class="'mr-2'" :submits="true">Register</ButtonElement>
-              <ButtonElement name="reset" :columns="3" full :add-class="'mx-2'" :resets="true">Clear form</ButtonElement>
+              <ButtonElement name="submit" full 
+                :columns="3" 
+                :add-class="'me-2'" 
+                :submits="true">
+                {{ buttonLabel('register', 'Register', 'me-2') }}
+              </ButtonElement>
+              <ButtonElement name="reset" full 
+                :columns="3" 
+                :resets="true">
+                {{ buttonLabel('reset', 'Clear form') }}
+              </ButtonElement>
             </GroupElement>
           </Vueform>
         </div>
@@ -119,11 +128,11 @@ export default {
           const signupResponse = await authenticationStore().signup(username, institution, email, password)
           if (signupResponse.status < 400) {
             console.debug('Successful registration')
-            // Audit login ok TODO
+            await rootStore().audit('register:' + email, '/register')
             this.$router.push('/login?action=registered')
           } else {
             this.serverError = 'An error occured during registration:' + signupResponse.message
-            // Audit login failed
+            await rootStore().audit('registerfail:' + email, '/register')
           }
         }
       })      

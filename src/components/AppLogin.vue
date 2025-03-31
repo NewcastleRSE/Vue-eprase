@@ -4,8 +4,8 @@
 
       <AppLogo cls="banner" />
 
-      <h3 v-if="$route.query.action === 'loggedOut'" class="text-danger">You have successfully logged out</h3>
-      <h3 v-if="$route.query.action === 'registered'" class="text-danger">Registration successful, please sign in</h3>
+      <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
+      <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
       <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
       <h1 class="mt-4">Log-in to ePRaSE</h1>
@@ -28,15 +28,37 @@
             :rules="['required', 'between:6,50']">
             <template #addon-after="scope">
               <i style="cursor:pointer" @click="togglePasswordVisibility"
-                :class="showPassword ? 'bi bi-eye-slash' : 'bi-eye'" 
+                :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
                 :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
             </template>
           </TextElement>
           <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
-            <ButtonElement name="submit" :columns="3" full :add-class="'mr-2'" :submits="true">Log in</ButtonElement>
-            <ButtonElement name="reset" :columns="3" full :add-class="'mx-2'" :resets="true">Clear form</ButtonElement>
-            <ButtonElement name="register" :columns="3" full :add-class="'mx-2'" @click="onRegisterClick">Register</ButtonElement>
-            <ButtonElement name="forgotpassword" :columns="3" full :add-class="'ml-2'" @click="onForgotPasswordClick">Forgot password?</ButtonElement>
+            <ButtonElement name="submit" full
+              :columns="3" 
+              :add-class="'me-2'" 
+              :submits="true">
+              {{ buttonLabel('login', 'Log in', 'me-2') }}
+            </ButtonElement>
+            <ButtonElement name="reset" full 
+              :columns="3" 
+              :add-class="'mx-2'" 
+              :resets="true">
+              {{ buttonLabel('reset', 'Clear form', 'me-2') }}
+            </ButtonElement>
+            <ButtonElement name="register" full 
+              :columns="3" 
+              :add-class="'mx-2'" 
+              :disabled="$route.query.action === 'registered'" 
+              @click="onRegisterClick">
+              {{ buttonLabel('register', 'Register', 'me-2') }}
+            </ButtonElement>
+            <ButtonElement name="forgotpassword" full 
+              :columns="3" 
+              :add-class="'ms-2'" 
+              :disabled="$route.query.action === 'registered'" 
+              @click="onForgotPasswordClick">
+              {{ buttonLabel('forgotPassword', 'Forgot password', 'me-2') }}
+            </ButtonElement>
           </GroupElement>
         </Vueform>
       </div>
@@ -47,7 +69,7 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
+import { validateNHSEmail, usernameFromEmail, buttonLabel } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { Validator } from '@vueform/vueform'
@@ -97,10 +119,10 @@ export default {
           const signinResponse = await authenticationStore().login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            await rootStore().audit('login', '/login')
+            await rootStore().audit('login:' + this.user.email, '/login')
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message
-            await rootStore().audit('loginfail', '/login')
+            await rootStore().audit('loginfail:' + this.user.email, '/login')
             authenticationStore().clear()
           }
         }

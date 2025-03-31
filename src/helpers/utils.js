@@ -36,3 +36,18 @@ export function validateNHSEmail(value) {
 export function usernameFromEmail(email) {
   return email.split('@').shift()
 }
+
+// Keep button icons and labels consistent
+export function buttonLabel(action, label, appendClass='') {
+  const actionIcons = {
+    'login': 'person-circle',
+    'register': 'person-fill-add',
+    'resetForm': 'x-circle-fill',
+    'forgotPassword': 'key-fill',
+    'next': 'arrow-right-circle-fill',
+    'previous': 'arrow-left-circle-fill',
+    'help': 'question-circle-fill',
+    'info': 'info-circle-fill'
+  }
+  return `<i class="bi bi-${actionIcons[action || 'info']}${appendClass ? ' ' + appendClass : ''}"></i>${label}`
+}
