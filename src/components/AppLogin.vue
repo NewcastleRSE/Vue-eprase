@@ -37,27 +37,27 @@
               :columns="3" 
               :add-class="'me-2'" 
               :submits="true">
-              {{ buttonLabel('login', 'Log in', 'me-2') }}
+              <i class="bi bi-person-circle me-2"></i>Log in
             </ButtonElement>
             <ButtonElement name="reset" full 
               :columns="3" 
               :add-class="'mx-2'" 
               :resets="true">
-              {{ buttonLabel('reset', 'Clear form', 'me-2') }}
+              <i class="bi bi-x-circle-fill me-2"></i>Clear form
             </ButtonElement>
             <ButtonElement name="register" full 
               :columns="3" 
               :add-class="'mx-2'" 
               :disabled="$route.query.action === 'registered'" 
               @click="onRegisterClick">
-              {{ buttonLabel('register', 'Register', 'me-2') }}
+              <i class="bi bi-person-fill-add me-2"></i>Register
             </ButtonElement>
             <ButtonElement name="forgotpassword" full 
               :columns="3" 
               :add-class="'ms-2'" 
               :disabled="$route.query.action === 'registered'" 
               @click="onForgotPasswordClick">
-              {{ buttonLabel('forgotPassword', 'Forgot password', 'me-2') }}
+              <i class="bi bi-key-fill me-2"></i>Fogot password?
             </ButtonElement>
           </GroupElement>
         </Vueform>
@@ -69,7 +69,7 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { validateNHSEmail, usernameFromEmail, buttonLabel } from '../helpers/utils'
+import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { Validator } from '@vueform/vueform'
@@ -116,14 +116,15 @@ export default {
         if (!form$.hasErrors) {
           // Do the signin
           console.debug('Validation completed successfully')
-          const signinResponse = await authenticationStore().login(usernameFromEmail(this.user.email), this.user.password)
+          const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            await rootStore().audit('login:' + this.user.email, '/login')
+            await this.audit('login:' + this.user.email, '/login')
+            this.$router.push('/')
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message
-            await rootStore().audit('loginfail:' + this.user.email, '/login')
-            authenticationStore().clear()
+            await this.audit('loginfail:' + this.user.email, '/login')
+            this.clear()
           }
         }
       })      

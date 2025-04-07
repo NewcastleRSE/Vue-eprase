@@ -11,7 +11,7 @@ export default {
     ...mapState(authenticationStore, ['logout'])
   },
   mounted() {
-    authenticationStore().logout()
+    this.logout()
     this.$router.push('/login?action=loggedOut')
   }
 }

@@ -68,34 +68,15 @@ export const authenticationStore = defineStore('authentication', {
     },
     async isLoggedIn() {
 
-      let ret = {}
+      let ret = false
 
       console.group('isLoggedIn()')
 
-      // Example return from /users/me API call (not in Strapi documentation!)
-      // {
-      //   "id": 1,
-      //   "documentId": "r6oyijabsyw5sifgjm0xuz7j",
-      //   "username": "david",
-      //   "email": "david.herbert@ncl.ac.uk",
-      //   "provider": "local",
-      //   "confirmed": true,
-      //   "blocked": false,
-      //   "createdAt": "2025-03-17T15:03:20.739Z",
-      //   "updatedAt": "2025-03-17T15:03:20.739Z",
-      //   "publishedAt": "2025-03-17T15:03:20.739Z"
-      // }
-
-      if (!this.token) {
-        console.debug('No JWT present => cannot be logged in')
-        ret = { status: 200, data: false }        
-      } else {
-        try {
-          const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
-          ret = { status: res.status, data: true}
-        } catch (err) {
-          ret = this.triageError(err)
-        }
+      try {
+        const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
+        ret = true
+      } catch (err) {
+        console.error(err)
       }
       
       console.debug('Returning', ret)

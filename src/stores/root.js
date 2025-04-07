@@ -63,6 +63,11 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('institutions?fields[0]=code&fields[1]=name&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
+    // Get list of ePrescribing system names (UPDATED Strapi)
+    async getEpSystems() {
+      const response = await this.apiCall('ep-services?fields[0]=name&sort[0]=name:asc', 'GET')
+      return response
+    },
     async getCategories() {
       if (this.categories.length == 0) {
         const response = await this.apiCall('categories', 'GET')

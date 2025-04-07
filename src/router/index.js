@@ -5,6 +5,7 @@ import AppWelcome from "../components/AppWelcome"
 import AppLogin from "../components/AppLogin"
 import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
+import Assessment from "../components/Assessment"
 import AssessmentIntro from "../components/AssessmentIntro"
 import AssessmentSystem from "../components/AssessmentSystem"
 import AssessmentPatients from "../components/AssessmentPatients"
@@ -40,6 +41,10 @@ export const router = createRouter({
     {
       path: "/",
       component: AppWelcome,
+    },
+    {
+      path: "/assessment",
+      component: Assessment,
     },
     {
       path: "/assessmentintro",
@@ -94,18 +99,25 @@ router.beforeEach(async (to, from, next) => {
   console.debug('Authentication required', authRequired)
 
   const loggedInRes = await authenticationStore().isLoggedIn()
-  if (!loggedInRes.data !== true) {
+  if (loggedInRes === false) {
     // Clear all local storage, e.g. wipe sessions with expired JWTs
     authenticationStore().clear()
   }
-  console.debug('Logged in user', loggedInRes.data)
+  console.debug('Logged in user', loggedInRes)
 
-  if (authRequired && loggedInRes.data !== true) {
+  if (authRequired && loggedInRes === false) {
 
     console.debug('Routing to login page...')
     console.groupEnd()
 
     return next('/login')
+
+  } else if (to.path == '/' && loggedInRes === true) {
+
+    console.debug('Routing logged in user to assessment page, skip welcome')
+    console.groupEnd()
+
+    return next('/assessment')
 
   } else {
 

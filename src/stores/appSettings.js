@@ -5,14 +5,14 @@ export const appSettingsStore = defineStore('appSettings', {
     return {
       version: '3.0.0',
       debugMode: false,
-      appOpen: true,
+      appOpen: true,//RETIRE
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
       passwordMaxLength: 50,
       assessmentNumPatients: 15,
       numConfigError: 5,
       numPrescriptions: 45,
-      epSystemOptions: [
+      epSystemOptions: [//RETIRE
         { value: 'Altera (Sunrise, Allscripts)', text: 'Altera (Sunrise, Allscripts)' },
         { value: 'Better', text: 'Better' },
         { value: 'Cerner (Oracle)', text: 'Cerner (Oracle)' },
@@ -38,6 +38,7 @@ export const appSettingsStore = defineStore('appSettings', {
       ]
     }
   },
+  //RETIRE
   actions: {
     setOpen: (isOpen) => {
       this.appOpen = isOpen

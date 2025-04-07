@@ -30,8 +30,8 @@
             <TextElement name="password" label="Password" autocomplete="on"
               :input-type="showPassword ? 'text' : 'password'"            
               :debounce="1000" 
-              :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long', confirmed: 'Password and confirmation must be the same'}" 
-              :rules="['required', 'between:6,50', 'confirmed']">
+              :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
+              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility(false)"
                   :class="showPassword ? 'bi bi-eye-slash' : 'bi-eye'" 
@@ -41,8 +41,8 @@
             <TextElement name="password_confirmation" label="Confirm password" autocomplete="on"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
               :debounce="1000" 
-              :messages="{required: 'Password confirmation is required', between: 'Password confirmation must be between 6 and 50 characters long'}" 
-              :rules="['required', 'between:6,50']">
+              :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
+              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility(true)"
                   :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi-eye'" 
@@ -54,12 +54,12 @@
                 :columns="3" 
                 :add-class="'me-2'" 
                 :submits="true">
-                {{ buttonLabel('register', 'Register', 'me-2') }}
+                <i class="bi bi-person-fill-add me-2"></i>Register
               </ButtonElement>
               <ButtonElement name="reset" full 
                 :columns="3" 
                 :resets="true">
-                {{ buttonLabel('reset', 'Clear form') }}
+                <i class="bi bi-x-circle-fill me-2"></i>Clear form
               </ButtonElement>
             </GroupElement>
           </Vueform>
@@ -73,6 +73,7 @@
 
 import AppLogo from './AppLogo'
 import { mapState } from 'pinia'
+import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
@@ -94,7 +95,8 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['signup']),
-    ...mapState(rootStore, ['getInstitutions'])
+    ...mapState(rootStore, ['getInstitutions']),
+    ...mapState(appSettingsStore, ['passwordMinLength', 'passwordMaxLength'])
   },
   data() {
     return {   
@@ -125,14 +127,14 @@ export default {
           console.debug('Validation completed successfully')
           this.user.username = usernameFromEmail(this.user.email)
           const { username, institution, email, password } = this.user
-          const signupResponse = await authenticationStore().signup(username, institution, email, password)
+          const signupResponse = await this.signup(username, institution, email, password)
           if (signupResponse.status < 400) {
             console.debug('Successful registration')
-            await rootStore().audit('register:' + email, '/register')
+            await this.audit('register:' + email, '/register')
             this.$router.push('/login?action=registered')
           } else {
             this.serverError = 'An error occured during registration:' + signupResponse.message
-            await rootStore().audit('registerfail:' + email, '/register')
+            await this.audit('registerfail:' + email, '/register')
           }
         }
       })      
@@ -140,7 +142,7 @@ export default {
     },
     async getInstitutionCodesNames() {
       let institutions = []
-      const response = await rootStore().getInstitutions()
+      const response = await this.getInstitutions()
       if (response.status < 400) {
         institutions = response.data.data.map(inst => { return { value: inst.id, label: inst.name } })
         institutions.unshift({value: '', label: 'Please select...', disabled: true})        
