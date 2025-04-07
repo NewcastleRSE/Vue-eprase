@@ -12,14 +12,17 @@
       <Vueform ref="assessmentStepsForm">
         <template #empty>
           <FormSteps>
-            <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to system information' }"></FormStep>
-            <FormStep name="system" label="ePrescribing system information">System form here...</FormStep>
+            <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to system information' }" />
+            <FormStep name="system" label="ePrescribing system information" :elements="['system']" :labels="{ next: 'Continue to patient build' }" />
             <FormStep name="patients" label="Patient build">Patient build here...</FormStep>
           </FormSteps>
           <FormElements>
             <StaticElement name="intro">
               <AssessmentIntro />
-            </StaticElement>            
+            </StaticElement>
+            <StaticElement name="system">
+              <AssessmentSystem />
+            </StaticElement>  
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -39,6 +42,7 @@
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import AssessmentIntro from './AssessmentIntro'
+import AssessmentSystem from './AssessmentSystem'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
@@ -54,6 +58,7 @@ export default {
   },
   components: {
     AssessmentIntro,
+    AssessmentSystem,
     LoginInfo,
     AppFooter,
     AppLogo,

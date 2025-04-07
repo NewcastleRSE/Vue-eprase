@@ -2,7 +2,7 @@
   <div class="mt-4">
     <h2>EP System Information</h2>
     <h3>Please answer the following questions about your ePrescribing system:</h3>
-    <Vueform ref="assessmentSystemForm" v-model="system" sync>
+    <Vueform ref="assessmentSystemForm" :endpoint="false" v-model="system" sync>
       <SelectElement name="epService" label="Name of ePrescribing system"
         :native="false" 
         :search="true"
@@ -14,14 +14,23 @@
         :debounce="1000" 
         :conditions="[['epService', '==', 'Other']]"
         :messages="{required: 'Other eP system name is required'}" 
-        :rules="['required']" />
-      <TextElement name="localEpServiceName" label="eP service local name" placeholder="Local name for the ePrescribing system, if different from the official name?" 
+        :rules="[{ 'required': ['epService', '==', 'Other'] }]" />
+      <TextElement name="otherEpService" label="Other eP service" placeholder="Name of other eP system" 
         :debounce="1000" />
+      <TextElement name="localEpServiceName" label="eP service local name" placeholder="Local name for the ePrescribing system, if different from the official name" 
+        :debounce="1000" />
+      <DateElement name="epServiceImplemented" load-format="MM/YYYY"
+        :messages="{required: 'Implementation date is required'}"  
+        :rules="['required']" />
+      <DateElement name="epServiceUpdated" load-format="MM/YYYY" 
+        :conditions="[['']]"
+        :messages="{required: 'Update date is required'}"  
+        :rules="['required', 'after_or_equal:epServiceImplemented']" />
     </Vueform>
   </div>
 
 
-  <main class="leftalign">
+  <!-- <main class="leftalign">
 
     <TabHeader :showIndex="0" />
     <div class="content p-4">
@@ -34,46 +43,7 @@
       <div class="p-4">
         <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="ep-system-selector">Which electronic prescribing (eP) system
-              are you using? <span class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.ep_service" name="ep-service" >
-                <select v-bind="field" id="ep-system-selector" class="form-select"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                  <option value="" disabled>Select system...</option>
-                  <option v-for="epSystem in epSystemOptions" :value="epSystem.value">{{ epSystem.text }}</option>
-                </select>
-              </Field>
-            </div>
-            <ErrorMessage name="ep-service" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div v-if="results.ep_service === 'Other'" class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="other-ep-system">Other eP service? <span
-                class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.other_ep_system" name="other" >
-                <input v-bind="field" id="other-ep-system" type="text" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Enter system...">
-              </Field>
-            </div>
-            <ErrorMessage name="other" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="local-ep-system-name">Local name for the ePrescribing system, if different from the official name?</label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.local_ep_system_name" name="local-ep-system-name">
-                <input v-bind="field" id="local-ep-system-name" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top">
-              </Field>
-            </div>
-          </div>
-
+        
           <div class="mb-4 row">
             <label class="col-sm-8 col-form-label" for="ep-service-implemented">When (month/year) was current eP system
               implemented? <span class="required-field">*</span></label>
@@ -399,12 +369,7 @@
           </div>
         </Form>
       </div>
-    </div>
-
-    <ErrorAlertModal ref="errorAlertModal" />
-    <AppLogo cls="bottomright" />
-
-  </main>
+    </div> -->
 
 </template>
 
@@ -414,30 +379,11 @@ import dayjs from 'dayjs'
 import { prependZero } from '../helpers/utils'
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
-import TabHeader from './TabHeader'
-import LoginInfo from './LoginInfo'
-import AppLogo from './AppLogo'
-import ErrorAlertModal from './ErrorAlertModal'
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import VueDatePicker from '@vuepic/vue-datepicker'
 
 export default {
-  name: "AssessmentSystem",
-  components: {
-    TabHeader,
-    LoginInfo,
-    AppLogo,
-    ErrorAlertModal,
-    Form,
-    Field,
-    ErrorMessage,
-    VueDatePicker
-  },
+  name: "AssessmentSystem",  
   computed: {
-    ...mapState(rootStore, ['getEpSystems']),
-    errorAlertModal() {
-      return this.$refs.errorAlertModal
-    },    
+    ...mapState(rootStore, ['getEpSystems']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
     }
@@ -448,8 +394,10 @@ export default {
       system: {
         epService: '',
         otheEpService: '',
-        localEpServiceName
-      }
+        localEpServiceName: '',
+        epServiceImplemented: null,
+        epServiceUpdated: null,
+      },
       // validationSchema: {
       //   'ep-service': 'required',
       //   'other': (value) => {
@@ -527,98 +475,98 @@ export default {
       //     }
       //   }
       // },
-      results: {
-        ep_service: '',
-        ep_service_implemented: null,
-        ep_service_updated: null,
-        local_ep_system_name: '',
-        ep_version: '',
-        num_maintainers: '',
-        ep_usage: '',
-        other_ep_system: '',
-        add_ep_system: '',
-        patient_type: '',
-        lab_results: '',
-        med_history: '',
-        man_results: '',
-        diagnosis_results: '',
-        penicillin_description: '',
-        penicillin_description_other: '',
-        penicillin_results: '',
-        penicillin_comment: '',
-        high_risk_meds: [],
-        options: [
-          // { text: 'Warfarin', value: 'Warfarin' },
-          // { text: 'Insulin', value: 'Insulin' },
-          // { text: 'Fluids', value: 'Fluids' },
-          // { text: 'Oxygen', value: 'Oxygen' },
-          // { text: 'Patient controlled analgesia (PCA)', value: 'PCA' },
-          // { text: 'Continuous infusions', value: 'Continuous infusions' },
-          // { text: 'Parenteral nutrition', value: 'Parenteral nutrition' },
-          // { text: 'Enteral nutrition', value: 'Enteral nutrition' },
-          // { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements' },
-          // { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines' }
-          // Updates 2024-07-01 & 2024-10-02 (chemo => 2 options)
-          { text: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
-          { text: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
-          { text: 'Warfarin', value: 'Warfarin' },
-          { text: 'Heparin', value: 'Heparin' },
-          { text: 'Insulin', value: 'Insulin' },
-          { text: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
-          { text: 'Chemotherapy oral', value: 'Chemotherapy oral' },
-          { text: 'Chemotherapy IV', value: 'Chemotherapy IV'},
-          { text: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
-          { text: 'Antimicrobials', value: 'Antimicrobials' },
-          { text: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
-          { text: 'Controlled Drugs', value: 'Controlled Drugs' },
-          { text: 'Patient Controlled Analgesia', value: 'PCA' },
-          { text: 'Multi-Ingredient Infusions (e.g Morphine, Cyclizine, Water for Injection)', value: 'MII' },
-          { text: 'Pharmacogenomics', value: 'Pharmacogenomics' },
-          { text: 'Fluids', value: 'Fluids' },
-          { text: 'Blood Products / Components (e.g. red cells, platelets, fresh frozen plasma and cryoprecipitate, or plasma derivatives)', value: 'Blood Products' },
-          { text: 'Medical Gases (e.g. Oxygen, Medical Air, Nitrous Oxide)', value: 'Medical Gases' },
-          { text: 'Parenteral Nutrition', value: 'Parenteral Nutrition' },
-          { text: 'Other Nutrition', value: 'Other Nutrition' },
-          { text: 'Linked Therapeutic Drug Monitoring (e.g. Gentamicin / Vancomycin)', value: 'LTDM' },
-          { text: 'Ability to prescribe dose titration', value: 'Dose Titration' }
-        ],
-        clinical_areas: [],
-        other_clinical_area: '',
-        area_options: [
-          // { text: 'Adult Critical Care', value: 'ACC' },
-          // { text: 'Paediatric Critical Care', value: 'PCC' },
-          // { text: 'Paediatric Wards', value: 'Paediatric Wards' },
-          // { text: 'A & E', value: 'A&E' },
-          // { text: 'Chemotherapy', value: 'Chemotherapy' },
-          // { text: 'Outpatients', value: 'Outpatients' },
-          // { text: 'Community Beds', value: 'Community beds' },
-          // { text: 'Day Cases', value: 'Day cases' },
-          // { text: 'Clinical Trials', value: 'Clinical trials' },
-          // { text: 'Intermediate Care', value: 'Intermediate care' }
-          // Updates 2024-07-01
-          { text: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
-          { text: 'Accident and Emergency EPMA being used for prescribing (A&E) ', value: 'A&E EPMA Prescribing' },
-          { text: 'Inpatient (e.g. Ambulatory unit, Care of the Elderly, Orthopaedics)', value: 'Inpatient' },
-          { text: 'Intensive Care Unit (ICU)', value: 'ICU' },
-          { text: 'Theatre', value: 'Theatre' },
-          { text: 'Day Cases ( e.g. procedures)', value: 'Day Cases' },
-          { text: 'Outpatients', value: 'Outpatients' },
-          { text: 'Special Clinics (e.g. Dialysis / Renal)', value: 'Special Clinics' },
-          { text: 'Sexual and Reproductive Health (SRH) services or Genitourinary Medicine Clinics (GUM)', value: 'SRH' },
-          { text: 'Maternity', value: 'Maternity' },
-          { text: 'Neonatal', value: 'Neonatal' },
-          { text: 'Special Care Baby Unit (SCBU) / Neonatal Intensive Care (NICU)', value: 'SCBU' },
-          { text: 'Paediatrics', value: 'Paediatrics' },
-          { text: 'Paediatric Intensive Care (PICU)', value: 'PICU' },
-          { text: 'Cancer Services', value: 'Cancer Services' },
-          { text: 'Community', value: 'Community' },
-          { text: 'Intermediate Care', value: 'Intermediate Care' },
-          { text: 'Virtual Wards', value: 'Virtual Wards' },
-          { text: 'Homecare medicines service', value: 'HMS' },
-          { text: 'Clinical Trials ', value: 'Clinical Trials' },
-          { text: 'Other (please specify)', value: 'Other' }
-        ]
-      },
+      // results: {
+      //   ep_service: '',
+      //   ep_service_implemented: null,
+      //   ep_service_updated: null,
+      //   local_ep_system_name: '',
+      //   ep_version: '',
+      //   num_maintainers: '',
+      //   ep_usage: '',
+      //   other_ep_system: '',
+      //   add_ep_system: '',
+      //   patient_type: '',
+      //   lab_results: '',
+      //   med_history: '',
+      //   man_results: '',
+      //   diagnosis_results: '',
+      //   penicillin_description: '',
+      //   penicillin_description_other: '',
+      //   penicillin_results: '',
+      //   penicillin_comment: '',
+      //   high_risk_meds: [],
+      //   options: [
+      //     // { text: 'Warfarin', value: 'Warfarin' },
+      //     // { text: 'Insulin', value: 'Insulin' },
+      //     // { text: 'Fluids', value: 'Fluids' },
+      //     // { text: 'Oxygen', value: 'Oxygen' },
+      //     // { text: 'Patient controlled analgesia (PCA)', value: 'PCA' },
+      //     // { text: 'Continuous infusions', value: 'Continuous infusions' },
+      //     // { text: 'Parenteral nutrition', value: 'Parenteral nutrition' },
+      //     // { text: 'Enteral nutrition', value: 'Enteral nutrition' },
+      //     // { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements' },
+      //     // { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines' }
+      //     // Updates 2024-07-01 & 2024-10-02 (chemo => 2 options)
+      //     { text: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
+      //     { text: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
+      //     { text: 'Warfarin', value: 'Warfarin' },
+      //     { text: 'Heparin', value: 'Heparin' },
+      //     { text: 'Insulin', value: 'Insulin' },
+      //     { text: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
+      //     { text: 'Chemotherapy oral', value: 'Chemotherapy oral' },
+      //     { text: 'Chemotherapy IV', value: 'Chemotherapy IV'},
+      //     { text: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
+      //     { text: 'Antimicrobials', value: 'Antimicrobials' },
+      //     { text: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
+      //     { text: 'Controlled Drugs', value: 'Controlled Drugs' },
+      //     { text: 'Patient Controlled Analgesia', value: 'PCA' },
+      //     { text: 'Multi-Ingredient Infusions (e.g Morphine, Cyclizine, Water for Injection)', value: 'MII' },
+      //     { text: 'Pharmacogenomics', value: 'Pharmacogenomics' },
+      //     { text: 'Fluids', value: 'Fluids' },
+      //     { text: 'Blood Products / Components (e.g. red cells, platelets, fresh frozen plasma and cryoprecipitate, or plasma derivatives)', value: 'Blood Products' },
+      //     { text: 'Medical Gases (e.g. Oxygen, Medical Air, Nitrous Oxide)', value: 'Medical Gases' },
+      //     { text: 'Parenteral Nutrition', value: 'Parenteral Nutrition' },
+      //     { text: 'Other Nutrition', value: 'Other Nutrition' },
+      //     { text: 'Linked Therapeutic Drug Monitoring (e.g. Gentamicin / Vancomycin)', value: 'LTDM' },
+      //     { text: 'Ability to prescribe dose titration', value: 'Dose Titration' }
+      //   ],
+      //   clinical_areas: [],
+      //   other_clinical_area: '',
+      //   area_options: [
+      //     // { text: 'Adult Critical Care', value: 'ACC' },
+      //     // { text: 'Paediatric Critical Care', value: 'PCC' },
+      //     // { text: 'Paediatric Wards', value: 'Paediatric Wards' },
+      //     // { text: 'A & E', value: 'A&E' },
+      //     // { text: 'Chemotherapy', value: 'Chemotherapy' },
+      //     // { text: 'Outpatients', value: 'Outpatients' },
+      //     // { text: 'Community Beds', value: 'Community beds' },
+      //     // { text: 'Day Cases', value: 'Day cases' },
+      //     // { text: 'Clinical Trials', value: 'Clinical trials' },
+      //     // { text: 'Intermediate Care', value: 'Intermediate care' }
+      //     // Updates 2024-07-01
+      //     { text: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
+      //     { text: 'Accident and Emergency EPMA being used for prescribing (A&E) ', value: 'A&E EPMA Prescribing' },
+      //     { text: 'Inpatient (e.g. Ambulatory unit, Care of the Elderly, Orthopaedics)', value: 'Inpatient' },
+      //     { text: 'Intensive Care Unit (ICU)', value: 'ICU' },
+      //     { text: 'Theatre', value: 'Theatre' },
+      //     { text: 'Day Cases ( e.g. procedures)', value: 'Day Cases' },
+      //     { text: 'Outpatients', value: 'Outpatients' },
+      //     { text: 'Special Clinics (e.g. Dialysis / Renal)', value: 'Special Clinics' },
+      //     { text: 'Sexual and Reproductive Health (SRH) services or Genitourinary Medicine Clinics (GUM)', value: 'SRH' },
+      //     { text: 'Maternity', value: 'Maternity' },
+      //     { text: 'Neonatal', value: 'Neonatal' },
+      //     { text: 'Special Care Baby Unit (SCBU) / Neonatal Intensive Care (NICU)', value: 'SCBU' },
+      //     { text: 'Paediatrics', value: 'Paediatrics' },
+      //     { text: 'Paediatric Intensive Care (PICU)', value: 'PICU' },
+      //     { text: 'Cancer Services', value: 'Cancer Services' },
+      //     { text: 'Community', value: 'Community' },
+      //     { text: 'Intermediate Care', value: 'Intermediate Care' },
+      //     { text: 'Virtual Wards', value: 'Virtual Wards' },
+      //     { text: 'Homecare medicines service', value: 'HMS' },
+      //     { text: 'Clinical Trials ', value: 'Clinical Trials' },
+      //     { text: 'Other (please specify)', value: 'Other' }
+      //   ]
+      // },
       startTime: ''
     }
   },
@@ -627,12 +575,12 @@ export default {
       let epSystems = []
       const response = await this.getEpSystems()
       if (response.status < 400) {
-        institutions = response.data.data.map(ep => { return { value: ep.name, label: ep.name } })
-        institutions.unshift({value: '', label: 'Please select...', disabled: true})        
+        epSystems = response.data.data.map(ep => { return { value: ep.name, label: ep.name } })
+        epSystems.unshift({value: '', label: 'Please select...', disabled: true})        
       } else {
         this.serverError = [response.message]
       }
-      return institutions
+      return epSystems
     },
     // onResetClick() {
     //   this.$refs.assessmentSystemForm.resetForm()
@@ -683,6 +631,8 @@ export default {
     //     }
     //   })
     // }
+  },
+  mounted() {
   },
   created: function () {
     this.startTime = dayjs()
