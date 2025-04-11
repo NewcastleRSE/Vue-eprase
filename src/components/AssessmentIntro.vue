@@ -47,7 +47,11 @@
 <script>
 
 export default {
-  name: "AssessmentIntro"
+  name: "AssessmentIntro",
+  mounted() {
+    console.group('AssessmentIntro mounted hook')
+    console.groupEnd()
+  }
 }
 </script>
 

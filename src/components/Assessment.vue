@@ -9,9 +9,9 @@
 
       <h1 class="assessment-head p-4">ePRaSE Assessment {{ year }}</h1>
 
-      <Vueform ref="assessmentStepsForm">
+      <Vueform ref="assessmentStepsForm" :endpoint="false">
         <template #empty>
-          <FormSteps>
+          <FormSteps @next="nextStep" @select="selectStep">
             <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to system information' }" />
             <FormStep name="system" label="ePrescribing system information" :elements="['system']" :labels="{ next: 'Continue to patient build' }" />
             <FormStep name="patients" label="Patient build">Patient build here...</FormStep>
@@ -21,8 +21,8 @@
               <AssessmentIntro />
             </StaticElement>
             <StaticElement name="system">
-              <AssessmentSystem />
-            </StaticElement>  
+              <AssessmentSystem v-if="activeStep == 1" />
+            </StaticElement>              
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -51,9 +51,12 @@ import ErrorAlertModal from './ErrorAlertModal'
 export default {
   name: "Assessment",
   computed: {
-    ...mapState(appSettingsStore, ['version', 'year']),    
+    ...mapState(appSettingsStore, ['version', 'year']),
     errorAlertModal() {
       return this.$refs.errorAlertModal
+    },
+    formSteps() {
+      return this.$refs.assessmentStepsForm
     }
   },
   components: {
@@ -66,13 +69,26 @@ export default {
   },
   data() {
     return {     
-      assessmentComplete: false 
+      assessmentComplete: false,
+      activeStep: 0
     }
   },
-  methods: {    
+  methods: {      
+    nextStep(toStep) {
+      console.group('nextStep()')
+      console.debug('Next step', toStep.index)
+      console.groupEnd()
+    }, 
+    selectStep(active, previous) {
+      console.group('selectStep()')
+      console.debug('Active step', active.index, 'previous', previous.index)
+      this.activeStep = active.index
+      console.groupEnd()
+    }  
   },
   mounted() {
-    console.debug('Form',this.$refs.assessmentStepsForm)
+    console.group('Assessment mounted hook')
+    console.groupEnd()
   }
 }
 </script>

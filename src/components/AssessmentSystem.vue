@@ -1,34 +1,30 @@
 <template>
-  <div class="mt-4">
-    <h2>EP System Information</h2>
-    <h3>Please answer the following questions about your ePrescribing system:</h3>
-    <Vueform ref="assessmentSystemForm" :endpoint="false" v-model="system" sync>
-      <SelectElement name="epService" label="Name of ePrescribing system"
-        :native="false" 
-        :search="true"
-        :track-by="['label', 'value']"
-        :items="getEpSystemNames" 
-        :messages="{required: 'EP system is required'}" 
-        :rules="['required']" />
-      <TextElement name="otherEpService" label="Other eP service?" placeholder="Name of other eP system" 
-        :debounce="1000" 
-        :conditions="[['epService', '==', 'Other']]"
-        :messages="{required: 'Other eP system name is required'}" 
-        :rules="[{ 'required': ['epService', '==', 'Other'] }]" />
-      <TextElement name="otherEpService" label="Other eP service" placeholder="Name of other eP system" 
-        :debounce="1000" />
-      <TextElement name="localEpServiceName" label="eP service local name" placeholder="Local name for the ePrescribing system, if different from the official name" 
-        :debounce="1000" />
-      <DateElement name="epServiceImplemented" load-format="MM/YYYY"
-        :messages="{required: 'Implementation date is required'}"  
-        :rules="['required']" />
-      <DateElement name="epServiceUpdated" load-format="MM/YYYY" 
-        :conditions="[['']]"
-        :messages="{required: 'Update date is required'}"  
-        :rules="['required', 'after_or_equal:epServiceImplemented']" />
-    </Vueform>
-  </div>
-
+  <GroupElement name="systemForm">
+    <StaticElement name="systemHeading">
+      <h2>EP System Information</h2>
+      <h3>Please answer the following questions:</h3>
+    </StaticElement>
+    <SelectElement name="epService" :label="embolden('Name of ePrescribing system')"
+      :native="false" 
+      :search="true"
+      :track-by="['label', 'value']"
+      :items="getEpSystemNames"
+      :messages="{required: 'Name of ePrescribing system is required'}" 
+      :rules="['required']"
+    />    
+    <TextElement name="otherEpService" :label="embolden('Do you use an additional ePrescribing service?')" placeholder="Name of other eP system" 
+      :debounce="1000" 
+      :messages="{required: 'Other eP system name is required'}" 
+      :rules="[{ 'required': ['epService', '==', 'Other'] }]" />      
+    <TextElement name="localEpServiceName" :label="embolden('Local name for ePrecribing service')" placeholder="Local name for the ePrescribing system, if different from the official name" 
+      :debounce="1000" />
+    <DateElement name="epServiceImplemented" :label="embolden('ePrescribing system implementation date')" :extendOptions="{ dateFormat: 'M/Y', plugins: [new monthSelectPlugin()], disableMobile: true }"
+      :messages="{required: 'Implementation date is required'}"  
+      :rules="['required']" />
+    <DateElement name="epServiceUpdated" :label="embolden('Last ePrescribing system update date')" :extendOptions="{ dateFormat: 'M/Y', plugins: [new monthSelectPlugin()], disableMobile: true }"
+      :messages="{required: 'Update date is required'}"  
+      :rules="['required', 'after_or_equal:epServiceImplemented']" />  
+  </GroupElement>
 
   <!-- <main class="leftalign">
 
@@ -375,25 +371,45 @@
 
 <script>
 
-import dayjs from 'dayjs'
-import { prependZero } from '../helpers/utils'
+//TODO install https://www.npmjs.com/package/vue-flatpickr-component then
+// import flatPicker from "vue-flatpickr-component";
+// import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
+
+// export default {
+//   components: {
+//     flatPicker,
+//   },
+//   data() {
+//     return {
+//       dpconfig: {
+//         wrap: true,
+//         altInput: true,
+//         dateFormat: "m-y",
+//         altFormat: "m-y",
+//         plugins: [monthSelectPlugin],
+//         // Additional options for flatpickr
+//       },
+//     };
+//   },
+// };
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
+import { StaticElement } from '@vueform/vueform/dist/bootstrap'
 
 export default {
-  name: "AssessmentSystem",  
+  name: "AssessmentSystem",    
   computed: {
     ...mapState(rootStore, ['getEpSystems']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
-    }
+    }    
   },
   data() {
     return {
       serverError: false,
       system: {
         epService: '',
-        otheEpService: '',
+        otherEpService: '',
         localEpServiceName: '',
         epServiceImplemented: null,
         epServiceUpdated: null,
@@ -582,6 +598,7 @@ export default {
       }
       return epSystems
     },
+
     // onResetClick() {
     //   this.$refs.assessmentSystemForm.resetForm()
     //   this.results.ep_service_implemented = null
@@ -631,11 +648,6 @@ export default {
     //     }
     //   })
     // }
-  },
-  mounted() {
-  },
-  created: function () {
-    this.startTime = dayjs()
   }
 }
 </script>

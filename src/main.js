@@ -120,6 +120,10 @@ app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
+app.config.globalProperties.embolden = function(str) {
+  return `<span class="fw-bold">${str}</span>`
+}
+
 // app.config.errorHandler = function (err, vm, info) {
 //   console.log(`Error: ${err.toString()}\nInfo: ${info}`)
 // }

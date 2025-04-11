@@ -95,7 +95,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['signup']),
-    ...mapState(rootStore, ['getInstitutions']),
+    ...mapState(rootStore, ['getInstitutions', 'audit']),
     ...mapState(appSettingsStore, ['passwordMinLength', 'passwordMaxLength'])
   },
   data() {
