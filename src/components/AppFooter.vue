@@ -22,10 +22,10 @@
         button-type="anchor"
         href="https://eprasedocs.blob.core.windows.net/web/Eprase2024UserGuide.pdf"
         target="_blank"
-        title="Opens in a new tab"
+        title="PDF - opens in a new tab"
         :columns="2" 
         :add-class="'mx-2'">
-        <i class="bi bi-question-circle me-2"></i>User guide (PDF)
+        <i class="bi bi-question-circle me-2"></i>User guide
       </ButtonElement>
       <ButtonElement name="contact" full 
         data-bs-toggle="modal" data-bs-target="#contactModal"

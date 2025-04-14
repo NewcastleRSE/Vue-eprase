@@ -18,12 +18,12 @@
       <div class="mb-4">
         <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
           <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
-            :debounce="1000" 
+            :debounce="500" 
             :messages="{required: 'Email is required'}" 
             :rules="['required', nhsEmail]" />
           <TextElement name="password" label="Password" autocomplete="on"
             :input-type="showPassword ? 'text' : 'password'"            
-            :debounce="1000" 
+            :debounce="500" 
             :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
             :rules="['required', 'between:6,50']">
             <template #addon-after="scope">
@@ -57,7 +57,7 @@
               :add-class="'ms-2'" 
               :disabled="$route.query.action === 'registered'" 
               @click="onForgotPasswordClick">
-              <i class="bi bi-key-fill me-2"></i>Fogot password?
+              <i class="bi bi-key-fill me-2"></i>Forgot password?
             </ButtonElement>
           </GroupElement>
         </Vueform>
@@ -69,19 +69,9 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
+import { usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
-import { Validator } from '@vueform/vueform'
-
-const nhsEmail = class extends Validator {
-  get msg( ){ 
-    return 'Must be a valid nhs.net or nhs.uk email address'
-  }
-  check(value) {
-    return validateNHSEmail(value)
-  }
-}
 
 export default {
   name: "AppLogin",

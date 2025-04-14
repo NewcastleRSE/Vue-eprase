@@ -13,17 +13,35 @@
       :rules="['required']"
     />    
     <TextElement name="otherEpService" :label="embolden('Do you use an additional ePrescribing service?')" placeholder="Name of other eP system" 
-      :debounce="1000" 
+      :debounce="500" 
       :messages="{required: 'Other eP system name is required'}" 
       :rules="[{ 'required': ['epService', '==', 'Other'] }]" />      
-    <TextElement name="localEpServiceName" :label="embolden('Local name for ePrecribing service')" placeholder="Local name for the ePrescribing system, if different from the official name" 
-      :debounce="1000" />
-    <DateElement name="epServiceImplemented" :label="embolden('ePrescribing system implementation date')" :extendOptions="{ dateFormat: 'M/Y', plugins: [new monthSelectPlugin()], disableMobile: true }"
-      :messages="{required: 'Implementation date is required'}"  
+    <TextElement name="localEpServiceName" :label="embolden('Local name for ePrescribing service')" placeholder="Local name for the ePrescribing system, if different from the official name" 
+      :debounce="500" />
+    <DateElement name="epServiceImplemented"
+      :max="new Date()"
+      :label="embolden('ePrescribing system implementation date')" 
+      :extendOptions="{ plugins: [monthSelector] }"
+      :messages="{required: 'Implementation date is required'}"
       :rules="['required']" />
-    <DateElement name="epServiceUpdated" :label="embolden('Last ePrescribing system update date')" :extendOptions="{ dateFormat: 'M/Y', plugins: [new monthSelectPlugin()], disableMobile: true }"
+    <DateElement name="epServiceUpdated"
+      :max="new Date()"
+      :label="embolden('Last ePrescribing system update date')" 
+      :extendOptions="{ plugins: [monthSelector] }"
       :messages="{required: 'Update date is required'}"  
-      :rules="['required', 'after_or_equal:epServiceImplemented']" />  
+      :rules="['required', 'dateIsSameOrAfter:epServiceImplemented,service implementation date']" /> 
+    <TextElement name="numMaintainers" :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?')"
+      :debounce="500" 
+      :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0.1 and 10', min: 'Must be > 0.1', max: 'Must be < 10' }" 
+      :rules="['required', 'numeric', 'min:0.1', 'max:10']" /> 
+    <SelectElement name="epUsage" :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?')"
+      :native="false" 
+      :search="true"
+      :track-by="['label', 'value']"
+      :items="getEpUsages"
+      :messages="{required: 'Percentage is required'}" 
+      :rules="['required']"
+    />   
   </GroupElement>
 
   <!-- <main class="leftalign">
@@ -39,51 +57,9 @@
       <div class="p-4">
         <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
 
+                  
+
         
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="ep-service-implemented">When (month/year) was current eP system
-              implemented? <span class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-implemented">
-                <VueDatePicker id="ep-service-implemented" ref="epServiceImplemented" v-bind="field" v-model="results.ep_service_implemented"
-                  month-picker auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
-                  :max-date="new Date()" />
-              </Field>
-            </div>
-            <ErrorMessage name="ep-service-implemented" as="div" class="mt-2 text-danger text-center"
-              v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="ep-service-updated">When (month/year) was current eP system last updated? <span class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" name="ep-service-updated">
-                <VueDatePicker id="ep-service-updated" ref="epServiceUpdated" v-bind="field" v-model="results.ep_service_updated" month-picker
-                  auto-apply placeholder="Select month/year" :state="meta.dirty ? meta.valid : null"
-                  :max-date="new Date()" />
-              </Field>
-            </div>
-            <ErrorMessage name="ep-service-updated" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="num-maintainers">How many WTE maintain the drug catalogue and
-              prescribing decision support for this system? <span class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.num_maintainers" name="num-maintainers">
-                <input v-bind="field" id="num-maintainers" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top"
-                  title="How many people (FTEs) across your trust do you have who maintain your drug catalogue and associated decision support for the electronic prescribing system you are using for this assessment?"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-              </Field>
-            </div>
-            <ErrorMessage name="num-maintainers" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
 
           <div class="mb-4 row">
             <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
@@ -392,9 +368,11 @@
 //     };
 //   },
 // };
+
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
-import { StaticElement } from '@vueform/vueform/dist/bootstrap'
+import flatPicker from 'vue-flatpickr-component'
+import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 
 export default {
   name: "AssessmentSystem",    
@@ -402,7 +380,17 @@ export default {
     ...mapState(rootStore, ['getEpSystems']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
-    }    
+    },
+    monthSelector() {
+      return new monthSelectPlugin({
+        shorthand: true,
+        dateFormat: 'MMM Y',
+        altFormat: 'MMM Y'
+      })
+    }   
+  },
+  components: {
+    flatPicker
   },
   data() {
     return {
@@ -413,7 +401,18 @@ export default {
         localEpServiceName: '',
         epServiceImplemented: null,
         epServiceUpdated: null,
+        numMaintainers: 0.0,
+        epUsage
       },
+      // dpconfig: {
+      //   wrap: true,
+      //   altInput: true,
+      //   dateFormat: "M/Y",
+      //   altFormat: "M/Y",
+      //   plugins: [monthSelector]
+      //   //disableMobile: true
+      //   // Additional options for flatpickr
+      // },
       // validationSchema: {
       //   'ep-service': 'required',
       //   'other': (value) => {
@@ -597,8 +596,7 @@ export default {
         this.serverError = [response.message]
       }
       return epSystems
-    },
-
+    }
     // onResetClick() {
     //   this.$refs.assessmentSystemForm.resetForm()
     //   this.results.ep_service_implemented = null

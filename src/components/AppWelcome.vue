@@ -28,7 +28,7 @@
                 :add-class="'ms-2'" 
                 :disabled="$route.query.action === 'registered'" 
                 @click="onForgotPasswordClick">
-                <i class="bi bi-key-fill me-2"></i>Fogot password?
+                <i class="bi bi-key-fill me-2"></i>Forgot password?
               </ButtonElement>
             </GroupElement>
           </Vueform>  

@@ -17,7 +17,7 @@
         <div class="mb-4">
           <Vueform ref="registerForm" :endpoint="false" @submit="onRegisterClick" v-model="user" sync>
             <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
-              :debounce="1000" 
+              :debounce="500" 
               :messages="{required: 'Email is required'}" 
               :rules="['required', nhsEmail]" />
             <SelectElement name="institution" label="Your NHS Trust"
@@ -29,7 +29,7 @@
               :rules="['required']" />
             <TextElement name="password" label="Password" autocomplete="on"
               :input-type="showPassword ? 'text' : 'password'"            
-              :debounce="1000" 
+              :debounce="500" 
               :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
               <template #addon-after="scope">
@@ -40,7 +40,7 @@
             </TextElement>
             <TextElement name="password_confirmation" label="Confirm password" autocomplete="on"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
-              :debounce="1000" 
+              :debounce="500" 
               :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
               <template #addon-after="scope">
@@ -76,17 +76,7 @@ import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
-import { validateNHSEmail, usernameFromEmail } from '../helpers/utils'
-import { Validator } from '@vueform/vueform'
-
-const nhsEmail = class extends Validator {
-  get msg( ){ 
-    return 'Must be a valid nhs.net or nhs.uk email address'
-  }
-  check(value) {
-    return validateNHSEmail(value)
-  }
-}
+import { usernameFromEmail } from '../helpers/utils'
 
 export default {
   name: "AppRegister",

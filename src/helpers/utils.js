@@ -26,13 +26,6 @@ export function getFormattedDate(time) {
   return new Date(time * 1000).toLocaleDateString("en-GB")
 }
 
-export function validateNHSEmail(value) {
-  console.debug('Validate NHS email', value)
-  const isValid = /^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/.test(value)
-  console.debug('Return', isValid)
-  return isValid
-}
-
 export function usernameFromEmail(email) {
   return email.split('@').shift()
 }
