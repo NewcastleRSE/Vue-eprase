@@ -53,11 +53,12 @@ const dateIsSameOrAfter = class extends Validator {
 }
 
 export default defineConfig({
+  env: 'development',
   theme: bootstrap,
   locales: { en },
   locale: 'en',
   displayErrors: false,
-  displayMmessages: false,
+  displayMessages: false,
   floatPlaceholders: false,
   rules: {
     nhsEmail, dateIsSameOrAfter

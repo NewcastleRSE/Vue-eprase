@@ -35,13 +35,20 @@
       :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0.1 and 10', min: 'Must be > 0.1', max: 'Must be < 10' }" 
       :rules="['required', 'numeric', 'min:0.1', 'max:10']" /> 
     <SelectElement name="epUsage" :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?')"
-      :native="false" 
-      :search="true"
+      :native="false"
       :track-by="['label', 'value']"
-      :items="getEpUsages"
+      :items="[
+        { value: '', label: 'Select percentage...', disabled: true },
+        { value: '76-100', label: '76-100%' },
+        { value: '51-75', label: '51-75%' },
+        { value: '26-50', label: '26-50%' },
+        { value: '0-25', label: '0-25%' }
+      ]"
       :messages="{required: 'Percentage is required'}" 
       :rules="['required']"
     />   
+    <TextElement name="otherEpSystem" :label="embolden('Other ePrescribing systems in use')" placeholder="Name(s) of other ePrerscribing systems in use in your organisation" 
+      :debounce="500" />
   </GroupElement>
 
   <!-- <main class="leftalign">
@@ -56,44 +63,6 @@
 
       <div class="p-4">
         <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
-
-                  
-
-        
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="usage-selector">Approximately what percentage of inpatient
-              prescription orders are prescribed through the eP system across your organisation? <span
-                class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.ep_usage" name="ep-usage" >
-                <select v-bind="field" id="usage-selector" class="form-select"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                  <option value="" disabled>Select percentage...</option>
-                  <option value="76-100">76-100%</option>
-                  <option value="51-75">51-75%</option>
-                  <option value="26-50">26-50%</option>
-                  <option value="0-25">0-25%</option>
-                </select>
-              </Field>
-            </div>
-            <ErrorMessage name="ep-usage" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="add-ep-system">Are there other ePrescribing systems in use in
-              the organisation? if so, please provide their names.</label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.add_ep_system" name="add-ep-system" >
-                <input v-bind="field" id="add-ep-system" type="text" class="form-control" placeholder="Other...">
-              </Field>
-            </div>
-            <ErrorMessage name="add-ep-system" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
 
           <div class="mb-4 row">
             <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
@@ -402,7 +371,8 @@ export default {
         epServiceImplemented: null,
         epServiceUpdated: null,
         numMaintainers: 0.0,
-        epUsage
+        epUsage: '',
+        otherEpSystem: ''
       },
       // dpconfig: {
       //   wrap: true,

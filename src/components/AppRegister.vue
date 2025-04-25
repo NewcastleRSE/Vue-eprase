@@ -19,7 +19,7 @@
             <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
               :debounce="500" 
               :messages="{required: 'Email is required'}" 
-              :rules="['required', nhsEmail]" />
+              :rules="['required', $vueform.rules.nhsEmail]" />
             <SelectElement name="institution" label="Your NHS Trust"
               :native="false" 
               :search="true"
@@ -90,7 +90,6 @@ export default {
   },
   data() {
     return {   
-      nhsEmail,   
       user: {
         username: '',
         institution: '',

@@ -20,7 +20,7 @@
           <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
             :debounce="500" 
             :messages="{required: 'Email is required'}" 
-            :rules="['required', nhsEmail]" />
+            :rules="['required', $vueform.rules.nhsEmail]" />
           <TextElement name="password" label="Password" autocomplete="on"
             :input-type="showPassword ? 'text' : 'password'"            
             :debounce="500" 
@@ -84,7 +84,6 @@ export default {
   },
   data() {
     return {
-      nhsEmail,    
       user: {
         email: '',
         username: '',
