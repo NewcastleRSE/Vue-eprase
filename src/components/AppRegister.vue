@@ -16,18 +16,21 @@
 
         <div class="mb-4">
           <Vueform ref="registerForm" :endpoint="false" @submit="onRegisterClick" v-model="user" sync>
-            <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
+            <TextElement name="email" placeholder="Valid NHS email address"
+              :label="embolden('Email address', true)"
               :debounce="500" 
               :messages="{required: 'Email is required'}" 
               :rules="['required', $vueform.rules.nhsEmail]" />
-            <SelectElement name="institution" label="Your NHS Trust"
+            <SelectElement name="institution"
+              :label="embolden('Your NHS Trust', true)"
               :native="false" 
               :search="true"
               :track-by="['label', 'value']"
               :items="getInstitutionCodesNames" 
               :messages="{required: 'Institution is required'}" 
               :rules="['required']" />
-            <TextElement name="password" label="Password" autocomplete="on"
+            <TextElement name="password" autocomplete="on"
+              :label="embolden('Password', true)"
               :input-type="showPassword ? 'text' : 'password'"            
               :debounce="500" 
               :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
@@ -38,7 +41,8 @@
                   :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
               </template>
             </TextElement>
-            <TextElement name="password_confirmation" label="Confirm password" autocomplete="on"
+            <TextElement name="password_confirmation" autocomplete="on"
+              :label="embolden('Confirm password', true)"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
               :debounce="500" 
               :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 

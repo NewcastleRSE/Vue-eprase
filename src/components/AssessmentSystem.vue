@@ -1,10 +1,10 @@
-<template>
-  <GroupElement name="systemForm">
+<template> 
+  <GroupElement ref="system" name="systemForm" :class="'mb-4'">
     <StaticElement name="systemHeading">
       <h2>EP System Information</h2>
       <h3>Please answer the following questions:</h3>
     </StaticElement>
-    <SelectElement name="epService" :label="embolden('Name of ePrescribing system')"
+    <SelectElement name="epService" :label="embolden('Name of ePrescribing system', true)"
       :native="false" 
       :search="true"
       :track-by="['label', 'value']"
@@ -12,7 +12,7 @@
       :messages="{required: 'Name of ePrescribing system is required'}" 
       :rules="['required']"
     />    
-    <TextElement name="otherEpService" :label="embolden('Do you use an additional ePrescribing service?')" placeholder="Name of other eP system" 
+    <TextElement name="otherEpService" :label="embolden('Do you use an additional ePrescribing service?', true)" placeholder="Name of other eP system" 
       :debounce="500" 
       :messages="{required: 'Other eP system name is required'}" 
       :rules="[{ 'required': ['epService', '==', 'Other'] }]" />      
@@ -20,21 +20,22 @@
       :debounce="500" />
     <DateElement name="epServiceImplemented"
       :max="new Date()"
-      :label="embolden('ePrescribing system implementation date')" 
+      :label="embolden('ePrescribing system implementation date', true)" 
       :extendOptions="{ plugins: [monthSelector] }"
       :messages="{required: 'Implementation date is required'}"
       :rules="['required']" />
     <DateElement name="epServiceUpdated"
       :max="new Date()"
-      :label="embolden('Last ePrescribing system update date')" 
+      :label="embolden('Last ePrescribing system update date', true)" 
       :extendOptions="{ plugins: [monthSelector] }"
       :messages="{required: 'Update date is required'}"  
       :rules="['required', 'dateIsSameOrAfter:epServiceImplemented,service implementation date']" /> 
-    <TextElement name="numMaintainers" :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?')"
+    <TextElement name="numMaintainers" :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
       :debounce="500" 
       :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0.1 and 10', min: 'Must be > 0.1', max: 'Must be < 10' }" 
       :rules="['required', 'numeric', 'min:0.1', 'max:10']" /> 
-    <SelectElement name="epUsage" :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?')"
+    <SelectElement name="epUsage" 
+      :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?', true)"
       :native="false"
       :track-by="['label', 'value']"
       :items="[
@@ -47,301 +48,131 @@
       :messages="{required: 'Percentage is required'}" 
       :rules="['required']"
     />   
-    <TextElement name="otherEpSystem" :label="embolden('Other ePrescribing systems in use')" placeholder="Name(s) of other ePrerscribing systems in use in your organisation" 
+    <TextElement name="otherEpSystem" :label="embolden('Other ePrescribing systems in use')" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
       :debounce="500" />
-  </GroupElement>
-
-  <!-- <main class="leftalign">
-
-    <TabHeader :showIndex="0" />
-    <div class="content p-4">
-
-      <LoginInfo />
-
-      <h1 class="h2">EP System Information</h1>
-      <h2 class="h3">Please answer the following questions about your ePrescribing system:</h2>
-
-      <div class="p-4">
-        <Form ref="assessmentSystemForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
-
-          <div class="mb-4 row">
-            <p class="col-sm-8 fw-bold">Is your hospital laboratory results system fully integrated with your
-              ePrescribing system? <span class="required-field">*</span></p>
-            <div class="col-sm-4">
-              <fieldset>
-              <legend style="display: none;">Lab results integration question options</legend>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
-                  value="true">
-                  <input v-bind="field" id="lab-results-yes" type="radio" name="lab-results" value="true" class="form-check-input">
-                </Field>
-                <label class="form-check-label" for="lab-results-yes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.lab_results" type="radio" name="lab-results"
-                value="false">
-                  <input v-bind="field" id="lab-results-no" type="radio" name="lab-results" value="false" class="form-check-input">
-                </Field>
-                <label class="form-check-label" for="lab-results-no">No</label>
-              </div>
-            </fieldset>
-            </div>
-          </div>
-
-          <div class="mb-4 row" v-if="results.lab_results === 'true'">
-            <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i> Are you able to manually enter laboratory
-              results into your patient admin and/ or ePrescribing test system that you are using to do this
-              assessments?</p>
-            <div class="col-sm-4">
-            <fieldset>
-              <legend style="display: none;">Lab result manual entry options</legend>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
-                value="true">
-                  <input v-bind="field" id="man-results-yes"  type="radio" name="man-results" value="true" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="man-results-yes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.man_results" type="radio" name="man-results"
-                 value="false">
-                  <input v-bind="field" id="man-results-no" type="radio" name="man-results" value="false" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="man-results-no">No</label>
-              </div>
-            </fieldset>
-            </div>
-          </div>
-
-          <div class="mb-4 row">
-            <p class="col-sm-8 fw-bold">Are you able to manually enter diagnosis and medical history into your test
-              system? <span class="required-field">*</span></p>
-            <div class="col-sm-4">
-            <fieldset>
-              <legend style="display: none;">Test system question options</legend>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
-                  value="true">
-                  <input v-bind="field" id="med-history-yes" type="radio" name="med-history" value="true" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="med-history-yes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.med_history" type="radio" name="med-history"
-                  value="false">
-                  <input v-bind="field" id="med-history-no" type="radio" name="med-history" value="false" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="med-history-no">No</label>
-              </div>
-            </fieldset>
-            </div>
-          </div>
-
-          <div v-if="results.med_history === 'true'" class="mb-4 row">
-            <p class="col-sm-8"><i class="bi bi-caret-right-fill"></i>Are you able to enter diagnosis or comorbidities
-              into your test system that you are using to do this assessment?
-            </p>
-            <div class="col-sm-4">
-            <fieldset>
-              <legend style="display: none;">Test system manual entry question options</legend>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
-                 value="true">
-                  <input v-bind="field" id="diagnosis-results-yes" type="radio" name="diagnosis-results" value="true" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="diagnosis-results-yes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <Field v-slot="{ field, meta }" v-model="results.diagnosis_results" name="diagnosis-results"
-                 value="false">
-                  <input v-bind="field" id="diagnosis-results-no"  type="radio" name="diagnosis-results" value="false" class="form-check-input"
-                    autocomplete="off">
-                </Field>
-                <label class="form-check-label" for="diagnosis-results-no">No</label>
-              </div>
-            </fieldset>
-            </div>
-          </div>
-
-          <div class="mb-4 row">
-            <p>Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin
-              allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert
-              failure. We are hoping to learn more about contributory factors to this issue with the following three
-              questions.</p>
-            <label class="col-sm-8 col-form-label fw-bold" for="penicillin-selector">How do you describe Penicillin
-              V in your system?<span class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.penicillin_description" name="penicillin-description">
-                <select v-bind="field" id="penicillin-selector" class="form-select"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''">
-                  <option value="" disabled>Select description...</option>
-                  <option value="penicillin_v">Penicillin V</option>
-                  <option value="phenoxymethylpenicillin">Phenoxymethylpenicillin</option>
-                  <option value="phenoxymethylpenicillin_tablets">Phenoxymethylpenicillin 250mg Tablets</option>
-                  <option value="other">Other</option>
-                </select>
-              </Field>
-            </div>
-            <ErrorMessage name="penicillin-description" as="div" class="mt-2 text-danger text-center"
-              v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div v-if="results.penicillin_description === 'other'" class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="penicillin-description-other">Your description? <span
-                class="required-field">*</span></label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.penicillin_description_other"
-                name="penicillin-description-other" >
-                <input v-bind="field" id="penicillin-description-other" type="text" class="form-control"
-                  :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''"
-                  placeholder="Enter description...">
-              </Field>
-            </div>
-            <ErrorMessage name="penicillin-description-other" as="div" class="mt-2 text-danger text-center"
-              v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <p class="col-sm-8 fw-bold">Thinking about when you enter Penicill (exactly as stated) in your allergy
-              recording function is Penicillamine visible as an option to select? <span class="required-field">*</span>
-            </p>
-            <div class="col-sm-4">
-              <fieldset>
-                <legend style="display: none;">Penicill question options</legend>
-                <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-                value="true">
-                    <input v-bind="field" type="radio" id="penicillin-results-yes" name="penicillin-results" value="true" class="form-check-input"
-                      autocomplete="off">
-                  </Field>
-                  <label class="form-check-label" for="penicillin-results-yes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <Field v-slot="{ field, meta }" v-model="results.penicillin_results" name="penicillin-results"
-                    value="false">
-                    <input v-bind="field" type="radio" id="penicillin-results-no" name="penicillin-results" value="false" class="form-check-input"
-                      autocomplete="off">
-                  </Field>
-                  <label class="form-check-label" for="penicillin-results-no">No</label>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-
-          <div class="mb-4 row">
-            <label class="col-sm-8 col-form-label fw-bold" for="penicillin-comment">If there is anything you would like to
-              tell us about penicillin prescribing in your organisation, please record it here.</label>
-            <div class="col-sm-4">
-              <Field v-slot="{ field, meta }" v-model="results.penicillin_comment" name="penicillin-comment">
-                <input v-bind="field" id="penicillin-comment" type="text" class="form-control" data-bs-toggle="tooltip" data-bs-placement="top">
-              </Field>
-            </div>
-            <ErrorMessage name="penicillin-comment" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="mb-4 row">
-            <p class="fw-bold">Is the ePrescribing system used to prescribe the following? <span class="required-field">*</span></p>
-            <fieldset>
-              <legend style="display: none;">ePrescribing system prescription question options</legend>
-              <div v-for="(option, index) in results.options" class="form-check ms-2">
-                <Field v-slot="{ field }" v-model="results.high_risk_meds" type="checkbox" name="high_risk_meds" :value="option.value">
-                  <input v-bind="field" :id="'id_high_risk_meds_' + index" type="checkbox" class="form-check-input" name="high_risk_meds"
-                    :value="option.value">
-                </Field>
-                <label class="form-check-label" :for="'id_high_risk_meds_' + index">{{ option.text }}</label>
-              </div>
-            </fieldset>
-          </div>
-
-          <div class="mb-4 row">
-            <p class="fw-bold">Is the ePrescribing system used in the following areas? <span class="required-field">*</span></p>
-            <fieldset>
-              <legend style="display: none;">ePrescribing area question options</legend>
-              <div v-for="(option, index) in results.area_options" class="form-check ms-2">
-                <Field v-slot="{ field }" v-model="results.clinical_areas" type="checkbox"
-                  name="clinical_areas" :value="option.value">
-                  <input v-bind="field" :id="'id_clinical_areas_' + index" type="checkbox" class="form-check-input" name="clinical_areas"
-                    :value="option.value">
-                </Field>
-                <label class="form-check-label" :for="'id_clinical_areas_' + index">{{ option.text }}</label>
-              </div>
-            </fieldset>
-          </div>
-
-          <div v-if="results.clinical_areas.includes('Other')" class="mb-4 row">
-            <label class="col-sm-8 col-form-label" for="other-clinical-area">Other area<span
-                class="required-field">*</span></label>
-            <fieldset>
-              <legend style="display: none;">Clinical area question options</legend>
-              <div class="col-sm-4">
-                <Field v-slot="{ field, meta }" v-model="results.other_clinical_area" name="other-clinical-area">
-                  <input v-bind="field" id="other-clinical-area" type="text" class="form-control"
-                    :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" placeholder="Specify...">
-                </Field>
-              </div>
-            </fieldset>
-            <ErrorMessage name="other-clinical-area" as="div" class="mt-2 text-danger text-center" v-slot="{ message }">
-              {{ message }}
-            </ErrorMessage>
-          </div>
-
-          <div class="row">
-            <p class="text-primary">* required fields</p>
-            <p>When you have answered all of the questions, click <span class="fw-bold">Next</span></p>
-          </div>
-
-          <div>
-            <button type="reset" class="btn btn-primary me-3" @click="onResetClick">
-              <i class="bi bi-x pe-1"></i>Clear</button>
-            <button type="button" class="next-btn btn btn-primary" id="next-button" :disabled="!formMeta.valid"
-              @click="onNextClick()">
-              <i class="bi bi-caret-right-fill pe-1"></i>Next</button>
-          </div>
-        </Form>
+    <GroupElement name="labResultsGroup" :class="'mt-2'">
+      <ToggleElement name="labResults" :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?', true)"
+        :labels="{ on: 'Yes', off: 'No' }"
+        @change="system.labResults = ! system.labResults" />
+      <ToggleElement name="manResults" :label="embolden('Are you able to manually enter laboratory results into your patient admin and/ or ePrescribing test system that you are using to do this assessment?', true)"
+        :labels="{ on: 'Yes', off: 'No' }"
+        v-if="system.labResults === true" />
+    </GroupElement> 
+    <GroupElement name="diagnosisResultsGroup" :class="'mt-2'">
+      <ToggleElement name="medHistory" :label="embolden('Are you able to manually enter diagnosis and medical history into your test system?', true)"
+        :labels="{ on: 'Yes', off: 'No' }"
+        @change="system.medHistory = ! system.medHistory" />
+      <ToggleElement name="diagnosisResults" :label="embolden('Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessment?', true)"
+        :labels="{ on: 'Yes', off: 'No' }"
+        v-if="system.medHistory === true" />
+    </GroupElement>
+    <StaticElement name="penicillinWarning">
+      <div class="alert alert-warning mt-4" role="alert">
+        Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin
+        allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert
+        failure. We are hoping to learn more about contributory factors to this issue with the following three
+        questions.
       </div>
-    </div> -->
-
+    </StaticElement>
+    <SelectElement name="penicillinDescription" :label="embolden('How do you describe Penicillin V in your system?', true)"
+      :native="false"
+      :track-by="['label', 'value']"
+      :items="[
+        { value: '', label: 'Select description...', disabled: true },
+        { value: 'penicillin_v', label: 'Penicillin V' },
+        { value: 'phenoxymethylpenicillin', label: 'Phenoxymethylpenicillin' },
+        { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
+        { value: 'other', label: 'Other' }
+      ]"
+      :messages="{required: 'Penicillin description is required'}" 
+      :rules="['required']"
+      @change="(newVal) => { system.penicillinDescription = newVal }"
+    />   
+    <TextElement name="penicillinDescriptionOther" :label="embolden('Your description', true)"
+      v-if="system.penicillinDescription == 'other'"
+      :rules="[{ 'required': ['penicillinDescription', '==', 'other'] }]"
+      :debounce="500" />
+    <ToggleElement name="penicillinResults" 
+      :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
+      :labels="{ on: 'Yes', off: 'No' }"
+    />
+    <TextElement name="penicillinComment" :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
+      :debounce="500" />
+    <CheckboxgroupElement name="highRiskMeds" :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
+      :items="[
+        { label: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
+        { label: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
+        { label: 'Warfarin', value: 'Warfarin' },
+        { label: 'Heparin', value: 'Heparin' },
+        { label: 'Insulin', value: 'Insulin' },
+        { label: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
+        { label: 'Chemotherapy oral', value: 'Chemotherapy oral' },
+        { label: 'Chemotherapy IV', value: 'Chemotherapy IV'},
+        { label: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
+        { label: 'Antimicrobials', value: 'Antimicrobials' },
+        { label: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
+        { label: 'Controlled Drugs', value: 'Controlled Drugs' },
+        { label: 'Patient Controlled Analgesia', value: 'PCA' },
+        { label: 'Multi-Ingredient Infusions (e.g Morphine, Cyclizine, Water for Injection)', value: 'MII' },
+        { label: 'Pharmacogenomics', value: 'Pharmacogenomics' },
+        { label: 'Fluids', value: 'Fluids' },
+        { label: 'Blood Products / Components (e.g. red cells, platelets, fresh frozen plasma and cryoprecipitate, or plasma derivatives)', value: 'Blood Products' },
+        { label: 'Medical Gases (e.g. Oxygen, Medical Air, Nitrous Oxide)', value: 'Medical Gases' },
+        { label: 'Parenteral Nutrition', value: 'Parenteral Nutrition' },
+        { label: 'Other Nutrition', value: 'Other Nutrition' },
+        { label: 'Linked Therapeutic Drug Monitoring (e.g. Gentamicin / Vancomycin)', value: 'LTDM' },
+        { label: 'Ability to prescribe dose titration', value: 'Dose Titration' }
+      ]"
+      :rules="['filled']" />
+    <CheckboxgroupElement name="clinicalAreas" :label="embolden('Is the ePrescribing system used in the following areas?', true)"       
+      :items="[
+        { label: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
+        { label: 'Accident and Emergency EPMA being used for prescribing (A&E) ', value: 'A&E EPMA Prescribing' },
+        { label: 'Inpatient (e.g. Ambulatory unit, Care of the Elderly, Orthopaedics)', value: 'Inpatient' },
+        { label: 'Intensive Care Unit (ICU)', value: 'ICU' },
+        { label: 'Theatre', value: 'Theatre' },
+        { label: 'Day Cases ( e.g. procedures)', value: 'Day Cases' },
+        { label: 'Outpatients', value: 'Outpatients' },
+        { label: 'Special Clinics (e.g. Dialysis / Renal)', value: 'Special Clinics' },
+        { label: 'Sexual and Reproductive Health (SRH) services or Genitourinary Medicine Clinics (GUM)', value: 'SRH' },
+        { label: 'Maternity', value: 'Maternity' },
+        { label: 'Neonatal', value: 'Neonatal' },
+        { label: 'Special Care Baby Unit (SCBU) / Neonatal Intensive Care (NICU)', value: 'SCBU' },
+        { label: 'Paediatrics', value: 'Paediatrics' },
+        { label: 'Paediatric Intensive Care (PICU)', value: 'PICU' },
+        { label: 'Cancer Services', value: 'Cancer Services' },
+        { label: 'Community', value: 'Community' },
+        { label: 'Intermediate Care', value: 'Intermediate Care' },
+        { label: 'Virtual Wards', value: 'Virtual Wards' },
+        { label: 'Homecare medicines service', value: 'HMS' },
+        { label: 'Clinical Trials ', value: 'Clinical Trials' },
+        { label: 'Other (please specify)', value: 'Other' }
+      ]"
+      @change="(newVal) => { system.clinicalAreas = newVal }"
+      :rules="['filled']" />
+    <TextElement name="otherClinicalArea" :label="embolden('Other area', true)"
+      v-if="system.clinicalAreas.includes('Other')"
+      :rules="[{ 'required': ['Other', 'in', 'clinicalAreas'] }]"
+      :debounce="500" />
+    <StaticElement name="nextStep">
+      <div class="alert alert-info mt-4" role="alert">
+        When you have answered all the questions, click <span class="fw-bold">Continue to patient build</span>
+      </div>
+    </StaticElement>
+    <ButtonElement name="reset" :columns="3" @click="onResetClick">
+      <i class="bi bi-x-circle-fill me-2"></i>Clear form
+    </ButtonElement>
+  </GroupElement>
 </template>
 
 <script>
-
-//TODO install https://www.npmjs.com/package/vue-flatpickr-component then
-// import flatPicker from "vue-flatpickr-component";
-// import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
-
-// export default {
-//   components: {
-//     flatPicker,
-//   },
-//   data() {
-//     return {
-//       dpconfig: {
-//         wrap: true,
-//         altInput: true,
-//         dateFormat: "m-y",
-//         altFormat: "m-y",
-//         plugins: [monthSelectPlugin],
-//         // Additional options for flatpickr
-//       },
-//     };
-//   },
-// };
 
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
+import { StaticElement, ToggleElement } from '@vueform/vueform/dist/bootstrap'
+import { CheckboxgroupElement } from '@vueform/vueform/dist/tailwind-material'
 
 export default {
   name: "AssessmentSystem",    
@@ -370,188 +201,20 @@ export default {
         localEpServiceName: '',
         epServiceImplemented: null,
         epServiceUpdated: null,
-        numMaintainers: 0.0,
+        numMaintainers: 1.0,
         epUsage: '',
-        otherEpSystem: ''
-      },
-      // dpconfig: {
-      //   wrap: true,
-      //   altInput: true,
-      //   dateFormat: "M/Y",
-      //   altFormat: "M/Y",
-      //   plugins: [monthSelector]
-      //   //disableMobile: true
-      //   // Additional options for flatpickr
-      // },
-      // validationSchema: {
-      //   'ep-service': 'required',
-      //   'other': (value) => {
-      //     if (this.results.ep_service == 'Other') {
-      //       if (!value) {
-      //         return 'Please give details'
-      //       } else if (value.length > 255) {
-      //         return 'Input is restricted to 255 characters'
-      //       } else if (!value.match(this.legalCharacterMatcher)) {
-      //         return 'Input contains illegal characters'
-      //       } else {
-      //         return true
-      //       }
-      //     } else {
-      //       return true
-      //     }
-      //   },
-      //   'local-ep-system-name': (value) => {
-      //     if (!value) {
-      //       return true
-      //     } else if (value.length > 255) {
-      //       return 'Input is restricted to 255 characters'
-      //     } else if (!value.match(this.legalCharacterMatcher)) {
-      //       return 'Input contains illegal characters'
-      //     } else {
-      //       return true
-      //     }
-      //   },
-      //   'ep-service-implemented': 'required|validMonthYearDateBefore:@ep-service-updated',
-      //   'ep-service-updated': 'required',
-      //   'num-maintainers': (value) => {
-      //     if (!value || !value.match(/^\d*(\.\d)?$/)) {
-      //       return 'Should be a number with at most one decimal place'
-      //     }
-      //     return true
-      //   },
-      //   'ep-usage': 'required',
-      //   'lab-results': (value) => {
-      //     return ['true', 'false'].includes(value) ? true : 'Please select one'
-      //   },
-      //   'man-results': (value) => {
-      //     return (this.results.lab_results == 'true' ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
-      //   },
-      //   'med-history': (value) => {
-      //     return ['true', 'false'].includes(value) ? true : 'Please select one'
-      //   },
-      //   'diagnosis-results': (value) => {
-      //     return (this.results.med_history == 'true' ? (['true', 'false'].includes(value) ? true : 'Please select one') : true)
-      //   },
-      //   'penicillin-description': 'required',
-      //   'penicillin-description-other': (value) => {
-      //     if (this.results.penicillin_description == 'other') {
-      //       return !!value || 'Please enter a description'
-      //     }
-      //     return true
-      //   },
-      //   'penicillin-results': (value) => {
-      //     return ['true', 'false'].includes(value) ? true : 'Please select one'
-      //   },
-      //   'high_risk_meds': 'required',
-      //   'clinical_areas': 'required',
-      //   'other-clinical-area': (value) => {
-      //     if (this.results.clinical_areas.includes('Other')) {
-      //       if (!value) {
-      //         return 'Please give details'
-      //       } else if (value.length > 255) {
-      //         return 'Input is restricted to 255 characters'
-      //       } else if (!value.match(this.legalCharacterMatcher)) {
-      //         return 'Input contains illegal characters'
-      //       } else {
-      //         return true
-      //       }
-      //     } else {
-      //       return true
-      //     }
-      //   }
-      // },
-      // results: {
-      //   ep_service: '',
-      //   ep_service_implemented: null,
-      //   ep_service_updated: null,
-      //   local_ep_system_name: '',
-      //   ep_version: '',
-      //   num_maintainers: '',
-      //   ep_usage: '',
-      //   other_ep_system: '',
-      //   add_ep_system: '',
-      //   patient_type: '',
-      //   lab_results: '',
-      //   med_history: '',
-      //   man_results: '',
-      //   diagnosis_results: '',
-      //   penicillin_description: '',
-      //   penicillin_description_other: '',
-      //   penicillin_results: '',
-      //   penicillin_comment: '',
-      //   high_risk_meds: [],
-      //   options: [
-      //     // { text: 'Warfarin', value: 'Warfarin' },
-      //     // { text: 'Insulin', value: 'Insulin' },
-      //     // { text: 'Fluids', value: 'Fluids' },
-      //     // { text: 'Oxygen', value: 'Oxygen' },
-      //     // { text: 'Patient controlled analgesia (PCA)', value: 'PCA' },
-      //     // { text: 'Continuous infusions', value: 'Continuous infusions' },
-      //     // { text: 'Parenteral nutrition', value: 'Parenteral nutrition' },
-      //     // { text: 'Enteral nutrition', value: 'Enteral nutrition' },
-      //     // { text: 'Nutritional supplements (not classed as a medicine)', value: 'Nutritional supplements' },
-      //     // { text: 'Medicines undefined with the catalogue (free text function)', value: 'Undefined medicines' }
-      //     // Updates 2024-07-01 & 2024-10-02 (chemo => 2 options)
-      //     { text: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
-      //     { text: 'IV Infusions (e.g. Continuous / Intermittent / Complex)', value: 'IV infusions' },
-      //     { text: 'Warfarin', value: 'Warfarin' },
-      //     { text: 'Heparin', value: 'Heparin' },
-      //     { text: 'Insulin', value: 'Insulin' },
-      //     { text: 'Insulin Sliding Scales', value: 'Insulin Sliding Scales' },
-      //     { text: 'Chemotherapy oral', value: 'Chemotherapy oral' },
-      //     { text: 'Chemotherapy IV', value: 'Chemotherapy IV'},
-      //     { text: 'Scheduling system for Immunisations / Vaccinations', value: 'Scheduling System' },
-      //     { text: 'Antimicrobials', value: 'Antimicrobials' },
-      //     { text: 'Antipsychotics / Antidepressants (e.g. Depot Injections)', value: 'Antipsychotics' },
-      //     { text: 'Controlled Drugs', value: 'Controlled Drugs' },
-      //     { text: 'Patient Controlled Analgesia', value: 'PCA' },
-      //     { text: 'Multi-Ingredient Infusions (e.g Morphine, Cyclizine, Water for Injection)', value: 'MII' },
-      //     { text: 'Pharmacogenomics', value: 'Pharmacogenomics' },
-      //     { text: 'Fluids', value: 'Fluids' },
-      //     { text: 'Blood Products / Components (e.g. red cells, platelets, fresh frozen plasma and cryoprecipitate, or plasma derivatives)', value: 'Blood Products' },
-      //     { text: 'Medical Gases (e.g. Oxygen, Medical Air, Nitrous Oxide)', value: 'Medical Gases' },
-      //     { text: 'Parenteral Nutrition', value: 'Parenteral Nutrition' },
-      //     { text: 'Other Nutrition', value: 'Other Nutrition' },
-      //     { text: 'Linked Therapeutic Drug Monitoring (e.g. Gentamicin / Vancomycin)', value: 'LTDM' },
-      //     { text: 'Ability to prescribe dose titration', value: 'Dose Titration' }
-      //   ],
-      //   clinical_areas: [],
-      //   other_clinical_area: '',
-      //   area_options: [
-      //     // { text: 'Adult Critical Care', value: 'ACC' },
-      //     // { text: 'Paediatric Critical Care', value: 'PCC' },
-      //     // { text: 'Paediatric Wards', value: 'Paediatric Wards' },
-      //     // { text: 'A & E', value: 'A&E' },
-      //     // { text: 'Chemotherapy', value: 'Chemotherapy' },
-      //     // { text: 'Outpatients', value: 'Outpatients' },
-      //     // { text: 'Community Beds', value: 'Community beds' },
-      //     // { text: 'Day Cases', value: 'Day cases' },
-      //     // { text: 'Clinical Trials', value: 'Clinical trials' },
-      //     // { text: 'Intermediate Care', value: 'Intermediate care' }
-      //     // Updates 2024-07-01
-      //     { text: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
-      //     { text: 'Accident and Emergency EPMA being used for prescribing (A&E) ', value: 'A&E EPMA Prescribing' },
-      //     { text: 'Inpatient (e.g. Ambulatory unit, Care of the Elderly, Orthopaedics)', value: 'Inpatient' },
-      //     { text: 'Intensive Care Unit (ICU)', value: 'ICU' },
-      //     { text: 'Theatre', value: 'Theatre' },
-      //     { text: 'Day Cases ( e.g. procedures)', value: 'Day Cases' },
-      //     { text: 'Outpatients', value: 'Outpatients' },
-      //     { text: 'Special Clinics (e.g. Dialysis / Renal)', value: 'Special Clinics' },
-      //     { text: 'Sexual and Reproductive Health (SRH) services or Genitourinary Medicine Clinics (GUM)', value: 'SRH' },
-      //     { text: 'Maternity', value: 'Maternity' },
-      //     { text: 'Neonatal', value: 'Neonatal' },
-      //     { text: 'Special Care Baby Unit (SCBU) / Neonatal Intensive Care (NICU)', value: 'SCBU' },
-      //     { text: 'Paediatrics', value: 'Paediatrics' },
-      //     { text: 'Paediatric Intensive Care (PICU)', value: 'PICU' },
-      //     { text: 'Cancer Services', value: 'Cancer Services' },
-      //     { text: 'Community', value: 'Community' },
-      //     { text: 'Intermediate Care', value: 'Intermediate Care' },
-      //     { text: 'Virtual Wards', value: 'Virtual Wards' },
-      //     { text: 'Homecare medicines service', value: 'HMS' },
-      //     { text: 'Clinical Trials ', value: 'Clinical Trials' },
-      //     { text: 'Other (please specify)', value: 'Other' }
-      //   ]
-      // },
+        otherEpSystem: '',
+        labResults: false,
+        manResults: false,
+        medHistory: false,
+        diagnosisResults: false,
+        penicillinDescription: '',
+        penicillinDescriptionOther: '',
+        penicillinResults: false,
+        highRiskMeds: [],
+        clinicalAreas: [],
+        otherClinicalArea: ''
+      },      
       startTime: ''
     }
   },
@@ -566,12 +229,31 @@ export default {
         this.serverError = [response.message]
       }
       return epSystems
-    }
-    // onResetClick() {
-    //   this.$refs.assessmentSystemForm.resetForm()
-    //   this.results.ep_service_implemented = null
-    //   this.results.ep_service_updated = null
-    // },
+    },
+    async onResetClick() {      
+      await this.$refs.system.form$.load({ 
+        epService: '',
+        otherEpService: '',
+        localEpServiceName: '',
+        epServiceImplemented: null,
+        epServiceUpdated: null,
+        numMaintainers: 1.0,
+        epUsage: '',
+        otherEpSystem: '',
+        labResults: false,
+        manResults: false,
+        medHistory: false,
+        diagnosisResults: false,
+        penicillinDescription: '',
+        penicillinDescriptionOther: '',
+        penicillinResults: false,
+        highRiskMeds: [],
+        clinicalAreas: [],
+        otherClinicalArea: ''
+      })
+      this.$refs.system.form$.clean()
+      this.$refs.system.form$.resetValidators()
+    },
     // onNextClick() {
     //   this.$refs.assessmentSystemForm.validate().then(async (valid) => {
     //     if (valid) {
@@ -616,6 +298,9 @@ export default {
     //     }
     //   })
     // }
+  }, 
+  mounted() {
+    console.log('Form element is', this.$refs.system.form$.data)
   }
 }
 </script>

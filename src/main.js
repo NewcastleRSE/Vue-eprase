@@ -120,8 +120,12 @@ app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
-app.config.globalProperties.embolden = function(str) {
-  return `<span class='fw-bold'>${str}</span>`
+app.config.globalProperties.embolden = function(str, required=false) {
+  let markup = `<span class="fw-bold">${str}</span>`
+  if (required) {
+    markup += `<sup class="ms-1" title="Field is required"><i class="bi bi-asterisk text-danger"></i></sup>`
+  }
+  return markup
 }
 
 // app.config.errorHandler = function (err, vm, info) {

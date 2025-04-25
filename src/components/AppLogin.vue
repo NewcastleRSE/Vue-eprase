@@ -17,11 +17,13 @@
 
       <div class="mb-4">
         <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
-          <TextElement name="email" label="Email address" placeholder="Valid NHS email address" 
+          <TextElement name="email" placeholder="Valid NHS email address"
+            :label="embolden('Email address', true)" 
             :debounce="500" 
             :messages="{required: 'Email is required'}" 
             :rules="['required', $vueform.rules.nhsEmail]" />
-          <TextElement name="password" label="Password" autocomplete="on"
+          <TextElement name="password" autocomplete="on"
+            :label="embolden('Password', true)"
             :input-type="showPassword ? 'text' : 'password'"            
             :debounce="500" 
             :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
