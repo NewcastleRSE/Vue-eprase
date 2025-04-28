@@ -12,7 +12,8 @@
       <Vueform ref="assessmentStepsForm" :endpoint="false">
         <template #empty>
           <FormSteps @next="nextStep" @select="selectStep">
-            <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to system information' }" />
+            <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to assessment selection' }" />
+            <FormStep name="selectAssessment" label="Start or continue an assessment" :elements="['selectAssessment']" :labels="{ next: 'Continue to system information' }" />
             <FormStep name="system" label="ePrescribing system information" :elements="['system']" :labels="{ next: 'Continue to patient build' }" />
             <FormStep name="patients" label="Patient build">Patient build here...</FormStep>
           </FormSteps>
@@ -20,8 +21,11 @@
             <StaticElement name="intro">
               <AssessmentIntro />
             </StaticElement>
+            <StaticElement name="selectAssessment">
+              Assessment selection here...
+            </StaticElement>
             <StaticElement name="system">
-              <AssessmentSystem v-if="activeStep == 1" />
+              <AssessmentSystem v-if="activeStep == 2" />
             </StaticElement>              
           </FormElements>
           <FormStepsControls /> 
