@@ -22,7 +22,7 @@
               <AssessmentIntro />
             </StaticElement>
             <StaticElement name="selectAssessment">
-              Assessment selection here...
+              <AssessmentSelection v-if="activeStep == 1" />
             </StaticElement>
             <StaticElement name="system">
               <AssessmentSystem v-if="activeStep == 2" />
@@ -53,7 +53,7 @@ import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
 
 export default {
-  name: "Assessment",
+  name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
     errorAlertModal() {
@@ -65,6 +65,7 @@ export default {
   },
   components: {
     AssessmentIntro,
+    AssessmentSelection,
     AssessmentSystem,
     LoginInfo,
     AppFooter,
