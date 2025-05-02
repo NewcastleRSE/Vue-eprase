@@ -46,6 +46,7 @@
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import AssessmentIntro from './AssessmentIntro'
+import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'

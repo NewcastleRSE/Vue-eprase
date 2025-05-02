@@ -84,10 +84,10 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
-    async signup(username, institution, email, password) {
+    async signup(username, institution, hospital, email, password) {
 
       let ret = {}
-      const payload = { username, institution, email, password }
+      const payload = { username, institution, hospital, email, password }
       
       console.group('signup()')
       console.debug('Data payload', payload)

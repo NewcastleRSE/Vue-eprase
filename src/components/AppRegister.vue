@@ -26,9 +26,18 @@
               :native="false" 
               :search="true"
               :track-by="['label', 'value']"
-              :items="getInstitutionCodesNames" 
+              :items="institutions" 
               :messages="{required: 'Institution is required'}" 
+              @change="(newVal) => getHospitals(newVal)"
               :rules="['required']" />
+            <SelectElement v-if="user.institution != ''" name="hospital"
+              :label="embolden('Your hospital site (add manually if not in list)', true)"
+              :search="true"
+              :create="true" 
+              :append-new-option="true"
+              :items="hospitals" 
+              :messages="{required: 'Hospital is required'}" 
+              :rules="[{ 'required': ['institution', '!=', ''] }]" />
             <TextElement name="password" autocomplete="on"
               :label="embolden('Password', true)"
               :input-type="showPassword ? 'text' : 'password'"            
@@ -97,10 +106,13 @@ export default {
       user: {
         username: '',
         institution: '',
+        hospital: '',
         email: '',
         password: '',
         confirmPassword: '',
       },
+      institutions: [],
+      hospitals: [],
       serverError: false,
       showPassword: false,
       showPasswordConfirm: false
@@ -119,8 +131,8 @@ export default {
           // Do the signup
           console.debug('Validation completed successfully')
           this.user.username = usernameFromEmail(this.user.email)
-          const { username, institution, email, password } = this.user
-          const signupResponse = await this.signup(username, institution, email, password)
+          const { username, institution, hospital, email, password } = this.user
+          const signupResponse = await this.signup(username, institution, hospital, email, password)
           if (signupResponse.status < 400) {
             console.debug('Successful registration')
             await this.audit('register:' + email, '/register')
@@ -134,15 +146,16 @@ export default {
       console.groupEnd()
     },
     async getInstitutionCodesNames() {
-      let institutions = []
       const response = await this.getInstitutions()
       if (response.status < 400) {
-        institutions = response.data.data.map(inst => { return { value: inst.id, label: inst.name } })
-        institutions.unshift({value: '', label: 'Please select...', disabled: true})        
+        this.institutions = response.data.data.map(inst => { return { value: inst.id, label: inst.name, hospitals: inst.hospitals } })
+        this.institutions.unshift({value: '', label: 'Please select...', disabled: true})        
       } else {
         this.serverError = [response.message]
       }
-      return institutions
+    },
+    getHospitals(instId) {   
+      this.hospitals = instId ? this.institutions.filter(inst => inst.value == instId).hospitals : []
     },
     togglePasswordVisibility(isConfirm) {
       if (isConfirm) {
@@ -151,6 +164,9 @@ export default {
         this.showPassword = !this.showPassword
       }      
     }
+  },
+  async mounted() {
+    await this.getInstitutionCodesNames()
   }
 }
 
