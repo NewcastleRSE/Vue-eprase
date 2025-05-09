@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { authenticationStore } from './authentication'
 
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
@@ -6,6 +7,7 @@ export const assessmentStore = defineStore('assessment', {
       assessmentId: null,
       assessmentState: 'Not started',
       patientType: 'Adult',
+      institution: '',
       system: {
         epService: '',
         otherEpService: '',
@@ -27,10 +29,16 @@ export const assessmentStore = defineStore('assessment', {
         clinicalAreas: [],
         otherClinicalArea: ''
       },
-      patients: []
+      patients: [],
+      hospital: ''
     }
   }),
   persist: true, 
-  actions: {    
+  actions: {  
+    async getAssessmentsForInstitution() {
+      const instCode = authenticationStore().orgCode
+      const response = await this.apiCall(`assessments?populate=*&populate[institution][filters][code][$eq]=${instCode}`, 'GET')
+      return response
+    },  
   }
 })

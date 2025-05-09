@@ -53,11 +53,7 @@ export const rootStore = defineStore('root', {
       console.groupEnd()
 
       return ret
-    },
-    async getAssessmentById(assessment_id) {
-      const response = await this.apiCall('resultByAssessmentId?ID=' + assessment_id, 'GET')
-      return response
-    },
+    },    
     // Get list of institutions (UPDATED Strapi)
     async getInstitutions() {
       const response = await this.apiCall('institutions?fields[0]=code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')

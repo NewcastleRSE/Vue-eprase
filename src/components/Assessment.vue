@@ -45,6 +45,7 @@
 
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
+import { assessmentStore } from '../stores/assessment'
 import AssessmentIntro from './AssessmentIntro'
 import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
@@ -57,6 +58,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
+    ...mapState(assessmentStore, ['getAssessmentsForInstitution']),
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
@@ -74,8 +76,9 @@ export default {
     ErrorAlertModal
   },
   data() {
-    return {     
-      assessmentComplete: false,
+    return {   
+      assessmentComplete: false,  
+      allAssessments: [],
       activeStep: 0
     }
   },
@@ -92,8 +95,14 @@ export default {
       console.groupEnd()
     }  
   },
-  mounted() {
+  async mounted() {
     console.group('Assessment mounted hook')
+    const instResponse = this.getAssessmentsForInstitution()
+    if (instResponse.status < 400) {
+      this.allAssessments = instResponse.data.data
+    } else {
+      this.errorAlertModal.show(instResponse.message)
+    }
     console.groupEnd()
   }
 }

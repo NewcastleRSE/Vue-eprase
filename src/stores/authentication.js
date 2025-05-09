@@ -7,7 +7,9 @@ export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
     userId: null,
+    email: null, 
     institutionId: null,
+    hospital: null,
     orgCode: null,
     orgName: null,
     trust: null,
@@ -42,7 +44,9 @@ export const authenticationStore = defineStore('authentication', {
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
+          email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
+          hospital: userDetails.user.hospital,
           orgCode: instRes.data.institution.code,
           orgName: instRes.data.institution.name,
           trust: instRes.data.institution.trust_type

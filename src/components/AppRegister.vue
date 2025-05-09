@@ -28,14 +28,22 @@
               :track-by="['label', 'value']"
               :items="institutions" 
               :messages="{required: 'Institution is required'}" 
-              @change="(newVal) => getHospitals(newVal)"
+              @change="(newVal, oldVal, el$) => {
+                const hospital = el$.form$.el$('hospital')
+                hospital.clear()
+                hospital.updateItems()
+              }"
               :rules="['required']" />
             <SelectElement v-if="user.institution != ''" name="hospital"
               :label="embolden('Your hospital site (add manually if not in list)', true)"
+              :native="false"
               :search="true"
               :create="true" 
               :append-new-option="true"
-              :items="hospitals" 
+              :items="async (query, input) => {
+                const institution = input.$parent.el$.form$.el$('institution')
+                return getHospitals(institution.value)
+              }" 
               :messages="{required: 'Hospital is required'}" 
               :rules="[{ 'required': ['institution', '!=', ''] }]" />
             <TextElement name="password" autocomplete="on"
@@ -112,7 +120,6 @@ export default {
         confirmPassword: '',
       },
       institutions: [],
-      hospitals: [],
       serverError: false,
       showPassword: false,
       showPasswordConfirm: false
@@ -154,8 +161,11 @@ export default {
         this.serverError = [response.message]
       }
     },
-    getHospitals(instId) {   
-      this.hospitals = instId ? this.institutions.filter(inst => inst.value == instId).hospitals : []
+    getHospitals(instId) { 
+      console.debug('Get hospitals for inst id', instId)
+      const hospitals = instId ? this.institutions.filter(inst => inst.value == instId) : []
+      console.debug('Returns', hospitals)
+      return hospitals.length > 0 ? hospitals[0].hospitals : []
     },
     togglePasswordVisibility(isConfirm) {
       if (isConfirm) {
@@ -165,8 +175,8 @@ export default {
       }      
     }
   },
-  async mounted() {
-    await this.getInstitutionCodesNames()
+  mounted() {
+    this.getInstitutionCodesNames()
   }
 }
 
