@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { rootStore } from './root'
 import { authenticationStore } from './authentication'
 
 export const assessmentStore = defineStore('assessment', {
@@ -6,9 +7,11 @@ export const assessmentStore = defineStore('assessment', {
     assessmentData: {
       assessmentId: null,
       assessmentState: 'Not started',
-      patientType: 'Adult',
-      institution: '',
-      system: {
+      assessmentOption: '',
+      patientType: '',
+      institution: '',   
+      hospital: '',   
+      system: {        
         epService: '',
         otherEpService: '',
         localEpServiceName: '',
@@ -29,16 +32,23 @@ export const assessmentStore = defineStore('assessment', {
         clinicalAreas: [],
         otherClinicalArea: ''
       },
-      patients: [],
-      hospital: ''
-    }
+      patients: []      
+    },
+    allPossibleAssessments: []
   }),
   persist: true, 
   actions: {  
     async getAssessmentsForInstitution() {
-      const instCode = authenticationStore().orgCode
-      const response = await this.apiCall(`assessments?populate=*&populate[institution][filters][code][$eq]=${instCode}`, 'GET')
-      return response
-    },  
+      const response = await rootStore().apiCall(`assessments??populate[institution][filters][code][$eq]=${authenticationStore().orgCode}&populate=system&populate=patients`, 'GET')
+      if (response.status < 400) {
+        this.$patch({ allPossibleAssessments: response.data.data })
+        return true
+      } else {
+        return response.message
+      }
+    },
+    updateAssessmentData(newData) {
+      //TODO - extract anything in sub-objects like 'system' based on the name e.g. 'system.epService' and $patch
+    }
   }
 })

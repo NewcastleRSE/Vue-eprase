@@ -1,5 +1,5 @@
 <template>
-  <GroupElement ref="system" name="systemForm" :class="'mb-4'">
+  <GroupElement ref="selection" name="selectionForm" :class="'mb-4'">
     <StaticElement name="systemHeading">
       <h2>Assessment Selection</h2>
     </StaticElement>
@@ -8,16 +8,19 @@
       :items="[
         { value: 'new', label: 'Start a new assessment' },
         { value: 'continue', label: 'Continue an existing assessment' },
-        { value: 'reports', 'label': 'View reports for completed assessment(s)' }
+        { value: 'reports', label: 'View reports for completed assessment(s)' }
       ]"
       :messages="{required: 'Select an option'}" 
+      @change="(newVal) => { 
+        assessmentOption = newVal 
+      }"
       :rules="['required']"
     />
-    <RadiogroupElement v-if="assessmentOption == 'new'" v-model="assessmentData.patientType" name="patientType"
+    <RadiogroupElement v-if="assessmentOption == 'new'" name="patientType"
       :label="embolden('For patient type', true)"      
       :items="[
         { value: 'Adult', label: 'Adults' },
-        { value: 'Paediatric', label: 'Paediatrics' }]",
+        { value: 'Paediatric', label: 'Paediatrics' }]"
       :messages="{required: 'Select an option'}" 
       :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
     />
@@ -32,15 +35,12 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AssessmentSelection',
   computed: {
-    ...mapState(assessmentStore, ['assessmentId', 'assessmentState', 'patientType']),
-    assessmentData() {
-      return assessmentStore().assessmentData
-    }
+    ...mapState(assessmentStore, ['allPossibleAssessments'])   
   },
   data() {
     return {
-      serverError: false,   
       assessmentOption: '',
+      serverError: false,   
       startTime: ''
     }
   },
@@ -48,7 +48,9 @@ export default {
 
   },
   mounted() {
-
+    console.group('AssessmentSelection mounted()')
+    console.log('All possible assessments', this.allPossibleAssessments)
+    console.groupEnd()
   }
 }
 </script>

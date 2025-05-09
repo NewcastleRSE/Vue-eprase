@@ -4,7 +4,7 @@
       <h2>EP System Information</h2>
       <h3>Please answer the following questions:</h3>
     </StaticElement>
-    <SelectElement name="epService" v-model="systemData.epService"
+    <SelectElement name="system['epService']"
       :label="embolden('Name of ePrescribing system', true)"
       :native="false" 
       :search="true"
@@ -13,32 +13,32 @@
       :messages="{required: 'Name of ePrescribing system is required'}" 
       :rules="['required']"
     />    
-    <TextElement name="otherEpService" v-model="systemData.otherEpService" placeholder="Name of other eP system"
+    <!-- <TextElement name="system.otherEpService" placeholder="Name of other eP system"
       :label="embolden('Do you use an additional ePrescribing service?', true)"
       :debounce="500" 
       :messages="{required: 'Other eP system name is required'}" 
-      :rules="[{ 'required': ['epService', '==', 'Other'] }]" />      
-    <TextElement name="localEpServiceName" v-model="systemData.localEpServiceName" placeholder="Local name for the ePrescribing system, if different from the official name" 
+      :rules="[{ 'required': ['system.epService', '==', 'Other'] }]" />      
+    <TextElement name="system.localEpServiceName" placeholder="Local name for the ePrescribing system, if different from the official name" 
       :label="embolden('Local name for ePrescribing service')"
       :debounce="500" />
-    <DateElement name="epServiceImplemented" v-model="systemData.epServiceImplemented"
+    <DateElement name="system.epServiceImplemented"
       :max="new Date()"
       :label="embolden('ePrescribing system implementation date', true)" 
       :extendOptions="{ plugins: [monthSelector] }"
       :messages="{required: 'Implementation date is required'}"
       :rules="['required']" />
-    <DateElement name="epServiceUpdated" v-model="systemData.epServiceUpdated"
+    <DateElement name="system.epServiceUpdated"
       :max="new Date()"
       :label="embolden('Last ePrescribing system update date', true)" 
       :extendOptions="{ plugins: [monthSelector] }"
       :messages="{required: 'Update date is required'}"  
       :rules="['required', 'dateIsSameOrAfter:epServiceImplemented,service implementation date']" /> 
-    <TextElement name="numMaintainers" v-model="systemData.numMaintainers"
+    <TextElement name="system.numMaintainers"
       :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
       :debounce="500" 
       :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0 and 10', min: 'Must be >= 0', max: 'Must be < 10' }" 
       :rules="['required', 'numeric', 'min:0.0', 'max:10']" /> 
-    <SelectElement name="epUsage" v-model="systemData.epUsage"
+    <SelectElement name="system.epUsage"
       :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?', true)"
       :native="false"
       :track-by="['label', 'value']"
@@ -52,28 +52,28 @@
       :messages="{required: 'Percentage is required'}" 
       :rules="['required']"
     />   
-    <TextElement name="otherEpSystem" v-model="systemData.otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
+    <TextElement name="system.otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
       :label="embolden('Other ePrescribing systems in use')" 
       :debounce="500" />
     <GroupElement name="labResultsGroup" :class="'mt-2'">
-      <ToggleElement name="labResults" v-model="systemData.labResults"
+      <ToggleElement name="system.labResults"
         :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?', true)"
         :labels="{ on: 'Yes', off: 'No' }"
-        @change="system.labResults = ! system.labResults" />
-      <ToggleElement name="manResults" v-model="systemData.manResults"
+        @change="systemData.labResults = ! systemData.labResults" />
+      <ToggleElement name="system.manResults"
         :label="embolden('Are you able to manually enter laboratory results into your patient admin and/ or ePrescribing test system that you are using to do this assessment?', true)"
         :labels="{ on: 'Yes', off: 'No' }"
-        v-if="system.labResults === true" />
+        v-if="systemData.labResults === true" />
     </GroupElement> 
     <GroupElement name="diagnosisResultsGroup" :class="'mt-2'">
-      <ToggleElement name="medHistory" v-model="systemData.medHistory"
+      <ToggleElement name="system.medHistory"
         :label="embolden('Are you able to manually enter diagnosis and medical history into your test system?', true)"
         :labels="{ on: 'Yes', off: 'No' }"
-        @change="system.medHistory = ! system.medHistory" />
-      <ToggleElement name="diagnosisResults" v-model="systemData.diagnosisResults"
+        @change="systemData.medHistory = ! systemData.medHistory" />
+      <ToggleElement name="system.diagnosisResults"
         :label="embolden('Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessment?', true)"
         :labels="{ on: 'Yes', off: 'No' }"
-        v-if="system.medHistory === true" />
+        v-if="systemData.medHistory === true" />
     </GroupElement>
     <StaticElement name="penicillinWarning">
       <div class="alert alert-warning mt-4" role="alert">
@@ -83,7 +83,7 @@
         questions.
       </div>
     </StaticElement>
-    <SelectElement name="penicillinDescription" v-model="systemData.penicillinDescription"
+    <SelectElement name="system.penicillinDescription"
       :label="embolden('How do you describe Penicillin V in your system?', true)"
       :native="false"
       :track-by="['label', 'value']"
@@ -96,21 +96,21 @@
       ]"
       :messages="{required: 'Penicillin description is required'}" 
       :rules="['required']"
-      @change="(newVal) => { system.penicillinDescription = newVal }"
+      @change="(newVal) => { systemData.penicillinDescription = newVal }"
     />   
-    <TextElement name="penicillinDescriptionOther" v-model="systemData.penicillinDescriptionOther"
+    <TextElement name="penicillinDescriptionOther"
       :label="embolden('Your description', true)"
-      v-if="system.penicillinDescription == 'other'"
-      :rules="[{ 'required': ['penicillinDescription', '==', 'other'] }]"
+      v-if="systemData.penicillinDescription == 'other'"
+      :rules="[{ 'required': ['system.penicillinDescription', '==', 'other'] }]"
       :debounce="500" />
-    <ToggleElement name="penicillinResults" v-model="systemData.penicillinResults"
+    <ToggleElement name="system.penicillinResults"
       :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
       :labels="{ on: 'Yes', off: 'No' }"
     />
-    <TextElement name="penicillinComment" v-model="systemData.penicillinComment"
+    <TextElement name="system.penicillinComment"
       :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
       :debounce="500" />
-    <CheckboxgroupElement name="highRiskMeds" v-model="systemData.highRiskMeds"
+    <CheckboxgroupElement name="system.highRiskMeds"
       :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
       :items="[
         { label: 'All medicines (e.g. Licensed / Unlicensed / Formulary)', value: 'All medicines' },
@@ -137,7 +137,7 @@
         { label: 'Ability to prescribe dose titration', value: 'Dose Titration' }
       ]"
       :rules="['filled']" />
-    <CheckboxgroupElement name="clinicalAreas" v-model="systemData.clinicalAreas" 
+    <CheckboxgroupElement name="system.clinicalAreas"
       :label="embolden('Is the ePrescribing system used in the following areas?', true)"       
       :items="[
         { label: 'Accident and Emergency EPMA Accessible i.e. open to view medication records (A&E) ', value: 'A&E EPMA Acc' },
@@ -162,18 +162,18 @@
         { label: 'Clinical Trials ', value: 'Clinical Trials' },
         { label: 'Other (please specify)', value: 'Other' }
       ]"
-      @change="(newVal) => { system.clinicalAreas = newVal }"
+      @change="(newVal) => { systemData.clinicalAreas = newVal }"
       :rules="['filled']" />
-    <TextElement name="otherClinicalArea" v-model="systemData.otherClinicalArea"
+    <TextElement name="system.otherClinicalArea"
       :label="embolden('Other area', true)"
-      v-if="system.clinicalAreas.includes('Other')"
+      v-if="systemData.clinicalAreas.includes('Other')"
       :rules="[{ 'required': ['Other', 'in', 'clinicalAreas'] }]"
       :debounce="500" />
     <StaticElement name="nextStep">
       <div class="alert alert-info mt-4" role="alert">
         When you have answered all the questions, click <span class="fw-bold">Continue to patient build</span>
       </div>
-    </StaticElement>
+    </StaticElement> -->
     <ButtonElement name="reset" :columns="3" @click="onResetClick">
       <i class="bi bi-x-circle-fill me-2"></i>Clear form
     </ButtonElement>
@@ -182,7 +182,7 @@
 
 <script>
 
-import { mapState } from 'pinia'
+import { mapState, mapWritableState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import flatPicker from 'vue-flatpickr-component'
@@ -191,7 +191,8 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 export default {
   name: 'AssessmentSystem',    
   computed: {
-    ...mapState(rootStore, ['getEpSystems']),     
+    ...mapState(rootStore, ['getEpSystems']),
+    ...mapWritableState(assessmentStore, ['assessmentData']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
     },
@@ -202,9 +203,9 @@ export default {
         altFormat: 'MMM Y'
       })
     },
-    systemData() {
-      return assessmentStore().assessmentData.system
-    }
+    // systemData() {
+    //   return this.assessmentData.system
+    // }
   },
   components: {
     flatPicker
@@ -297,7 +298,8 @@ export default {
     // }
   }, 
   mounted() {
-    console.log('Form element is', this.$refs.system.form$.data)
+    // console.log('Form element is', this.$refs.system.form$.data)
+    // console.log('System data', this.systemData)
   }
 }
 </script>

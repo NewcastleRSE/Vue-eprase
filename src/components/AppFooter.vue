@@ -1,6 +1,6 @@
 <template>
   <Vueform ref="footerButtonBar">
-    <GroupElement name="buttonBar" :columns="10" :add-class="'mt-2'">
+    <GroupElement name="buttonBar" :columns="8" :add-class="'mt-2'">
       <ButtonElement name="about" full
         data-bs-toggle="modal" data-bs-target="#aboutModal"
         :columns="2" 
@@ -12,12 +12,7 @@
         :columns="2" 
         :add-class="'mx-2'">
         <i class="bi bi-clipboard me-2"></i>Instructions
-      </ButtonElement>
-      <ButtonElement name="reports" full 
-        :columns="2" 
-        :add-class="'mx-2'">
-        <i class="bi bi bi-bar-chart me-2"></i>Reports
-      </ButtonElement>
+      </ButtonElement>      
       <ButtonElement name="userGuide" full 
         button-type="anchor"
         href="https://eprasedocs.blob.core.windows.net/web/Eprase2024UserGuide.pdf"
@@ -47,21 +42,11 @@ import AboutModal from './AboutModal'
 import ContactModal from './ContactModal'
 
 export default {
-  name: "AppFooter",
-  props: {
-    allowReports: false
-  },
+  name: "AppFooter", 
   components: {
     InstructionsModal,
     AboutModal,
     ContactModal
-  },
-  methods: {
-    reports() {
-      if (this.allowReports) {
-        this.$router.push('/assessmentresults')
-      }     
-    }
   }
 }
 

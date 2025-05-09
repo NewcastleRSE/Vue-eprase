@@ -9,7 +9,7 @@
 
       <h1 class="assessment-head p-4">ePRaSE Assessment {{ year }}</h1>
 
-      <Vueform ref="assessmentStepsForm" :endpoint="false">
+      <Vueform ref="assessmentStepsForm" :endpoint="false" v-model="allFormData" sync>
         <template #empty>
           <FormSteps @next="nextStep" @select="selectStep">
             <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to assessment selection' }" />
@@ -33,7 +33,7 @@
       </Vueform>
 
       <div class="px-4 my-4">
-        <AppFooter :allowReports="assessmentComplete" />
+        <AppFooter />
       </div>
     </div>
     <AppLogo cls="bottomright" />
@@ -43,7 +43,7 @@
 
 <script>
 
-import { mapState } from 'pinia'
+import { mapState, mapStores } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { assessmentStore } from '../stores/assessment'
 import AssessmentIntro from './AssessmentIntro'
@@ -58,7 +58,18 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['getAssessmentsForInstitution']),
+    ...mapStores(assessmentStore),
+    allFormData: {
+      get() {
+        console.log('Getter called', assessmentStore().assessmentData)
+        return assessmentStore().assessmentData
+      },
+      set(data) {
+        console.log('Setter called with', data)
+        // Needed to cope with the nested object structure
+        assessmentStore().updateAssessmentData(data)
+      }      
+    },
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
@@ -97,11 +108,9 @@ export default {
   },
   async mounted() {
     console.group('Assessment mounted hook')
-    const instResponse = this.getAssessmentsForInstitution()
-    if (instResponse.status < 400) {
-      this.allAssessments = instResponse.data.data
-    } else {
-      this.errorAlertModal.show(instResponse.message)
+    const instResponse = await assessmentStore().getAssessmentsForInstitution()
+    if (instResponse !== true) {      
+      this.errorAlertModal.show(instResponse)
     }
     console.groupEnd()
   }

@@ -162,9 +162,7 @@ export default {
       }
     },
     getHospitals(instId) { 
-      console.debug('Get hospitals for inst id', instId)
       const hospitals = instId ? this.institutions.filter(inst => inst.value == instId) : []
-      console.debug('Returns', hospitals)
       return hospitals.length > 0 ? hospitals[0].hospitals : []
     },
     togglePasswordVisibility(isConfirm) {

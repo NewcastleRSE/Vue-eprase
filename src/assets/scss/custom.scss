@@ -151,13 +151,12 @@ td.over-mitigation {
   background-color: $info;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
+  /* Make checkboxes and radios bigger */
   --vf-space-checkbox: 1rem;
   --vf-checkbox-size: 1.25rem;
-  --vf-border-width-checkbox-t: 2px;
-  --vf-border-width-checkbox-r: 2px;
-  --vf-border-width-checkbox-b: 2px;
-  --vf-border-width-checkbox-l: 2px;
+  /* Darken the borders of radios and checkboxes to make them easier to see */
+  --vf-border-color-input: var(--vf-gray-500); 
 }
 
 
