@@ -2,6 +2,28 @@ import { defineStore } from 'pinia'
 import { rootStore } from './root'
 import { authenticationStore } from './authentication'
 
+const EMPTY_SYSTEM = {        
+  epService: '',
+  otherEpService: '',
+  localEpServiceName: '',
+  epServiceImplemented: null,
+  epServiceUpdated: null,
+  numMaintainers: 1.0,
+  epUsage: '',
+  otherEpSystem: '',
+  labResults: false,
+  manResults: false,
+  medHistory: false,
+  diagnosisResults: false,
+  penicillinDescription: '',
+  penicillinDescriptionOther: '',
+  penicillinResults: false,
+  penicillinComment: '',
+  highRiskMeds: [],
+  clinicalAreas: [],
+  otherClinicalArea: ''
+}
+
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
     assessmentData: {
@@ -11,27 +33,7 @@ export const assessmentStore = defineStore('assessment', {
       patientType: '',
       institution: '',   
       hospital: '',   
-      system: {        
-        epService: '',
-        otherEpService: '',
-        localEpServiceName: '',
-        epServiceImplemented: null,
-        epServiceUpdated: null,
-        numMaintainers: 1.0,
-        epUsage: '',
-        otherEpSystem: '',
-        labResults: false,
-        manResults: false,
-        medHistory: false,
-        diagnosisResults: false,
-        penicillinDescription: '',
-        penicillinDescriptionOther: '',
-        penicillinResults: false,
-        penicillinComment: '',
-        highRiskMeds: [],
-        clinicalAreas: [],
-        otherClinicalArea: ''
-      },
+      system: EMPTY_SYSTEM,
       patients: []      
     },
     allPossibleAssessments: []
@@ -47,8 +49,10 @@ export const assessmentStore = defineStore('assessment', {
         return response.message
       }
     },
-    updateAssessmentData(newData) {
-      //TODO - extract anything in sub-objects like 'system' based on the name e.g. 'system.epService' and $patch
+    resetSystemData() {
+      this.$patch((state) => {
+        state.assessmentData.system = EMPTY_SYSTEM
+      })
     }
   }
 })

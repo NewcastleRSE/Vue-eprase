@@ -1,6 +1,6 @@
 <template>
-  <GroupElement ref="selection" name="selectionForm" :class="'mb-4'">
-    <StaticElement name="systemHeading">
+  <GroupElement ref="selection" name="selectionGroup" :class="'mb-4'">
+    <StaticElement name="selectionHeading">
       <h2>Assessment Selection</h2>
     </StaticElement>
     <RadiogroupElement name="assessmentOption"
@@ -16,7 +16,7 @@
       }"
       :rules="['required']"
     />
-    <RadiogroupElement v-if="assessmentOption == 'new'" name="patientType"
+    <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
       :label="embolden('For patient type', true)"      
       :items="[
         { value: 'Adult', label: 'Adults' },
@@ -35,11 +35,13 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AssessmentSelection',
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments'])   
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData']),
+    selectionData() {
+      return this.assessmentData
+    }
   },
   data() {
     return {
-      assessmentOption: '',
       serverError: false,   
       startTime: ''
     }

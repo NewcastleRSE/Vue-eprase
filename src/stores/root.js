@@ -64,6 +64,16 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('ep-services?fields[0]=name&sort[0]=name:asc', 'GET')
       return response
     },
+    // Get list of high risk meds (UPDATED Strapi)
+    async getHighRiskMeds() {
+      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value', 'GET')
+      return response
+    },
+    // Get list of clinical areas (UPDATED Strapi)
+    async getClinicalAreas() {
+      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value', 'GET')
+      return response
+    },
     async getCategories() {
       if (this.categories.length == 0) {
         const response = await this.apiCall('categories', 'GET')

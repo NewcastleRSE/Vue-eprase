@@ -12,20 +12,20 @@
       <Vueform ref="assessmentStepsForm" :endpoint="false" v-model="allFormData" sync>
         <template #empty>
           <FormSteps @next="nextStep" @select="selectStep">
-            <FormStep name="intro" label="Introduction to ePRaSE" :elements="['intro']" :labels="{ next: 'Continue to assessment selection' }" />
-            <FormStep name="selectAssessment" label="Start or continue an assessment" :elements="['selectAssessment']" :labels="{ next: 'Continue to system information' }" />
-            <FormStep name="system" label="ePrescribing system information" :elements="['system']" :labels="{ next: 'Continue to patient build' }" />
-            <FormStep name="patients" label="Patient build">Patient build here...</FormStep>
+            <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" :elements="['epraseIntroEl']" :labels="{ next: 'Continue to assessment selection' }" />
+            <FormStep name="selectAssessmentStep" label="Start or continue an assessment" :elements="['selectAssessmentEl']" :labels="{ next: 'Continue to system information' }" />
+            <FormStep name="systemInfoStep" label="ePrescribing system information" :elements="['systemInfoEl']" :labels="{ next: 'Continue to patient build' }" />
+            <FormStep name="patientBuildStep" label="Patient build">Patient build here...</FormStep>
           </FormSteps>
           <FormElements>
-            <StaticElement name="intro">
+            <StaticElement name="epraseIntroEl">
               <AssessmentIntro />
             </StaticElement>
-            <StaticElement name="selectAssessment">
+            <StaticElement name="selectAssessmentEl">
               <AssessmentSelection v-if="activeStep == 1" />
             </StaticElement>
-            <StaticElement name="system">
-              <AssessmentSystem v-if="activeStep == 2" />
+            <StaticElement name="systemInfoEl">
+              <AssessmentSystem v-if="activeStep == 2" @get-data-fail="reportError" />
             </StaticElement>              
           </FormElements>
           <FormStepsControls /> 
@@ -60,15 +60,11 @@ export default {
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapStores(assessmentStore),
     allFormData: {
-      get() {
-        console.log('Getter called', assessmentStore().assessmentData)
+      get() {        
         return assessmentStore().assessmentData
-      },
-      set(data) {
-        console.log('Setter called with', data)
-        // Needed to cope with the nested object structure
-        assessmentStore().updateAssessmentData(data)
-      }      
+      }, 
+      set(newdata) {
+      }
     },
     errorAlertModal() {
       return this.$refs.errorAlertModal
@@ -104,13 +100,16 @@ export default {
       console.debug('Active step', active.index, 'previous', previous.index)
       this.activeStep = active.index
       console.groupEnd()
-    }  
+    },
+    reportError(message) {
+      this.errorAlertModal.show(message)
+    }
   },
   async mounted() {
     console.group('Assessment mounted hook')
     const instResponse = await assessmentStore().getAssessmentsForInstitution()
     if (instResponse !== true) {      
-      this.errorAlertModal.show(instResponse)
+      this.reportError(instResponse)
     }
     console.groupEnd()
   }
