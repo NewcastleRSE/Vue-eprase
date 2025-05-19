@@ -47,7 +47,7 @@ export const authenticationStore = defineStore('authentication', {
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,
-          orgCode: instRes.data.institution.code,
+          orgCode: instRes.data.institution.institution_code,
           orgName: instRes.data.institution.name,
           trust: instRes.data.institution.trust_type
         })

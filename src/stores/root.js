@@ -56,7 +56,7 @@ export const rootStore = defineStore('root', {
     },    
     // Get list of institutions (UPDATED Strapi)
     async getInstitutions() {
-      const response = await this.apiCall('institutions?fields[0]=code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
+      const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
     // Get list of ePrescribing system names (UPDATED Strapi)

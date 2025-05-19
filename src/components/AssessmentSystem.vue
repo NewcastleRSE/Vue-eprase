@@ -76,40 +76,42 @@
           :labels="{ on: 'Yes', off: 'No' }"
           v-if="systemData.medHistory === true" />
       </GroupElement>
-      <StaticElement name="penicillinWarning">
-        <div class="alert alert-warning mt-4" role="alert">
-          Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin
-          allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert
-          failure. We are hoping to learn more about contributory factors to this issue with the following three
-          questions.
-        </div>
-      </StaticElement>
-      <SelectElement name="penicillinDescription"
-        :label="embolden('How do you describe Penicillin V in your system?', true)"
-        :native="false"
-        :track-by="['label', 'value']"
-        :items="[
-          { value: '', label: 'Select description...', disabled: true },
-          { value: 'penicillin_v', label: 'Penicillin V' },
-          { value: 'phenoxymethylpenicillin', label: 'Phenoxymethylpenicillin' },
-          { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
-          { value: 'other', label: 'Other' }
-        ]"
-        :messages="{required: 'Penicillin description is required'}" 
-        :rules="['required']"        
-      />   
-      <TextElement name="penicillinDescriptionOther"
-        :label="embolden('Your description', true)"
-        v-if="systemData.penicillinDescription == 'other'"
-        :rules="[{ 'required': ['system.penicillinDescription', '==', 'other'] }]"
-        :debounce="500" />
-      <ToggleElement name="penicillinResults"
-        :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
-        :labels="{ on: 'Yes', off: 'No' }"
-      />
-      <TextElement name="penicillinComment"
-        :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
-        :debounce="500" />
+      <GroupElement name="penicillinGroup" :class="'mb-4'">
+        <StaticElement name="penicillinWarning">
+          <div class="alert alert-warning mt-4" role="alert">
+            Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin
+            allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert
+            failure. We are hoping to learn more about contributory factors to this issue with the following three
+            questions.
+          </div>
+        </StaticElement>
+        <SelectElement name="penicillinDescription"
+          :label="embolden('How do you describe Penicillin V in your system?', true)"
+          :native="false"
+          :track-by="['label', 'value']"
+          :items="[
+            { value: '', label: 'Select description...', disabled: true },
+            { value: 'penicillin_v', label: 'Penicillin V' },
+            { value: 'phenoxymethylpenicillin', label: 'Phenoxymethylpenicillin' },
+            { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
+            { value: 'other', label: 'Other' }
+          ]"
+          :messages="{required: 'Penicillin description is required'}" 
+          :rules="['required']"        
+        />   
+        <TextElement name="penicillinDescriptionOther"
+          :label="embolden('Your description', true)"
+          v-if="systemData.penicillinDescription == 'other'"
+          :rules="[{ 'required': ['system.penicillinDescription', '==', 'other'] }]"
+          :debounce="500" />
+        <ToggleElement name="penicillinResults"
+          :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
+          :labels="{ on: 'Yes', off: 'No' }"
+        />
+        <TextElement name="penicillinComment"
+          :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
+          :debounce="500" />
+      </GroupElement>      
       <CheckboxgroupElement name="highRiskMeds"
         :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
         :items="cbgHighRiskMeds"

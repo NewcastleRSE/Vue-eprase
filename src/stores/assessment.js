@@ -41,7 +41,9 @@ export const assessmentStore = defineStore('assessment', {
   persist: true, 
   actions: {  
     async getAssessmentsForInstitution() {
-      const response = await rootStore().apiCall(`assessments??populate[institution][filters][code][$eq]=${authenticationStore().orgCode}&populate=system&populate=patients`, 'GET')
+      const instCode = authenticationStore().orgCode
+      const hospital = authenticationStore().hospital
+      const response = await rootStore().apiCall(`assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=system&populate=patients`, 'GET')
       if (response.status < 400) {
         this.$patch({ allPossibleAssessments: response.data.data })
         return true

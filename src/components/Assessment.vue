@@ -9,23 +9,42 @@
 
       <h1 class="assessment-head p-4">ePRaSE Assessment {{ year }}</h1>
 
-      <Vueform ref="assessmentStepsForm" :endpoint="false" v-model="allFormData" sync>
+      <Vueform ref="assessmentStepsForm" validate-on="step" :endpoint="false" v-model="allFormData" sync>
         <template #empty>
           <FormSteps @next="nextStep" @select="selectStep">
-            <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" :elements="['epraseIntroEl']" :labels="{ next: 'Continue to assessment selection' }" />
-            <FormStep name="selectAssessmentStep" label="Start or continue an assessment" :elements="['selectAssessmentEl']" :labels="{ next: 'Continue to system information' }" />
-            <FormStep name="systemInfoStep" label="ePrescribing system information" :elements="['systemInfoEl']" :labels="{ next: 'Continue to patient build' }" />
-            <FormStep name="patientBuildStep" label="Patient build">Patient build here...</FormStep>
+            <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
+              :elements="['epraseIntroEl']"
+              :buttons="{ previous: false }"
+              :labels="{ next: 'Continue to assessment selection' }" />
+            <FormStep name="selectAssessmentStep" label="Start or continue an assessment" 
+              :elements="['selectAssessmentEl']" 
+              :buttons="{ previous: false }"
+              :labels="{ next: 'Continue to system information' }" />
+            <FormStep name="systemInfoStep" label="ePrescribing system information" 
+              :elements="['systemInfoEl']" 
+              :labels="{ 
+                next: 'Continue to patient build',
+                previous: 'Back to assessment selection' 
+              }" />
+            <FormStep name="patientBuildStep" label="Patient build" 
+              :elements="['patientBuildEl']" 
+              :labels="{ 
+                next: 'Continue to scenarios',
+                previous: 'Back to patient build' 
+              }" />
           </FormSteps>
           <FormElements>
-            <StaticElement name="epraseIntroEl">
+            <StaticElement v-if="activeStep == 0" name="epraseIntroEl">
               <AssessmentIntro />
             </StaticElement>
-            <StaticElement name="selectAssessmentEl">
-              <AssessmentSelection v-if="activeStep == 1" />
+            <StaticElement v-if="activeStep == 1" name="selectAssessmentEl">
+              <AssessmentSelection />
             </StaticElement>
-            <StaticElement name="systemInfoEl">
-              <AssessmentSystem v-if="activeStep == 2" @get-data-fail="reportError" />
+            <StaticElement v-if="activeStep == 2" name="systemInfoEl">
+              <AssessmentSystem @get-data-fail="reportError" />
+            </StaticElement>
+            <StaticElement v-if="activeStep == 3" name="patientBuildEl">
+              Patient build here
             </StaticElement>              
           </FormElements>
           <FormStepsControls /> 
@@ -98,7 +117,7 @@ export default {
     selectStep(active, previous) {
       console.group('selectStep()')
       console.debug('Active step', active.index, 'previous', previous.index)
-      this.activeStep = active.index
+      this.activeStep = active.index      
       console.groupEnd()
     },
     reportError(message) {
