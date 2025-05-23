@@ -242,50 +242,6 @@ export default {
       this.selectUnselect(this.$refs.systemObject.children$['clinicalAreas'], !this.checkedAllCa)
       this.checkedAllCa = ! this.checkedAllCa      
     }
-    // onNextClick() {
-    //   this.$refs.assessmentSystemForm.validate().then(async (valid) => {
-    //     if (valid) {
-
-    //       const time_taken = dayjs().diff(this.startTime, 'seconds')
-
-    //       const ep_service = this.results.ep_service
-    //       const local_ep_system_name = this.results.local_ep_system_name
-    //       const ep_service_implemented = `${prependZero(this.results.ep_service_implemented.month + 1)}-${this.results.ep_service_implemented.year}`
-    //       const ep_service_updated = `${prependZero(this.results.ep_service_updated.month + 1)}-${this.results.ep_service_updated.year}`
-    //       const ep_version = '0'  // Note: no longer used as of July 2024
-    //       const num_maintainers = this.results.num_maintainers
-    //       const other_ep_system = this.results.other_ep_system
-    //       const ep_usage = this.results.ep_usage
-    //       const add_ep_system = this.results.add_ep_system
-    //       const patient_type = 'Adults'
-    //       const lab_results = this.results.lab_results
-    //       const man_results = this.results.man_results
-    //       const diagnosis_results = this.results.diagnosis_results
-    //       const penicillin_description = this.results.penicillin_description
-    //       const penicillin_description_other = this.results.penicillin_description_other
-    //       const penicillin_results = this.results.penicillin_results
-    //       const penicillin_comment = this.results.penicillin_comment
-    //       const med_history = this.results.med_history
-    //       const high_risk_meds = this.results.high_risk_meds.toString()
-    //       const clinical_areas = this.results.clinical_areas
-    //       if (this.results.other_clinical_area != '') {
-    //         clinical_areas.push(this.results.other_clinical_area)
-    //       }
-    //       const final_clinical_areas = clinical_areas.toString()
-    //       const response = await rootStore().saveSystemData(
-    //         ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system,
-    //         patient_type, lab_results, man_results, diagnosis_results, penicillin_description, penicillin_description_other, penicillin_results, penicillin_comment,
-    //         med_history, high_risk_meds, final_clinical_areas, time_taken
-    //       )
-    //       if (response.status < 400) {
-    //         rootStore().audit('Save system data', '/assessmentSystem')
-    //         this.$router.push('/assessmentpatients/' + patient_type)
-    //       } else {
-    //         this.errorAlertModal.show(response.message)
-    //       }
-    //     }
-    //   })
-    // }
   }, 
   mounted() {
   }

@@ -35,8 +35,7 @@ export const assessmentStore = defineStore('assessment', {
       institution: '',   
       hospital: '',   
       system: EMPTY_SYSTEM,
-      patients: [],
-      test: ''      
+      patients: []
     },
     allPossibleAssessments: []
   }),
@@ -57,6 +56,9 @@ export const assessmentStore = defineStore('assessment', {
       this.$patch((state) => {
         state.assessmentData.system = EMPTY_SYSTEM
       })
+    },
+    async saveAssessmentForInstitution() {
+
     }
   }
 })
