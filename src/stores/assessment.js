@@ -5,6 +5,7 @@ import { authenticationStore } from './authentication'
 const EMPTY_SYSTEM = {        
   epService: '',
   otherEpService: '',
+  addEpService: '',
   localEpServiceName: '',
   epServiceImplemented: null,
   epServiceUpdated: null,
@@ -34,7 +35,8 @@ export const assessmentStore = defineStore('assessment', {
       institution: '',   
       hospital: '',   
       system: EMPTY_SYSTEM,
-      patients: []      
+      patients: [],
+      test: ''      
     },
     allPossibleAssessments: []
   }),

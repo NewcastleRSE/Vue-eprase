@@ -9,7 +9,7 @@
 
       <h1 class="assessment-head p-4">ePRaSE Assessment {{ year }}</h1>
 
-      <Vueform ref="assessmentStepsForm" validate-on="step" :endpoint="false" v-model="allFormData" sync>
+      <Vueform ref="assessmentStepsForm" validate-on="change|step" v-model="allFormData" sync>
         <template #empty>
           <FormSteps @next="nextStep" @select="selectStep">
             <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
@@ -20,7 +20,7 @@
               :elements="['selectAssessmentEl']" 
               :buttons="{ previous: false }"
               :labels="{ next: 'Continue to system information' }" />
-            <FormStep name="systemInfoStep" label="ePrescribing system information" 
+            <FormStep name="systemInfoStep" label="ePrescribing system information"               
               :elements="['systemInfoEl']" 
               :labels="{ 
                 next: 'Continue to patient build',
@@ -30,22 +30,21 @@
               :elements="['patientBuildEl']" 
               :labels="{ 
                 next: 'Continue to scenarios',
-                previous: 'Back to patient build' 
+                previous: 'Back to system information'
+              }" />
+            <FormStep name="scenarioStep" label="Scenarios" 
+              :elements="['scenarioEl']" 
+              :labels="{ 
+                next: 'Continue to reports',
+                previous: 'Back to patient build'
               }" />
           </FormSteps>
-          <FormElements>
-            <StaticElement v-if="activeStep == 0" name="epraseIntroEl">
-              <AssessmentIntro />
-            </StaticElement>
-            <StaticElement v-if="activeStep == 1" name="selectAssessmentEl">
-              <AssessmentSelection />
-            </StaticElement>
-            <StaticElement v-if="activeStep == 2" name="systemInfoEl">
-              <AssessmentSystem @get-data-fail="reportError" />
-            </StaticElement>
-            <StaticElement v-if="activeStep == 3" name="patientBuildEl">
-              Patient build here
-            </StaticElement>              
+          <FormElements>            
+            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" />
+            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" @get-data-fail="reportError" />
+            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" @get-data-fail="reportError" />
+            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" @get-data-fail="reportError" />
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -68,10 +67,13 @@ import { assessmentStore } from '../stores/assessment'
 import AssessmentIntro from './AssessmentIntro'
 import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
+import AssessmentPatientBuild from './AssessmentPatientBuild'
+import AssessmentScenario from './AssessmentScenario'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
+
 
 export default {
   name: 'Assessment',
@@ -96,6 +98,8 @@ export default {
     AssessmentIntro,
     AssessmentSelection,
     AssessmentSystem,
+    AssessmentPatientBuild,
+    AssessmentScenario,
     LoginInfo,
     AppFooter,
     AppLogo,
@@ -111,12 +115,16 @@ export default {
   methods: {      
     nextStep(toStep) {
       console.group('nextStep()')
-      console.debug('Next step', toStep.index)
+      console.debug('Next step', toStep.index, 'current', this)
+      // console.debug('Validating...')
+      // this.formSteps.validate().then(async (args) => {
+      //   console.debug('Validation result', args)
+      // })
       console.groupEnd()
     }, 
     selectStep(active, previous) {
       console.group('selectStep()')
-      console.debug('Active step', active.index, 'previous', previous.index)
+      console.debug('Active step', active, 'previous', previous)
       this.activeStep = active.index      
       console.groupEnd()
     },

@@ -7,8 +7,11 @@ import en from '@vueform/vueform/locales/en'
 import bootstrap from '@vueform/vueform/dist/bootstrap'
 import { defineConfig, Validator } from '@vueform/vueform'
 
+// https://www.30secondsofcode.org/js/s/get-nested-object-value/ - uses nullish coalescing (??) and optional chaining (?.) operators
+const deepGet = (obj, keys) => keys.reduce((xs, x) => xs?.[x] ?? null, obj)
+
 const nhsEmail = class extends Validator {
-  get msg() { 
+  get msg() {
     return 'Must be a valid nhs.net or nhs.uk email address'
   }
   check(value) {
@@ -19,9 +22,38 @@ const nhsEmail = class extends Validator {
   }
 }
 
+const fieldIsOther = class extends Validator {
+
+  get msg() {
+    return 'Please complete this field'
+  }
+
+  get messageParams() {
+    return {
+      attribute: this.attributeName,
+      otherField: this.otherField
+    }
+  }
+
+  get otherField() {
+    return this.attributes[0]
+  }
+
+  check(value) {
+    console.debug(this.otherField, this.form$.data)
+    this.watch(this.otherField)
+    const otherVal = deepGet(this.form$.data, this.otherField.split('.'))
+    if (otherVal != null) {
+      const otherArr = Array.isArray(otherVal) ? otherVal : [otherVal]
+      return otherArr.includes('Other') || otherVal.includes('other')
+    }
+    return true
+  }
+}
+
 const dateIsSameOrAfter = class extends Validator {
   get msg() {
-    return ':attribute must be the same or after :otherDateDescription'
+    return 'Must be the same or after :otherDateDescription'
   }
 
   get messageParams() {
@@ -29,7 +61,7 @@ const dateIsSameOrAfter = class extends Validator {
       attribute: this.attributeName,
       otherDate: this.otherDate,
       otherDateDescription: this.otherDateDescription
-    }    
+    }
   }
 
   get otherDate() {
@@ -44,7 +76,7 @@ const dateIsSameOrAfter = class extends Validator {
     dayjs.extend(customParseFormat)
     dayjs.extend(isSameOrAfter)
     this.watch(this.otherDate)
-    const d2 = this.form$.data[this.otherDate]
+    const d2 = deepGet(this.form$.data, this.otherDate.split('.'))
     if (d2 != null) {
       return dayjs(value).isSameOrAfter(dayjs(d2))
     }
@@ -57,10 +89,11 @@ export default defineConfig({
   theme: bootstrap,
   locales: { en },
   locale: 'en',
+  validateOn: 'change|step',
   displayErrors: false,
   displayMessages: false,
   floatPlaceholders: false,
   rules: {
-    nhsEmail, dateIsSameOrAfter
+    nhsEmail, dateIsSameOrAfter, fieldIsOther
   }
 })

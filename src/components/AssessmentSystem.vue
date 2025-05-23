@@ -14,11 +14,14 @@
         :messages="{required: 'Name of ePrescribing system is required'}" 
         :rules="['required']"
       />
-      <TextElement name="otherEpService" placeholder="Name of other eP system"
-        :label="embolden('Do you use an additional ePrescribing service?', true)"
+      <TextElement v-if="systemData.epService == 'Other'" name="otherEpService" placeholder="Name of your eP system"
+        :label="embolden('Name of your ePrescribing system', true)"
         :debounce="500" 
         :messages="{required: 'Other eP system name is required'}" 
-        :rules="[{ 'required': ['system.epService', '==', 'Other'] }]" />      
+        :rules="['required', 'fieldIsOther:system.epService']" />      
+      <TextElement name="addEpService" placeholder="Name of additional eP system"
+        :label="embolden('Do you use an additional ePrescribing service?', true)"
+        :debounce="500" />
       <TextElement name="localEpServiceName" placeholder="Local name for the ePrescribing system, if different from the official name" 
         :label="embolden('Local name for ePrescribing service')"
         :debounce="500" />
@@ -33,7 +36,7 @@
         :label="embolden('Last ePrescribing system update date', true)" 
         :extendOptions="{ plugins: [monthSelector] }"
         :messages="{required: 'Update date is required'}"  
-        :rules="['required', 'dateIsSameOrAfter:epServiceImplemented,service implementation date']" /> 
+        :rules="['required', 'dateIsSameOrAfter:system.epServiceImplemented,service implementation date']" /> 
       <TextElement name="numMaintainers"
         :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
         :debounce="500" 
@@ -102,7 +105,8 @@
         <TextElement name="penicillinDescriptionOther"
           :label="embolden('Your description', true)"
           v-if="systemData.penicillinDescription == 'other'"
-          :rules="[{ 'required': ['system.penicillinDescription', '==', 'other'] }]"
+          :messages="{required: 'Additional description is required'}" 
+          :rules="['required', 'fieldIsOther:system.penicillinDescription']"
           :debounce="500" />
         <ToggleElement name="penicillinResults"
           :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
@@ -131,7 +135,8 @@
       <TextElement name="otherClinicalArea"
         :label="embolden('Other area', true)"
         v-if="systemData.clinicalAreas.includes('Other')"
-        :rules="[{ 'required': ['Other', 'in', 'clinicalAreas'] }]"
+        :messages="{required: 'Other clinical area needs to be specified'}" 
+        :rules="['required', 'fieldIsOther:system.clinicalAreas']"
         :debounce="500" />
       <StaticElement name="nextStep">
         <div class="alert alert-info mt-4" role="alert">
@@ -190,6 +195,7 @@ export default {
       if (response.status < 400) {
         epSystems = response.data.data.map(ep => { return { value: ep.name, label: ep.name } })
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})        
+        epSystems.push({value: 'Other', label: 'Other (please specify)'})
       } else {
         this.$emit('get-data-fail', response.message)
       }
