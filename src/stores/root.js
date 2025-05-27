@@ -74,6 +74,12 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value', 'GET')
       return response
     },
+    // Get all patients of the required type (UPDATED Strapi)
+    async getPatientPool(patientType) {
+      const isAdult = patientType != 'Paediatric' 
+      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}&populate=scenarios`)
+      return response
+    },
     async getCategories() {
       if (this.categories.length == 0) {
         const response = await this.apiCall('categories', 'GET')

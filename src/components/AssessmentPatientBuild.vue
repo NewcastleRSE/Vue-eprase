@@ -13,6 +13,9 @@
 
 export default {
   name: 'AssessmentPatientBuild',
+  props: {
+    isActive: Boolean
+  },
   computed: {
     
   },

@@ -24,7 +24,7 @@
       :messages="{required: 'Select an option'}" 
       :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
     />
-    <RadiogroupElement v-if="selectionData.assessmentOption != 'new'" name="assessmentId"
+    <RadiogroupElement v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" name="assessmentId"
       :label="embolden('ePrescribing system', true)"      
       :items="listQualifyingAssessments"
       :messages="{required: 'Select an option'}" 
@@ -47,8 +47,24 @@ const ASSESSMENT_STATES = [
 
 export default {
   name: 'AssessmentSelection',
+  props: {
+    isActive: {
+      type: Boolean,
+      value: false,
+      required: true
+    }
+  },
+  watch: {
+    isActive(newVal, oldVal) { 
+      console.debug('isActive() watcher - new value', newVal, 'old value', oldVal)
+      if (newVal === false) {
+        // User has moved away => save the info
+        this.saveAssessmentForInstitution()
+      }  
+    }
+  },
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'saveAssessmentForInstitution']),
     selectionData() {
       return this.assessmentData
     },
@@ -86,7 +102,7 @@ export default {
   },
   mounted() {
     console.group('AssessmentSelection mounted()')
-    console.log('All possible assessments', this.allPossibleAssessments)
+    console.debug('All possible assessments', this.allPossibleAssessments)
     console.groupEnd()
   }
 }

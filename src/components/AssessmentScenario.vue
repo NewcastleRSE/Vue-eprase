@@ -11,6 +11,9 @@
 
 export default {
   name: 'AssessmentScenario',
+  props: {
+    isActive: Boolean
+  },
   computed: {
     
   },

@@ -40,11 +40,11 @@
               }" />
           </FormSteps>
           <FormElements>            
-            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
-            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" />
-            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" @get-data-fail="reportError" />
-            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" @get-data-fail="reportError" />
-            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" @get-data-fail="reportError" />
+            <AssessmentIntro name="epraseIntroEl" v-show="activeStep == 0" :isActive="activeStep == 0" />
+            <AssessmentSelection name="selectAssessmentEl" v-show="activeStep == 1" :isActive="activeStep == 1" />
+            <AssessmentSystem name="systemInfoEl" v-show="activeStep == 2" :isActive="activeStep == 2" @get-data-fail="reportError" />
+            <AssessmentPatientBuild name="patientBuildEl" v-show="activeStep == 3" :isActive="activeStep == 3" @get-data-fail="reportError" />
+            <AssessmentScenario name="scenarioEl" v-show="activeStep == 4" :isActive="activeStep == 4" @get-data-fail="reportError" />
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -115,16 +115,13 @@ export default {
   methods: {      
     nextStep(toStep) {
       console.group('nextStep()')
-      console.debug('Next step', toStep.index, 'current', this)
-      // console.debug('Validating...')
-      // this.formSteps.validate().then(async (args) => {
-      //   console.debug('Validation result', args)
-      // })
+      console.debug('Next step', toStep.index)      
+      console.debug(this.allFormData)
       console.groupEnd()
     }, 
     selectStep(active, previous) {
       console.group('selectStep()')
-      console.debug('Active step', active, 'previous', previous)
+      console.debug('Active step', active.index, 'previous', previous.index)
       this.activeStep = active.index      
       console.groupEnd()
     },

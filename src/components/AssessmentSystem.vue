@@ -160,6 +160,9 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 
 export default {
   name: 'AssessmentSystem',    
+  props: {
+    isActive: Boolean
+  },
   computed: {
     ...mapState(rootStore, ['getEpSystems', 'getClinicalAreas', 'getHighRiskMeds']),
     ...mapState(assessmentStore, ['assessmentData', 'resetSystemData']),     

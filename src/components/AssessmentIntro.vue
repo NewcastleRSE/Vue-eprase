@@ -52,6 +52,9 @@
 
 export default {
   name: "AssessmentIntro",
+  props: {
+    isActive: Boolean
+  },
   mounted() {
     console.group('AssessmentIntro mounted hook')
     console.groupEnd()

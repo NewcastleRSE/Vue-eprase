@@ -29,3 +29,13 @@ export function getFormattedDate(time) {
 export function usernameFromEmail(email) {
   return email.split('@').shift()
 }
+
+export function shuffle(a) {
+  // Durstenfeld shuffle in-place - see https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  console.debug('List before shuffle', a)
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  console.debug('List after shuffle', a)
+}
