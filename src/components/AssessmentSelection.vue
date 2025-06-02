@@ -96,7 +96,7 @@ export default {
         default: validCriteria = ASSESSMENT_STATES; break;
       }
       return this.allPossibleAssessments.filter(assessment => validCriteria.includes(assessment.state)).map(assessment => {
-        return { value: assessment.id, label: `${assessment['system'].ep_service} (${assessment.patient_type})` } 
+        return { value: assessment.documentId, label: `${assessment['system'].ep_service} (${assessment.patient_type})` } 
       })
     }
   },
