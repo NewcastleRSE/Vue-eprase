@@ -48,7 +48,9 @@ export const assessmentStore = defineStore('assessment', {
       const hospital = authenticationStore().hospital
       const response = await rootStore().apiCall(`assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=system&populate=patients`, 'GET')
       if (response.status < 400) {
-        this.$patch({ allPossibleAssessments: response.data.data })
+        console.debug('Response data from fetch assessments', response.data.data, 'this before', this)
+        this.$patch((state) => { state.allPossibleAssessments = response.data.data })
+        console.debug('this after', this)
         return true
       } else {
         return response.message
@@ -62,8 +64,34 @@ export const assessmentStore = defineStore('assessment', {
     async saveAssessmentForInstitution() {
 
       console.group('saveAssessmentForInstitution()')
+      console.debug('Auth store values', authenticationStore())
+
+      let ret = false
+
+      if (this.assessmentData.assessmentId == null) {
+        const response = await rootStore().apiCall('assessments', 'POST', {
+          data: {
+            state: this.assessmentData.assessmentState,
+            patient_type: this.assessmentData.patientType,
+            hospital: authenticationStore().hospital,
+            institution: {
+              connect: [authenticationStore().orgDocId]
+            }
+          }
+        })
+        if (response.status < 400) {
+          console.debug('Save assessment response is', response)
+          this.$patch((state) => { state.assessmentData.assessmentId = response.data.data.documentId })
+          ret = true
+        } else {
+          ret = response.message
+        }
+      } else {
+        ret = 'Cannot save new assessment as have existing ID', this.assessmentId
+      } 
 
       console.groupEnd()
+      return ret
 
     },
     async patientBuildList() {

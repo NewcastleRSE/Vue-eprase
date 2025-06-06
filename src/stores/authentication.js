@@ -10,6 +10,7 @@ export const authenticationStore = defineStore('authentication', {
     email: null, 
     institutionId: null,
     hospital: null,
+    orgDocId: null,
     orgCode: null,
     orgName: null,
     trust: null,
@@ -47,6 +48,7 @@ export const authenticationStore = defineStore('authentication', {
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,
+          orgDocId: instRes.data.institution.documentId,
           orgCode: instRes.data.institution.institution_code,
           orgName: instRes.data.institution.name,
           trust: instRes.data.institution.trust_type

@@ -1,3 +1,7 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
 export function calcPercentage(num, total) {
   return total !== 0 ? ((num / total) * 100).toFixed(1) : 0
 }
@@ -24,6 +28,12 @@ export function prependZero(month) {
 
 export function getFormattedDate(time) {
   return new Date(time * 1000).toLocaleDateString("en-GB")
+}
+
+export function isoToUkDate(iso) {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+  return dayjs(iso).tz('Europe/London').format('DD-MM-YYYY HH:mm:ss');
 }
 
 export function usernameFromEmail(email) {

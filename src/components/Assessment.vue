@@ -40,11 +40,25 @@
               }" />
           </FormSteps>
           <FormElements>            
-            <AssessmentIntro name="epraseIntroEl" v-show="activeStep == 0" :isActive="activeStep == 0" />
-            <AssessmentSelection name="selectAssessmentEl" v-show="activeStep == 1" :isActive="activeStep == 1" />
-            <AssessmentSystem name="systemInfoEl" v-show="activeStep == 2" :isActive="activeStep == 2" @get-data-fail="reportError" />
-            <AssessmentPatientBuild name="patientBuildEl" v-show="activeStep == 3" :isActive="activeStep == 3" @get-data-fail="reportError" />
-            <AssessmentScenario name="scenarioEl" v-show="activeStep == 4" :isActive="activeStep == 4" @get-data-fail="reportError" />
+            <AssessmentIntro name="epraseIntroEl" v-show="activeStep == 0" 
+              :isActive="activeStep == 0" 
+              :stepDir="stepDir" />
+            <AssessmentSelection name="selectAssessmentEl" v-show="activeStep == 1" 
+              :isActive="activeStep == 1" 
+              :stepDir="stepDir" 
+              @save-data-fail="reportError" />
+            <AssessmentSystem name="systemInfoEl" v-show="activeStep == 2" 
+              :isActive="activeStep == 2"
+              :stepDir="stepDir"
+              @get-data-fail="reportError" />
+            <AssessmentPatientBuild name="patientBuildEl" v-show="activeStep == 3" 
+              :isActive="activeStep == 3" 
+              :stepDir="stepDir" 
+              @get-data-fail="reportError" />
+            <AssessmentScenario name="scenarioEl" v-show="activeStep == 4" 
+              :isActive="activeStep == 4" 
+              :stepDir="stepDir" 
+              @get-data-fail="reportError" />
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -61,7 +75,7 @@
 
 <script>
 
-import { mapState, mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { assessmentStore } from '../stores/assessment'
 import AssessmentIntro from './AssessmentIntro'
@@ -79,10 +93,10 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapStores(assessmentStore),
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution']),
     allFormData: {
       get() {        
-        return assessmentStore().assessmentData
+        return this.assessmentData
       }, 
       set(newdata) {
       }
@@ -109,7 +123,8 @@ export default {
     return {   
       assessmentComplete: false,  
       allAssessments: [],
-      activeStep: 0
+      activeStep: 0,
+      stepDir: 1
     }
   },
   methods: {      
@@ -122,7 +137,8 @@ export default {
     selectStep(active, previous) {
       console.group('selectStep()')
       console.debug('Active step', active.index, 'previous', previous.index)
-      this.activeStep = active.index      
+      this.activeStep = active.index 
+      this.stepDir = active.index - previous.index     
       console.groupEnd()
     },
     reportError(message) {
@@ -131,7 +147,7 @@ export default {
   },
   async mounted() {
     console.group('Assessment mounted hook')
-    const instResponse = await assessmentStore().getAssessmentsForInstitution()
+    const instResponse = await this.getAssessmentsForInstitution()
     if (instResponse !== true) {      
       this.reportError(instResponse)
     }
