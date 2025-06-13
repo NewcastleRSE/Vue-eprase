@@ -1,41 +1,58 @@
 import { defineStore } from 'pinia'
 import axios from "axios"
-import { jwtDecode } from 'jwt-decode'
+
+const API = process.env.BASE_URL
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
     userId: null,
+    email: null, 
     institutionId: null,
+    hospital: null,
+    orgDocId: null,
     orgCode: null,
     orgName: null,
     trust: null,
     token: null
   }),
-  persist: true,
-  getters: {   
-    isLoggedIn: (state) => {
-      if (state.user && state.userId && state.institutionId && state.token) {
-        // Check token expiry date
-        const decodedToken = jwtDecode(state.token)
-        return decodedToken && (decodedToken.exp * 1000) > new Date().getTime()
-      }
-      return false
+  getters: {
+    authTokenHeader() {
+      return { 'Authorization': `Bearer ${this.token}` }
     }
   },
+  persist: true, 
   actions: {
-    async login(username, password) {
+    async login(identifier, password) {
 
       let ret = {}
+      const payload = { identifier, password }
 
       console.group('login()')
-      console.debug('Username', username, 'password', password)
+      console.debug('Data payload', payload)
 
       try {
-        const user = await axios.post('auth/signin', { username, password })
-        const institutionDetails = await this.getInstitutionDetails(user.data.institution_id)
-        console.debug('User', user, 'institution details', institutionDetails)
-        this.storeUserData(user, institutionDetails)
+        // NOTE: this uses the standard authentication pathway which doesn't restrict institutions to one logged-in user at a time
+        // Will need to develop a plugin to do the signin in order to implement this - David 21/03/2025
+        const signinRes = await axios.post(API + 'auth/local', payload)
+        const userDetails = signinRes.data
+        console.debug('User details from signin', userDetails)
+        this.$patch({token: signinRes.data.jwt})  // Store the JWT
+
+        console.debug('Determining user institution...')
+        const instRes = await axios.get(`${API}users/me?populate=institution`, { headers: this.authTokenHeader }) 
+        
+        this.$patch({
+          user: userDetails.user.username,
+          userId: userDetails.user.id,
+          email: userDetails.user.email,
+          institutionId: instRes.data.institution.id,
+          hospital: userDetails.user.hospital,
+          orgDocId: instRes.data.institution.documentId,
+          orgCode: instRes.data.institution.institution_code,
+          orgName: instRes.data.institution.name,
+          trust: instRes.data.institution.trust_type
+        })
         ret =  { status: 200, data: this.userId }        
       } catch (err) {        
         ret = this.triageError(err)      
@@ -51,23 +68,39 @@ export const authenticationStore = defineStore('authentication', {
       localStorage.clear()
     },
     logout() {
-
       console.group('logout()')
-
       this.clear()
-
       console.groupEnd()
     },
-    async signup(username, institution, email, password) {
+    async isLoggedIn() {
 
-      let ret = {}
+      let ret = false
 
-      console.group('signup()')
-      console.debug('Username', username, 'institution', institution, 'email', email, 'password', password)
+      console.group('isLoggedIn()')
 
       try {
-        await axios.post('auth/signup/user', { username, institution, email, password, role:['user'] })
-        ret = { status: 'ok', data: '' }
+        const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
+        ret = true
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async signup(username, institution, hospital, email, password) {
+
+      let ret = {}
+      const payload = { username, institution, hospital, email, password }
+      
+      console.group('signup()')
+      console.debug('Data payload', payload)
+
+      try {
+        const signupRes = await axios.post('auth/local/register', payload)        
+        ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
       }
@@ -76,44 +109,7 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return ret
-    },    
-    async checkIsAdminUser(userId) {
-
-      console.group('checkIsAdminUser()')
-
-      userId = userId || this.userId
-      console.debug('User ID', userId)
-      if (!userId) return false
-
-      try {
-        const res = await axios.get('auth/userIsAdmin?USER_ID=' + userId, { headers: { 'Authorization': 'Bearer ' + this.token } })
-        console.debug('Admin user', res.data)
-        console.groupEnd()
-        return res.data
-      } catch (err) {
-        console.error('Error checking if user is admin:', err)
-        console.groupEnd()
-        return false
-      }
-    },
-    async getInstitutionDetails(institutionId) {
-
-      console.group('getInstitutionDetails()')
-
-      institutionId = institutionId || this.institutionId
-      console.debug('Institution ID', institutionId)
-
-      try {
-        const res = await axios.get('auth/institutionDetails?institutionId=' + institutionId)
-        console.debug('Details', res.data)
-        console.groupEnd()
-        return res.data
-      } catch (err) {
-        console.error('Error getting user institution details:', err)
-        console.groupEnd()
-        return false
-      }
-    },
+    },        
     triageError(err) {
 
       console.group('triageError()')
@@ -123,7 +119,7 @@ export const authenticationStore = defineStore('authentication', {
       if (err.response) {
         console.debug('err.response set')
         console.debug(err.response)
-        payload = { status: err.response.status, message: err.response.data.message || err.response.data }
+        payload = { status: err.response.status, message: err.response.data.error.message || err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
         console.debug(err.request)
@@ -131,76 +127,13 @@ export const authenticationStore = defineStore('authentication', {
       } else {
         console.debug('Catch-all')
         console.error(err)
-        payload =  { status: 500, message: err }
+        payload =  { status: err.status, message: err.message }
       }
 
       console.debug('Payload', payload)
       console.groupEnd()
 
       return payload
-    },
-    storeUserData(user, institution) {
-
-      console.group('storeUserData()')
-      console.debug('User data', user.data, 'institution', institution)
-
-      const csPayload = {
-        user: user.data.username,
-        userId: user.data.user_id,
-        institutionId: user.data.institution_id,
-        orgCode: institution.orgCode,
-        orgName: institution.orgName,
-        trust: institution.trust,
-        token: user.data.jwt.accessToken
-      }
-
-      console.debug('State before update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
-
-      this.$patch(csPayload)      
-
-      console.debug('State after update : ', this.userId, this.user, this.institutionId, this.orgCode, this.orgName, this.trust, this.token)
-      console.groupEnd()
-    },
-    // User management methods, only accessible to an admin
-    async findUsers(identifier, institution_id) {
-      try {
-        const params = new URLSearchParams()
-        if (identifier) {
-          params.set('identifier', identifier)
-        }
-        if (institution_id) {
-          params.set('institution_id', institution_id)
-        }
-        const query = params.toString()
-        const res = await axios.get('auth/findUsers?' + query, { headers: { 'Authorization': 'Bearer ' + this.token } })
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    async updateUser(id, email, password, enable, institution_id) {
-      try {
-        const res = await axios.post('auth/updateUser', 
-          { id, email, password, enable, institution_id }, 
-          { headers: { 'Authorization': 'Bearer ' + this.token, 'Content-Type': 'multipart/form-data' } }
-        )
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    async deleteUser(id) {
-      try {
-        const res = await axios.delete('auth/deleteUser', 
-          { headers: { 'Authorization': 'Bearer ' + this.token }, params: { id: id } }
-        )
-        return { status: res.status, data: res.data }
-      } catch (err) {
-        this.triageError(err)
-      }
-    },
-    isValidNHSEmail(value) {
-      value.match(/^[a-zA-Z0-9-.]+@([a-z]+.|)nhs.(uk|net)+$/)
     }
   }
 })

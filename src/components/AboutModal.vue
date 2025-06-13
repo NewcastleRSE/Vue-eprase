@@ -29,7 +29,7 @@
 
 <script>
 
-import { mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import GenericModal from './GenericModal'
 
@@ -39,11 +39,11 @@ export default {
     GenericModal
   },
   computed: {
-    ...mapStores(rootStore)
+    ...mapState(rootStore, ['audit'])
   },
   methods: {
     close() {
-      rootStore().audit('View about', '/assessmentintro')
+      this.audit('View about', '/assessmentintro')
     }
   }
 }

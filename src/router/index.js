@@ -5,6 +5,7 @@ import AppWelcome from "../components/AppWelcome"
 import AppLogin from "../components/AppLogin"
 import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
+import Assessment from "../components/Assessment"
 import AssessmentIntro from "../components/AssessmentIntro"
 import AssessmentSystem from "../components/AssessmentSystem"
 import AssessmentPatients from "../components/AssessmentPatients"
@@ -14,12 +15,18 @@ import AssessmentResults from "../components/AssessmentResults"
 import UserManager from "../components/UserManager"
 import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
+import VueformTest from "../components/VueformTest"
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "/login/:loggedOut?",
+      path: "/test",
+      name: "test",
+      component: VueformTest
+    },
+    {
+      path: "/login/:action?",
       name: "login",
       component: AppLogin,
     },
@@ -34,6 +41,10 @@ export const router = createRouter({
     {
       path: "/",
       component: AppWelcome,
+    },
+    {
+      path: "/assessment",
+      component: Assessment,
     },
     {
       path: "/assessmentintro",
@@ -74,31 +85,7 @@ export const router = createRouter({
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
-  ],
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    }
-    if (to.hash) {
-      return { selector: to.hash }
-    }
-    return { x: 0, y: 0 }
-  }
-})
-
-// Hook to disable browser back button (pretty desperate stuff)
-router.afterEach((to, from) => {
-
-  console.group('router.afterEach()')
-  console.debug('Navigated to', to, 'from', from)
-
-  console.debug('Replacing history state...')
-  history.replaceState(history.state, '', to.fullPath)
-  console.debug('Assign onpopstate handler...')
-  window.onpopstate = () => history.go(1)
-
-  console.debug('Done')
-  console.groupEnd()
+  ]
 })
 
 // Hook to ensure user logged in for all non-public pages
@@ -107,36 +94,30 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  const auth = authenticationStore()
-  const publicPages = ['/', '/login', '/failedlogin', '/register', '/requestpassword', '/resetpassword', '/instructions', '/assessmentcontent', '/categorytable']
-  const adminPages = ['/adminhome']
+  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword']
   const authRequired = !publicPages.includes(to.path)
-  const adminRequired = adminPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
-  const loggedIn = auth.isLoggedIn
-  if (!loggedIn) {
-    // Clear all local storage, e.g. sessions where JWT has expired
-    auth.clear()
+  const loggedInRes = await authenticationStore().isLoggedIn()
+  if (loggedInRes === false) {
+    // Clear all local storage, e.g. wipe sessions with expired JWTs
+    authenticationStore().clear()
   }
-  console.debug('Logged in user', loggedIn)
+  console.debug('Logged in user', loggedInRes)
 
-  const isAdmin = await (async () => { return await auth.checkIsAdminUser() })()
-  console.debug('Admin required', adminRequired, 'user is admin', isAdmin)
-
-  if (adminRequired && !isAdmin) {
-
-    console.debug('Routing to login page for admin')
-    console.groupEnd()
-
-    return next('/login?requiresAdmin=1')
-
-  } else if (authRequired && !loggedIn) {
+  if (authRequired && loggedInRes === false) {
 
     console.debug('Routing to login page...')
     console.groupEnd()
 
     return next('/login')
+
+  } else if (to.path == '/' && loggedInRes === true) {
+
+    console.debug('Routing logged in user to assessment page, skip welcome')
+    console.groupEnd()
+
+    return next('/assessment')
 
   } else {
 

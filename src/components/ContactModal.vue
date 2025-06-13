@@ -5,7 +5,7 @@
     <ul class="list-group">      
       <li class="list-group-item">
         <i class="bi bi-envelope pe-2"></i>
-        nuth.eprase@nhs.net
+        <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
       </li>     
     </ul>
   </GenericModal>
@@ -14,7 +14,7 @@
 <script>
 
 import GenericModal from './GenericModal'
-import { mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 
 export default {
@@ -23,11 +23,11 @@ export default {
     GenericModal
   },
   computed: {
-    ...mapStores(rootStore)
+    ...mapState(rootStore, ['audit'])
   },
   methods: {
     close() {
-      rootStore().audit('View contact', '/assessmentintro')
+      this.audit('View contact', '/assessmentintro')
     }
   }
 }

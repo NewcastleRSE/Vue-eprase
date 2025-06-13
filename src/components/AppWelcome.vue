@@ -2,25 +2,37 @@
   <main class="pt-5">
     <AppLogo cls="banner" />
     <div class="pb-3">
-      <h1>Welcome to ePRaSE 2024</h1>
+      <h1>Welcome to ePRaSE {{ year }}</h1>
       <p class="service-description mx-auto">
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
-      <div class="py-4" v-if="appOpen">
-        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
-          Login
-        </button>
-        <button v-if="isLoggedIn" type="button" class="btn btn-lg btn-primary me-3" @click="onResumeClick">
-          Resume assessment
-        </button>
-        <button v-if="!isLoggedIn" type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
-          Register
-        </button>
-      </div>
-      <div v-if="!appOpen">
-        <span class="fw-bold">This application is currently closed</span>
-      </div>
+        <div class="row w-50 mx-auto">
+          <Vueform>          
+            <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+              <ButtonElement name="login" full
+                :columns="4" 
+                :add-class="'me-2'" 
+                @click="onLoginClick">
+                <i class="bi bi-person-circle me-2"></i>Log in
+              </ButtonElement>            
+              <ButtonElement name="register" full 
+                :columns="4" 
+                :add-class="'mx-2'" 
+                :disabled="$route.query.action === 'registered'" 
+                @click="onRegisterClick">
+                <i class="bi bi-person-fill-add me-2"></i>Register
+              </ButtonElement>
+              <ButtonElement name="forgotpassword" full 
+                :columns="4" 
+                :add-class="'ms-2'" 
+                :disabled="$route.query.action === 'registered'" 
+                @click="onForgotPasswordClick">
+                <i class="bi bi-key-fill me-2"></i>Forgot password?
+              </ButtonElement>
+            </GroupElement>
+          </Vueform>  
+        </div>
     </div>
     <div class="row w-75 mx-auto">
       <div class="col p-1">
@@ -43,7 +55,6 @@
 import { mapState } from 'pinia'
 import AppLogo from "./AppLogo"
 import { appSettingsStore } from '../stores/appSettings'
-import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: "AppWelcome",
@@ -51,8 +62,7 @@ export default {
     AppLogo
   },
   computed: {
-    ...mapState(appSettingsStore, ['version', 'appOpen']),
-    ...mapState(authenticationStore, ['isLoggedIn'])
+    ...mapState(appSettingsStore, ['version', 'year'])
   },
   methods: {
     onLoginClick() {
@@ -61,8 +71,8 @@ export default {
     onRegisterClick() {
       this.$router.push('/register')
     },
-    onResumeClick() {
-      this.$router.push('/assessmentintro')
+    onForgotPasswordClick() {
+      this.$router.push('/forgotpassword')
     }
   }
 }

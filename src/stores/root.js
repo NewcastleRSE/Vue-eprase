@@ -34,7 +34,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = { headers: { Authorization: `Bearer ${auth.token}` } }
+      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
 
       try {
         if (method == 'GET') {
@@ -53,13 +53,31 @@ export const rootStore = defineStore('root', {
       console.groupEnd()
 
       return ret
-    },
-    async getAssessmentById(assessment_id) {
-      const response = await this.apiCall('resultByAssessmentId?ID=' + assessment_id, 'GET')
+    },    
+    // Get list of institutions (UPDATED Strapi)
+    async getInstitutions() {
+      const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
-    async getInstitutions() {
-      const response = await this.apiCall('auth/institutions', 'GET')
+    // Get list of ePrescribing system names (UPDATED Strapi)
+    async getEpSystems() {
+      const response = await this.apiCall('ep-services?fields[0]=name&sort[0]=name:asc', 'GET')
+      return response
+    },
+    // Get list of high risk meds (UPDATED Strapi)
+    async getHighRiskMeds() {
+      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value', 'GET')
+      return response
+    },
+    // Get list of clinical areas (UPDATED Strapi)
+    async getClinicalAreas() {
+      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value', 'GET')
+      return response
+    },
+    // Get all patients of the required type (UPDATED Strapi)
+    async getPatientPool(patientType) {
+      const isAdult = patientType != 'Paediatric' 
+      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}&populate=scenarios`)
       return response
     },
     async getCategories() {
@@ -180,17 +198,11 @@ export const rootStore = defineStore('root', {
       return(response)
     },
     async audit(action, uri) {
-      const response = await this.apiCall('audit', 'POST', { action, uri })
+      const response = await this.apiCall('audits', 'POST', { data: { action, uri } })
       if (response.status >= 400) {
         console.error(response.message)
       }
-    },
-    async failedLoginAudit(action, uri) {
-      const response = await this.apiCall('failedLoginAudit', 'POST', { action, uri })
-      if (response.status >= 400) {
-        console.error(response.message)
-      }
-    },   
+    },    
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
     storeAssessmentComplete(complete) { this.assessmentComplete = complete },    

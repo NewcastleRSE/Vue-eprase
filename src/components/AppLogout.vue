@@ -2,17 +2,17 @@
 
 <script>
 
-import { mapStores } from 'pinia'
+import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: "AppLogout",
   computed: {
-    ...mapStores(authenticationStore)
+    ...mapState(authenticationStore, ['logout'])
   },
   mounted() {
-    authenticationStore().logout()
-    this.$router.push('/login?loggedOut=1')
+    this.logout()
+    this.$router.push('/login?action=loggedOut')
   }
 }
 </script>

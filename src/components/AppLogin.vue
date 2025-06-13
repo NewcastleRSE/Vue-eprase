@@ -1,139 +1,134 @@
 <template>
   <main>
     <div class="loginpage">
+
       <AppLogo cls="banner" />
-      <h3 v-if="$route.query.requiresAdmin === '1'" class="text-danger">You need to be an admin to access this page</h3>
-      <h3 v-if="$route.query.loggedOut === '1'" class="text-danger">You have successfully logged out</h3>
+
+      <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
+      <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
+      <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
+
       <h1 class="mt-4">Log-in to ePRaSE</h1>
+
       <p class="pb-2">
-        Please enter your login details below, or click 'Register' to create a new user account. You will need a valid
+        Please enter your login details below, or click 'Register' to create a new user account.<br>You will need a valid
         <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
       </p>
 
-      <Form ref="loginForm" v-slot="{ meta: formMeta }" :validation-schema="validationSchema">
-        <div v-if="serverError" class="mb-4 row">
-          <p class="text-danger text-center col-sm-12">Your login has failed, please check that you are using the correct email and address and password. 
-            If your login details continue to fail, please contact the ePRaSE team at: <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
-          </p>
-        </div>
-        <div class="mb-4 row">
-          <label for="email" class="col-sm-4 form-label">E-mail Address:</label>
-          <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.email" name="email">
-              <input v-bind="field" id="email" type="email" class="form-control"
-                :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
-            </Field>
-          </div>
-          <ErrorMessage name="email" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
-            {{ message }}
-          </ErrorMessage>
-        </div>
-        <div class="mb-4 row">
-          <label for="password" class="col-sm-4 form-label">Password:</label>
-          <div class="col-sm-8">
-            <Field v-slot="{ field, meta }" v-model="user.password" name="password">
-              <input v-bind="field"  id="password"  type="password" class="form-control"
-                :class="meta.dirty ? (meta.valid ? 'is-valid' : 'is-invalid') : ''" />
-            </Field>
-          </div>
-          <ErrorMessage name="password" as="div" class="mt-2 text-danger text-center col-sm-12" v-slot="{ message }">
-            {{ message }}
-          </ErrorMessage>
-        </div>
-        <div class="mb-4">
-          <button type="button" :disabled="!formMeta.valid" class="btn btn-lg btn-primary me-3" @click="onLoginClick">
-            Login
-          </button>
-          <button type="reset" class="btn btn-lg btn-primary me-3" @click="onResetClick">
-            Cancel
-          </button>
-          <button v-if="$route.query.loggedOut != '1'" type="button" class="btn btn-lg btn-primary" @click="onRegisterClick">
-            Register
-          </button>         
-        </div>
-      </Form>
-      <p>
-        If you have forgotten your password, please contact the ePRaSE team at:
-        <a href="mailto:nuth.eprase@nhs.net">nuth.eprase@nhs.net</a>
-      </p>
-
-      <!--<p><a routerLink="">Forgotten your Password? <router-link to="/requestpassword">Click here</router-link></a><br/><br/></p>-->
-      <!--<p id="email-link">If you are having difficulty logging in after attempting a password reset, please send an email to <a href="mailto:eprase@newcastle.onmicrosoft.com">eprase@newcastle.onmicrosoft.com</a></p>-->
-
+      <div class="mb-4">
+        <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
+          <TextElement name="email" placeholder="Valid NHS email address"
+            :label="embolden('Email address', true)" 
+            :debounce="500" 
+            :messages="{required: 'Email is required'}" 
+            :rules="['required', $vueform.rules.nhsEmail]" />
+          <TextElement name="password" autocomplete="on"
+            :label="embolden('Password', true)"
+            :input-type="showPassword ? 'text' : 'password'"            
+            :debounce="500" 
+            :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
+            :rules="['required', 'between:6,50']">
+            <template #addon-after="scope">
+              <i style="cursor:pointer" @click="togglePasswordVisibility"
+                :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
+                :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
+            </template>
+          </TextElement>
+          <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+            <ButtonElement name="submit" full
+              :columns="3" 
+              :add-class="'me-2'" 
+              :submits="true">
+              <i class="bi bi-person-circle me-2"></i>Log in
+            </ButtonElement>
+            <ButtonElement name="reset" full 
+              :columns="3" 
+              :add-class="'mx-2'" 
+              :resets="true">
+              <i class="bi bi-x-circle-fill me-2"></i>Clear form
+            </ButtonElement>
+            <ButtonElement name="register" full 
+              :columns="3" 
+              :add-class="'mx-2'" 
+              :disabled="$route.query.action === 'registered'" 
+              @click="onRegisterClick">
+              <i class="bi bi-person-fill-add me-2"></i>Register
+            </ButtonElement>
+            <ButtonElement name="forgotpassword" full 
+              :columns="3" 
+              :add-class="'ms-2'" 
+              :disabled="$route.query.action === 'registered'" 
+              @click="onForgotPasswordClick">
+              <i class="bi bi-key-fill me-2"></i>Forgot password?
+            </ButtonElement>
+          </GroupElement>
+        </Vueform>
+      </div>
     </div>
   </main>
 </template>
 
 <script>
-import { mapStores } from 'pinia'
-import AppLogo from "./AppLogo"
-import { Form, Field, ErrorMessage } from 'vee-validate'
-import { rootStore } from '../stores/root'
+import { mapState } from 'pinia'
+import AppLogo from './AppLogo'
+import { usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
+import { rootStore } from '../stores/root'
 
 export default {
   name: "AppLogin",
   components: {
-    AppLogo,
-    Form,
-    Field,
-    ErrorMessage,
+    AppLogo
   },
   computed: {
-    ...mapStores(rootStore, authenticationStore)
+    ...mapState(authenticationStore, ['login', 'clear']),
+    ...mapState(rootStore, ['audit'])
   },
   data() {
     return {
-      validationSchema: {
-        'email': 'required|nhsEmail',
-        'password': 'required|lengthBetween:6,50'
-      },
       user: {
         email: '',
         username: '',
         password: '',
       },
-      serverError: false,
-      loggedOut: false
+      showPassword: false,
+      serverError: false
     }
   },
   methods: {
-    onLoginClick() {
+    onLoginClick(form$) {
 
       console.group('onLoginClick()')
+      console.debug('Login form', form$)
 
       this.serverError = false
-
-      this.user.username = this.user.email.split('@').shift()
-      this.$refs.loginForm.validate().then(async (valid) => {
-        console.log('Form submission valid', valid)
-        if (valid) {
-          const username = this.user.username
-          const password = this.user.password
-          console.debug('Username', username, 'password', password)
-          const response = await this.authenticationStore.login(username, password)
-          if (response.status == 200) {
-            const userId = response.data
-            rootStore().audit('Successful login', '/login')            
-            const isAdmin = await this.authenticationStore.checkIsAdminUser(userId)
-            if (isAdmin) {
-              this.$router.push('/adminhome')
-            } else {
-              this.$router.push('/assessmentintro')
-            }     
-          } else { 
-            this.serverError = true
-            rootStore().failedLoginAudit('Failed login', '/login')
-          }              
+  
+      form$.validate().then(async () => {
+        if (!form$.hasErrors) {
+          // Do the signin
+          console.debug('Validation completed successfully')
+          const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
+          if (signinResponse.status < 400) {
+            console.debug('Successful signin')
+            await this.audit('login:' + this.user.email, '/login')
+            this.$router.push('/')
+          } else {
+            this.serverError = 'An error occured during signin:' + signinResponse.message
+            await this.audit('loginfail:' + this.user.email, '/login')
+            this.clear()
+          }
         }
-      })
+      })      
       console.groupEnd()
     },
-    onResetClick() {
-      this.$refs.loginForm.resetForm()
+    onForgotPasswordClick() {
+      this.$router.push('/forgotpassword')
     },
     onRegisterClick() {
       this.$router.push('/register')
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword
     }
   }
 }
