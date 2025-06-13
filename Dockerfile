@@ -1,8 +1,8 @@
 # build environment
-FROM node:20 as build
+FROM node:20 AS build
 WORKDIR /app
 ARG TARGET
-ENV PATH /app/node_modules/.bin:$PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
 RUN npm install --silent
 RUN npm install @vue/cli@5.0.8 -g
