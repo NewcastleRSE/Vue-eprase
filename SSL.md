@@ -78,3 +78,7 @@ Then copy it into the /client/certs directory.
 `mv eprase.nhs.uk-new.crt eprase.nhs.uk.crt`
 
 The certificate path is coded in the docker-compose.yml file.
+
+ #### Docker- Verify repository client with certificates
+
+https://docs.docker.com/engine/security/certificates/
