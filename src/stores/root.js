@@ -27,6 +27,7 @@ export const rootStore = defineStore('root', {
     async apiCall(url, method = 'POST', body = null) {
 
       console.group('apiCall()')
+      console.warn(process.env)
 
       if (!(method == 'GET' || method == 'POST')) {
         throw new Error(`API call using ${method} not implemented`)
