@@ -88,23 +88,20 @@
             questions.
           </div>
         </StaticElement>
-        <SelectElement name="penicillinDescription"
-          :label="embolden('How do you describe Penicillin V in your system?', true)"
-          :native="false"
-          :track-by="['label', 'value']"
+        <CheckboxgroupElement name="penicillinDescription"
+          :label="embolden('How do you describe Penicillin V in your system?', true)"        
           :items="[
-            { value: '', label: 'Select description...', disabled: true },
             { value: 'penicillin_v', label: 'Penicillin V' },
             { value: 'phenoxymethylpenicillin', label: 'Phenoxymethylpenicillin' },
             { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
             { value: 'other', label: 'Other' }
           ]"
-          :messages="{required: 'Penicillin description is required'}" 
-          :rules="['required']"        
+          :messages="{filled: 'Please select all that apply'}" 
+          :rules="['filled']"        
         />   
         <TextElement name="penicillinDescriptionOther"
-          :label="embolden('Your description', true)"
-          v-if="systemData.penicillinDescription == 'other'"
+          :label="embolden('Your additional description', true)"
+          v-if="systemData.penicillinDescription.includes('other')"
           :messages="{required: 'Additional description is required'}" 
           :rules="['required', 'fieldIsOther:system.penicillinDescription']"
           :debounce="500" />
@@ -161,7 +158,16 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 export default {
   name: 'AssessmentSystem',    
   props: {
-    isActive: Boolean
+    isActive: {
+      type: Boolean,
+      value: false,
+      required: true
+    },
+    stepDir: {
+      type: Number,
+      value: 1,
+      required: true
+    }
   },
   computed: {
     ...mapState(rootStore, ['getEpSystems', 'getClinicalAreas', 'getHighRiskMeds']),

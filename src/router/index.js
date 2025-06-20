@@ -6,14 +6,6 @@ import AppLogin from "../components/AppLogin"
 import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
 import Assessment from "../components/Assessment"
-import AssessmentIntro from "../components/AssessmentIntro"
-import AssessmentSystem from "../components/AssessmentSystem"
-import AssessmentPatients from "../components/AssessmentPatients"
-import AssessmentPatientDetails from "../components/AssessmentPatientDetails"
-import AssessmentScenarios from "../components/AssessmentScenarios"
-import AssessmentResults from "../components/AssessmentResults"
-import UserManager from "../components/UserManager"
-import AdminHome from "../components/AdminHome"
 import PrintablePdf from "../components/PrintablePdf"
 import VueformTest from "../components/VueformTest"
 
@@ -45,40 +37,7 @@ export const router = createRouter({
     {
       path: "/assessment",
       component: Assessment,
-    },
-    {
-      path: "/assessmentintro",
-      component: AssessmentIntro,
-    },
-    {
-      path: "/assessmentSystem",
-      component: AssessmentSystem,
-    },
-    {
-      path: "/assessmentpatients/:type?",
-      component: AssessmentPatients,
-    },
-    {
-      path: "/assessmentpatientdetails",
-      component: AssessmentPatientDetails,
-    },
-    {
-      path: "/assessmentscenarios",
-      component: AssessmentScenarios,
     },   
-    {
-      path: "/assessmentresults/:ID?",
-      name: "assessmentresults",
-      component: AssessmentResults
-    },    
-    {
-      path: "/adminhome",
-      component: AdminHome,
-    },  
-    {
-      path: "/usermanager",
-      component: UserManager,
-    },       
     {
       path: "/printablepdf",
       component: PrintablePdf,

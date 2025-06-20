@@ -18,7 +18,7 @@ const EMPTY_SYSTEM = {
   manResults: false,
   medHistory: false,
   diagnosisResults: false,
-  penicillinDescription: '',
+  penicillinDescription: [],
   penicillinDescriptionOther: '',
   penicillinResults: false,
   penicillinComment: '',

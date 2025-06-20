@@ -30,10 +30,13 @@ export function getFormattedDate(time) {
   return new Date(time * 1000).toLocaleDateString("en-GB")
 }
 
-export function isoToUkDate(iso) {
+export function isoToUkDate(iso, includeTime = false) {
   dayjs.extend(utc);
   dayjs.extend(timezone);
-  return dayjs(iso).tz('Europe/London').format('DD-MM-YYYY HH:mm:ss');
+  console.debug(iso, includeTime)
+  const ukd = dayjs(iso).tz('Europe/London').format(`DD-MM-YYYY${includeTime ? ' HH:mm' : ''}`)
+  console.debug(ukd)
+  return ukd
 }
 
 export function usernameFromEmail(email) {

@@ -32,6 +32,7 @@
           <th>ePrescribing system</th>
           <th>Patient type</th>
           <th>Assessment state</th>
+          <th>Created on</th>
           <th>Last update</th>
         </tr>
       </thead>
@@ -41,6 +42,7 @@
           <td>{{ assessment.system && assessment.system.ep_service ? assessment.system.ep_service : 'Not yet specified' }}</td>
           <td>{{ assessment.patient_type }}</td>
           <td>{{ assessment.state }}</td>
+          <td>{{ assessment.createdAt }}</td>
           <td>{{ assessment.updatedAt }}</td>
         </tr>
       </tbody>
@@ -80,7 +82,7 @@ export default {
   watch: {
     async isActive(newVal, oldVal) { 
       console.debug('isActive() watcher - new value', newVal, 'old value', oldVal)
-      if (newVal === false && stepDir == 1) {
+      if (newVal === false && this.stepDir == 1) {
         // User has moved away forwards in the dialogs => save the info
         const saveResponse = await this.saveAssessmentForInstitution()        
         if (saveResponse) {
@@ -141,7 +143,12 @@ export default {
         case 'continue': validCriteria = ASSESSMENT_STATES.slice(0, 3); break;
         default: validCriteria = ASSESSMENT_STATES; break;
       }      
-      return this.allPossibleAssessments.filter(assessment => validCriteria.includes(assessment.state))
+      const possibles = this.allPossibleAssessments.filter(assessment => validCriteria.includes(assessment.state)).map(a => Object.assign(a, {
+        createdAt: isoToUkDate(a.createdAt, false),
+        updatedAt: isoToUkDate(a.updatedAt, true)
+      }))
+      console.debug(possibles)
+      return possibles
     }
   },
   mounted() {
