@@ -33,7 +33,8 @@ export function getFormattedDate(time) {
 export function isoToUkDate(iso) {
   dayjs.extend(utc);
   dayjs.extend(timezone);
-  return dayjs(iso).tz('Europe/London').format('DD-MM-YYYY HH:mm:ss');
+  const ukd = dayjs(iso).tz('Europe/London').format(`DD-MM-YYYY${includeTime ? ' HH:mm' : ''}`)
+  return ukd
 }
 
 export function usernameFromEmail(email) {

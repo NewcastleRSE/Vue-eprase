@@ -27,34 +27,45 @@ const EMPTY_SYSTEM = {
   otherClinicalArea: ''
 }
 
+const EMPTY_DATA = {
+  assessmentId: null,
+  assessmentState: 'Not started',
+  assessmentOption: '',
+  institution: '',   
+  hospital: '',
+  epService: '',
+  otherEpService: '',
+  patientType: '',     
+  system: EMPTY_SYSTEM,
+  patients: []
+}
+
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
-    assessmentData: {
-      assessmentId: null,
-      assessmentState: 'Not started',
-      assessmentOption: '',
-      patientType: '',
-      institution: '',   
-      hospital: '',   
-      system: EMPTY_SYSTEM,
-      patients: []
-    },
+    assessmentData: EMPTY_DATA,
     allPossibleAssessments: []
   }),
-  persist: true, 
+  persist: true,   
   actions: {  
     async getAssessmentsForInstitution() {
       const instCode = authenticationStore().orgCode
       const hospital = authenticationStore().hospital
-      const response = await rootStore().apiCall(`assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=system&populate=patients`, 'GET')
+      const response = await rootStore().apiCall(`assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
       if (response.status < 400) {
-        console.debug('Response data from fetch assessments', response.data.data, 'this before', this)
+        console.debug('Response data from fetch assessments', response.data.data)
         this.$patch((state) => { state.allPossibleAssessments = response.data.data })
-        console.debug('this after', this)
         return true
       } else {
         return response.message
       }
+    },
+    reset() {
+      console.group('reset() on assessment store')
+      this.$patch((state) => {
+        state.assessmentData = EMPTY_DATA
+      })
+      console.debug(this.assessmentData)
+      console.groupEnd()
     },
     resetSystemData() {
       this.$patch((state) => {
@@ -68,7 +79,7 @@ export const assessmentStore = defineStore('assessment', {
 
       let ret = false
 
-      if (this.assessmentData.assessmentId == null) {
+      if (this.assessmentData.assessmentOption == 'new') {
         const response = await rootStore().apiCall('assessments', 'POST', {
           data: {
             state: this.assessmentData.assessmentState,
@@ -76,12 +87,22 @@ export const assessmentStore = defineStore('assessment', {
             hospital: authenticationStore().hospital,
             institution: {
               connect: [authenticationStore().orgDocId]
-            }
+            },
+            ep_service: {
+              connect: [this.assessmentData.epService]
+            },
+            other_ep_service: this.assessmentData.otherEpService
           }
         })
         if (response.status < 400) {
           console.debug('Save assessment response is', response)
-          this.$patch((state) => { state.assessmentData.assessmentId = response.data.data.documentId })
+          this.$patch((state) => { 
+            state.assessmentData = Object.assign(state.assessmentData, {
+              assessmentId: response.data.data.documentId,
+              hospital: authenticationStore().hospital,
+              institution: authenticationStore().orgDocId
+            })
+          })
           ret = true
         } else {
           ret = response.message
