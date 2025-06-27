@@ -42,8 +42,13 @@ const fieldIsOther = class extends Validator {
   check(value) {
     console.debug(this.otherField, this.form$.data)
     this.watch(this.otherField)
-    const otherVal = deepGet(this.form$.data, this.otherField.split('.'))
+    let otherVal = deepGet(this.form$.data, this.otherField.split('.'))    
     if (otherVal != null) {
+      console.debug(otherVal)
+      if (Object.keys(otherVal).includes('label')) {
+        // Select option is an object with keys 'label' and 'value'
+        otherVal = otherVal.label
+      }
       const otherArr = Array.isArray(otherVal) ? otherVal : [otherVal]
       return otherArr.includes('Other') || otherVal.includes('other')
     }

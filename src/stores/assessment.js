@@ -4,6 +4,13 @@ import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
 
+const ASSESSMENT_STATES = [
+  'Not started',
+  'System complete',
+  'Patient build complete',
+  'Scenarios complete'
+]
+
 const EMPTY_SYSTEM = {        
   epService: '',
   otherEpService: '',
@@ -33,7 +40,7 @@ const EMPTY_DATA = {
   assessmentOption: '',
   institution: '',   
   hospital: '',
-  epService: '',
+  epService: {},
   otherEpService: '',
   patientType: '',     
   system: EMPTY_SYSTEM,
@@ -43,7 +50,8 @@ const EMPTY_DATA = {
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
     assessmentData: EMPTY_DATA,
-    allPossibleAssessments: []
+    allPossibleAssessments: [],
+    assessmentStates: ASSESSMENT_STATES
   }),
   persist: true,   
   actions: {  
@@ -72,14 +80,15 @@ export const assessmentStore = defineStore('assessment', {
         state.assessmentData.system = EMPTY_SYSTEM
       })
     },
-    async saveAssessmentForInstitution() {
+    async selectAssessment() {
 
-      console.group('saveAssessmentForInstitution()')
-      console.debug('Auth store values', authenticationStore())
+      console.group('selectAssessment()')
 
       let ret = false
 
       if (this.assessmentData.assessmentOption == 'new') {
+        // New assessment
+        console.debug('New assessment => save data')
         const response = await rootStore().apiCall('assessments', 'POST', {
           data: {
             state: this.assessmentData.assessmentState,
@@ -89,7 +98,7 @@ export const assessmentStore = defineStore('assessment', {
               connect: [authenticationStore().orgDocId]
             },
             ep_service: {
-              connect: [this.assessmentData.epService]
+              connect: [this.assessmentData.epService.value]
             },
             other_ep_service: this.assessmentData.otherEpService
           }
@@ -107,8 +116,27 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = response.message
         }
-      } else {
-        ret = 'Cannot save new assessment as have existing ID', this.assessmentId
+      } else if (this.assessmentData.assessmentOption == 'continue') {
+        // Continuing existing assessment
+        console.debug('Continuing assessment', this.assessmentData.assessmentId, '=> patch in data')
+        const chosenAssessment = this.allPossibleAssessments.filter(a => a.documentId == this.assessmentData.assessmentId)
+        if (chosenAssessment.length > 0) {
+          this.$patch((state) => {
+            state.assessmentData = {
+              assessmentState: chosenAssessment.state,
+              epService: {
+                value: chosenAssessment.ep_service.documentId,
+                label: chosenAssessment.epService.name
+              },
+              otherEpService: chosenAssessment.other_ep_service,
+              hospital: authenticationStore().hospital,
+              institution: authenticationStore().orgDocId,
+              patientType: chosenAssessment.patient_type
+            }
+          })
+        } else {
+          ret = `Assessment with id ${this.assessmentData.assessmentId} not found in list of assessments for this institution/hospital`
+        }
       } 
 
       console.groupEnd()
@@ -117,16 +145,19 @@ export const assessmentStore = defineStore('assessment', {
     },
     async patientBuildList() {
 
+      let ret = false
+
       console.group('patientBuildList()')      
 
-      if (this.patients.length == 0) {
+      if (this.assessmentData.patients.length == 0) {
+        // Load any patient list 
         // Generate patient list
-        const response = await rootStore().getPatientPool(this.patientType)
+        const response = await rootStore().getPatientPool(this.assessmentData.patientType)
         if (response.status < 400) {
           const patientPool = response.data.data
           if (patientPool.length < appSettingsStore().assessmentNumPatients) {
             console.groupEnd()
-            return `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.patientType}`
+            return `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.patientType}`
           }
           // Get those whose scenarios include a required one
           const requiredPatients = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length > 0)
@@ -141,17 +172,25 @@ export const assessmentStore = defineStore('assessment', {
             requiredPatients.push(randomPool[num])
           }
           shuffle(requiredPatients)
-          this.patients = requiredPatients
-          console.debug('Generated new patient list', this.patients)
-          console.groupEnd()
-          return true
-        } else {
-          console.groupEnd()
-          return response.message
+          this.assessmentData.patients = requiredPatients
+          console.debug('Generated new patient list', this.assessmentData.patients)
+          // Save to assessment patient list
+          const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
+            data: {
+              patients: {
+                connect: this.assessmentData.patients.map(p => p.documentId)
+              }
+            }
+          })         
+          ret = response.status < 400 ? true : response.message
+        } else {          
+          ret = response.message
         }                
       } else {
         // Fetch existing patient list
       }
-    }
+      console.debug('Returning', ret)
+      console.groupEnd()
+    }    
   }
 })
