@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia'
+import humps from 'lodash-humps'
+import createHumps from 'lodash-humps/lib/createHumps'
+import { snakeCase } from 'lodash'
 import { shuffle } from '../helpers/utils'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
@@ -11,11 +14,9 @@ const ASSESSMENT_STATES = [
   'Scenarios complete'
 ]
 
-const EMPTY_SYSTEM = {        
-  epService: '',
-  otherEpService: '',
-  addEpService: '',
-  localEpServiceName: '',
+const EMPTY_SYSTEM = {          
+  addEpSystem: '',
+  localEpSystemName: '',
   epServiceImplemented: null,
   epServiceUpdated: null,
   numMaintainers: 1.0,
@@ -58,6 +59,10 @@ export const assessmentStore = defineStore('assessment', {
     async getAssessmentsForInstitution() {
       const instCode = authenticationStore().orgCode
       const hospital = authenticationStore().hospital
+      // Note: there are some redundant database calls in this store ('system' and 'patients' are retrieved separately) - the full call here was once:
+      // assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service&populate=system&populate=patients
+      // If anyone can enlighten me on the "Invalid Key Error 2" this reliably gives unless one of the 'populate' or 'filter' terms is removed I (David) would be interested
+      // Does not seems to matter which term goes, so it may be a Strapi bug or a query that's just too complex...
       const response = await rootStore().apiCall(`assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
@@ -119,21 +124,33 @@ export const assessmentStore = defineStore('assessment', {
       } else if (this.assessmentData.assessmentOption == 'continue') {
         // Continuing existing assessment
         console.debug('Continuing assessment', this.assessmentData.assessmentId, '=> patch in data')
-        const chosenAssessment = this.allPossibleAssessments.filter(a => a.documentId == this.assessmentData.assessmentId)
-        if (chosenAssessment.length > 0) {
+        const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == this.assessmentData.assessmentId)
+        if (chosenAssessments.length > 0) {
           this.$patch((state) => {
-            state.assessmentData = {
-              assessmentState: chosenAssessment.state,
+            state.assessmentData = Object.assign(state.assessmentData, {
+              assessmentState: chosenAssessments[0].state,
               epService: {
-                value: chosenAssessment.ep_service.documentId,
-                label: chosenAssessment.epService.name
+                value: chosenAssessments[0].ep_service.documentId,
+                label: chosenAssessments[0].ep_service.name
               },
-              otherEpService: chosenAssessment.other_ep_service,
+              otherEpService: chosenAssessments[0].other_ep_service,
               hospital: authenticationStore().hospital,
               institution: authenticationStore().orgDocId,
-              patientType: chosenAssessment.patient_type
-            }
+              patientType: chosenAssessments[0].patient_type
+            })
           })
+          // Retrieve system data
+          ret = true
+          const systemResponse = await this.systemBuild()
+          if (systemResponse !== true) {
+            ret = `Failed to retrieve system data, error ${systemResponse}`
+          } else {
+            // All ok, now retrieve patient list
+            const patientResponse = await this.patientListBuild()
+            if (patientResponse !== true) {
+              ret = `Failed to retrieve patient list, error ${patientResponse}`
+            }
+          }         
         } else {
           ret = `Assessment with id ${this.assessmentData.assessmentId} not found in list of assessments for this institution/hospital`
         }
@@ -143,51 +160,109 @@ export const assessmentStore = defineStore('assessment', {
       return ret
 
     },
-    async patientBuildList() {
+    async systemBuild() {
 
-      let ret = false
+      let ret = true
 
-      console.group('patientBuildList()')      
+      console.group('systemBuild()')
 
-      if (this.assessmentData.patients.length == 0) {
-        // Load any patient list 
-        // Generate patient list
-        const response = await rootStore().getPatientPool(this.assessmentData.patientType)
-        if (response.status < 400) {
-          const patientPool = response.data.data
-          if (patientPool.length < appSettingsStore().assessmentNumPatients) {
-            console.groupEnd()
-            return `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.patientType}`
-          }
-          // Get those whose scenarios include a required one
-          const requiredPatients = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length > 0)
-          const randomPool = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length == 0)
-          // All the required patients are included, choose correct number of additional non-required ones
-          const numRemaining = appSettingsStore().assessmentNumPatients - requiredPatients.length
-          const randoms = new Set()
-          while (randoms.size !== numRemaining) {
-            randoms.add(Math.floor(Math.random() * randomPool.length))
-          }          
-          for (const num of randoms) {
-            requiredPatients.push(randomPool[num])
-          }
-          shuffle(requiredPatients)
-          this.assessmentData.patients = requiredPatients
-          console.debug('Generated new patient list', this.assessmentData.patients)
-          // Save to assessment patient list
-          const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
-            data: {
-              patients: {
-                connect: this.assessmentData.patients.map(p => p.documentId)
-              }
-            }
-          })         
-          ret = response.status < 400 ? true : response.message
-        } else {          
-          ret = response.message
-        }                
+      if (this.assessmentData.assessmentState != 'Not started') {
+        // Retrieve stored system info
+        const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
+        if (systemResponse.status < 400) {
+          // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
+          this.assessmentData.system = humps(systemResponse.data.data.system)
+        } else {
+          ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
+        }
       } else {
-        // Fetch existing patient list
+        // Save system info
+        const snakes = createHumps(snakeCase)
+        const response = await rootStore().apiCall('system', 'POST', {
+          data: Object.assign({}, snakes(this.assessmentData.system), {
+            institution: {
+              connect: [authenticationStore().orgDocId]
+            },
+            assessment: {
+              connect: [this.assessmentData.assessmentId]
+            }
+          })
+        })
+        if (response.status < 400) {
+          // Update the assessment status
+          const updateAssessmentResponse = await rootStore().apiCall('assessment', 'PUT', { data: { state: 'System complete' }})
+          if (updateAssessmentResponse.status < 400) {
+            this.$patch((state) => {
+              state.assessmentData.assessmentState = 'System complete'
+            })
+          } else {
+            ret = `Failed to update assessment state to 'System complete'`
+          }          
+        } else {
+          ret = `Failed to save system data, error ${response.message}`
+        }
+      }    
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
+    async patientListBuild() {
+
+      let ret = true
+
+      console.group('patientListBuild()')      
+
+      if (this.assessmentData.patients.length == 0 && this.assessmentData.assessmentState != 'Not started') {
+        // Load patient list, if any
+        const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=patients`, 'GET')
+        if (patientResponse.status < 400) {
+          // API call ok 
+          const patients = patientResponse.data.data.patients
+          if (patients.length == 0) {
+            // Generate patient list
+            const response = await rootStore().getPatientPool(this.assessmentData.patientType)
+            if (response.status < 400) {
+              const patientPool = response.data.data
+              if (patientPool.length < appSettingsStore().assessmentNumPatients) {
+                console.warn(`Not enough patients of patient type : ${this.assessmentData.patientType} in database`)
+                ret = `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.patientType}`
+              } else {
+                // Get those whose scenarios include a required one
+                const requiredPatients = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length > 0)
+                const randomPool = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length == 0)
+                // All the required patients are included, choose correct number of additional non-required ones
+                const numRemaining = appSettingsStore().assessmentNumPatients - requiredPatients.length
+                const randoms = new Set()
+                while (randoms.size !== numRemaining) {
+                  randoms.add(Math.floor(Math.random() * randomPool.length))
+                }          
+                for (const num of randoms) {
+                  requiredPatients.push(randomPool[num])
+                }
+                shuffle(requiredPatients)
+                this.assessmentData.patients = requiredPatients
+                console.debug('Generated new patient list', this.assessmentData.patients)
+                // Save to assessment patient list
+                const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
+                  data: {
+                    patients: {
+                      connect: this.assessmentData.patients.map(p => p.documentId)
+                    }
+                  }
+                })         
+                if (response.status >= 400) {
+                  ret = `Failed to save patient list for assesssment : error was ${response.message}`
+                } 
+              }              
+            } else {          
+              ret = `Failed to retrieve data from patient table ${response.message}`
+            }        
+          } else {
+            this.assessmentData.patients = patients
+          }
+        } else {
+          ret = `Error ${patientResponse.message} while retrieving patients for assessment`
+        }
       }
       console.debug('Returning', ret)
       console.groupEnd()

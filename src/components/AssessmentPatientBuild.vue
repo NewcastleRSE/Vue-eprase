@@ -14,7 +14,16 @@
 export default {
   name: 'AssessmentPatientBuild',
   props: {
-    isActive: Boolean
+    isActive: {
+      type: Boolean,
+      value: false,
+      required: true
+    },
+    stepDir: {
+      type: Number,
+      value: 1,
+      required: true
+    }
   },
   computed: {
     

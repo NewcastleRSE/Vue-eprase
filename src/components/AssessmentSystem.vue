@@ -1,28 +1,14 @@
 <template>
   <GroupElement name="systemGroup" :class="'mb-4'">
     <StaticElement name="epSystemHeading">
-      <h2>EP System Information</h2>
-      <h3>Please answer the following questions:</h3>
+      <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
+      <h3>Please fill in the following additional information:</h3>
     </StaticElement>
-    <ObjectElement ref="systemObject" name="system">
-      <SelectElement name="epService"
-        :label="embolden('Name of ePrescribing system', true)"
-        :native="false" 
-        :search="true"
-        :track-by="['label', 'value']"
-        :items="getEpSystemNames"
-        :messages="{required: 'Name of ePrescribing system is required'}" 
-        :rules="['required']"
-      />
-      <TextElement v-if="systemData.epService == 'Other'" name="otherEpService" placeholder="Name of your eP system"
-        :label="embolden('Name of your ePrescribing system', true)"
-        :debounce="500" 
-        :messages="{required: 'Other eP system name is required'}" 
-        :rules="['required', 'fieldIsOther:system.epService']" />      
-      <TextElement name="addEpService" placeholder="Name of additional eP system"
+    <ObjectElement ref="systemObject" name="system">      
+      <TextElement name="addEpSystem" placeholder="Name of additional eP system"
         :label="embolden('Do you use an additional ePrescribing service?', true)"
         :debounce="500" />
-      <TextElement name="localEpServiceName" placeholder="Local name for the ePrescribing system, if different from the official name" 
+      <TextElement name="localEpSystemName" placeholder="Local name for the ePrescribing system, if different from the official name" 
         :label="embolden('Local name for ePrescribing service')"
         :debounce="500" />
       <DateElement name="epServiceImplemented"
@@ -161,10 +147,36 @@ import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 export default {
   name: 'AssessmentSystem',    
   props: {
-    isActive: Boolean
+    isActive: {
+      type: Boolean,
+      value: false,
+      required: true
+    },
+    stepDir: {
+      type: Number,
+      value: 1,
+      required: true
+    }
+  },
+  async isActive(newVal, oldVal) { 
+
+    console.group('AssessmentSystem isActive() watcher')      
+    console.debug('New value', newVal, 'old value', oldVal)
+
+    if (newVal === false && this.stepDir == 1) {
+      // User has moved away forwards in the dialogs => save the info
+      const sysResponse = await this.systemBuild()        
+      if (selectResponse === true) {
+        await this.audit('build_system:' + this.email, '/assessment')
+      } else {
+        this.$emit('save-data-fail', selectResponse)
+        await this.audit('build_system_fail:' + this.email, '/assessment')
+      }
+    }
+    console.groupEnd()  
   },
   computed: {
-    ...mapState(rootStore, ['getEpSystems', 'getClinicalAreas', 'getHighRiskMeds']),
+    ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
     ...mapState(assessmentStore, ['assessmentData', 'resetSystemData']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
@@ -175,6 +187,9 @@ export default {
         dateFormat: 'MMM Y',
         altFormat: 'MMM Y'
       })
+    },
+    epSystemName() {
+      return this.assessmentData.epService.label == 'Other' ? this.assessmentData.otherEpService : this.assessmentData.epService.label
     },
     systemData() {
       return this.assessmentData.system
@@ -191,19 +206,7 @@ export default {
     }
   },
   emits: ['get-data-fail'],
-  methods: {
-    async getEpSystemNames() {
-      let epSystems = []
-      const response = await this.getEpSystems()
-      if (response.status < 400) {
-        epSystems = response.data.data.map(ep => { return { value: ep.name, label: ep.name } })
-        epSystems.unshift({value: '', label: 'Please select...', disabled: true})        
-        epSystems.push({value: 'Other', label: 'Other (please specify)'})
-      } else {
-        this.$emit('get-data-fail', response.message)
-      }
-      return epSystems
-    },
+  methods: {    
     async cbgClinicalAreas() {
       const response = await this.getClinicalAreas()
       if (response.status < 400) {

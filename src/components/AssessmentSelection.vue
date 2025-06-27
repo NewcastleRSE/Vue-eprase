@@ -108,17 +108,21 @@ export default {
   },
   watch: {
     async isActive(newVal, oldVal) { 
-      console.debug('isActive() watcher - new value', newVal, 'old value', oldVal)
+
+      console.group('AssessmentSelection isActive() watcher')      
+      console.debug('New value', newVal, 'old value', oldVal)
+
       if (newVal === false && this.stepDir == 1) {
         // User has moved away forwards in the dialogs => save the info
         const selectResponse = await this.selectAssessment()        
-        if (selectResponse) {
+        if (selectResponse === true) {
           await this.audit('select_assessement:' + this.email, '/assessment')
         } else {
           this.$emit('save-data-fail', selectResponse)
           await this.audit('select_assessement_fail:' + this.email, '/assessment')
         }
-      }  
+      }
+      console.groupEnd()  
     }
   },
   computed: {
@@ -130,9 +134,6 @@ export default {
     },   
     updatableAssessments() {
       return this.listQualifyingAssessments()
-    },
-    assessmentStatesList() {
-      return assessmentStates
     },
     allowNew() {
       // New assessment allowed if there is < 2 assessments for the user's hospital (2 patient types - adult & child)
@@ -171,17 +172,17 @@ export default {
 
       console.group('listQualifyingAssessments()')
 
-      let validCriteria = assessmentStatesList
+      let validCriteria = this.assessmentStates
       switch (this.selectionData.assessmentOption) {
-        case 'reports': validCriteria = assessmentStatesList.slice(3, 4); break;
-        case 'continue': validCriteria = assessmentStatesList.slice(0, 3); break;
-        default: validCriteria = assessmentStatesList; break;
+        case 'reports': validCriteria = this.assessmentStates.slice(3, 4); break;
+        case 'continue': validCriteria = this.assessmentStates.slice(0, 3); break;
+        default: validCriteria = this.assessmentStates; break;
       }      
       const possibles = this.allPossibleAssessments.filter(a => validCriteria.includes(a.state)) 
 
       console.debug('Possible assessments', possibles, Array.isArray(possibles))
       console.groupEnd()
-      
+
       return possibles
     },
     async getEpSystemNames() {
