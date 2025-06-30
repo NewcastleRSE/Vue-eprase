@@ -89,6 +89,14 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}&populate=scenarios`)
       return response
     },
+    // Audit action (UPDATED Strapi)
+    async audit(action, uri, result) {
+      const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })
+      if (response.status >= 400) {
+        // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
+        console.error(response.message)
+      }
+    },   
     async getCategories() {
       if (this.categories.length == 0) {
         const response = await this.apiCall('categories', 'GET')
@@ -205,13 +213,7 @@ export const rootStore = defineStore('root', {
         this.storeMitigationData(goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests)
       }
       return(response)
-    },
-    async audit(action, uri) {
-      const response = await this.apiCall('audits', 'POST', { data: { action, uri } })
-      if (response.status >= 400) {
-        console.error(response.message)
-      }
-    },    
+    },     
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
     storeAssessmentComplete(complete) { this.assessmentComplete = complete },    

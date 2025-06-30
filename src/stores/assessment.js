@@ -18,7 +18,8 @@ const ASSESSMENT_STATES = [
   {'Scenarios started': 6},
   {'Scenarios complete': 7},
   {'Config errors started': 8},
-  {'Config errors complete': 9}
+  {'Config errors complete': 9},
+  {'Assessment complete': 10}
 ]
 
 const EMPTY_SYSTEM = {
@@ -62,7 +63,7 @@ export const assessmentStore = defineStore('assessment', {
     allPossibleAssessments: [],
     assessmentStates: ASSESSMENT_STATES
   }),
-  persist: true,   
+  persist: true, 
   actions: {  
     async getAssessmentsForInstitution() {
       const instCode = authenticationStore().orgCode
@@ -93,11 +94,18 @@ export const assessmentStore = defineStore('assessment', {
         state.assessmentData.system = EMPTY_SYSTEM
       })
     },
+    onOrPassedAssessmentStage(required, current = null) {
+      const currentState = current == null ? ASSESSMENT_STATES[this.assessmentData.assessmentState] : ASSESSMENT_STATES[current]
+      const requiredState = ASSESSMENT_STATES[required]
+      return currentState >= requiredState
+    },
     async selectAssessment() {
 
       console.group('selectAssessment()')
 
       let ret = true
+      let uri = '/assessments'
+      let action = 'select_assessment'
 
       if (this.assessmentData.assessmentOption == 'new') {
         // New assessment
@@ -127,6 +135,7 @@ export const assessmentStore = defineStore('assessment', {
       } else if (this.assessmentData.assessmentOption == 'continue') {
         // Continuing existing assessment
         console.debug('Continuing assessment', this.assessmentData.assessmentId, '=> patch in data')
+        uri = `${uri}/${this.assessmentData.assessmentId}`
         const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == this.assessmentData.assessmentId)
         if (chosenAssessments.length > 0) {
           this.$patch((state) => {
@@ -152,6 +161,8 @@ export const assessmentStore = defineStore('assessment', {
           ret = `Assessment with id ${this.assessmentData.assessmentId} not found in list of assessments for this institution/hospital`
         }
       } 
+      await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+
       console.groupEnd()
       return ret
 
@@ -162,10 +173,7 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('getSystemData()')
 
-      const currentState = ASSESSMENT_STATES[this.assessmentData.assessmentState]
-      const requiredState = ASSESSMENT_STATES['System started']
-
-      if (currentState >= requiredState) {
+      if (this.onOrPassedAssessmentStage('System started')) {
         // Retrieve stored system info
         const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
         if (systemResponse.status < 400) {
@@ -183,37 +191,39 @@ export const assessmentStore = defineStore('assessment', {
     async saveSystemData() {
 
       let ret = true
+      let uri = '/systems'
+      let action = 'save_system_data'
 
       console.group('saveSystemData()')
 
-      const currentState = ASSESSMENT_STATES[this.assessmentData.assessmentState]
-      const requiredState = ASSESSMENT_STATES['System started']
-
-      // Save system info
-      const snakes = createHumps(snakeCase)
-      if (this.assessmentData.system.systemId != null) {
-        // Update existing system data
-        const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: snakes(this.assessmentData.system) })
-        if (response.status >= 400) {         
-          ret = `Failed to update system data, error ${response.message}`
-        }
-      } else {
-        // Save new system data
-        const newSystem = Object.assign({}, snakes(this.assessmentData.system), {
-          institution: { connect: [authenticationStore().orgDocId] },
-          assessment: { connect: [this.assessmentData.assessmentId] }
-        })
-        delete newSystem.system_id  // Don't pass a null!
-        const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
-        if (response.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.system.systemId = response.data.data.documentId
-          })
-          this.updateAssessmentStatus('System complete')
+      if (this.onOrPassedAssessmentStage('System started')) {
+        // Save system info
+        const snakes = createHumps(snakeCase)
+        if (this.assessmentData.system.systemId != null) {
+          // Update existing system data
+          const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: snakes(this.assessmentData.system) })
+          if (response.status >= 400) {         
+            ret = `Failed to update system data, error ${response.message}`
+          }
         } else {
-          ret = `Failed to save system data, error ${response.message}`
-        }
-      }        
+          // Save new system data
+          const newSystem = Object.assign({}, snakes(this.assessmentData.system), {
+            institution: { connect: [authenticationStore().orgDocId] },
+            assessment: { connect: [this.assessmentData.assessmentId] }
+          })
+          delete newSystem.system_id  // Don't pass a null!
+          const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
+          if (response.status < 400) {
+            this.$patch((state) => {
+              state.assessmentData.system.systemId = response.data.data.documentId
+            })
+            this.updateAssessmentStatus('System complete')
+          } else {
+            ret = `Failed to save system data, error ${response.message}`
+          }
+        } 
+        await rootStore().audit(action, uri, ret === true ? 'ok' : ret)      
+      }      
       console.debug('Returning', ret)
       console.groupEnd()
       return ret

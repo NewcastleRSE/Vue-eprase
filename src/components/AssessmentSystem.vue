@@ -76,8 +76,6 @@
         </StaticElement>
         <CheckboxgroupElement name="penicillinDescription"
           :label="embolden('How do you describe Penicillin V in your system?', true)"
-          :native="false"
-          :track-by="['label', 'value']"
           :items="[
             { value: '', label: 'Select description...', disabled: true },
             { value: 'penicillin_v', label: 'Penicillin V' },
@@ -165,19 +163,16 @@ export default {
 
     if (newVal === false && this.stepDir == 1) {
       // User has moved away forwards in the dialogs => save the info
-      const sysResponse = await this.systemBuild()        
-      if (selectResponse === true) {
-        await this.audit('build_system:' + this.email, '/assessment')
-      } else {
+      const sysResponse = await this.saveSystemData()        
+      if (sysResponse !== true) {
         this.$emit('save-data-fail', selectResponse)
-        await this.audit('build_system_fail:' + this.email, '/assessment')
       }
     }
     console.groupEnd()  
   },
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
-    ...mapState(assessmentStore, ['assessmentData', 'resetSystemData']),     
+    ...mapState(assessmentStore, ['assessmentData', 'resetSystemData', 'saveSystemData']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
     },

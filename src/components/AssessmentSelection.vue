@@ -122,18 +122,15 @@ export default {
       if (newVal === false && this.stepDir == 1) {
         // User has moved away forwards in the dialogs => save the info
         const selectResponse = await this.selectAssessment()        
-        if (selectResponse === true) {
-          await this.audit('select_assessement:' + this.email, '/assessment')
-        } else {
+        if (selectResponse !== true) {
           this.$emit('save-data-fail', selectResponse)
-          await this.audit('select_assessement_fail:' + this.email, '/assessment')
         }
       }
       console.groupEnd()  
     }
   },
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'selectAssessment', 'assessmentStates']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
@@ -159,11 +156,11 @@ export default {
     },
     allowContinue() {
       // Continue allowed if there are non-completed assessments
-      return this.allPossibleAssessments.filter(assessment => assessment.state != 'Scenarios complete').length > 0
+      return this.allPossibleAssessments.filter(assessment => assessment.state != 'Assessment complete').length > 0
     },
     allowReports() {
       // Reports are allowed if there are any completed assessments
-      return this.allPossibleAssessments.filter(assessment => assessment.state == 'Scenarios complete').length > 0
+      return this.allPossibleAssessments.filter(assessment => assessment.state == 'Assessment complete').length > 0
     }    
   },
   data() {
@@ -182,15 +179,14 @@ export default {
 
       console.group('listQualifyingAssessments()')
 
-      let validCriteria = this.assessmentStates
-      switch (this.selectionData.assessmentOption) {
-        case 'reports': validCriteria = this.assessmentStates.slice(3, 4); break;
-        case 'continue': validCriteria = this.assessmentStates.slice(0, 3); break;
-        default: validCriteria = this.assessmentStates; break;
-      }      
-      const possibles = this.allPossibleAssessments.filter(a => validCriteria.includes(a.state)) 
-
-      console.debug('Possible assessments', possibles, Array.isArray(possibles))
+      let possibles = this.allPossibleAssessments
+      if (this.selectionData.assessmentOption == 'reports') {
+        // Extract all completed assessments
+        possibles = possibles.filter(a => a.state == 'Assessment complete') 
+      } else if (this.selectionData.assessmentOption == 'continue') {
+        possibles = possibles.filter(a => a.state != 'Assessment complete') 
+      }
+      console.debug('Possible assessments', possibles)
       console.groupEnd()
 
       return possibles
