@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
@@ -8,13 +10,19 @@ import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
 
 const ASSESSMENT_STATES = [
-  'Not started',
-  'System complete',
-  'Patient build complete',
-  'Scenarios complete'
+  {'Not started': 1},
+  {'System started': 2},
+  {'System complete': 3},
+  {'Patient build started': 4},
+  {'Patient build complete': 5},
+  {'Scenarios started': 6},
+  {'Scenarios complete': 7},
+  {'Config errors started': 8},
+  {'Config errors complete': 9}
 ]
 
-const EMPTY_SYSTEM = {          
+const EMPTY_SYSTEM = {
+  systemId: null,          
   addEpSystem: '',
   localEpSystemName: '',
   epServiceImplemented: null,
@@ -30,8 +38,8 @@ const EMPTY_SYSTEM = {
   penicillinDescriptionOther: '',
   penicillinResults: false,
   penicillinComment: '',
-  highRiskMeds: [],
-  clinicalAreas: [],
+  highRiskMeds: '',
+  clinicalAreas: '',
   otherClinicalArea: ''
 }
 
@@ -89,7 +97,7 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('selectAssessment()')
 
-      let ret = false
+      let ret = true
 
       if (this.assessmentData.assessmentOption == 'new') {
         // New assessment
@@ -99,12 +107,8 @@ export const assessmentStore = defineStore('assessment', {
             state: this.assessmentData.assessmentState,
             patient_type: this.assessmentData.patientType,
             hospital: authenticationStore().hospital,
-            institution: {
-              connect: [authenticationStore().orgDocId]
-            },
-            ep_service: {
-              connect: [this.assessmentData.epService.value]
-            },
+            institution: { connect: [authenticationStore().orgDocId] },
+            ep_service: { connect: [this.assessmentData.epService.value] },
             other_ep_service: this.assessmentData.otherEpService
           }
         })
@@ -117,7 +121,6 @@ export const assessmentStore = defineStore('assessment', {
               institution: authenticationStore().orgDocId
             })
           })
-          ret = true
         } else {
           ret = response.message
         }
@@ -140,70 +143,101 @@ export const assessmentStore = defineStore('assessment', {
             })
           })
           // Retrieve system data
-          ret = true
-          const systemResponse = await this.systemBuild()
-          if (systemResponse !== true) {
-            ret = `Failed to retrieve system data, error ${systemResponse}`
-          } else {
-            // All ok, now retrieve patient list
-            const patientResponse = await this.patientListBuild()
-            if (patientResponse !== true) {
-              ret = `Failed to retrieve patient list, error ${patientResponse}`
-            }
+          ret = await this.getSystemData()
+          if (ret === true) {
+            // Retrieve patient data
+            ret = await this.getPatientList()
           }         
         } else {
           ret = `Assessment with id ${this.assessmentData.assessmentId} not found in list of assessments for this institution/hospital`
         }
       } 
-
       console.groupEnd()
       return ret
 
     },
-    async systemBuild() {
+    async getSystemData() {
 
       let ret = true
 
-      console.group('systemBuild()')
+      console.group('getSystemData()')
 
-      if (this.assessmentData.assessmentState != 'Not started') {
+      const currentState = ASSESSMENT_STATES[this.assessmentData.assessmentState]
+      const requiredState = ASSESSMENT_STATES['System started']
+
+      if (currentState >= requiredState) {
         // Retrieve stored system info
         const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
         if (systemResponse.status < 400) {
           // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
-          this.assessmentData.system = humps(systemResponse.data.data.system)
+          this.$patch((state) => {
+            state.assessmentData.system = humps(systemResponse.data.data.system)
+          })          
         } else {
           ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
         }
+      }
+      console.groupEnd()
+      return ret
+    },
+    async saveSystemData() {
+
+      let ret = true
+
+      console.group('saveSystemData()')
+
+      const currentState = ASSESSMENT_STATES[this.assessmentData.assessmentState]
+      const requiredState = ASSESSMENT_STATES['System started']
+
+      // Save system info
+      const snakes = createHumps(snakeCase)
+      if (this.assessmentData.system.systemId != null) {
+        // Update existing system data
+        const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: snakes(this.assessmentData.system) })
+        if (response.status >= 400) {         
+          ret = `Failed to update system data, error ${response.message}`
+        }
       } else {
-        // Save system info
-        const snakes = createHumps(snakeCase)
-        const response = await rootStore().apiCall('system', 'POST', {
-          data: Object.assign({}, snakes(this.assessmentData.system), {
-            institution: {
-              connect: [authenticationStore().orgDocId]
-            },
-            assessment: {
-              connect: [this.assessmentData.assessmentId]
-            }
-          })
+        // Save new system data
+        const newSystem = Object.assign({}, snakes(this.assessmentData.system), {
+          institution: { connect: [authenticationStore().orgDocId] },
+          assessment: { connect: [this.assessmentData.assessmentId] }
         })
+        delete newSystem.system_id  // Don't pass a null!
+        const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
         if (response.status < 400) {
-          // Update the assessment status
-          const updateAssessmentResponse = await rootStore().apiCall('assessment', 'PUT', { data: { state: 'System complete' }})
-          if (updateAssessmentResponse.status < 400) {
-            this.$patch((state) => {
-              state.assessmentData.assessmentState = 'System complete'
-            })
-          } else {
-            ret = `Failed to update assessment state to 'System complete'`
-          }          
+          this.$patch((state) => {
+            state.assessmentData.system.systemId = response.data.data.documentId
+          })
+          this.updateAssessmentStatus('System complete')
         } else {
           ret = `Failed to save system data, error ${response.message}`
         }
-      }    
+      }        
       console.debug('Returning', ret)
       console.groupEnd()
+      return ret
+    },
+    async updateAssessmentStatus(newStatus) {
+
+      let ret = true
+
+      console.group('updateAssessmentStatus()')
+      console.debug('Set assessment status to', newStatus)
+
+      if (this.assessmentData.assessmentId != null) {
+        const updateStatusResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', { data: { state: newStatus }})
+        if (updateStatusResponse.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.assessmentState = newStatus
+          })
+        } else {
+          ret = `Failed to update assessment state to ${newStatus}`
+        }        
+      }         
+      console.debug('Returning', ret)
+      console.groupEnd()
+
       return ret
     },
     async patientListBuild() {
@@ -240,7 +274,9 @@ export const assessmentStore = defineStore('assessment', {
                   requiredPatients.push(randomPool[num])
                 }
                 shuffle(requiredPatients)
-                this.assessmentData.patients = requiredPatients
+                this.$patch((state) => {
+                  state.assessmentData.patients = requiredPatients
+                })
                 console.debug('Generated new patient list', this.assessmentData.patients)
                 // Save to assessment patient list
                 const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
@@ -258,7 +294,9 @@ export const assessmentStore = defineStore('assessment', {
               ret = `Failed to retrieve data from patient table ${response.message}`
             }        
           } else {
-            this.assessmentData.patients = patients
+            this.$patch((state) => {
+              state.assessmentData.patients = patients
+            })
           }
         } else {
           ret = `Error ${patientResponse.message} while retrieving patients for assessment`
@@ -266,6 +304,8 @@ export const assessmentStore = defineStore('assessment', {
       }
       console.debug('Returning', ret)
       console.groupEnd()
+
+      return ret
     }    
   }
 })

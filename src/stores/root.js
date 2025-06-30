@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 const API = process.env.BASE_URL
+const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({
@@ -27,9 +28,10 @@ export const rootStore = defineStore('root', {
     async apiCall(url, method = 'POST', body = null) {
 
       console.group('apiCall()')
+      // Added to help debug problems with paths when transferring to staging server
       console.warn(process.env)
 
-      if (!(method == 'GET' || method == 'POST')) {
+      if (!(SUPPORTED_METHODS.includes(method.toUpperCase()))) {
         throw new Error(`API call using ${method} not implemented`)
       }
 
@@ -44,6 +46,12 @@ export const rootStore = defineStore('root', {
         } else if (method == 'POST') {
           console.debug('POST url', API + url, 'config', config, 'body', body)
           response = await axios.post(API + url, body, config)
+        } else if (method == 'PUT') {
+          console.debug('PUT url', API + url, 'config', config, 'body', body)
+          response = await axios.put(API + url, body, config)
+        } else if (method == 'DELETE') {
+          console.debug('DELETE url', API + url, 'config', config, 'body', body)
+          response = await axios.delete(API + url, body, config)
         }
         ret = { status: response.status, data: response.data}
       } catch(err) {

@@ -74,7 +74,7 @@
             questions.
           </div>
         </StaticElement>
-        <SelectElement name="penicillinDescription"
+        <CheckboxgroupElement name="penicillinDescription"
           :label="embolden('How do you describe Penicillin V in your system?', true)"
           :native="false"
           :track-by="['label', 'value']"
@@ -85,8 +85,8 @@
             { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
             { value: 'other', label: 'Other' }
           ]"
-          :messages="{required: 'Penicillin description is required'}" 
-          :rules="['required']"        
+          :messages="{filled: 'Please check all that apply'}" 
+          :rules="['filled']"        
         />   
         <TextElement name="penicillinDescriptionOther"
           :label="embolden('Your description', true)"

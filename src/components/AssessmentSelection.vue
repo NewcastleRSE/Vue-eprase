@@ -58,7 +58,14 @@
           </thead>
           <tbody>
             <tr v-for="assessment in updatableAssessments">
-              <td><RadioElement name="assessmentId" :radio-value="assessment.documentId" :class="'me-2'" /></td>
+              <td :rowspan="updatableAssessments.length">
+                <RadiogroupElement name="assessmentId" 
+                  :label="null"
+                  :items="updatableDocIds"
+                  :messages="{required: 'Select one'}" 
+                  :rules="['required']"
+                  :class="'me-2'" />
+              </td>
               <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
               <td>{{ assessment.patient_type }}</td>
               <td>{{ assessment.state }}</td>
@@ -134,6 +141,9 @@ export default {
     },   
     updatableAssessments() {
       return this.listQualifyingAssessments()
+    },
+    updatableDocIds() {
+      return this.listQualifyingAssessments().map(qa => { return { value: qa.documentId, label: '' }})
     },
     allowNew() {
       // New assessment allowed if there is < 2 assessments for the user's hospital (2 patient types - adult & child)
