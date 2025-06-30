@@ -77,7 +77,6 @@
         <CheckboxgroupElement name="penicillinDescription"
           :label="embolden('How do you describe Penicillin V in your system?', true)"
           :items="[
-            { value: '', label: 'Select description...', disabled: true },
             { value: 'penicillin_v', label: 'Penicillin V' },
             { value: 'phenoxymethylpenicillin', label: 'Phenoxymethylpenicillin' },
             { value: 'phenoxymethylpenicillin_tablets', label: 'Phenoxymethylpenicillin 250mg Tablets' },
@@ -167,12 +166,18 @@ export default {
       if (sysResponse !== true) {
         this.$emit('save-data-fail', selectResponse)
       }
+    } else if (newVal === true && this.stepDir == 1) {
+      // User has moved onto this dialog => update assessment status
+      const statusResponse = await this.updateAssessmentStatus('System started')
+      if (statusResponse !== true) {
+        this.$emit('save-data-fail', statusResponse)
+      }
     }
     console.groupEnd()  
   },
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
-    ...mapState(assessmentStore, ['assessmentData', 'resetSystemData', 'saveSystemData']),     
+    ...mapState(assessmentStore, ['assessmentData', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
     },
@@ -200,7 +205,7 @@ export default {
       checkedAllCa: false
     }
   },
-  emits: ['get-data-fail'],
+  emits: ['get-data-fail', 'save-data-fail'],
   methods: {    
     async cbgClinicalAreas() {
       const response = await this.getClinicalAreas()
@@ -245,6 +250,8 @@ export default {
     }
   }, 
   mounted() {
+    console.group('AssessmentSystem mounted()')
+    console.groupEnd()
   }
 }
 </script>

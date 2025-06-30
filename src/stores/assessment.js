@@ -35,12 +35,12 @@ const EMPTY_SYSTEM = {
   manResults: false,
   medHistory: false,
   diagnosisResults: false,
-  penicillinDescription: '',
+  penicillinDescription: [],
   penicillinDescriptionOther: '',
   penicillinResults: false,
   penicillinComment: '',
-  highRiskMeds: '',
-  clinicalAreas: '',
+  highRiskMeds: [],
+  clinicalAreas: [],
   otherClinicalArea: ''
 }
 
@@ -163,6 +163,7 @@ export const assessmentStore = defineStore('assessment', {
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
 
+      console.debug('Returning', ret)
       console.groupEnd()
       return ret
 
@@ -185,6 +186,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
         }
       }
+      console.debug('Returning', ret)
       console.groupEnd()
       return ret
     },
@@ -228,14 +230,22 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
+    async getPatientList() {
+      //TODO
+      return true
+    },
+    async savePatientList() {
+      //TODO
+      return true
+    },
     async updateAssessmentStatus(newStatus) {
 
       let ret = true
 
       console.group('updateAssessmentStatus()')
-      console.debug('Set assessment status to', newStatus)
+      console.debug('Attempt to set assessment status to', newStatus, 'current status is', this.assessmentData.assessmentState)
 
-      if (this.assessmentData.assessmentId != null) {
+      if (this.assessmentData.assessmentId != null && !this.onOrPassedAssessmentStage(newStatus)) {
         const updateStatusResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', { data: { state: newStatus }})
         if (updateStatusResponse.status < 400) {
           this.$patch((state) => {

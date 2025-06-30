@@ -114,6 +114,7 @@ export default {
     }
   },
   watch: {
+    // Looks like this watch traps all isActive changes - need to remove it when it's unmounted
     async isActive(newVal, oldVal) { 
 
       console.group('AssessmentSelection isActive() watcher')      

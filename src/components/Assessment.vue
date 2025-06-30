@@ -39,23 +39,24 @@
                 previous: 'Back to patient build'
               }" />
           </FormSteps>
-          <FormElements>            
-            <AssessmentIntro name="epraseIntroEl" v-show="activeStep == 0" 
+          <FormElements>
+          <!-- See AssessmentScenarios line 22ff - do this as a dynamically loaded component -->            
+            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" 
               :isActive="activeStep == 0" 
               :stepDir="stepDir" />
-            <AssessmentSelection name="selectAssessmentEl" v-show="activeStep == 1" 
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" 
               :isActive="activeStep == 1" 
               :stepDir="stepDir" 
               @save-data-fail="reportError" />
-            <AssessmentSystem name="systemInfoEl" v-show="activeStep == 2" 
+            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" 
               :isActive="activeStep == 2"
               :stepDir="stepDir"
               @get-data-fail="reportError" />
-            <AssessmentPatientBuild name="patientBuildEl" v-show="activeStep == 3" 
+            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" 
               :isActive="activeStep == 3" 
               :stepDir="stepDir" 
               @get-data-fail="reportError" />
-            <AssessmentScenario name="scenarioEl" v-show="activeStep == 4" 
+            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" 
               :isActive="activeStep == 4" 
               :stepDir="stepDir" 
               @get-data-fail="reportError" />
