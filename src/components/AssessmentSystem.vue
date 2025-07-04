@@ -142,39 +142,7 @@ import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 
 export default {
-  name: 'AssessmentSystem',    
-  props: {
-    isActive: {
-      type: Boolean,
-      value: false,
-      required: true
-    },
-    stepDir: {
-      type: Number,
-      value: 1,
-      required: true
-    }
-  },
-  async isActive(newVal, oldVal) { 
-
-    console.group('AssessmentSystem isActive() watcher')      
-    console.debug('New value', newVal, 'old value', oldVal)
-
-    if (newVal === false && this.stepDir == 1) {
-      // User has moved away forwards in the dialogs => save the info
-      const sysResponse = await this.saveSystemData()        
-      if (sysResponse !== true) {
-        this.$emit('save-data-fail', selectResponse)
-      }
-    } else if (newVal === true && this.stepDir == 1) {
-      // User has moved onto this dialog => update assessment status
-      const statusResponse = await this.updateAssessmentStatus('System started')
-      if (statusResponse !== true) {
-        this.$emit('save-data-fail', statusResponse)
-      }
-    }
-    console.groupEnd()  
-  },
+  name: 'AssessmentSystem',      
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
     ...mapState(assessmentStore, ['assessmentData', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),     
@@ -200,12 +168,11 @@ export default {
   },
   data() {
     return {
-      startTime: '',
       checkedAllHrm: false,
       checkedAllCa: false
     }
   },
-  emits: ['get-data-fail', 'save-data-fail'],
+  emits: ['assessment-system-complete', 'get-data-fail', 'save-data-fail'],
   methods: {    
     async cbgClinicalAreas() {
       const response = await this.getClinicalAreas()
@@ -249,8 +216,22 @@ export default {
       this.checkedAllCa = ! this.checkedAllCa      
     }
   }, 
-  mounted() {
+  async mounted() {
     console.group('AssessmentSystem mounted()')
+    const updateResponse = await this.updateAssessmentStatus('System started')
+    if (updateResponse !== true) {
+      this.$emit('save-data-fail', updateResponse)
+    }
+    console.groupEnd()
+  },
+  async beforeUnmount() {
+    console.group('AssessmentSystem beforeUnmount()')
+    const sysResponse = await this.saveSystemData()        
+    if (sysResponse !== true) {
+      this.$emit('save-data-fail', sysResponse)
+    } else {
+      this.$emit('assessment-system-complete', 'ok')
+    }   
     console.groupEnd()
   }
 }

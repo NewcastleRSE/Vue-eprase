@@ -50,13 +50,23 @@
 
 <script>
 
+import { mapState } from 'pinia'
+import { assessmentStore } from '../stores/assessment'
+
 export default {
-  name: "AssessmentIntro",
-  props: {
-    isActive: Boolean
-  },
-  mounted() {
+  name: "AssessmentIntro", 
+  computed: {
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution']),
+  }, 
+  emits: ['assessment-intro-complete', 'get-data-fail'],
+  async mounted() {
     console.group('AssessmentIntro mounted hook')
+    const instResponse = await this.getAssessmentsForInstitution()
+    if (instResponse !== true) {      
+      this.$emit('get-data-fail', instResponse)
+    } else {
+      this.$emit('assessment-intro-complete', instResponse)
+    }
     console.groupEnd()
   }
 }

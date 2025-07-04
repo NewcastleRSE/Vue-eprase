@@ -1,7 +1,7 @@
 <template>
-  <GroupElement ref="selection" name="scenarioGroup" :class="'mb-4'">
-    <StaticElement name="scenarioHeading">
-      <h2>Scenarios</h2>
+  <GroupElement name="configErrorGroup" :class="'mb-4'">
+    <StaticElement name="configErrorHeading">
+      <h2>Config Errors</h2>
     </StaticElement>
     <!-- TODO -->
   </GroupElement>
@@ -10,7 +10,7 @@
 <script>
 
 export default {
-  name: 'AssessmentScenario',  
+  name: 'AssessmentConfigError',  
   computed: {
     
   },
@@ -24,11 +24,11 @@ export default {
     
   },
   mounted() {
-    console.group('AssessmentScenario mounted()')
+    console.group('AssessmentConfigError mounted()')
     console.groupEnd()
   },
   beforeUnmount() {
-    console.group('AssessmentScenario beforeUnmount()')
+    console.group('AssessmentConfigError beforeUnmount()')
     console.groupEnd()
   }
 }

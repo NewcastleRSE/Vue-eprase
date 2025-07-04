@@ -9,18 +9,18 @@ import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
 
-const ASSESSMENT_STATES = [
-  {'Not started': 1},
-  {'System started': 2},
-  {'System complete': 3},
-  {'Patient build started': 4},
-  {'Patient build complete': 5},
-  {'Scenarios started': 6},
-  {'Scenarios complete': 7},
-  {'Config errors started': 8},
-  {'Config errors complete': 9},
-  {'Assessment complete': 10}
-]
+const ASSESSMENT_STATES = {
+  'Not started': 1,
+  'System started': 2,
+  'System complete': 3,
+  'Patient build started': 4,
+  'Patient build complete': 5,
+  'Scenarios started': 6,
+  'Scenarios complete': 7,
+  'Config errors started': 8,
+  'Config errors complete': 9,
+  'Assessment complete': 10
+}
 
 const EMPTY_SYSTEM = {
   systemId: null,          
@@ -95,8 +95,16 @@ export const assessmentStore = defineStore('assessment', {
       })
     },
     onOrPassedAssessmentStage(required, current = null) {
+
+      console.group('onOrPassedAssessmentStage()')
+      console.debug('Current', current, 'test', required)
+
       const currentState = current == null ? ASSESSMENT_STATES[this.assessmentData.assessmentState] : ASSESSMENT_STATES[current]
       const requiredState = ASSESSMENT_STATES[required]
+
+      console.debug('Current state', currentState, 'test state', requiredState)
+      console.groupEnd()
+
       return currentState >= requiredState
     },
     async selectAssessment() {
@@ -219,7 +227,7 @@ export const assessmentStore = defineStore('assessment', {
             this.$patch((state) => {
               state.assessmentData.system.systemId = response.data.data.documentId
             })
-            this.updateAssessmentStatus('System complete')
+            ret = await this.updateAssessmentStatus('System complete')
           } else {
             ret = `Failed to save system data, error ${response.message}`
           }
@@ -230,20 +238,13 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
-    async getPatientList() {
-      //TODO
-      return true
-    },
-    async savePatientList() {
-      //TODO
-      return true
-    },
     async updateAssessmentStatus(newStatus) {
 
       let ret = true
 
       console.group('updateAssessmentStatus()')
       console.debug('Attempt to set assessment status to', newStatus, 'current status is', this.assessmentData.assessmentState)
+      console.debug('Assessment data currently', this.assessmentData)
 
       if (this.assessmentData.assessmentId != null && !this.onOrPassedAssessmentStage(newStatus)) {
         const updateStatusResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', { data: { state: newStatus }})

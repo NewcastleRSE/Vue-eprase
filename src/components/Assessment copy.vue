@@ -11,7 +11,7 @@
 
       <Vueform ref="assessmentStepsForm" validate-on="change|step" v-model="allFormData" sync>
         <template #empty>
-          <FormSteps @next="nextStep" @previous="previousStep" @select="selectStep">
+          <FormSteps @next="nextStep" @select="selectStep">
             <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
@@ -22,9 +22,9 @@
               :labels="{ next: 'Continue to system information' }" />
             <FormStep name="systemInfoStep" label="ePrescribing system information"               
               :elements="['systemInfoEl']" 
-              :buttons="{ previous: false }"
               :labels="{ 
-                next: 'Continue to patient build'
+                next: 'Continue to patient build',
+                previous: 'Back to assessment selection' 
               }" />
             <FormStep name="patientBuildStep" label="Patient build" 
               :elements="['patientBuildEl']" 
@@ -35,29 +35,31 @@
             <FormStep name="scenarioStep" label="Scenarios" 
               :elements="['scenarioEl']" 
               :labels="{ 
-                next: 'Continue to config errors',
-                previous: 'Back to patient build'
-              }" />
-            <FormStep name="configErrorStep" label="Config errors" 
-              :elements="['configErrorEl']" 
-              :labels="{ 
                 next: 'Continue to reports',
-                previous: 'Back to scenarios'
+                previous: 'Back to patient build'
               }" />
           </FormSteps>
           <FormElements>
-            <AssessmentIntro ref="epraseIntroEl" name="epraseIntroEl" v-if="activeStep == 0" 
+          <!-- See AssessmentScenarios line 22ff - do this as a dynamically loaded component -->            
+            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" 
+              :isActive="activeStep == 0" 
+              :stepDir="stepDir" />
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" 
+              :isActive="activeStep == 1" 
+              :stepDir="stepDir" 
+              @save-data-fail="reportError" />
+            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" 
+              :isActive="activeStep == 2"
+              :stepDir="stepDir"
               @get-data-fail="reportError" />
-            <AssessmentSelection ref="selectAssessmentEl" name="selectAssessmentEl" v-if="activeStep == 1" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentSystem ref="systemInfoEl" name="systemInfoEl" v-if="activeStep == 2" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentPatientBuild ref="patientBuildEl" name="patientBuildEl" v-if="activeStep == 3" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentScenario ref="scenarioEl" name="scenarioEl" v-if="activeStep == 4" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentConfigError ref="configErrorEl" name="configErrorEl" v-if="activeStep == 5" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
+            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" 
+              :isActive="activeStep == 3" 
+              :stepDir="stepDir" 
+              @get-data-fail="reportError" />
+            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" 
+              :isActive="activeStep == 4" 
+              :stepDir="stepDir" 
+              @get-data-fail="reportError" />
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -82,7 +84,6 @@ import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
 import AssessmentPatientBuild from './AssessmentPatientBuild'
 import AssessmentScenario from './AssessmentScenario'
-import AssessmentConfigError from './AssessmentConfigError'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
@@ -93,7 +94,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData']),
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution']),
     allFormData: {
       get() {        
         return this.assessmentData
@@ -114,7 +115,6 @@ export default {
     AssessmentSystem,
     AssessmentPatientBuild,
     AssessmentScenario,
-    AssessmentConfigError,
     LoginInfo,
     AppFooter,
     AppLogo,
@@ -124,38 +124,35 @@ export default {
     return {   
       assessmentComplete: false,  
       allAssessments: [],
-      activeStep: 0,     
-      nextClicked: false,
-      previousClicked: false
+      activeStep: 0,
+      stepDir: 1
     }
   },
-  methods: {         
+  methods: {      
     nextStep(toStep) {
       console.group('nextStep()')
-      console.debug('Next step', toStep.index, 'full step', toStep)
-      this.nextClicked = true      
-      console.debug('Form data', this.allFormData)
-      console.groupEnd()
-    }, 
-    previousStep(toStep) {
-      console.group('previousStep()')
-      console.debug('Previous step', toStep.index)
-      this.previousClicked = true      
+      console.debug('Next step', toStep.index)      
+      console.debug(this.allFormData)
       console.groupEnd()
     }, 
     selectStep(active, previous) {
       console.group('selectStep()')
       console.debug('Active step', active.index, 'previous', previous.index)
-      console.debug('Active', active)
-      console.debug('Previous', previous)
       this.activeStep = active.index 
-      this.nextClicked = false
-      this.previousClicked = false
+      this.stepDir = active.index - previous.index     
       console.groupEnd()
     },
     reportError(message) {
       this.errorAlertModal.show(message)
     }
+  },
+  async mounted() {
+    console.group('Assessment mounted hook')
+    const instResponse = await this.getAssessmentsForInstitution()
+    if (instResponse !== true) {      
+      this.reportError(instResponse)
+    }
+    console.groupEnd()
   }
 }
 </script>

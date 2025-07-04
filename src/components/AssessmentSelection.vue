@@ -1,94 +1,80 @@
 <template>
-  <GroupElement name="assessmentGroup">
-    <GroupElement ref="selection" name="selectionGroup" :class="'mb-4'" v-if="stepDir == 1">
-      <StaticElement name="selectionHeading">
-        <h2>Assessment Selection</h2>
-      </StaticElement>
-      <RadiogroupElement 
-        name="assessmentOption"
-        :label="embolden('I would like to:', true)"      
-        :items="[
-          { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
-          { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
-          { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
-        ]"
-        :messages="{required: 'Select an option'}"       
-        :rules="['required']"
-        @change="setOption"
+  <GroupElement name="assessmentGroup" :class="'mb-4'">
+    <StaticElement name="selectionHeading">
+      <h2>Assessment Selection</h2>
+    </StaticElement>
+    <RadiogroupElement 
+      name="assessmentOption"
+      :label="embolden('I would like to:', true)"      
+      :items="[
+        { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
+        { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
+        { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
+      ]"
+      :messages="{required: 'Select an option'}"       
+      :rules="['required']"
+      @change="setOption"
+    />
+    <GroupElement name="newAssessmentGroup" v-if="selectionData.assessmentOption == 'new'">
+      <SelectElement name="epService"
+        @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
+        :label="embolden('For ePrescribing system', true)"
+        :native="false" 
+        :search="true"
+        :track-by="['label', 'value']"
+        :items="getEpSystemNames"
+        :object="true"
+        :messages="{required: 'Name of ePrescribing system is required'}"           
+        :rules="['required']"          
       />
-      <GroupElement name="newAssessmentGroup" v-if="selectionData.assessmentOption == 'new'">
-        <SelectElement name="epService"
-          @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
-          :label="embolden('For ePrescribing system', true)"
-          :native="false" 
-          :search="true"
-          :track-by="['label', 'value']"
-          :items="getEpSystemNames"
-          :object="true"
-          :messages="{required: 'Name of ePrescribing system is required'}"           
-          :rules="['required']"          
-        />
-        <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
-          :label="embolden('Name of ePrescribing system', true)"
-          :debounce="500" 
-          :messages="{required: 'Other eP system name is required'}" 
-          :rules="['required', 'fieldIsOther:epService']" />
-        <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
-          :label="embolden('For patient type', true)"      
-          :items="[
-            { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
-            { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
-          :messages="{required: 'Select an option'}" 
-          :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
-        />       
-      </GroupElement>
-      
-      <GroupElement name="continueAssessmentGroup">
-        <table v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" class="table table-striped caption-top" style="min-width:800px">
-          <caption>You can access the following assessments:</caption>
-          <thead>
-            <tr>
-              <th>&nbsp;</th>
-              <th>ePrescribing system</th>
-              <th>Patient type</th>
-              <th>Assessment state</th>
-              <th>Created on</th>
-              <th>Last update</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="assessment in updatableAssessments">
-              <td :rowspan="updatableAssessments.length">
-                <RadiogroupElement name="assessmentId" 
-                  :label="null"
-                  :items="updatableDocIds"
-                  :messages="{required: 'Select one'}" 
-                  :rules="['required']"
-                  :class="'me-2'" />
-              </td>
-              <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
-              <td>{{ assessment.patient_type }}</td>
-              <td>{{ assessment.state }}</td>
-              <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
-            </tr>
-          </tbody>
-        </table>  
-      </GroupElement>    
+      <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
+        :label="embolden('Name of ePrescribing system', true)"
+        :debounce="500" 
+        :messages="{required: 'Other eP system name is required'}" 
+        :rules="['required', 'fieldIsOther:epService']" />
+      <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
+        :label="embolden('For patient type', true)"      
+        :items="[
+          { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
+          { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
+        :messages="{required: 'Select an option'}" 
+        :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
+      />       
     </GroupElement>
-    <GroupElement name="infoOnlyGroup" v-if="stepDir == -1">
-      <StaticElement name="selectionHeading">
-        <h2>Current Assessment Details</h2>
-      </StaticElement>
-      <StaticElement name="selectionInfo">
-        <div class="alert alert-info mt-4" role="alert">
-          You are currently doing the assessment for <span class="fw-bold">{{ selectionData.epService == 'Other' ? selectionData.otherEpService : selectionData.epService.name }}</span> 
-          in organisation <span class="fw-bold">{{ orgName }} ({{ hospital }})</span>
-          for <span class="fw-bold">{{ selectionData.patientType }}</span> patients
-        </div>
-      </StaticElement>
-    </GroupElement>
-  </GroupElement>
+    
+    <GroupElement name="continueAssessmentGroup">
+      <table v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" class="table table-striped caption-top" style="min-width:800px">
+        <caption>You can access the following assessments:</caption>
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>ePrescribing system</th>
+            <th>Patient type</th>
+            <th>Assessment state</th>
+            <th>Created on</th>
+            <th>Last update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="assessment in updatableAssessments">
+            <td :rowspan="updatableAssessments.length">
+              <RadiogroupElement name="assessmentId" 
+                :label="null"
+                :items="updatableDocIds"
+                :messages="{required: 'Select one'}" 
+                :rules="['required']"
+                :class="'me-2'" />
+            </td>
+            <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
+            <td>{{ assessment.patient_type }}</td>
+            <td>{{ assessment.state }}</td>
+            <td>{{ convertDate(assessment.createdAt, false) }}</td>
+            <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+          </tr>
+        </tbody>
+      </table>  
+    </GroupElement>    
+  </GroupElement>    
 </template>
 
 <script>
@@ -100,36 +86,7 @@ import { authenticationStore } from '../stores/authentication'
 import { isoToUkDate } from '../helpers/utils'
 
 export default {
-  name: 'AssessmentSelection',
-  props: {
-    isActive: {
-      type: Boolean,
-      value: false,
-      required: true
-    },
-    stepDir: {
-      type: Number,
-      value: 1,
-      required: true
-    }
-  },
-  watch: {
-    // Looks like this watch traps all isActive changes - need to remove it when it's unmounted
-    async isActive(newVal, oldVal) { 
-
-      console.group('AssessmentSelection isActive() watcher')      
-      console.debug('New value', newVal, 'old value', oldVal)
-
-      if (newVal === false && this.stepDir == 1) {
-        // User has moved away forwards in the dialogs => save the info
-        const selectResponse = await this.selectAssessment()        
-        if (selectResponse !== true) {
-          this.$emit('save-data-fail', selectResponse)
-        }
-      }
-      console.groupEnd()  
-    }
-  },
+  name: 'AssessmentSelection',  
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
@@ -166,12 +123,10 @@ export default {
   },
   data() {
     return {
-      isOtherEpSystem: false,
-      serverError: false,   
-      startTime: ''
+      isOtherEpSystem: false
     }
   },
-  emits: ['save-data-fail', 'get-data-fail'],
+  emits: ['assessment-selection-complete', 'save-data-fail', 'get-data-fail'],
   methods: {
     setOption(optionValue) {
       this.selectionData.assessmentOption = optionValue
@@ -210,9 +165,12 @@ export default {
       return isoToUkDate(d, useTime)
     }
   },
-  mounted() {
-    console.group('AssessmentSelection mounted()')
-    console.debug('All possible assessments', this.allPossibleAssessments)
+  async beforeUnmount() {
+    console.group('AssessmentSelection beforeUnmount()')
+    const selectResponse = await this.selectAssessment()        
+    if (selectResponse !== true) {
+      this.$emit('save-data-fail', selectResponse)
+    } 
     console.groupEnd()
   }
 }
