@@ -1,5 +1,5 @@
 <template>
-  <GroupElement name="assessmentGroup" :class="'mb-4'">
+  <GroupElement name="assessmentGroup" :class="'mb-4'">        
     <StaticElement name="selectionHeading">
       <h2>Assessment Selection</h2>
     </StaticElement>
@@ -74,7 +74,7 @@
         </tbody>
       </table>  
     </GroupElement>    
-  </GroupElement>    
+  </GroupElement>
 </template>
 
 <script>
@@ -88,7 +88,7 @@ import { isoToUkDate } from '../helpers/utils'
 export default {
   name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'selectAssessment']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
@@ -126,7 +126,7 @@ export default {
       isOtherEpSystem: false
     }
   },
-  emits: ['assessment-selection-complete', 'save-data-fail', 'get-data-fail'],
+  emits: ['save-data-fail', 'get-data-fail'],
   methods: {
     setOption(optionValue) {
       this.selectionData.assessmentOption = optionValue

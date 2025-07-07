@@ -58,14 +58,12 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution']),
   }, 
-  emits: ['assessment-intro-complete', 'get-data-fail'],
+  emits: ['get-data-fail'],
   async mounted() {
     console.group('AssessmentIntro mounted hook')
     const instResponse = await this.getAssessmentsForInstitution()
     if (instResponse !== true) {      
       this.$emit('get-data-fail', instResponse)
-    } else {
-      this.$emit('assessment-intro-complete', instResponse)
     }
     console.groupEnd()
   }

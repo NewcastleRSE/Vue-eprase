@@ -1,5 +1,5 @@
 <template>
-  <GroupElement name="systemGroup" :class="'mb-4'">
+  <GroupElement name="systemGroup" :class="'mb-4'">    
     <StaticElement name="epSystemHeading">
       <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
       <h3>Please fill in the following additional information:</h3>
@@ -87,7 +87,7 @@
         />   
         <TextElement name="penicillinDescriptionOther"
           :label="embolden('Your description', true)"
-          v-if="systemData.penicillinDescription == 'other'"
+          v-if="systemData.penicillinDescription.includes('other')"
           :messages="{required: 'Additional description is required'}" 
           :rules="['required', 'fieldIsOther:system.penicillinDescription']"
           :debounce="500" />
@@ -145,7 +145,7 @@ export default {
   name: 'AssessmentSystem',      
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
-    ...mapState(assessmentStore, ['assessmentData', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),     
+    ...mapState(assessmentStore, ['assessmentData', 'dataReady', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),     
     legalCharacterMatcher() {
       return /^[A-Za-z0-9-.,_() ]+$/
     },
@@ -161,6 +161,9 @@ export default {
     },
     systemData() {
       return this.assessmentData.system
+    },
+    dataLoaded() {
+      return this.dataReady
     }
   },
   components: {
@@ -172,7 +175,19 @@ export default {
       checkedAllCa: false
     }
   },
-  emits: ['assessment-system-complete', 'get-data-fail', 'save-data-fail'],
+  watch: {
+    async dataLoaded(newVal) {
+      if (newVal === true) {
+        console.debug('AssessmentSystem - dataLoaded watcher called on completion of previous data operation')
+        const updateResponse = await this.updateAssessmentStatus('System started')
+        if (updateResponse !== true) {
+          this.$emit('save-data-fail', updateResponse)
+        }
+        console.debug('AssessmentSystem - dataLoaded watcher complete')
+      }
+    }
+  },
+  emits: ['get-data-fail', 'save-data-fail'],
   methods: {    
     async cbgClinicalAreas() {
       const response = await this.getClinicalAreas()
@@ -218,10 +233,6 @@ export default {
   }, 
   async mounted() {
     console.group('AssessmentSystem mounted()')
-    const updateResponse = await this.updateAssessmentStatus('System started')
-    if (updateResponse !== true) {
-      this.$emit('save-data-fail', updateResponse)
-    }
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -229,9 +240,7 @@ export default {
     const sysResponse = await this.saveSystemData()        
     if (sysResponse !== true) {
       this.$emit('save-data-fail', sysResponse)
-    } else {
-      this.$emit('assessment-system-complete', 'ok')
-    }   
+    } 
     console.groupEnd()
   }
 }

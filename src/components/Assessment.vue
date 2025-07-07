@@ -46,17 +46,17 @@
               }" />
           </FormSteps>
           <FormElements>
-            <AssessmentIntro ref="epraseIntroEl" name="epraseIntroEl" v-if="activeStep == 0" 
+            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" 
               @get-data-fail="reportError" />
-            <AssessmentSelection ref="selectAssessmentEl" name="selectAssessmentEl" v-if="activeStep == 1" 
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" 
               @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentSystem ref="systemInfoEl" name="systemInfoEl" v-if="activeStep == 2" 
+            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" 
               @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentPatientBuild ref="patientBuildEl" name="patientBuildEl" v-if="activeStep == 3" 
+            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" 
               @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentScenario ref="scenarioEl" name="scenarioEl" v-if="activeStep == 4" 
+            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" 
               @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentConfigError ref="configErrorEl" name="configErrorEl" v-if="activeStep == 5" 
+            <AssessmentConfigError name="configErrorEl" v-if="activeStep == 5" 
               @get-data-fail="reportError" @save-data-fail="reportError" />
           </FormElements>
           <FormStepsControls /> 

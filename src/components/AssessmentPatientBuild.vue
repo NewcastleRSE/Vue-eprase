@@ -1,12 +1,12 @@
 <template>
-  <GroupElement name="patientBuildGroup" :class="'mb-4'">
+  <GroupElement name="patientBuildGroup" :class="'mb-4'">    
     <StaticElement name="patientBuildHeading">
       <h2>Patient build</h2>
     </StaticElement>
     <StaticElement name="patientBuildBody">
-    
+      TODO
     </StaticElement>
-  </GroupElement>
+  </GroupElement>  
 </template>
 
 <script>
@@ -17,9 +17,28 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AssessmentPatientBuild',  
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'updateAssessmentStatus']),  
+    ...mapState(assessmentStore, ['patientListBuild', 'dataReady', 'updateAssessmentStatus']),
+    dataLoaded() {
+      return this.dataReady
+    }  
   },
-  emits: ['assessment-patient-build-complete', 'get-data-fail', 'save-data-fail'],
+  watch: {
+    async dataLoaded(newVal) {
+      if (newVal === true) {
+        console.debug('AssessmentPatientBuild - dataLoaded watcher called on completion of previous data operation')
+        const updateResponse = await this.updateAssessmentStatus('Patient build started')
+        if (updateResponse !== true) {
+          this.$emit('save-data-fail', updateResponse)
+        }
+        const loadPatientsResponse = await this.patientListBuild()
+        if (loadPatientsResponse !== true) {
+          this.$emit('save-data-fail', loadPatientsResponse)
+        }
+        console.debug('AssessmentPatientBuild - dataLoaded watcher complete')
+      }
+    }
+  },
+  emits: ['get-data-fail', 'save-data-fail'],
   data() {
     return {      
     }
@@ -28,15 +47,7 @@ export default {
     
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')
-    const updateResponse = await this.updateAssessmentStatus('Patient build started')
-    if (updateResponse !== true) {
-      this.$emit('save-data-fail', updateResponse)
-    }
-    const loadPatientsResponse = await this.patientListBuild()
-    if (loadPatientsResponse !== true) {
-      this.$emit('save-data-fail', loadPatientsResponse)
-    }
+    console.group('AssessmentPatientBuild mounted()')    
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -44,8 +55,6 @@ export default {
     const updateResponse = await this.updateAssessmentStatus('Patient build complete')
     if (updateResponse !== true) {
       this.$emit('save-data-fail', updateResponse)
-    } else {
-      this.$emit('assessment-patient-build-complete', 'ok')
     }
     console.groupEnd()
   }

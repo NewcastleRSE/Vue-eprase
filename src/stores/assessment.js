@@ -61,11 +61,24 @@ export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
     assessmentData: EMPTY_DATA,
     allPossibleAssessments: [],
-    assessmentStates: ASSESSMENT_STATES
+    assessmentStates: ASSESSMENT_STATES,
+    dataReady: false
   }),
   persist: true, 
-  actions: {  
+  actions: {
+    setDataReady(readyStatus) {
+      this.$patch((state) => {
+        state.dataReady = readyStatus
+      })
+    },
     async getAssessmentsForInstitution() {
+
+      let ret = true
+
+      console.group('getAssessmentsForInstitution()')
+
+      this.setDataReady(false)
+
       const instCode = authenticationStore().orgCode
       const hospital = authenticationStore().hospital
       // Note: there are some redundant database calls in this store ('system' and 'patients' are retrieved separately) - the full call here was once:
@@ -76,10 +89,12 @@ export const assessmentStore = defineStore('assessment', {
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
         this.$patch((state) => { state.allPossibleAssessments = response.data.data })
-        return true
       } else {
-        return response.message
+        ret = response.message
       }
+      this.setDataReady(true)
+      console.groupEnd()
+      return ret
     },
     reset() {
       console.group('reset() on assessment store')
@@ -114,6 +129,7 @@ export const assessmentStore = defineStore('assessment', {
       let ret = true
       let uri = '/assessments'
       let action = 'select_assessment'
+      this.setDataReady(false)
 
       if (this.assessmentData.assessmentOption == 'new') {
         // New assessment
@@ -131,11 +147,9 @@ export const assessmentStore = defineStore('assessment', {
         if (response.status < 400) {
           console.debug('Save assessment response is', response)
           this.$patch((state) => { 
-            state.assessmentData = Object.assign(state.assessmentData, {
-              assessmentId: response.data.data.documentId,
-              hospital: authenticationStore().hospital,
-              institution: authenticationStore().orgDocId
-            })
+            state.assessmentData.assessmentId = response.data.data.documentId
+            state.assessmentData.hospital = authenticationStore().hospital,
+            state.assessmentData.institution = authenticationStore().orgDocId
           })
         } else {
           ret = response.message
@@ -163,13 +177,19 @@ export const assessmentStore = defineStore('assessment', {
           ret = await this.getSystemData()
           if (ret === true) {
             // Retrieve patient data
-            ret = await this.getPatientList()
-          }         
+            ret = await this.patientListBuild()
+          } 
+          if (ret === true)         {
+            // Retrieve scenario data TODO
+            //ret = await this.getScenarios()
+          }
         } else {
           ret = `Assessment with id ${this.assessmentData.assessmentId} not found in list of assessments for this institution/hospital`
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+
+      this.setDataReady(true)
 
       console.debug('Returning', ret)
       console.groupEnd()
@@ -179,13 +199,14 @@ export const assessmentStore = defineStore('assessment', {
     async getSystemData() {
 
       let ret = true
+      this.setDataReady(false)
 
       console.group('getSystemData()')
 
       if (this.onOrPassedAssessmentStage('System started')) {
         // Retrieve stored system info
         const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
-        if (systemResponse.status < 400) {
+        if (systemResponse.status < 400 && systemResponse.data.data.system != null) {
           // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
           this.$patch((state) => {
             state.assessmentData.system = humps(systemResponse.data.data.system)
@@ -194,6 +215,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
         }
       }
+      this.setDataReady(true)
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
@@ -203,6 +225,7 @@ export const assessmentStore = defineStore('assessment', {
       let ret = true
       let uri = '/systems'
       let action = 'save_system_data'
+      this.setDataReady(false)
 
       console.group('saveSystemData()')
 
@@ -234,6 +257,7 @@ export const assessmentStore = defineStore('assessment', {
         } 
         await rootStore().audit(action, uri, ret === true ? 'ok' : ret)      
       }      
+      this.setDataReady(true)
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
@@ -264,10 +288,11 @@ export const assessmentStore = defineStore('assessment', {
     async patientListBuild() {
 
       let ret = true
+      this.setDataReady(false)
 
       console.group('patientListBuild()')      
 
-      if (this.assessmentData.patients.length == 0 && this.assessmentData.assessmentState != 'Not started') {
+      if (this.assessmentData.patients.length == 0 && this.onOrPassedAssessmentStage('Patient build started')) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=patients`, 'GET')
         if (patientResponse.status < 400) {
@@ -323,6 +348,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = `Error ${patientResponse.message} while retrieving patients for assessment`
         }
       }
+      this.setDataReady(true)
       console.debug('Returning', ret)
       console.groupEnd()
 
