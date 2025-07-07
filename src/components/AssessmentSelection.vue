@@ -39,7 +39,11 @@
           { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
         :messages="{required: 'Select an option'}" 
         :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
-      />       
+      />
+      <ToggleElement name="sharingConsent"
+        :label="embolden('I consent to sharing my institution name and associated data with other trusts', true)"
+        :labels="{ on: 'Yes', off: 'No' }"
+      />        
     </GroupElement>
     
     <GroupElement name="continueAssessmentGroup">
@@ -167,6 +171,7 @@ export default {
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')
+    console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
     const selectResponse = await this.selectAssessment()        
     if (selectResponse !== true) {
       this.$emit('save-data-fail', selectResponse)

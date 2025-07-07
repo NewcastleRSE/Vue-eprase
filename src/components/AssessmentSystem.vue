@@ -175,18 +175,6 @@ export default {
       checkedAllCa: false
     }
   },
-  watch: {
-    async dataLoaded(newVal) {
-      if (newVal === true) {
-        console.debug('AssessmentSystem - dataLoaded watcher called on completion of previous data operation')
-        const updateResponse = await this.updateAssessmentStatus('System started')
-        if (updateResponse !== true) {
-          this.$emit('save-data-fail', updateResponse)
-        }
-        console.debug('AssessmentSystem - dataLoaded watcher complete')
-      }
-    }
-  },
   emits: ['get-data-fail', 'save-data-fail'],
   methods: {    
     async cbgClinicalAreas() {
@@ -237,6 +225,7 @@ export default {
   },
   async beforeUnmount() {
     console.group('AssessmentSystem beforeUnmount()')
+    console.assert(this.dataLoaded, 'AssessmentSystem beforeUnmount() hook - dataReady flag is false')
     const sysResponse = await this.saveSystemData()        
     if (sysResponse !== true) {
       this.$emit('save-data-fail', sysResponse)

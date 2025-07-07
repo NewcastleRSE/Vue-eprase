@@ -25,11 +25,7 @@ export default {
   watch: {
     async dataLoaded(newVal) {
       if (newVal === true) {
-        console.debug('AssessmentPatientBuild - dataLoaded watcher called on completion of previous data operation')
-        const updateResponse = await this.updateAssessmentStatus('Patient build started')
-        if (updateResponse !== true) {
-          this.$emit('save-data-fail', updateResponse)
-        }
+        console.debug('AssessmentPatientBuild - dataLoaded watcher called on completion of previous data operation')        
         const loadPatientsResponse = await this.patientListBuild()
         if (loadPatientsResponse !== true) {
           this.$emit('save-data-fail', loadPatientsResponse)
@@ -47,12 +43,13 @@ export default {
     
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')    
+    console.group('AssessmentPatientBuild mounted()')        
     console.groupEnd()
   },
   async beforeUnmount() {
     console.group('AssessmentPatientBuild beforeUnmount()')
-    const updateResponse = await this.updateAssessmentStatus('Patient build complete')
+    console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
+    const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
     if (updateResponse !== true) {
       this.$emit('save-data-fail', updateResponse)
     }

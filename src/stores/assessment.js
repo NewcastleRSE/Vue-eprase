@@ -11,15 +11,11 @@ import { authenticationStore } from './authentication'
 
 const ASSESSMENT_STATES = {
   'Not started': 1,
-  'System started': 2,
-  'System complete': 3,
-  'Patient build started': 4,
-  'Patient build complete': 5,
-  'Scenarios started': 6,
-  'Scenarios complete': 7,
-  'Config errors started': 8,
-  'Config errors complete': 9,
-  'Assessment complete': 10
+  'System complete': 2,
+  'Patient build complete': 3,
+  'Scenarios complete': 4,
+  'Config errors complete': 5,
+  'Assessment complete': 6
 }
 
 const EMPTY_SYSTEM = {
@@ -44,6 +40,9 @@ const EMPTY_SYSTEM = {
   otherClinicalArea: ''
 }
 
+const ARRAY_FIELDS_HUMPS = ['penicillinDescription', 'highRiskMeds', 'clinicalAreas']
+const ARRAY_FIELDS_SNAKES = ['penicillin_description', 'high_risk_meds', 'clinical_areas']
+
 const EMPTY_DATA = {
   assessmentId: null,
   assessmentState: 'Not started',
@@ -54,7 +53,8 @@ const EMPTY_DATA = {
   otherEpService: '',
   patientType: '',     
   system: EMPTY_SYSTEM,
-  patients: []
+  patients: [],
+  sharingConsent: false
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -109,6 +109,15 @@ export const assessmentStore = defineStore('assessment', {
         state.assessmentData.system = EMPTY_SYSTEM
       })
     },
+    convertArrayFields(obj, toArray) {
+      const fieldsToConvert = toArray ? ARRAY_FIELDS_HUMPS : ARRAY_FIELDS_SNAKES
+      fieldsToConvert.forEach(ftc => {
+        if (ftc in obj) {
+          obj[ftc] = toArray ? obj[ftc].split(',') : obj[ftc].toString()
+        }
+      })
+      return obj
+    },
     onOrPassedAssessmentStage(required, current = null) {
 
       console.group('onOrPassedAssessmentStage()')
@@ -122,6 +131,8 @@ export const assessmentStore = defineStore('assessment', {
 
       return currentState >= requiredState
     },
+    // Select a currently in-progress assessment, or initialise a new one
+    // Standalone method which always sets/unsets dataReady flag
     async selectAssessment() {
 
       console.group('selectAssessment()')
@@ -141,7 +152,8 @@ export const assessmentStore = defineStore('assessment', {
             hospital: authenticationStore().hospital,
             institution: { connect: [authenticationStore().orgDocId] },
             ep_service: { connect: [this.assessmentData.epService.value] },
-            other_ep_service: this.assessmentData.otherEpService
+            other_ep_service: this.assessmentData.otherEpService,
+            sharing_consent: this.assessmentData.sharingConsent
           }
         })
         if (response.status < 400) {
@@ -170,7 +182,8 @@ export const assessmentStore = defineStore('assessment', {
               otherEpService: chosenAssessments[0].other_ep_service,
               hospital: authenticationStore().hospital,
               institution: authenticationStore().orgDocId,
-              patientType: chosenAssessments[0].patient_type
+              patientType: chosenAssessments[0].patient_type,
+              sharingConsent: chosenAssessments[0].sharing_consent
             })
           })
           // Retrieve system data
@@ -196,40 +209,49 @@ export const assessmentStore = defineStore('assessment', {
       return ret
 
     },
-    async getSystemData() {
+    // Get the system data (may be used standalone - setting dataReady, or as part of another method)
+    async getSystemData(recordLoading = false) {
 
       let ret = true
-      this.setDataReady(false)
+
+      // NOTE: recordLoading flag eliminates runaway watcher calls when multiple async methods are called in one store operation
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
 
       console.group('getSystemData()')
 
-      if (this.onOrPassedAssessmentStage('System started')) {
+      if (this.onOrPassedAssessmentStage('System complete')) {
         // Retrieve stored system info
         const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
         if (systemResponse.status < 400 && systemResponse.data.data.system != null) {
           // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
           this.$patch((state) => {
-            state.assessmentData.system = humps(systemResponse.data.data.system)
+            state.assessmentData.system = this.convertArrayFields(humps(systemResponse.data.data.system), true)
           })          
         } else {
           ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
         }
       }
-      this.setDataReady(true)
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
     },
+    // Save the system data (standalone method which sets and unsets dataReady)
     async saveSystemData() {
 
       let ret = true
       let uri = '/systems'
       let action = 'save_system_data'
+
       this.setDataReady(false)
 
       console.group('saveSystemData()')
 
-      if (this.onOrPassedAssessmentStage('System started')) {
+      if (this.onOrPassedAssessmentStage('Not started')) {
         // Save system info
         const snakes = createHumps(snakeCase)
         if (this.assessmentData.system.systemId != null) {
@@ -240,10 +262,10 @@ export const assessmentStore = defineStore('assessment', {
           }
         } else {
           // Save new system data
-          const newSystem = Object.assign({}, snakes(this.assessmentData.system), {
+          const newSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system), {
             institution: { connect: [authenticationStore().orgDocId] },
             assessment: { connect: [this.assessmentData.assessmentId] }
-          })
+          }), false)          
           delete newSystem.system_id  // Don't pass a null!
           const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
           if (response.status < 400) {
@@ -262,13 +284,18 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
-    async updateAssessmentStatus(newStatus) {
+    // Update the assessment state to 'newStatus' - can be called standalone (sets/unsets dataReady flag) or as part of another method
+    async updateAssessmentStatus(newStatus, recordLoading = false) {
 
       let ret = true
 
       console.group('updateAssessmentStatus()')
       console.debug('Attempt to set assessment status to', newStatus, 'current status is', this.assessmentData.assessmentState)
       console.debug('Assessment data currently', this.assessmentData)
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
 
       if (this.assessmentData.assessmentId != null && !this.onOrPassedAssessmentStage(newStatus)) {
         const updateStatusResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', { data: { state: newStatus }})
@@ -279,20 +306,26 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = `Failed to update assessment state to ${newStatus}`
         }        
-      }         
+      }     
+      if (recordLoading) {
+        this.setDataReady(true)
+      }    
       console.debug('Returning', ret)
       console.groupEnd()
-
       return ret
     },
-    async patientListBuild() {
+    // Retrieve or build the patient list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
+    async patientListBuild(recordLoading = false) {
 
       let ret = true
-      this.setDataReady(false)
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }      
 
       console.group('patientListBuild()')      
 
-      if (this.assessmentData.patients.length == 0 && this.onOrPassedAssessmentStage('Patient build started')) {
+      if (this.assessmentData.patients.length == 0 && this.assessmentData.assessmentId != null) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=patients`, 'GET')
         if (patientResponse.status < 400) {
@@ -348,7 +381,9 @@ export const assessmentStore = defineStore('assessment', {
           ret = `Error ${patientResponse.message} while retrieving patients for assessment`
         }
       }
-      this.setDataReady(true)
+      if (recordLoading) {
+        this.setDataReady(true)
+      }      
       console.debug('Returning', ret)
       console.groupEnd()
 
