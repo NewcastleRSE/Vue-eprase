@@ -86,8 +86,11 @@ export const rootStore = defineStore('root', {
     // Get all patients of the required type (UPDATED Strapi)
     async getPatientPool(patientType) {
       const isAdult = patientType != 'Paediatric' 
-      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}&populate=scenarios`, 'GET')
+      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}`, 'GET')
       return response
+    },
+    async getFullPatientData(patientId) {
+      const response = await this.apiCall(`patients/${patientId}?populate=*`)
     },
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
