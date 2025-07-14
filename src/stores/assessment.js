@@ -54,7 +54,7 @@ const EMPTY_DATA = {
   patientType: '',     
   system: EMPTY_SYSTEM,
   patients: [],
-  sharingConsent: false
+  consent: false
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -153,7 +153,7 @@ export const assessmentStore = defineStore('assessment', {
             institution: { connect: [authenticationStore().orgDocId] },
             ep_service: { connect: [this.assessmentData.epService.value] },
             other_ep_service: this.assessmentData.otherEpService,
-            sharing_consent: this.assessmentData.sharingConsent
+            consent: this.assessmentData.sharingConsent
           }
         })
         if (response.status < 400) {
@@ -183,7 +183,7 @@ export const assessmentStore = defineStore('assessment', {
               hospital: authenticationStore().hospital,
               institution: authenticationStore().orgDocId,
               patientType: chosenAssessments[0].patient_type,
-              sharingConsent: chosenAssessments[0].sharing_consent
+              consent: chosenAssessments[0].consent
             })
           })
           // Retrieve system data
@@ -314,6 +314,69 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
+    // Get all patients of the required type
+    async getPatientPool(patientType) {
+
+      let ret = true
+
+      console.group('getPatientPool()')
+      console.debug('Get pool of patients of type', patientType)
+
+      const isAdult = patientType != 'Paediatric'
+      // NOTE: increase page size here if number of patients ever exceeds 100! 
+      const response = await rootStore().apiCall(`patients?filters[is_adult][$eq]=${isAdult}&pagination[pageSize]=100`, 'GET')
+      if (response.status < 400) {
+        ret = response.data.data
+      } else {
+        ret = false
+      }
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    // Get all scenarios which are required
+    async getRequiredScenarioPatientCodes() {
+
+      let ret = true
+
+      console.group('getRequiredScenarios()')
+      
+      const response = await rootStore().apiCall('scenarios?filters[required][$eq]=true&populate[patients][fields][0]=patient_code', 'GET')
+      if (response.status < 400) {
+        ret = response.data.data.map(rsc => rsc.patients.patient_code)
+      } else {
+        ret = false
+      }
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    // Retrieve all the relations for a patient with given documentId
+    async getPatientDetails(docId, recordLoading = false) {
+
+      let ret = false
+
+      console.group('getPatientDetails()')
+      console.debug('Patient doc id', docId)
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      } 
+
+      const fpdResponse = await rootStore().apiCall(`patients/${docId}?populate=*`, 'GET')
+      if (fpdResponse.status < 400) {
+        ret = fpdResponse.data.data
+      } 
+      if (recordLoading) {
+        this.setDataReady(true)
+      }  
+      console.debug('Returned data was', ret)
+      console.groupEnd()
+
+      return ret
+    },
     // Retrieve or build the patient list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
     async patientListBuild(recordLoading = false) {
 
@@ -333,44 +396,49 @@ export const assessmentStore = defineStore('assessment', {
           const patients = patientResponse.data.data.patients
           if (patients.length == 0) {
             // Generate patient list
-            const response = await rootStore().getPatientPool(this.assessmentData.patientType)
-            if (response.status < 400) {
-              const patientPool = response.data.data
+            const poolRet = await this.getPatientPool(this.assessmentData.patientType)
+            if (poolRet !== false) {
+              const patientPool = poolRet
               if (patientPool.length < appSettingsStore().assessmentNumPatients) {
                 console.warn(`Not enough patients of patient type : ${this.assessmentData.patientType} in database`)
                 ret = `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.patientType}`
               } else {
                 // Get those whose scenarios include a required one
-                const requiredPatients = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length > 0)
-                const randomPool = patientPool.filter(p => p.scenarios.filter(s => s.required === true).length == 0)
-                // All the required patients are included, choose correct number of additional non-required ones
-                const numRemaining = appSettingsStore().assessmentNumPatients - requiredPatients.length
-                const randoms = new Set()
-                while (randoms.size !== numRemaining) {
-                  randoms.add(Math.floor(Math.random() * randomPool.length))
-                }          
-                for (const num of randoms) {
-                  requiredPatients.push(randomPool[num])
-                }
-                shuffle(requiredPatients)
-                this.$patch((state) => {
-                  state.assessmentData.patients = requiredPatients
-                })
-                console.debug('Generated new patient list', this.assessmentData.patients)
-                // Save to assessment patient list
-                const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
-                  data: {
-                    patients: {
-                      connect: this.assessmentData.patients.map(p => p.documentId)
-                    }
+                const requiredPatientCodes = await this.getRequiredScenarioPatientCodes()
+                if (requiredPatientCodes !== false) {
+                  const requiredPatients = patientPool.filter(p => requiredPatientCodes.includes(p.patient_code))
+                  const randomPool = patientPool.filter(p => !requiredPatientCodes.includes(p.patient_code))
+                  // All the required patients are included, choose correct number of additional non-required ones
+                  const numRemaining = appSettingsStore().assessmentNumPatients - requiredPatients.length
+                  const randoms = new Set()
+                  while (randoms.size !== numRemaining) {
+                    randoms.add(Math.floor(Math.random() * randomPool.length))
+                  }          
+                  for (const num of randoms) {
+                    requiredPatients.push(randomPool[num])
                   }
-                })         
-                if (response.status >= 400) {
-                  ret = `Failed to save patient list for assesssment : error was ${response.message}`
-                } 
+                  shuffle(requiredPatients)
+                  this.$patch((state) => {
+                    state.assessmentData.patients = requiredPatients
+                  })
+                  console.debug('Generated new patient list', this.assessmentData.patients)
+                  // Save to assessment patient list
+                  const response = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', {
+                    data: {
+                      patients: {
+                        connect: this.assessmentData.patients.map(p => p.documentId)
+                      }
+                    }
+                  })
+                  if (response.status >= 400) {
+                    ret = `Failed to save patient list for assesssment : error was ${response.message}`
+                  } 
+                } else {
+                  ret = 'Failed to retrieve required scenario list'
+                }                
               }              
             } else {          
-              ret = `Failed to retrieve data from patient table ${response.message}`
+              ret = `Failed to retrieve pool of suitable patients`
             }        
           } else {
             this.$patch((state) => {

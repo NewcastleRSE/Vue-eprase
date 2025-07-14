@@ -75,23 +75,14 @@ export const rootStore = defineStore('root', {
     },
     // Get list of high risk meds (UPDATED Strapi)
     async getHighRiskMeds() {
-      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value', 'GET')
+      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
     },
     // Get list of clinical areas (UPDATED Strapi)
     async getClinicalAreas() {
-      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value', 'GET')
+      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
-    },
-    // Get all patients of the required type (UPDATED Strapi)
-    async getPatientPool(patientType) {
-      const isAdult = patientType != 'Paediatric' 
-      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}`, 'GET')
-      return response
-    },
-    async getFullPatientData(patientId) {
-      const response = await this.apiCall(`patients/${patientId}?populate=*`)
-    },
+    },    
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })

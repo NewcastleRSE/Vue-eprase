@@ -123,7 +123,10 @@ export default {
     allowReports() {
       // Reports are allowed if there are any completed assessments
       return this.allPossibleAssessments.filter(assessment => assessment.state == 'Assessment complete').length > 0
-    }    
+    }, 
+    dataLoaded() {
+      return this.dataReady
+    }
   },
   data() {
     return {
