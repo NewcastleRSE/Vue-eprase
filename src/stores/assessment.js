@@ -100,6 +100,8 @@ export const assessmentStore = defineStore('assessment', {
       console.group('reset() on assessment store')
       this.$patch((state) => {
         state.assessmentData = EMPTY_DATA
+        state.allPossibleAssessments = []
+        state.dataReady = true
       })
       console.debug(this.assessmentData)
       console.groupEnd()
@@ -256,7 +258,9 @@ export const assessmentStore = defineStore('assessment', {
         const snakes = createHumps(snakeCase)
         if (this.assessmentData.system.systemId != null) {
           // Update existing system data
-          const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: snakes(this.assessmentData.system) })
+          const updatedSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system)))
+          delete updatedSystem.system_id  // Not a valid key for the database
+          const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
           if (response.status >= 400) {         
             ret = `Failed to update system data, error ${response.message}`
           }
@@ -266,7 +270,7 @@ export const assessmentStore = defineStore('assessment', {
             institution: { connect: [authenticationStore().orgDocId] },
             assessment: { connect: [this.assessmentData.assessmentId] }
           }), false)          
-          delete newSystem.system_id  // Don't pass a null!
+          delete newSystem.system_id  // Not a valid key for the database
           const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
           if (response.status < 400) {
             this.$patch((state) => {

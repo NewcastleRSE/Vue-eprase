@@ -11,7 +11,7 @@
 
       <Vueform ref="assessmentStepsForm" validate-on="change|step" v-model="allFormData" sync>
         <template #empty>
-          <FormSteps @next="nextStep" @previous="previousStep" @select="selectStep">
+          <FormSteps ref="assessmentStepsControl" @next="nextStep" @previous="previousStep" @select="selectStep">
             <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
@@ -46,18 +46,12 @@
               }" />
           </FormSteps>
           <FormElements>
-            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" 
-              @get-data-fail="reportError" />
-            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
-            <AssessmentConfigError name="configErrorEl" v-if="activeStep == 5" 
-              @get-data-fail="reportError" @save-data-fail="reportError" />
+            <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" />
+            <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
+            <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
+            <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
+            <AssessmentConfigError name="configErrorEl" v-if="activeStep == 5" />
           </FormElements>
           <FormStepsControls /> 
         </template>
@@ -152,10 +146,58 @@ export default {
       this.nextClicked = false
       this.previousClicked = false
       console.groupEnd()
-    },
-    reportError(message) {
-      this.errorAlertModal.show(message)
     }
+  },
+  mounted() {
+
+    console.group('Assessment top-level mounted() hook')
+
+    // Take the user to the appropriate component according to any assessment progress
+    const stepsControl = this.$refs.assessmentStepsControl
+    console.debug('Steps control', stepsControl)
+    switch (this.assessmentData.assessmentState) {      
+      case 'System complete':
+        stepsControl.goTo('patientBuildStep', true) 
+        break
+      case 'Patient build complete':
+        stepsControl.goTo('scenarioStep', true) 
+        break 
+      case 'Scenarios complete':
+        stepsControl.goTo('configErrorStep', true) 
+        break
+      case 'Config errors complete':
+        //TODO
+        break
+      case 'Assessment complete':
+        //TODO
+        break
+      default: 
+        if (this.assessmentData.assessmentId == null) {
+          // No assessment data present, so start from beginning
+          stepsControl.goTo('epraseIntroStep', false)
+        } else {
+          // An assessment has been started but no data has yet been entered
+          stepsControl.goTo('systemInfoStep', false)
+        }
+        break
+    }
+
+    console.groupEnd()
+  },
+  errorCaptured(...args) {
+
+    console.group('errorCaptured()')
+    console.debug(args)
+
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displyed...
+    const activeElement = document.activeElement
+    if (activeElement) {
+      activeElement.blur();
+    }
+    this.errorAlertModal.show(args[0].message)
+
+    console.groupEnd()
+    return false
   }
 }
 </script>
