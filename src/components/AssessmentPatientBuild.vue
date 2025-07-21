@@ -19,26 +19,27 @@
                 class="accordion-button" 
                 type="button" 
                 data-bs-toggle="collapse"
-                :id="'accordion-btn-' + patient.documentId" 
-                :data-bs-target="'#patient-' + patient.documentId" 
-                aria-expanded="true" 
-                :aria-controls="patient.documentId"
+                :id="'accordion-btn-' + patient.patient_code" 
+                :class="currentPatient == patient.documentId ? '' : 'collapsed'"
+                :data-bs-target="'#patient-' + patient.patient_code" 
+                :aria-expanded="currentPatient == patient.documentId" 
+                :aria-controls="patient.patient_code"
                 @click="patientRelations(patient.documentId)"
               >
                 <span class="fw-bold">{{ patient.full_name }}</span>
               </button>
             </h2>
-            <div :id="'patient-' + patient.documentId" class="accordion-collapse collapse" :class="currentPatient == patient.documentId ? 'show' : ''" data-bs-parent="#patientAccordion">
+            <div :id="'patient-' + patient.patient_code" class="accordion-collapse collapse" :class="currentPatient == patient.documentId ? 'show' : ''" data-bs-parent="#patientAccordion">
               <div class="accordion-body">
                 <!-- Nav tabs -->
-                <ul class="nav nav-tabs" :id="'patient-' + patient.documentId + '-tabs'" role="tablist">
+                <ul class="nav nav-tabs" :id="'patient-' + patient.patient_code + '-tabs'" role="tablist">
                   <li v-for="(value, key, index) in patientDataTabs" class="nav-item" role="presentation">
                     <button 
                       class="nav-link" data-bs-toggle="tab" type="button" role="tab"
                       :class="index == 0 ? 'active' : ''"
                       @click="patientDetailsTabSelector()"
-                      :id="'patient-' + patient.documentId + '-' + key + '-tab'" 
-                      :data-bs-target="'#patient-' + patient.documentId + '-' + key">{{ value }}
+                      :id="'patient-' + patient.patient_code + '-' + key + '-tab'" 
+                      :data-bs-target="'#patient-' + patient.patient_code + '-' + key">{{ value }}
                     </button>
                   </li>                  
                 </ul>
@@ -46,26 +47,35 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                   <!-- Profile tab -->
-                  <div class="tab-pane fade show mt-2" :id="'patient-' + patient.documentId + '-profile'" role="tabpanel" tabindex="0">
-                    <div>
-                      <img style="width: 150px; height: 150px" v-if="patient.gender === 'Male'" src="../assets/images/anon-male.png" alt="male patient" />
-                      <img style="width: 150px; height: 150px" v-if="patient.gender === 'Female'" src="../assets/images/anon-female.png" alt="female-patient" />
+                  <div class="tab-pane fade active show mt-2" :id="'patient-' + patient.patient_code + '-profile'" role="tabpanel" tabindex="0">
+                    <div v-if="!dataLoaded" class="d-flex justify-content-center">
+                      <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading Profile...</span>
+                      </div>
                     </div>
-                    <div>
-                      <table class="table table-striped">
-                        <tbody>
-                          <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
-                          <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
-                          <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
-                          <tr><th>Age</th><td>{{ patient.age }}</td></tr>
-                          <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
-                          <tr><th>Height (m)</th><td>{{ patient.height }}</td></tr>
-                          <tr><th>Weight (kg)</th><td>{{ patient.weight }}</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    <div v-if="dataLoaded">
+                      <div class="d-flex">
+                        <div class="p-2">
+                          <img style="width: 150px; height: 150px" v-if="patient.gender === 'Male'" src="../assets/images/anon-male.png" alt="male patient" />
+                          <img style="width: 150px; height: 150px" v-if="patient.gender === 'Female'" src="../assets/images/anon-female.png" alt="female-patient" />                          
+                        </div>
+                        <div class="p-2 flex-grow-1">
+                          <table class="table table-striped">
+                            <tbody>
+                              <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
+                              <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
+                              <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
+                              <tr><th>Age</th><td>{{ patient.age }}</td></tr>
+                              <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
+                              <tr><th>Height (m)</th><td>{{ patient.height }}</td></tr>
+                              <tr><th>Weight (kg)</th><td>{{ patient.weight }}</td></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>                    
                   </div>
-                  <div class="tab-pane fade mt-2 " :id="'patient-' + patient.documentId + '-allergy'" role="tabpanel" tabindex="0">
+                  <div class="tab-pane fade mt-2 " :id="'patient-' + patient.patient_code + '-allergy'" role="tabpanel" tabindex="0">
                     <div v-if="!dataLoaded" class="d-flex justify-content-center">
                       <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading Allergies...</span>
@@ -82,7 +92,7 @@
                       </table>
                     </div>
                   </div>
-                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.documentId + '-comorbidity'" role="tabpanel" tabindex="0">
+                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-comorbidity'" role="tabpanel" tabindex="0">
                     <div v-if="!dataLoaded" class="d-flex justify-content-center">
                       <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading Comorbidities...</span>
@@ -99,7 +109,7 @@
                       </table>
                     </div>
                   </div>
-                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.documentId + '-diagnosis'" role="tabpanel" tabindex="0">
+                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-diagnosis'" role="tabpanel" tabindex="0">
                     <div v-if="!dataLoaded" class="d-flex justify-content-center">
                       <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading Presenting Complaints...</span>
@@ -116,7 +126,7 @@
                       </table>
                     </div>
                   </div>
-                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.documentId + '-prescription'" role="tabpanel" tabindex="0">
+                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-prescription'" role="tabpanel" tabindex="0">
                     <div v-if="!dataLoaded" class="d-flex justify-content-center">
                       <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading Medication History...</span>
@@ -146,7 +156,7 @@
                       </table>
                     </div>
                   </div>
-                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.documentId + '-clinical_data'" role="tabpanel" tabindex="0">
+                  <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-clinical_data'" role="tabpanel" tabindex="0">
                     <div v-if="!dataLoaded" class="d-flex justify-content-center">
                       <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading Clinical Data...</span>
@@ -163,6 +173,14 @@
                       </table>
                     </div>
                   </div>
+                  <ButtonElement 
+                    :name="'done-patient-' + patient.patient_code" 
+                    :columns="3" 
+                    @click="setPatientDataEntered(patient.patient_code)"
+                  >                    
+                    {{ patientDataEntered(patient.patient_code) ? 'Data entry complete' : 'Entering data into ePrescribing system' }}
+                    <i class="bi ms-2" :class="patientDataEntered(patient.patient_code) ? 'bi-check-circle-fill' : 'bi-three-dots'"></i>
+                  </ButtonElement>
                 </div>
               </div>
             </div>
@@ -183,7 +201,7 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AssessmentPatientBuild',  
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
     dataLoaded() {
       return this.dataReady
     },
@@ -253,6 +271,15 @@ export default {
         }
       }
       return this.allPatientData[docId]
+    },
+    patientDataEntered(code) {
+      return this.assessmentData.completedPatients.split(',').includes(code)
+    },
+    async setPatientDataEntered(patientCode) {
+      const spdeResponse = await this.setPatientEntryComplete(patientCode)
+      if (spdeResponse !== true) {
+        throw new Error(spdeResponse)
+      }
     }
   },
   async mounted() {
@@ -268,10 +295,13 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentPatientBuild beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
-    const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
-    if (updateResponse !== true) {
-      throw new Error(updateResponse)
-    }
+    if (this.assessmentData.completedPatients.split(',').length == this.patientData.length) {
+      // We have done all the data entry now
+      const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
+      if (updateResponse !== true) {
+        throw new Error(updateResponse)
+      }
+    }    
     console.groupEnd()
   }
 }

@@ -54,7 +54,8 @@ const EMPTY_DATA = {
   patientType: '',     
   system: EMPTY_SYSTEM,
   patients: [],
-  consent: false
+  consent: false,
+  completedPatients: ''
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -377,6 +378,39 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(true)
       }  
       console.debug('Returned data was', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async setPatientEntryComplete(patientCode, recordLoading = false) {
+
+      let ret = true
+
+      console.group('setPatientEntryComplete()')
+      console.debug('Patient code', patientCode)      
+
+      const enteredCodes = this.assessmentData.completedPatients == '' ? [] : this.assessmentData.completedPatients.split(',')
+      if (!enteredCodes.includes(patientCode)) {
+
+        if (recordLoading) {
+          this.setDataReady(false)
+        } 
+        enteredCodes.push(patientCode)
+        const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}`, 'PUT', { data: { completed_patients: enteredCodes.toString() } })
+        if (enteredResponse.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.completedPatients = enteredCodes.toString()
+          })
+        } else {
+          ret = `Failed to updated completed patients list by adding ${patientCode}`
+        }
+
+        if (recordLoading) {
+          this.setDataReady(true)
+        }
+      }
+              
+      console.debug('Returning', ret)
       console.groupEnd()
 
       return ret
