@@ -36,8 +36,7 @@
                   <li v-for="(value, key, index) in patientDataTabs" class="nav-item" role="presentation">
                     <button 
                       class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                      :class="index == 0 ? 'active' : ''"
-                      @click="patientDetailsTabSelector()"
+                      :class="index == 0 ? 'active' : ''"                      
                       :id="'patient-' + patient.patient_code + '-' + key + '-tab'" 
                       :data-bs-target="'#patient-' + patient.patient_code + '-' + key">{{ value }}
                     </button>
@@ -242,16 +241,9 @@ export default {
   },
   methods: {    
     patientAuxiliaryData(type) {
-      if (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) {
-        return this.allPatientData[this.currentPatient][type]
-      }
-      return []
-    },  
-    // Toggle 'active' class on tab pane for set of patient details
-    patientDetailsTabSelector(evt) {
-      //const btnId = evt.target.id
-
-    },
+      return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
+        ? this.allPatientData[this.currentPatient][type] : []     
+    },      
     // Patient DOB is random date within last 12 months, adjusted by their stored age
     formatDOB(patient) {
       dayjs.extend(customParseFormat)
@@ -259,6 +251,9 @@ export default {
     },
     docIdFromTabBtnId(tabId) {
       return tabId.replace(/^accordion-btn-([a-z0-9]+)$/, '\$1')
+    },
+    completedPatientsArray() {
+      return this.assessmentData.completedPatients == '' ? [] : this.assessmentData.completedPatients.split(',')
     },
     async patientRelations(docId) {
       this.currentPatient = docId
@@ -273,13 +268,32 @@ export default {
       return this.allPatientData[docId]
     },
     patientDataEntered(code) {
-      return this.assessmentData.completedPatients.split(',').includes(code)
+      return this.completedPatientsArray().includes(code)
+    },
+    openNextUnenteredPatient() {
+
+      console.group('openNextUnenteredPatient()')
+
+      const allCodes = this.patientData.map(p => p.patient_code)
+      const doneCodes = this.completedPatientsArray()
+
+      if (allCodes.length > doneCodes.length) {
+        // Still some to do
+        const notDoneCodes = allCodes.filter(c => !doneCodes.includes(c))
+        const nextCode = notDoneCodes.shift()
+        const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
+        this.patientRelations(docId)
+      } else {
+        console.debug('No unentered patients left')
+      }
+      console.groupEnd()
     },
     async setPatientDataEntered(patientCode) {
       const spdeResponse = await this.setPatientEntryComplete(patientCode)
       if (spdeResponse !== true) {
         throw new Error(spdeResponse)
       }
+      this.openNextUnenteredPatient()
     }
   },
   async mounted() {
@@ -288,14 +302,15 @@ export default {
     if (loadPatientsResponse !== true) {
       throw new Error(loadPatientsResponse)
     }   
-    // Get the details for the first (open) patient
-    this.patientRelations(this.patientData[0].documentId)
+    // Get the details for the first (unentered) patient
+    //this.patientRelations(this.patientData[0].documentId)
+    this.openNextUnenteredPatient()
     console.groupEnd()
   },
   async beforeUnmount() {
     console.group('AssessmentPatientBuild beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
-    if (this.assessmentData.completedPatients.split(',').length == this.patientData.length) {
+    if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
       if (updateResponse !== true) {

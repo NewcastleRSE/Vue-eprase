@@ -238,6 +238,8 @@ export default {
     console.groupEnd()
   },
   async beforeUnmount() {
+    // TODO - 21/07/2025 - Logging out at this point with a partially complete form causes an error when updating the assessment status 
+    // because the user's token disappears before the update method is called - hence we get a 403
     console.group('AssessmentSystem beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentSystem beforeUnmount() hook - dataReady flag is false')
     const sysResponse = await this.saveSystemData()        

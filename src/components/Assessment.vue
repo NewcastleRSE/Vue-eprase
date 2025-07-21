@@ -19,7 +19,7 @@
             <FormStep name="selectAssessmentStep" label="Start or continue an assessment" 
               :elements="['selectAssessmentEl']" 
               :buttons="{ previous: false }"
-              :labels="{ next: 'Continue to system information' }" />
+              :labels="{ next: assessmentOption == 'continue' ? 'Continue assessment from where you left off' : 'Continue to system information' }" />
             <FormStep name="systemInfoStep" label="ePrescribing system information"               
               :elements="['systemInfoEl']" 
               :buttons="{ previous: false }"
@@ -88,6 +88,15 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapState(assessmentStore, ['assessmentData']),
+    assessmentId() {
+      return this.assessmentData.assessmentId
+    },
+    assessmentOption() {
+      return this.assessmentData.assessmentOption
+    },
+    assessmentState() {
+      return this.assessmentData.assessmentState
+    },
     allFormData: {
       get() {        
         return this.assessmentData
@@ -100,6 +109,9 @@ export default {
     },
     formSteps() {
       return this.$refs.assessmentStepsForm
+    },
+    formStepsControl() {
+      return this.$refs.assessmentStepsControl
     }
   },
   components: {
@@ -122,12 +134,43 @@ export default {
       nextClicked: false,
       previousClicked: false
     }
-  },
+  },  
   methods: {         
     nextStep(toStep) {
       console.group('nextStep()')
       console.debug('Next step', toStep.index, 'full step', toStep)
-      this.nextClicked = true      
+      this.nextClicked = true
+      if (this.activeStep == 1 && this.assessmentOption == 'continue') {
+        // Jump to where the user left off if continuing an assessment
+        console.debug('Continuing an assessment, jump to where user left off...')
+        console.debug('Assessment state is', this.assessmentState)
+        switch (this.assessmentState) {      
+          case 'System complete':
+            this.formStepsControl.goTo('patientBuildStep', true) 
+            break
+          case 'Patient build complete':
+            this.formStepsControl.goTo('scenarioStep', true) 
+            break 
+          case 'Scenarios complete':
+            this.formStepsControl.goTo('configErrorStep', true) 
+            break
+          case 'Config errors complete':
+            //TODO
+            break
+          case 'Assessment complete':
+            //TODO
+            break
+          default: 
+            if (this.assessmentId == null) {
+              // No assessment data present, so start from beginning
+              this.formStepsControl.goTo('epraseIntroStep', false)
+            } else {
+              // An assessment has been started but no data has yet been entered
+              this.formStepsControl.goTo('systemInfoStep', false)
+            }
+            break
+        }
+      }
       console.debug('Form data', this.allFormData)
       console.groupEnd()
     }, 
@@ -144,44 +187,12 @@ export default {
       console.debug('Previous', previous)
       this.activeStep = active.index 
       this.nextClicked = false
-      this.previousClicked = false
+      this.previousClicked = false      
       console.groupEnd()
     }
   },
   mounted() {
-
     console.group('Assessment top-level mounted() hook')
-
-    // Take the user to the appropriate component according to any assessment progress
-    const stepsControl = this.$refs.assessmentStepsControl
-    console.debug('Steps control', stepsControl)
-    switch (this.assessmentData.assessmentState) {      
-      case 'System complete':
-        stepsControl.goTo('patientBuildStep', true) 
-        break
-      case 'Patient build complete':
-        stepsControl.goTo('scenarioStep', true) 
-        break 
-      case 'Scenarios complete':
-        stepsControl.goTo('configErrorStep', true) 
-        break
-      case 'Config errors complete':
-        //TODO
-        break
-      case 'Assessment complete':
-        //TODO
-        break
-      default: 
-        if (this.assessmentData.assessmentId == null) {
-          // No assessment data present, so start from beginning
-          stepsControl.goTo('epraseIntroStep', false)
-        } else {
-          // An assessment has been started but no data has yet been entered
-          stepsControl.goTo('systemInfoStep', false)
-        }
-        break
-    }
-
     console.groupEnd()
   },
   errorCaptured(...args) {
@@ -189,7 +200,7 @@ export default {
     console.group('errorCaptured()')
     console.debug(args)
 
-    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displyed...
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
     const activeElement = document.activeElement
     if (activeElement) {
       activeElement.blur();
