@@ -1,18 +1,41 @@
-<template></template>
+<template>
+  <div class="alert alert-info d-flex" v-if="!dataLoaded">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Saving assessment state...</span>
+    </div>
+    <div class="flex-grow-1">
+      Saving assessment state...
+    </div>
+  </div>
+</template>
 
 <script>
 
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
+import { assessmentStore } from '../stores/assessment'
 
 export default {
   name: "AppLogout",
   computed: {
-    ...mapState(authenticationStore, ['logout'])
+    ...mapState(authenticationStore, ['logout']),
+    ...mapState(assessmentStore, ['dataReady', 'setLoggingOut']),
+    dataLoaded() {
+      return this.dataReady
+    }
   },
-  mounted() {
-    this.logout()
-    this.$router.push('/login?action=loggedOut')
+  watch: {
+    dataReady(newVal) {
+      console.group('dataReady() watcher entered with new value', newVal)
+      if (newVal === true) {
+        // We can now log out safely as the store saving process has finished (so user JWT no longer required)
+        console.debug('Logging out user...')
+        this.setLoggingOut(false)
+        this.logout()
+        this.$router.push('/login?action=loggedOut')
+      }
+      console.groupEnd()
+    }
   }
 }
 </script>

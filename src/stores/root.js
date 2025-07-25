@@ -8,6 +8,7 @@ const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({
+    // OLD
     assessmentId: null,
     assessmentStatus: null,
     assessmentComplete: false,    

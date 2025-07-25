@@ -12,7 +12,7 @@
         <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
         <h3>Please fill in the following additional information:</h3>
       </StaticElement>
-      <ObjectElement ref="systemObject" name="system">      
+      <ObjectElement ref="systemObject" name="system" @before-unmount="async (el$) => { await el$.validate() }">      
         <TextElement name="addEpSystem" placeholder="Name of additional eP system"
           :label="embolden('Do you use an additional ePrescribing service?', true)"
           :debounce="500" />
@@ -156,7 +156,7 @@ export default {
   name: 'AssessmentSystem',      
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
-    ...mapState(assessmentStore, ['assessmentData', 'dataReady', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
+    ...mapState(assessmentStore, ['assessmentData', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
     confirmCancelEditModal() {
       return this.$refs.confirmCancelEditModal
     },  
@@ -169,6 +169,9 @@ export default {
         dateFormat: 'MMM Y',
         altFormat: 'MMM Y'
       })
+    },
+    systemForm() {
+      return this.$refs.systemObject
     },
     epSystemName() {
       return this.assessmentData.epService.label == 'Other' ? this.assessmentData.otherEpService : this.assessmentData.epService.label
@@ -237,12 +240,13 @@ export default {
     console.group('AssessmentSystem mounted()')
     console.groupEnd()
   },
-  async beforeUnmount() {
-    // TODO - 21/07/2025 - Logging out at this point with a partially complete form causes an error when updating the assessment status 
-    // because the user's token disappears before the update method is called - hence we get a 403
+  async beforeUnmount() {    
     console.group('AssessmentSystem beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentSystem beforeUnmount() hook - dataReady flag is false')
-    const sysResponse = await this.saveSystemData()        
+    console.assert(this.dataLoaded, 'AssessmentSystem beforeUnmount() hook - dataReady flag is false') 
+    // Note: DO NOT assume system data is complete if we log out in the middle of entering it!
+    // Also, it is very difficult to validate a form at this late stage as everything is in the process
+    // of being reset - compromise is to assume that if system data is NOT submitted then it is incomplete 
+    const sysResponse = await this.saveSystemData(!this.loggingOut)        
     if (sysResponse !== true) {
       throw new Error(sysResponse)
     } 

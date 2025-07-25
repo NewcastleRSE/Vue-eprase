@@ -63,13 +63,19 @@ export const assessmentStore = defineStore('assessment', {
     assessmentData: EMPTY_DATA,
     allPossibleAssessments: [],
     assessmentStates: ASSESSMENT_STATES,
-    dataReady: false
+    dataReady: false,
+    loggingOut: false
   }),
   persist: true, 
   actions: {
     setDataReady(readyStatus) {
       this.$patch((state) => {
         state.dataReady = readyStatus
+      })
+    },
+    setLoggingOut(logoutStatus) {
+      this.$patch((state) => {
+        state.loggingOut = logoutStatus
       })
     },
     async getAssessmentsForInstitution() {
@@ -244,7 +250,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Save the system data (standalone method which sets and unsets dataReady)
-    async saveSystemData() {
+    async saveSystemData(systemComplete) {
 
       let ret = true
       let uri = '/systems'
@@ -253,6 +259,7 @@ export const assessmentStore = defineStore('assessment', {
       this.setDataReady(false)
 
       console.group('saveSystemData()')
+      console.debug('System data complete (i.e. not logging out before submitting data)', systemComplete)
 
       if (this.onOrPassedAssessmentStage('Not started')) {
         // Save system info
@@ -260,6 +267,7 @@ export const assessmentStore = defineStore('assessment', {
         if (this.assessmentData.system.systemId != null) {
           // Update existing system data
           const updatedSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system)))
+          delete updatedSystem.id 
           delete updatedSystem.system_id  // Not a valid key for the database
           const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
           if (response.status >= 400) {         
@@ -270,14 +278,19 @@ export const assessmentStore = defineStore('assessment', {
           const newSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system), {
             institution: { connect: [authenticationStore().orgDocId] },
             assessment: { connect: [this.assessmentData.assessmentId] }
-          }), false)          
+          }), false) 
+          delete newSystem.id        
           delete newSystem.system_id  // Not a valid key for the database
           const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
           if (response.status < 400) {
             this.$patch((state) => {
               state.assessmentData.system.systemId = response.data.data.documentId
             })
-            ret = await this.updateAssessmentStatus('System complete')
+            if (systemComplete) {
+              // User is allowed to log out in the middle of entering system data (i.e. an incomplete/invalid form is potentially saved)
+              // Make sure we don't record the system data as completed in this case
+              ret = await this.updateAssessmentStatus('System complete')
+            }            
           } else {
             ret = `Failed to save system data, error ${response.message}`
           }
