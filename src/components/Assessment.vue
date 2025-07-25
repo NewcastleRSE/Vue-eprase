@@ -82,12 +82,11 @@ import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
 
-
 export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData']),
+    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
     assessmentId() {
       return this.assessmentData.assessmentId
     },
@@ -130,7 +129,7 @@ export default {
     return {   
       assessmentComplete: false,  
       allAssessments: [],
-      activeStep: 0,     
+      activeStep: 0,
       nextClicked: false,
       previousClicked: false
     }

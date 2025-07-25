@@ -174,10 +174,11 @@
                   </div>
                   <ButtonElement 
                     :name="'done-patient-' + patient.patient_code" 
-                    :columns="3" 
+                    :columns="6" 
+                    :title="patientDataEntered(patient.patient_code) ? 'You have entered all the data for this patient' : 'Click when you have finished entering patient data, and move on to the next one'"
                     @click="setPatientDataEntered(patient.patient_code)"
                   >                    
-                    {{ patientDataEntered(patient.patient_code) ? 'Data entry complete' : 'Entering data into ePrescribing system' }}
+                    {{ patientDataEntered(patient.patient_code) ? 'Data entry complete' : 'Data entry in progress' }}
                     <i class="bi ms-2" :class="patientDataEntered(patient.patient_code) ? 'bi-check-circle-fill' : 'bi-three-dots'"></i>
                   </ButtonElement>
                 </div>
@@ -297,14 +298,29 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')      
+    console.group('AssessmentPatientBuild mounted()')  
+    // This rather convoluted code ensures that the patient data being entered ends up on the screen, 
+    // rather than the user having to scroll down to see it...
+    const accordionItems = document.querySelectorAll('.accordion-collapse')
+    const acc = document.getElementById('patientAccordion')
+    console.debug('Accordion items', accordionItems, 'accordion', acc)
+    accordionItems.forEach((el) => {
+      el.addEventListener('shown.bs.collapse', (e) => {
+        console.debug('shown.bs.collapse handler()')
+        var scrollOffset = acc.scrollTop + el.parentNode.offsetTop
+        acc.scroll({
+          top: scrollOffset,
+          left: 0, 
+          behavior: 'smooth'
+        })
+      })
+    })   
     const loadPatientsResponse = await this.patientListBuild(true)
     if (loadPatientsResponse !== true) {
       throw new Error(loadPatientsResponse)
     }   
     // Get the details for the first (unentered) patient
-    //this.patientRelations(this.patientData[0].documentId)
-    this.openNextUnenteredPatient()
+    this.openNextUnenteredPatient()    
     console.groupEnd()
   },
   async beforeUnmount() {

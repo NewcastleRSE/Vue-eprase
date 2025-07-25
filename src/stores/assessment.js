@@ -18,6 +18,8 @@ const ASSESSMENT_STATES = {
   'Assessment complete': 6
 }
 
+const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
+
 const EMPTY_SYSTEM = {
   systemId: null,          
   addEpSystem: '',
@@ -37,7 +39,8 @@ const EMPTY_SYSTEM = {
   penicillinComment: '',
   highRiskMeds: [],
   clinicalAreas: [],
-  otherClinicalArea: ''
+  otherClinicalArea: '',
+  timeTaken: null
 }
 
 const ARRAY_FIELDS_HUMPS = ['penicillinDescription', 'highRiskMeds', 'clinicalAreas']
@@ -77,6 +80,9 @@ export const assessmentStore = defineStore('assessment', {
       this.$patch((state) => {
         state.loggingOut = logoutStatus
       })
+    },
+    assessmentStateIndex() {
+      return ASSESSMENT_STATES[this.assessmentData.assessmentState]
     },
     async getAssessmentsForInstitution() {
 
@@ -235,8 +241,11 @@ export const assessmentStore = defineStore('assessment', {
         const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.assessmentId}?populate=system`, 'GET')
         if (systemResponse.status < 400 && systemResponse.data.data.system != null) {
           // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
+          const newSystem = Object.assign({}, systemResponse.data.data.system)
+          newSystem.systemId = newSystem.documentId             // Map systemId onto documentId
+          OMIT_SYSTEM_FIELDS.forEach(f => delete newSystem[f])  // Delete all redundant fields         
           this.$patch((state) => {
-            state.assessmentData.system = this.convertArrayFields(humps(systemResponse.data.data.system), true)
+            state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
           })          
         } else {
           ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
@@ -267,8 +276,7 @@ export const assessmentStore = defineStore('assessment', {
         if (this.assessmentData.system.systemId != null) {
           // Update existing system data
           const updatedSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system)))
-          delete updatedSystem.id 
-          delete updatedSystem.system_id  // Not a valid key for the database
+          delete updatedSystem.system_id  // Not a valid key for the database (systemId == Strapi's documentId)
           const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
           if (response.status >= 400) {         
             ret = `Failed to update system data, error ${response.message}`
@@ -279,7 +287,6 @@ export const assessmentStore = defineStore('assessment', {
             institution: { connect: [authenticationStore().orgDocId] },
             assessment: { connect: [this.assessmentData.assessmentId] }
           }), false) 
-          delete newSystem.id        
           delete newSystem.system_id  // Not a valid key for the database
           const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
           if (response.status < 400) {

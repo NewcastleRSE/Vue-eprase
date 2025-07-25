@@ -16,7 +16,7 @@ import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: "AppLogout",
+  name: 'AppLogout',
   computed: {
     ...mapState(authenticationStore, ['logout']),
     ...mapState(assessmentStore, ['dataReady', 'setLoggingOut']),
