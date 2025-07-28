@@ -76,7 +76,7 @@ import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 
 export default {
-  name: "AppLogin",
+  name: 'AppLogin',
   components: {
     AppLogo
   },

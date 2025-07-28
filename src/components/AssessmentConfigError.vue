@@ -1,17 +1,17 @@
 <template>
-  <GroupElement name="scenarioGroup" :class="'mb-4'">
-    <StaticElement name="scenarioDataLoading" v-if="!dataReady">
+  <GroupElement name="configErrorGroup" :class="'mb-4'">
+    <StaticElement name="configErrorDataLoading" v-if="!dataReady">
       <div class="d-flex align-items-center">
-        <strong role="status">Loading scenario data for assessment...</strong>
+        <strong role="status">Loading config error data for assessment...</strong>
         <div class="spinner-border ms-auto" aria-hidden="true"></div>
       </div>
     </StaticElement>
-    <GroupElement name="scenarioDataLoaded">
-      <StaticElement name="scenarioHeading">
-        <h2>Scenarios</h2>
+    <GroupElement name="configErrorDataLoaded">
+      <StaticElement name="configErrorHeading">
+        <h2>Config Errors</h2>
       </StaticElement>
       <!-- TODO -->
-    </GroupElement>      
+    </GroupElement>    
   </GroupElement>
 </template>
 
@@ -21,9 +21,9 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: 'AssessmentScenario',
+  name: 'AssessmentConfigError',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus'])
+    ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus']),
   },
   emits: ['save-data-fail', 'get-data-fail'],
   data() {
@@ -35,11 +35,11 @@ export default {
     
   },
   mounted() {
-    console.group('AssessmentScenario mounted()')
+    console.group('AssessmentConfigError mounted()')
     console.groupEnd()
   },
   beforeUnmount() {
-    console.group('AssessmentScenario beforeUnmount()')
+    console.group('AssessmentConfigError beforeUnmount()')
     console.groupEnd()
   }
 }

@@ -25,15 +25,17 @@
 import { Dropdown } from 'bootstrap'
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
-import ExitModal from "./ExitModal"
+import { assessmentStore } from '../stores/assessment'
+import ExitModal from './ExitModal'
 
 export default {
-  name: "LoginInfo",
+  name: 'LoginInfo',
   components:{
     ExitModal
   },
   computed: {
     ...mapState(authenticationStore, ['user', 'orgName', 'isLoggedIn']),
+    ...mapState(assessmentStore, ['setLoggingOut']),
     exitModal() {
       return this.$refs.exitModal
     }
@@ -45,6 +47,7 @@ export default {
   },
   methods: {
     exit() {
+      this.setLoggingOut(true)
       this.$router.push('/logout')
     },
     toggleDropdownMenu() {

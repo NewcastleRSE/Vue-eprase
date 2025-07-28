@@ -4,9 +4,11 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 const API = process.env.BASE_URL
+const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({
+    // OLD
     assessmentId: null,
     assessmentStatus: null,
     assessmentComplete: false,    
@@ -27,8 +29,10 @@ export const rootStore = defineStore('root', {
     async apiCall(url, method = 'POST', body = null) {
 
       console.group('apiCall()')
+      // Added to help debug problems with paths when transferring to staging server
+      console.warn(process.env)
 
-      if (!(method == 'GET' || method == 'POST')) {
+      if (!(SUPPORTED_METHODS.includes(method.toUpperCase()))) {
         throw new Error(`API call using ${method} not implemented`)
       }
 
@@ -43,6 +47,12 @@ export const rootStore = defineStore('root', {
         } else if (method == 'POST') {
           console.debug('POST url', API + url, 'config', config, 'body', body)
           response = await axios.post(API + url, body, config)
+        } else if (method == 'PUT') {
+          console.debug('PUT url', API + url, 'config', config, 'body', body)
+          response = await axios.put(API + url, body, config)
+        } else if (method == 'DELETE') {
+          console.debug('DELETE url', API + url, 'config', config, 'body', body)
+          response = await axios.delete(API + url, body, config)
         }
         ret = { status: response.status, data: response.data}
       } catch(err) {
@@ -66,20 +76,22 @@ export const rootStore = defineStore('root', {
     },
     // Get list of high risk meds (UPDATED Strapi)
     async getHighRiskMeds() {
-      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value', 'GET')
+      const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
     },
     // Get list of clinical areas (UPDATED Strapi)
     async getClinicalAreas() {
-      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value', 'GET')
+      const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
-    },
-    // Get all patients of the required type (UPDATED Strapi)
-    async getPatientPool(patientType) {
-      const isAdult = patientType != 'Paediatric' 
-      const response = await this.apiCall(`patients?filters[is_adult][$eq]=${isAdult}&populate=scenarios`)
-      return response
-    },
+    },    
+    // Audit action (UPDATED Strapi)
+    async audit(action, uri, result) {
+      const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })
+      if (response.status >= 400) {
+        // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
+        console.error(response.message)
+      }
+    },   
     async getCategories() {
       if (this.categories.length == 0) {
         const response = await this.apiCall('categories', 'GET')
@@ -196,13 +208,7 @@ export const rootStore = defineStore('root', {
         this.storeMitigationData(goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests)
       }
       return(response)
-    },
-    async audit(action, uri) {
-      const response = await this.apiCall('audits', 'POST', { data: { action, uri } })
-      if (response.status >= 400) {
-        console.error(response.message)
-      }
-    },    
+    },     
     storeAssessmentId(id) { this.assessmentId = id },
     storeAssessmentStatus(status) { this.assessmentStatus = status },
     storeAssessmentComplete(complete) { this.assessmentComplete = complete },    
