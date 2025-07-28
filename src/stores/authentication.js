@@ -74,6 +74,24 @@ export const authenticationStore = defineStore('authentication', {
       this.clear()
       console.groupEnd()
     },
+    async userEmailFromId(userId) {
+
+      let ret = false
+
+      console.group('userEmailFromId()')
+
+      try {
+        const res = await axios.get(API + `users?fields[0]=email&filters[id][$eq]=${userId}`, { headers: this.authTokenHeader })
+        ret = true
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
     async isLoggedIn() {
 
       let ret = false

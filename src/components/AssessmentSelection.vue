@@ -48,10 +48,14 @@
           :messages="{required: 'Select an option'}" 
           :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
         />
-        <ToggleElement name="sharingConsent"
-          :label="embolden('I consent to sharing my institution name and associated data with other trusts', true)"
-          :labels="{ on: 'Yes', off: 'No' }"
-        />        
+        <CheckboxElement 
+          name="shareTrustsOptOut"
+          :label="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')"
+        /> 
+        <CheckboxElement 
+          name="shareSuppliersOptOut"
+          :label="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')" 
+        />   
       </GroupElement>
       
       <GroupElement name="continueAssessmentGroup">
@@ -65,6 +69,7 @@
               <th>Assessment state</th>
               <th>Created on</th>
               <th>Last update</th>
+              <th>Updater</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +79,7 @@
                   :label="null"
                   :items="updatableDocIds"
                   :messages="{required: 'Select one'}" 
-                  :rules="['required']"
+                  :rules="['filled']"
                   :class="'me-2'" />
               </td>
               <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
@@ -82,9 +87,13 @@
               <td>{{ assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
               <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+              <td>{{ userEmailFormId(updatedById) }}</td>
             </tr>
           </tbody>
-        </table>  
+        </table>
+        <ButtonElement name="reset" :columns="3" @click="continueAssessment()">
+          <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
+        </ButtonElement>  
       </GroupElement>    
     </GroupElement>      
   </GroupElement>
@@ -102,7 +111,7 @@ export default {
   name: 'AssessmentSelection',  
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
-    ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
+    ...mapState(authenticationStore, ['email', 'orgName', 'hospital', 'userEmailFromId']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
       return this.assessmentData
@@ -142,6 +151,7 @@ export default {
       isOtherEpSystem: false
     }
   },
+  emits: ['jump-to-step'],
   methods: {
     setOption(optionValue) {
       this.selectionData.assessmentOption = optionValue
@@ -161,6 +171,9 @@ export default {
       console.groupEnd()
 
       return possibles
+    },
+    continueAssessment() {
+      this.$emit('jump-to-step')
     },
     async getEpSystemNames() {
       let epSystems = []

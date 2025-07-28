@@ -7,6 +7,9 @@
       Saving assessment state...
     </div>
   </div>
+  <div class="alert alert-danger" v-if="dataLoaded">
+    Data has loaded, but logout hasn't proceeded!
+  </div>
 </template>
 
 <script>
@@ -35,7 +38,7 @@ export default {
         this.$router.push('/login?action=loggedOut')
       }
       console.groupEnd()
-    }
+    }, immediate: true
   }
 }
 </script>

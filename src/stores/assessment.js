@@ -21,9 +21,10 @@ const ASSESSMENT_STATES = {
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
 
 const EMPTY_SYSTEM = {
-  systemId: null,          
-  addEpSystem: '',
-  localEpSystemName: '',
+  systemId: null, 
+  // Removed 28/07/2025 David, following meeting with Steph & Ellie at which it was agreed these were confusing and redundant
+  // addEpSystem: '',
+  // localEpSystemName: '',
   epServiceImplemented: null,
   epServiceUpdated: null,
   numMaintainers: 1.0,
@@ -37,10 +38,14 @@ const EMPTY_SYSTEM = {
   penicillinDescriptionOther: '',
   penicillinResults: false,
   penicillinComment: '',
+  antiMicReviewTime: false,
+  antiMicInterpretResults: false,
+  antiMicComments: '',
   highRiskMeds: [],
   clinicalAreas: [],
-  otherClinicalArea: '',
-  timeTaken: null
+  otherClinicalArea: ''
+  // Removed 28/07/2025 David, following meeting with Steph & Ellie at which it was agreed this is redundant
+  //timeTaken: null
 }
 
 const ARRAY_FIELDS_HUMPS = ['penicillinDescription', 'highRiskMeds', 'clinicalAreas']
@@ -57,7 +62,8 @@ const EMPTY_DATA = {
   patientType: '',     
   system: EMPTY_SYSTEM,
   patients: [],
-  consent: false,
+  shareTrustsOptOut: false,
+  shareSuppliersOptOut: false,
   completedPatients: ''
 }
 

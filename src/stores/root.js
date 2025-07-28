@@ -83,7 +83,7 @@ export const rootStore = defineStore('root', {
     async getClinicalAreas() {
       const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
-    },    
+    },
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })

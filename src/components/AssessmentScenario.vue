@@ -25,7 +25,6 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus'])
   },
-  emits: ['save-data-fail', 'get-data-fail'],
   data() {
     return {
       

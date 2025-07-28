@@ -9,7 +9,16 @@
     </StaticElement>
     <GroupElement name="patientListLoaded" v-if="dataLoaded">
       <StaticElement name="patientBuildHeading">
-        <h2>Patient build</h2>
+        <h2>Assessment Patient Preparation</h2>
+      </StaticElement>
+      <StaticElement name="patientListInfo">
+        <div class="alert alert-info mt-4" role="alert">
+          Please admit the following test patients into your hospital's patient admissions system (or a test environment). 
+          When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
+          You will need to enter additional clinical information for each test patient (presented in the other named tabs) in order
+          for the subsequent scenarios to work correctly. When you have finished entering all the data, click the <span class="fw-bold">'Data entry in progress...'</span> button
+          to move to the next patient.
+        </div>
       </StaticElement>
       <StaticElement name="patientBuildBody">
         <div class="accordion" id="patientAccordion">

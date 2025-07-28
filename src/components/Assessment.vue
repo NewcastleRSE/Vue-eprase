@@ -18,8 +18,8 @@
               :labels="{ next: 'Continue to assessment selection' }" />
             <FormStep name="selectAssessmentStep" label="Start or continue an assessment" 
               :elements="['selectAssessmentEl']" 
-              :buttons="{ previous: false }"
-              :labels="{ next: assessmentOption == 'continue' ? 'Continue assessment from where you left off' : 'Continue to system information' }" />
+              :buttons="{ previous: false, next: assessmentOption != 'continue' }"
+              :labels="{ next: 'Continue to system information' }" />
             <FormStep name="systemInfoStep" label="ePrescribing system information"               
               :elements="['systemInfoEl']" 
               :buttons="{ previous: false }"
