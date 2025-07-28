@@ -139,6 +139,7 @@ export default {
       console.group('nextStep()')
       console.debug('Next step', toStep.index, 'full step', toStep)
       this.nextClicked = true
+      // TODO - this executes on the emission of jump-to-step event...
       if (this.activeStep == 1 && this.assessmentOption == 'continue') {
         // Jump to where the user left off if continuing an assessment
         console.debug('Continuing an assessment, jump to where user left off...')
