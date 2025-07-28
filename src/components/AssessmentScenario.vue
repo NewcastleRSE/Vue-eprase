@@ -21,7 +21,7 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: 'AssessmentScenario',  
+  name: 'AssessmentScenario',
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus'])
   },
