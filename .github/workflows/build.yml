@@ -35,6 +35,7 @@ jobs:
       - name: Compose Down
         uses: garygrossgarten/github-action-ssh@release
         with:
+          # Got rid of -v switch here as do not want to delete database when live content being entered!
           command: sudo docker compose down
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
