@@ -1,52 +1,92 @@
 <template>
-  <GroupElement ref="selection" name="selectionGroup" :class="'mb-4'">
-    <StaticElement name="selectionHeading">
-      <h2>Assessment Selection</h2>
+  <GroupElement name="assessmentGroup" :class="'mb-4'">
+    <StaticElement name="assessmentGroupLoading" v-if="!dataLoaded">
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading selections...</span>
+        </div>
+      </div>
     </StaticElement>
-    <RadiogroupElement name="assessmentOption"
-      :label="embolden('I would like to:', true)"      
-      :items="[
-        { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
-        { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
-        { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
-      ]"
-      :messages="{required: 'Select an option'}" 
-      @change="(newVal) => { 
-        assessmentOption = newVal 
-      }"
-      :rules="['required']"
-    />
-    <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
-      :label="embolden('For patient type', true)"      
-      :items="[
-        { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
-        { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
-      :messages="{required: 'Select an option'}" 
-      :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
-    />       
-    <table v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" class="table table-striped caption-top" style="min-width:800px">
-      <caption>You can access the following assessments:</caption>
-      <thead>
-        <tr>
-          <th>&nbsp;</th>
-          <th>ePrescribing system</th>
-          <th>Patient type</th>
-          <th>Assessment state</th>
-          <th>Created on</th>
-          <th>Last update</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="assessment in updatableAssessments">
-          <td><RadioElement name="assessmentId" :radio-value="assessment.documentId" :class="'me-2'" /></td>
-          <td>{{ assessment.system && assessment.system.ep_service ? assessment.system.ep_service : 'Not yet specified' }}</td>
-          <td>{{ assessment.patient_type }}</td>
-          <td>{{ assessment.state }}</td>
-          <td>{{ assessment.createdAt }}</td>
-          <td>{{ assessment.updatedAt }}</td>
-        </tr>
-      </tbody>
-    </table>  
+    <GroupElement name="assessmentGroupLoaded" v-if="dataLoaded">
+      <StaticElement name="selectionHeading">
+        <h2>Assessment Selection</h2>
+      </StaticElement>
+      <RadiogroupElement 
+        name="assessmentOption"
+        :label="embolden('I would like to:', true)"      
+        :items="[
+          { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
+          { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
+          { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
+        ]"
+        :messages="{required: 'Select an option'}"       
+        :rules="['required']"
+        @change="setOption"
+      />
+      <GroupElement name="newAssessmentGroup" v-if="selectionData.assessmentOption == 'new'">
+        <SelectElement name="epService"
+          @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
+          :label="embolden('For ePrescribing system', true)"
+          :native="false" 
+          :search="true"
+          :track-by="['label', 'value']"
+          :items="getEpSystemNames"
+          :object="true"
+          :messages="{required: 'Name of ePrescribing system is required'}"           
+          :rules="['required']"          
+        />
+        <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
+          :label="embolden('Name of ePrescribing system', true)"
+          :debounce="500" 
+          :messages="{required: 'Other eP system name is required'}" 
+          :rules="['required', 'fieldIsOther:epService']" />
+        <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
+          :label="embolden('For patient type', true)"      
+          :items="[
+            { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
+            { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
+          :messages="{required: 'Select an option'}" 
+          :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
+        />
+        <ToggleElement name="sharingConsent"
+          :label="embolden('I consent to sharing my institution name and associated data with other trusts', true)"
+          :labels="{ on: 'Yes', off: 'No' }"
+        />        
+      </GroupElement>
+      
+      <GroupElement name="continueAssessmentGroup">
+        <table v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" class="table table-striped caption-top" style="min-width:800px">
+          <caption>You can access the following assessments:</caption>
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>ePrescribing system</th>
+              <th>Patient type</th>
+              <th>Assessment state</th>
+              <th>Created on</th>
+              <th>Last update</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="assessment in updatableAssessments">
+              <td :rowspan="updatableAssessments.length">
+                <RadiogroupElement name="assessmentId" 
+                  :label="null"
+                  :items="updatableDocIds"
+                  :messages="{required: 'Select one'}" 
+                  :rules="['required']"
+                  :class="'me-2'" />
+              </td>
+              <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
+              <td>{{ assessment.patient_type }}</td>
+              <td>{{ assessment.state }}</td>
+              <td>{{ convertDate(assessment.createdAt, false) }}</td>
+              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+            </tr>
+          </tbody>
+        </table>  
+      </GroupElement>    
+    </GroupElement>      
   </GroupElement>
 </template>
 
@@ -58,54 +98,20 @@ import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import { isoToUkDate } from '../helpers/utils'
 
-const ASSESSMENT_STATES = [
-  'Not started',
-  'System complete',
-  'Patient build complete',
-  'Scenarios complete'
-]
-
 export default {
-  name: 'AssessmentSelection',
-  props: {
-    isActive: {
-      type: Boolean,
-      value: false,
-      required: true
-    },
-    stepDir: {
-      type: Number,
-      value: 1,
-      required: true
-    }
-  },
-  watch: {
-    async isActive(newVal, oldVal) { 
-      console.debug('isActive() watcher - new value', newVal, 'old value', oldVal)
-      if (newVal === false && this.stepDir == 1) {
-        // User has moved away forwards in the dialogs => save the info
-        const saveResponse = await this.saveAssessmentForInstitution()        
-        if (saveResponse) {
-          await this.audit('save_assessement:' + this.email, '/assessment')
-        } else {
-          this.$emit('save-data-fail', saveResponse.message)
-          await this.audit('save_assessement_fail:' + this.email, '/assessment')
-        }
-      }  
-    }
-  },
+  name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'saveAssessmentForInstitution']),
-    ...mapState(authenticationStore, ['email']),
-    ...mapState(rootStore, ['audit']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
+    ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
+    ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
       return this.assessmentData
-    },
+    },   
     updatableAssessments() {
-      return this.listQualifyingAssessments()//.map(a => { 
-        //a.updatedAt = isoToUkDate(a.updatedAt)
-        //return a
-      //})
+      return this.listQualifyingAssessments()
+    },
+    updatableDocIds() {
+      return this.listQualifyingAssessments().map(qa => { return { value: qa.documentId, label: '' }})
     },
     allowNew() {
       // New assessment allowed if there is < 2 assessments for the user's hospital (2 patient types - adult & child)
@@ -121,39 +127,66 @@ export default {
     },
     allowContinue() {
       // Continue allowed if there are non-completed assessments
-      return this.allPossibleAssessments.filter(assessment => assessment.state != 'Scenarios complete').length > 0
+      return this.allPossibleAssessments.filter(assessment => assessment.state != 'Assessment complete').length > 0
     },
     allowReports() {
       // Reports are allowed if there are any completed assessments
-      return this.allPossibleAssessments.filter(assessment => assessment.state == 'Scenarios complete').length > 0
-    }    
+      return this.allPossibleAssessments.filter(assessment => assessment.state == 'Assessment complete').length > 0
+    }, 
+    dataLoaded() {
+      return this.dataReady
+    }
   },
   data() {
     return {
-      serverError: false,   
-      startTime: ''
+      isOtherEpSystem: false
     }
   },
-  emits: ['save-data-fail'],
-  methods: {      
+  methods: {
+    setOption(optionValue) {
+      this.selectionData.assessmentOption = optionValue
+    }, 
     listQualifyingAssessments() {
-      let validCriteria = ASSESSMENT_STATES
-      switch (this.selectionData.assessmentOption) {
-        case 'reports': validCriteria = ASSESSMENT_STATES.slice(3, 4); break;
-        case 'continue': validCriteria = ASSESSMENT_STATES.slice(0, 3); break;
-        default: validCriteria = ASSESSMENT_STATES; break;
-      }      
-      const possibles = this.allPossibleAssessments.filter(assessment => validCriteria.includes(assessment.state)).map(a => Object.assign(a, {
-        createdAt: isoToUkDate(a.createdAt, false),
-        updatedAt: isoToUkDate(a.updatedAt, true)
-      }))
-      console.debug(possibles)
+
+      console.group('listQualifyingAssessments()')
+
+      let possibles = this.allPossibleAssessments
+      if (this.selectionData.assessmentOption == 'reports') {
+        // Extract all completed assessments
+        possibles = possibles.filter(a => a.state == 'Assessment complete') 
+      } else if (this.selectionData.assessmentOption == 'continue') {
+        possibles = possibles.filter(a => a.state != 'Assessment complete') 
+      }
+      console.debug('Possible assessments', possibles)
+      console.groupEnd()
+
       return possibles
+    },
+    async getEpSystemNames() {
+      let epSystems = []
+      const response = await this.getEpSystems()
+      if (response.status < 400) {
+        // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)        
+        epSystems = response.data.data.map(ep => { return { value: ep.documentId, label: ep.name } })
+        const otherIdx = epSystems.findIndex(ep => ep.label == 'Other')
+        epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
+        epSystems.unshift({value: '', label: 'Please select...', disabled: true})       
+      } else {
+        throw new Error(response.message)
+      }
+      return epSystems
+    },
+    convertDate(d, useTime) {
+      return isoToUkDate(d, useTime)
     }
   },
-  mounted() {
-    console.group('AssessmentSelection mounted()')
-    console.debug('All possible assessments', this.allPossibleAssessments)
+  async beforeUnmount() {
+    console.group('AssessmentSelection beforeUnmount()')
+    console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
+    const selectResponse = await this.selectAssessment()        
+    if (selectResponse !== true) {
+      throw new Error(selectResponse)
+    } 
     console.groupEnd()
   }
 }

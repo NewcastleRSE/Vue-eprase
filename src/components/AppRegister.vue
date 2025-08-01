@@ -100,7 +100,7 @@ import { rootStore } from '../stores/root'
 import { usernameFromEmail } from '../helpers/utils'
 
 export default {
-  name: "AppRegister",
+  name: 'AppRegister',
   components: {
     AppLogo
   },

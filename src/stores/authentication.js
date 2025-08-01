@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import axios from "axios"
+import axios from 'axios'
+import { assessmentStore } from './assessment'
 
 const API = process.env.BASE_URL
 
@@ -65,6 +66,7 @@ export const authenticationStore = defineStore('authentication', {
     },
     clear() {
       this.$reset()
+      assessmentStore().reset()
       localStorage.clear()
     },
     logout() {
