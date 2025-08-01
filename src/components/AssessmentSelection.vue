@@ -11,90 +11,94 @@
       <StaticElement name="selectionHeading">
         <h2>Assessment Selection</h2>
       </StaticElement>
-      <RadiogroupElement 
-        name="assessmentOption"
-        :label="embolden('I would like to:', true)"      
-        :items="[
-          { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
-          { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
-          { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
-        ]"
-        :messages="{required: 'Select an option'}"       
-        :rules="['required']"
-        @change="setOption"
-      />
-      <GroupElement name="newAssessmentGroup" v-if="selectionData.assessmentOption == 'new'">
-        <SelectElement name="epService"
-          @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
-          :label="embolden('For ePrescribing system', true)"
-          :native="false" 
-          :search="true"
-          :track-by="['label', 'value']"
-          :items="getEpSystemNames"
-          :object="true"
-          :messages="{required: 'Name of ePrescribing system is required'}"           
-          :rules="['required']"          
-        />
-        <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
-          :label="embolden('Name of ePrescribing system', true)"
-          :debounce="500" 
-          :messages="{required: 'Other eP system name is required'}" 
-          :rules="['required', 'fieldIsOther:epService']" />
-        <RadiogroupElement v-if="selectionData.assessmentOption == 'new'" name="patientType"
-          :label="embolden('For patient type', true)"      
+      <ObjectElement name="selection">
+        <RadiogroupElement 
+          name="assessmentOption"
+          :label="embolden('I would like to:', true)"      
           :items="[
-            { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
-            { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
-          :messages="{required: 'Select an option'}" 
-          :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
+            { value: 'new', label: 'Start a new assessment', disabled: ! allowNew },
+            { value: 'continue', label: 'Continue an existing assessment', disabled: ! allowContinue },
+            { value: 'reports', label: 'View reports for completed assessment(s)', disabled: ! allowReports }
+          ]"
+          :messages="{required: 'Select an option'}"       
+          :rules="['required']"
+          @change="setOption"
         />
-        <CheckboxElement 
-          name="shareTrustsOptOut"
-          :label="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')"
-        /> 
-        <CheckboxElement 
-          name="shareSuppliersOptOut"
-          :label="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')" 
-        />   
-      </GroupElement>
-      
-      <GroupElement name="continueAssessmentGroup">
-        <table v-if="selectionData.assessmentOption == 'continue' || selectionData.assessmentOption == 'reports'" class="table table-striped caption-top" style="min-width:800px">
-          <caption>You can access the following assessments:</caption>
-          <thead>
-            <tr>
-              <th>&nbsp;</th>
-              <th>ePrescribing system</th>
-              <th>Patient type</th>
-              <th>Assessment state</th>
-              <th>Created on</th>
-              <th>Last update</th>
-              <th>Updater</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="assessment in updatableAssessments">
-              <td :rowspan="updatableAssessments.length">
-                <RadiogroupElement name="assessmentId" 
-                  :label="null"
-                  :items="updatableDocIds"
-                  :messages="{required: 'Select one'}" 
-                  :rules="['filled']"
-                  :class="'me-2'" />
-              </td>
-              <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
-              <td>{{ assessment.patient_type }}</td>
-              <td>{{ assessment.state }}</td>
-              <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
-              <td>{{ userEmailFormId(updatedById) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <ButtonElement name="reset" :columns="3" @click="continueAssessment()">
-          <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
-        </ButtonElement>  
-      </GroupElement>    
+        <GroupElement name="newAssessmentGroup" v-if="selectionData.assessmentOption == 'new'">
+          <SelectElement name="epService"
+            @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
+            :label="embolden('For ePrescribing system', true)"
+            :native="false" 
+            :search="true"
+            :track-by="['label', 'value']"
+            :items="getEpSystemNames"
+            :object="true"
+            :messages="{required: 'Name of ePrescribing system is required'}"           
+            :rules="['required']"          
+          />
+          <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
+            :label="embolden('Name of ePrescribing system', true)"
+            :debounce="500" 
+            :messages="{required: 'Other eP system name is required'}" 
+            :rules="['required', 'fieldIsOther:selection.epService']" />
+          <RadiogroupElement name="patientType"
+            :label="embolden('For patient type', true)"      
+            :items="[
+              { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
+              { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
+            :messages="{required: 'Select an option'}" 
+            :rules="['required']"
+          />
+          <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
+            <CheckboxElement name="shareTrustsOptOut">
+              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box', true)"></span>
+            </CheckboxElement>          
+            <CheckboxElement name="shareSuppliersOptOut">
+              <span v-html="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box', true)"></span>
+            </CheckboxElement>   
+          </GroupElement>            
+        </GroupElement>
+        
+        <GroupElement name="continueAssessmentGroup" v-if="['continue', 'reports'].includes(selectionData.assessmentOption)">
+          <GroupElement name="assessmentTable">
+            <table class="table table-striped caption-top vf-col-12">
+              <caption>You can access the following assessments:</caption>
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>ePrescribing system</th>
+                  <th>Patient type</th>
+                  <th>Assessment state</th>
+                  <th>Created on</th>
+                  <th>Last update</th>
+                  <th>Updater</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="assessment in updatableAssessments">
+                  <td :rowspan="updatableAssessments.length">
+                    <RadiogroupElement name="assessmentId" 
+                      :label="null"
+                      :items="updatableDocIds"
+                      :messages="{required: 'Select one'}" 
+                      :rules="['filled']"
+                      :class="'me-2'" />
+                  </td>
+                  <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
+                  <td>{{ assessment.patient_type }}</td>
+                  <td>{{ assessment.state }}</td>
+                  <td>{{ convertDate(assessment.createdAt, false) }}</td>
+                  <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+                  <td>{{ assessment.createdBy.username }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </GroupElement>
+          <ButtonElement name="reset" :columns="3" @click="$emit('jumpToStep')">
+            <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
+          </ButtonElement>  
+        </GroupElement>    
+      </ObjectElement>      
     </GroupElement>      
   </GroupElement>
 </template>
@@ -111,7 +115,7 @@ export default {
   name: 'AssessmentSelection',  
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
-    ...mapState(authenticationStore, ['email', 'orgName', 'hospital', 'userEmailFromId']),
+    ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
       return this.assessmentData
@@ -151,7 +155,7 @@ export default {
       isOtherEpSystem: false
     }
   },
-  emits: ['jump-to-step'],
+  emits: ['jumpToStep'],
   methods: {
     setOption(optionValue) {
       this.selectionData.assessmentOption = optionValue
@@ -171,9 +175,6 @@ export default {
       console.groupEnd()
 
       return possibles
-    },
-    continueAssessment() {
-      this.$emit('jump-to-step')
     },
     async getEpSystemNames() {
       let epSystems = []

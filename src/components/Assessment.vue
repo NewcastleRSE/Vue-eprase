@@ -11,7 +11,7 @@
 
       <Vueform ref="assessmentStepsForm" validate-on="change|step" v-model="allFormData" sync>
         <template #empty>
-          <FormSteps ref="assessmentStepsControl" @next="nextStep" @previous="previousStep" @select="selectStep">
+          <FormSteps ref="assessmentSteps" @next="nextStep" @previous="previousStep" @select="selectStep">
             <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
@@ -47,13 +47,13 @@
           </FormSteps>
           <FormElements>
             <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
-            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" />
+            <AssessmentSelection name="selectAssessmentEl" v-if="activeStep == 1" @jump-to-step="goToStep" />
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
             <AssessmentConfigError name="configErrorEl" v-if="activeStep == 5" />
           </FormElements>
-          <FormStepsControls /> 
+          <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
       </Vueform>
 
@@ -107,7 +107,7 @@ export default {
       return this.$refs.errorAlertModal
     },
     formSteps() {
-      return this.$refs.assessmentStepsForm
+      return this.$refs.assessmentSteps
     },
     formStepsControl() {
       return this.$refs.assessmentStepsControl
@@ -134,43 +134,45 @@ export default {
       previousClicked: false
     }
   },  
-  methods: {         
-    nextStep(toStep) {
-      console.group('nextStep()')
-      console.debug('Next step', toStep.index, 'full step', toStep)
-      this.nextClicked = true
-      // TODO - this executes on the emission of jump-to-step event...
+  methods: {
+    goToStep() {
+      console.group('goToStep()')
+      console.log(this.formSteps.steps$)
       if (this.activeStep == 1 && this.assessmentOption == 'continue') {
         // Jump to where the user left off if continuing an assessment
         console.debug('Continuing an assessment, jump to where user left off...')
         console.debug('Assessment state is', this.assessmentState)
+        let toStep = null
+        let enableAll = true
         switch (this.assessmentState) {      
-          case 'System complete':
-            this.formStepsControl.goTo('patientBuildStep', true) 
+          case 'System complete': 
+            toStep ='patientBuildStep'           
             break
-          case 'Patient build complete':
-            this.formStepsControl.goTo('scenarioStep', true) 
+          case 'Patient build complete': 
+            toStep = 'scenarioStep'
             break 
-          case 'Scenarios complete':
-            this.formStepsControl.goTo('configErrorStep', true) 
+          case 'Scenarios complete': 
+            toStep = 'configErrorStep'
             break
-          case 'Config errors complete':
-            //TODO
+          case 'Config errors complete': 
+            //TODO 
             break
           case 'Assessment complete':
             //TODO
             break
           default: 
-            if (this.assessmentId == null) {
-              // No assessment data present, so start from beginning
-              this.formStepsControl.goTo('epraseIntroStep', false)
-            } else {
-              // An assessment has been started but no data has yet been entered
-              this.formStepsControl.goTo('systemInfoStep', false)
-            }
+            enableAll = false
+            toStep = this.assessmentId == null ? 'epraseIntroStep' : 'systemInfoStep'
             break
         }
+        this.formSteps.goTo(toStep, enableAll)
       }
+      console.groupEnd()
+    },     
+    nextStep(toStep) {
+      console.group('nextStep()')
+      console.debug('Next step', toStep.index, 'steps by key', this.formSteps.steps$, 'steps by array', this.formSteps.steps$Array)
+      this.nextClicked = true            
       console.debug('Form data', this.allFormData)
       console.groupEnd()
     }, 

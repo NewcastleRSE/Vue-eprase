@@ -40,7 +40,8 @@ const EMPTY_SYSTEM = {
   penicillinComment: '',
   antiMicReviewTime: false,
   antiMicInterpretResults: false,
-  antiMicComments: '',
+  antiMicReviewComments: '',
+  antiMicInterpretComments: false,
   highRiskMeds: [],
   clinicalAreas: [],
   otherClinicalArea: ''
@@ -48,22 +49,26 @@ const EMPTY_SYSTEM = {
   //timeTaken: null
 }
 
+const EMPTY_SELECTION = {
+  assessmentOption: '',
+  epService: {},
+  otherEpService: '',
+  patientType: '',  
+  shareTrustsOptOut: false,
+  shareSuppliersOptOut: false   
+}
+
 const ARRAY_FIELDS_HUMPS = ['penicillinDescription', 'highRiskMeds', 'clinicalAreas']
 const ARRAY_FIELDS_SNAKES = ['penicillin_description', 'high_risk_meds', 'clinical_areas']
 
 const EMPTY_DATA = {
   assessmentId: null,
-  assessmentState: 'Not started',
-  assessmentOption: '',
+  assessmentState: 'Not started',  
   institution: '',   
-  hospital: '',
-  epService: {},
-  otherEpService: '',
-  patientType: '',     
+  hospital: '',  
+  selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
-  patients: [],
-  shareTrustsOptOut: false,
-  shareSuppliersOptOut: false,
+  patients: [],  
   completedPatients: ''
 }
 
@@ -163,18 +168,19 @@ export const assessmentStore = defineStore('assessment', {
       let action = 'select_assessment'
       this.setDataReady(false)
 
-      if (this.assessmentData.assessmentOption == 'new') {
+      if (this.assessmentData.selection.assessmentOption == 'new') {
         // New assessment
         console.debug('New assessment => save data')
         const response = await rootStore().apiCall('assessments', 'POST', {
           data: {
             state: this.assessmentData.assessmentState,
-            patient_type: this.assessmentData.patientType,
+            patient_type: this.assessmentData.selection.patientType,
             hospital: authenticationStore().hospital,
             institution: { connect: [authenticationStore().orgDocId] },
-            ep_service: { connect: [this.assessmentData.epService.value] },
-            other_ep_service: this.assessmentData.otherEpService,
-            consent: this.assessmentData.sharingConsent
+            ep_service: { connect: [this.assessmentData.selection.epService.value] },
+            other_ep_service: this.assessmentData.selection.otherEpService,
+            share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
+            share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut
           }
         })
         if (response.status < 400) {
@@ -187,7 +193,7 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = response.message
         }
-      } else if (this.assessmentData.assessmentOption == 'continue') {
+      } else if (this.assessmentData.selection.assessmentOption == 'continue') {
         // Continuing existing assessment
         console.debug('Continuing assessment', this.assessmentData.assessmentId, '=> patch in data')
         uri = `${uri}/${this.assessmentData.assessmentId}`
@@ -196,15 +202,18 @@ export const assessmentStore = defineStore('assessment', {
           this.$patch((state) => {
             state.assessmentData = Object.assign(state.assessmentData, {
               assessmentState: chosenAssessments[0].state,
-              epService: {
-                value: chosenAssessments[0].ep_service.documentId,
-                label: chosenAssessments[0].ep_service.name
-              },
-              otherEpService: chosenAssessments[0].other_ep_service,
+              selection: {
+                epService: {
+                  value: chosenAssessments[0].ep_service.documentId,
+                  label: chosenAssessments[0].ep_service.name
+                },
+                otherEpService: chosenAssessments[0].other_ep_service,
+                patientType: chosenAssessments[0].patient_type,
+                shareTrustsOptOut: chosenAssessments[0].share_trusts_opt_out,
+                shareSuppliersOptOut: chosenAssessments[0].share_suppliers_opt_out
+              },                            
               hospital: authenticationStore().hospital,
-              institution: authenticationStore().orgDocId,
-              patientType: chosenAssessments[0].patient_type,
-              consent: chosenAssessments[0].consent
+              institution: authenticationStore().orgDocId
             })
           })
           // Retrieve system data

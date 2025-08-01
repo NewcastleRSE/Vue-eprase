@@ -12,7 +12,7 @@
         <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
         <h3>Please fill in the following additional information:</h3>
       </StaticElement>
-      <ObjectElement ref="systemObject" name="system" @before-unmount="async (el$) => { await el$.validate() }">              
+      <ObjectElement ref="systemObject" name="system">              
         <DateElement name="epServiceImplemented"
           :max="new Date()"
           :label="embolden('ePrescribing system implementation date', true)" 
@@ -104,12 +104,15 @@
             :label="embolden('Does your EPMA system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
+          <TextElement name="antiMicReviewComments"
+            :label="embolden('Additional comments', true)"
+            :debounce="500" />
           <ToggleElement name="antiMicInterpretResults"
             :label="embolden('Is your EP system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
-          <TextElement name="antiMicComments"
-            :label="embolden('Additional comments on antimicrobials', true)"
+          <TextElement name="antiMicInterpretComments"
+            :label="embolden('Additional comments', true)"
             :debounce="500" />
         </GroupElement>      
         <CheckboxgroupElement name="highRiskMeds"
@@ -178,8 +181,11 @@ export default {
     systemForm() {
       return this.$refs.systemObject
     },
+    selectionData() {
+      return this.assessmentData.selection
+    },
     epSystemName() {
-      return this.assessmentData.epService.label == 'Other' ? this.assessmentData.otherEpService : this.assessmentData.epService.label
+      return this.selectionData.epService.label == 'Other' ? this.selectionData.otherEpService : this.selectionData.epService.label
     },
     systemData() {
       return this.assessmentData.system
@@ -220,8 +226,8 @@ export default {
     },
     async onResetClick() {      
       this.resetSystemData()
-      this.$refs.systemObject.form$.clean()
-      this.$refs.systemObject.form$.resetValidators()
+      this.systemForm.form$.clean()
+      this.systemForm.form$.resetValidators()
     },
     selectUnselect(cbGroup, check) {
       if (check) {
@@ -233,11 +239,11 @@ export default {
       cbGroup.resetValidators()   
     },
     hrmBulkSelect() {
-      this.selectUnselect(this.$refs.systemObject.children$['highRiskMeds'], !this.checkedAllHrm)
+      this.selectUnselect(this.systemForm.children$['highRiskMeds'], !this.checkedAllHrm)
       this.checkedAllHrm = ! this.checkedAllHrm  
     },
     caBulkSelect() {
-      this.selectUnselect(this.$refs.systemObject.children$['clinicalAreas'], !this.checkedAllCa)
+      this.selectUnselect(this.systemForm.children$['clinicalAreas'], !this.checkedAllCa)
       this.checkedAllCa = ! this.checkedAllCa      
     }
   }, 
