@@ -35,7 +35,7 @@ jobs:
       - name: Compose Down
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: sudo docker-compose down -v
+          command: sudo docker-compose down
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.PRIVATE_KEY}}
