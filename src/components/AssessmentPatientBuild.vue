@@ -343,6 +343,7 @@ export default {
       }
     }    
     console.groupEnd()
+    //TODO logout not working!
   }
 }
 </script>
