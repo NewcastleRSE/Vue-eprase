@@ -88,10 +88,10 @@ export default {
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
     assessmentId() {
-      return this.assessmentData.assessmentId
+      return this.assessmentData.selection.assessmentId
     },
     assessmentOption() {
-      return this.assessmentData.assessmentOption
+      return this.assessmentData.selection.assessmentOption
     },
     assessmentState() {
       return this.assessmentData.assessmentState
@@ -135,9 +135,9 @@ export default {
     }
   },  
   methods: {
-    goToStep() {
+    goToStep(assessmentId) {
       console.group('goToStep()')
-      console.log(this.formSteps.steps$)
+      console.log('Assessment ID', assessmentId, 'currently stored', this.assessmentId)
       if (this.activeStep == 1 && this.assessmentOption == 'continue') {
         // Jump to where the user left off if continuing an assessment
         console.debug('Continuing an assessment, jump to where user left off...')

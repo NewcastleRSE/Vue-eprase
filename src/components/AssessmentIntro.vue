@@ -56,10 +56,11 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: "AssessmentIntro", 
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution']),
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset']),
   }, 
   async mounted() {
     console.group('AssessmentIntro mounted hook')
+    this.reset()
     const instResponse = await this.getAssessmentsForInstitution()
     if (instResponse !== true) {      
       throw new Error(instResponse)

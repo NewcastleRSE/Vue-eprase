@@ -11,7 +11,7 @@
       <StaticElement name="selectionHeading">
         <h2>Assessment Selection</h2>
       </StaticElement>
-      <ObjectElement name="selection">
+      <ObjectElement name="selection" ref="selectionData">
         <RadiogroupElement 
           name="assessmentOption"
           :label="embolden('I would like to:', true)"      
@@ -60,7 +60,7 @@
         </GroupElement>
         
         <GroupElement name="continueAssessmentGroup" v-if="['continue', 'reports'].includes(selectionData.assessmentOption)">
-          <GroupElement name="assessmentTable">
+          <GroupElement name="assessmentTable" v-if="updatableAssessments.length != 0">
             <table class="table table-striped caption-top vf-col-12">
               <caption>You can access the following assessments:</caption>
               <thead>
@@ -93,10 +93,13 @@
                 </tr>
               </tbody>
             </table>
+            <ButtonElement name="reset" :columns="3" @click="$emit('jumpToStep', this.$refs.selectionData.data.selection.assessmentId)">
+              <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
+            </ButtonElement>  
           </GroupElement>
-          <ButtonElement name="reset" :columns="3" @click="$emit('jumpToStep')">
-            <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
-          </ButtonElement>  
+          <StaticElement name="noAssessments" v-if="updatableAssessments.length == 0">
+            There are no assessments to choose from
+          </StaticElement>
         </GroupElement>    
       </ObjectElement>      
     </GroupElement>      
@@ -118,7 +121,7 @@ export default {
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
-      return this.assessmentData
+      return this.assessmentData.selection
     },   
     updatableAssessments() {
       return this.listQualifyingAssessments()
