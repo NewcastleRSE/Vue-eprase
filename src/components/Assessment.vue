@@ -161,6 +161,7 @@ export default {
             //TODO
             break
           default: 
+            console.assert(this.assessmentState == 'Not started')
             enableAll = false
             toStep = this.assessmentId == null ? 'epraseIntroStep' : 'systemInfoStep'
             break

@@ -285,40 +285,41 @@ export const assessmentStore = defineStore('assessment', {
       console.group('saveSystemData()')
       console.debug('System data complete (i.e. not logging out before submitting data)', systemComplete)
 
-      //if (this.onOrPassedAssessmentStage('Not started')) {
-        // Save system info
-        const snakes = createHumps(snakeCase)
-        if (this.assessmentData.system.systemId != null) {
-          // Update existing system data
-          const updatedSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system)))
-          delete updatedSystem.system_id  // Not a valid key for the database (systemId == Strapi's documentId)
-          const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
-          if (response.status >= 400) {         
-            ret = `Failed to update system data, error ${response.message}`
-          }
+      // Save system info
+      const snakes = createHumps(snakeCase)
+      if (this.assessmentData.system.systemId != null) {
+        // Update existing system data
+        const updatedSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system)))
+        delete updatedSystem.system_id  // Not a valid key for the database (systemId == Strapi's documentId)
+        const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
+        if (response.status >= 400) {         
+          ret = `Failed to update system data, error ${response.message}`
+        }
+      } else {
+        // Save new system data
+        const newSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system), {
+          institution: { connect: [authenticationStore().orgDocId] },
+          assessment: { connect: [this.assessmentData.selection.assessmentId] }
+        }), false) 
+        delete newSystem.system_id  // Not a valid key for the database
+        const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
+        if (response.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.system.systemId = response.data.data.documentId
+          })                      
         } else {
-          // Save new system data
-          const newSystem = this.convertArrayFields(Object.assign({}, snakes(this.assessmentData.system), {
-            institution: { connect: [authenticationStore().orgDocId] },
-            assessment: { connect: [this.assessmentData.selection.assessmentId] }
-          }), false) 
-          delete newSystem.system_id  // Not a valid key for the database
-          const response = await rootStore().apiCall('systems', 'POST', { data: newSystem })
-          if (response.status < 400) {
-            this.$patch((state) => {
-              state.assessmentData.system.systemId = response.data.data.documentId
-            })
-            if (systemComplete) {
-              // User is allowed to log out in the middle of entering system data (i.e. an incomplete/invalid form is potentially saved)
-              // Make sure we don't record the system data as completed in this case
-              ret = await this.updateAssessmentStatus('System complete')
-            }            
-          } else {
-            ret = `Failed to save system data, error ${response.message}`
-          }
-        //} 
-        await rootStore().audit(action, uri, ret === true ? 'ok' : ret)      
-      }      
+          ret = `Failed to save system data, error ${response.message}`
+        }
+      }
+                    
+      if (ret === true && systemComplete) {
+        // User is allowed to log out in the middle of entering system data (i.e. an incomplete/invalid form is potentially saved)
+        // Make sure we don't record the system data as completed in this case
+        ret = await this.updateAssessmentStatus('System complete')          
+      }
+
+      await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+
       this.setDataReady(true)
       console.debug('Returning', ret)
       console.groupEnd()

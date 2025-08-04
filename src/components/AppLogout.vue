@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="alert alert-danger" v-if="dataLoaded">
-    Data has loaded, but logout hasn't proceeded!
+    Data has loaded, but logout hasn't proceeded! The fact that you are seeing this means something isn't working properly!
   </div>
 </template>
 
@@ -32,14 +32,24 @@ export default {
       console.group('dataReady() watcher entered with new value', newVal)
       if (newVal === true) {
         // We can now log out safely as the store saving process has finished (so user JWT no longer required)
-        console.debug('Logging out user...')
-        this.setLoggingOut(false)
-        this.logout()
-        this.$router.push('/login?action=loggedOut')
+        this.logOutUser()
       }
       console.groupEnd()
     }, immediate: true
-  }
+  },
+  methods: {
+    logOutUser() {
+      console.debug('Logging out user...')
+      this.setLoggingOut(false)
+      this.logout()
+      this.$router.push('/login?action=loggedOut')
+    }
+  },
+  mounted() {
+    if (this.dataLoaded) {
+      this.logOutUser()
+    }
+  },
 }
 </script>
 
