@@ -93,7 +93,7 @@
                 </tr>
               </tbody>
             </table>
-            <ButtonElement name="reset" :columns="3" @click="$emit('jumpToStep', this.$refs.selectionData.data.selection.assessmentId)">
+            <ButtonElement name="reset" :columns="3" @click="continueAssessment(this.$refs.selectionData.data.selection.assessmentId)">
               <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
             </ButtonElement>  
           </GroupElement>
@@ -179,6 +179,22 @@ export default {
 
       return possibles
     },
+    async continueAssessment(assessmentId) {
+
+      console.group('continueAssessment()')
+
+      if (this.selectionData.assessmentOption == 'continue') {
+        console.debug('Chosen to continue assessment', assessmentId)
+        // Select an existing assessment
+        const selectResponse = await this.selectAssessment()        
+        if (selectResponse !== true) {
+          throw new Error(selectResponse)
+        } else {
+          console.groupEnd()
+          this.$emit('jumpToStep', assessmentId)
+        } 
+      }           
+    },
     async getEpSystemNames() {
       let epSystems = []
       const response = await this.getEpSystems()
@@ -200,10 +216,13 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
-    const selectResponse = await this.selectAssessment()        
-    if (selectResponse !== true) {
-      throw new Error(selectResponse)
-    } 
+    if (this.selectionData.assessmentOption == 'new') {
+      // Create a new assessment
+      const selectResponse = await this.selectAssessment()        
+      if (selectResponse !== true) {
+        throw new Error(selectResponse)
+      } 
+    }    
     console.groupEnd()
   }
 }

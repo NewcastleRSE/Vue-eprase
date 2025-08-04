@@ -4,7 +4,7 @@
       <h2>Assessment Patient Preparation</h2>
     </StaticElement>
     <StaticElement name="patientListInfo">
-      <div class="alert alert-info mt-4" role="alert">
+      <div class="alert alert-info mt-2" role="alert">
         Please admit the following test patients into your hospital's patient admissions system (or a test environment). 
         When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
         You will need to enter additional clinical information for each test patient (presented in the other named tabs) in order
@@ -193,6 +193,15 @@
         </div>
       </div>
     </StaticElement>
+    <HiddenElement name="completedPatients" />
+    <SliderElement name="numCompletedPatients" 
+      :columns="{ container: 9 }"
+      :format="{prefix: 'Patients entered: ', decimals: 0}" 
+      :min="0" 
+      :max="patientData.length" 
+      :extend-options="{ readonly: true }"
+      :rules="[allPatientsCompleted]" 
+    />
   </GroupElement>  
 </template>
 
@@ -202,9 +211,21 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
+import { Validator } from '@vueform/vueform'
+import { appSettingsStore } from '../stores/appSettings'
+
+const allPatientsCompleted = class extends Validator {
+  get msg() {
+    return 'Please enter all patients into your system'
+  }
+  check(value) {
+    console.debug('allPatientsCompleted() validator entered with', value)
+    return value && value == appSettingsStore().assessmentNumPatients
+  }
+}
 
 export default {
-  name: 'AssessmentPatientBuild',  
+  name: 'AssessmentPatientBuild',
   computed: {
     ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
     dataLoaded() {
@@ -242,7 +263,8 @@ export default {
   data() {
     return {
       allPatientData: {},
-      currentPatient: null
+      currentPatient: null,
+      allPatientsCompleted
     }    
   },
   methods: {    
@@ -328,4 +350,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+div#patientAccordion {
+  margin-bottom: 4rem;
+}
+
+</style>

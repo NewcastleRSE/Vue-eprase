@@ -69,7 +69,8 @@ const EMPTY_DATA = {
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
   patients: [],  
-  completedPatients: ''
+  completedPatients: '',
+  numCompletedPatients: 0
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -251,21 +252,20 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('getSystemData()')
 
-      //if (this.onOrPassedAssessmentStage('System complete')) {
-        // Retrieve stored system info
-        const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=system`, 'GET')
-        if (systemResponse.status < 400 && systemResponse.data.data.system != null) {
-          // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
-          const newSystem = Object.assign({}, systemResponse.data.data.system)
-          newSystem.systemId = newSystem.documentId             // Map systemId onto documentId
-          OMIT_SYSTEM_FIELDS.forEach(f => delete newSystem[f])  // Delete all redundant fields         
-          this.$patch((state) => {
-            state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
-          })          
-        } else {
-          ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
-        }
-      //}
+      // Retrieve stored system info
+      const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=system`, 'GET')
+      if (systemResponse.status < 400 && systemResponse.data.data.system != null) {
+        // 'humps' converts from PostgreSQL underscore-based field names to camelCase keys...
+        const newSystem = Object.assign({}, systemResponse.data.data.system)
+        newSystem.systemId = newSystem.documentId             // Map systemId onto documentId
+        OMIT_SYSTEM_FIELDS.forEach(f => delete newSystem[f])  // Delete all redundant fields         
+        this.$patch((state) => {
+          state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
+        })          
+      } else {
+        ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
+      }
+      
       if (recordLoading) {
         this.setDataReady(true)
       }
@@ -436,6 +436,7 @@ export const assessmentStore = defineStore('assessment', {
         if (enteredResponse.status < 400) {
           this.$patch((state) => {
             state.assessmentData.completedPatients = enteredCodes.toString()
+            state.assessmentData.numCompletedPatients = enteredCodes.length
           })
         } else {
           ret = `Failed to updated completed patients list by adding ${patientCode}`
