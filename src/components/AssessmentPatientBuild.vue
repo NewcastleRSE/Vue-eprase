@@ -193,14 +193,13 @@
         </div>
       </div>
     </StaticElement>
-    <HiddenElement name="completedPatients" />
+    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
     <SliderElement name="numCompletedPatients" 
       :columns="{ container: 9 }"
       :format="{prefix: 'Patients entered: ', decimals: 0}" 
       :min="0" 
-      :max="patientData.length" 
-      :extend-options="{ readonly: true }"
-      :rules="[allPatientsCompleted]" 
+      :max="patientData.length"
+      :value="this.completedPatientsArray().length" 
     />
   </GroupElement>  
 </template>
@@ -220,7 +219,7 @@ const allPatientsCompleted = class extends Validator {
   }
   check(value) {
     console.debug('allPatientsCompleted() validator entered with', value)
-    return value && value == appSettingsStore().assessmentNumPatients
+    return value && value.split(',').length == appSettingsStore().assessmentNumPatients
   }
 }
 

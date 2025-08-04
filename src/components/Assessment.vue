@@ -26,7 +26,7 @@
               :labels="{ 
                 next: 'Continue to patient build'
               }" />
-            <FormStep name="patientBuildStep" label="Patient build" 
+            <FormStep name="patientBuildStep" label="Patient entry" 
               :elements="['patientBuildEl']" 
               :labels="{ 
                 next: 'Continue to scenarios',
