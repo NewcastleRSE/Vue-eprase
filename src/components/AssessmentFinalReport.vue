@@ -1,14 +1,14 @@
 <template>
-  <GroupElement name="configErrorGroup" :class="'mb-4'">
-    <StaticElement name="configErrorDataLoading" v-if="!dataReady">
+  <GroupElement name="finalReportGroup" :class="'mb-4'">
+    <StaticElement name="finalReportDataLoading" v-if="!dataReady">
       <div class="d-flex align-items-center">
-        <strong role="status">Loading config error data for assessment...</strong>
+        <strong role="status">Loading final report data for assessment...</strong>
         <div class="spinner-border ms-auto" aria-hidden="true"></div>
       </div>
     </StaticElement>
-    <GroupElement name="configErrorDataLoaded">
-      <StaticElement name="configErrorHeading">
-        <h2>Config Errors</h2>
+    <GroupElement name="finalReportDataLoaded">
+      <StaticElement name="finalReportHeading">
+        <h2>Final Report</h2>
       </StaticElement>
       <!-- TODO -->
     </GroupElement>    
@@ -21,7 +21,7 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: 'AssessmentConfigError',  
+  name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus']),
   },
@@ -34,11 +34,11 @@ export default {
     
   },
   mounted() {
-    console.group('AssessmentConfigError mounted()')
+    console.group('AssessmentFinalReport mounted()')
     console.groupEnd()
   },
   beforeUnmount() {
-    console.group('AssessmentConfigError beforeUnmount()')
+    console.group('AssessmentFinalReport beforeUnmount()')
     console.groupEnd()
   }
 }

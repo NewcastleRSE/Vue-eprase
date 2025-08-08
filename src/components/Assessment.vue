@@ -16,11 +16,11 @@
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
               :labels="{ next: 'Continue to Assessment Selection' }" />
-            <FormStep name="selectAssessmentStep" label="Start or continue an assessment" 
+            <FormStep name="selectAssessmentStep" label="Start Or Continue Assessment" 
               :elements="['selectAssessmentEl']" 
               :buttons="{ previous: false, next: assessmentOption != 'continue' }"
               :labels="{ next: 'Continue to System Information' }" />
-            <FormStep name="systemInfoStep" label="System Information"               
+            <FormStep name="systemInfoStep" label="ePrescribing System Information"               
               :elements="['systemInfoEl']" 
               :buttons="{ previous: false }"
               :labels="{ 
@@ -30,7 +30,7 @@
               :elements="['patientBuildEl']" 
               :labels="{ 
                 next: 'Continue to Scenarios',
-                previous: 'Back to System Information'
+                previous: 'Back to ePrescribing System Information'
               }" />
             <FormStep name="scenarioStep" label="Scenarios" 
               :elements="['scenarioEl']" 
@@ -44,6 +44,13 @@
                 next: 'Continue to Reports',
                 previous: 'Back to Scenarios'
               }" />
+            <FormStep name="finalReportStep" label="Final Report" 
+              :elements="['finalReportEl']" 
+              :buttons="{ next: false, finish: true }"
+              :labels="{ 
+                finish: 'Complete assessment',
+                previous: 'Back to Configuration Questions'
+              }" />
           </FormSteps>
           <FormElements>
             <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
@@ -51,7 +58,8 @@
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
-            <AssessmentConfigError name="configQuestionEl" v-if="activeStep == 5" />
+            <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
+            <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -76,7 +84,8 @@ import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
 import AssessmentPatientBuild from './AssessmentPatientBuild'
 import AssessmentScenario from './AssessmentScenario'
-import AssessmentConfigError from './AssessmentConfigError'
+import AssessmentConfigQuestion from './AssessmentConfigQuestion'
+import AssessmentFinalReport from './AssessmentFinalReport'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
@@ -119,7 +128,8 @@ export default {
     AssessmentSystem,
     AssessmentPatientBuild,
     AssessmentScenario,
-    AssessmentConfigError,
+    AssessmentConfigQuestion,
+    AssessmentFinalReport,
     LoginInfo,
     AppFooter,
     AppLogo,

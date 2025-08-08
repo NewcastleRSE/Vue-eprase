@@ -49,6 +49,10 @@ const EMPTY_SYSTEM = {
   //timeTaken: null
 }
 
+const EMPTY_CONFIG_DATA = {
+  configQuestionResults: []
+}
+
 const EMPTY_SELECTION = {
   assessmentId: null,
   assessmentOption: '',
@@ -68,6 +72,7 @@ const EMPTY_DATA = {
   hospital: '',  
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
+  config: EMPTY_CONFIG_DATA,
   patients: [],  
   completedPatients: '',
   numCompletedPatients: 0
@@ -106,7 +111,7 @@ export const assessmentStore = defineStore('assessment', {
 
       const instCode = authenticationStore().orgCode
       const hospital = authenticationStore().hospital
-      // Note: there are some redundant database calls in this store ('system' and 'patients' are retrieved separately) - the full call here was once:
+      // Note: there are some redundant database calls in this store ('system', 'patients', 'scenarios' and 'config questions' are retrieved separately) - the full call here was once:
       // assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service&populate=system&populate=patients
       // If anyone can enlighten me on the "Invalid Key Error 2" this reliably gives unless one of the 'populate' or 'filter' terms is removed I (David) would be interested
       // Does not seems to matter which term goes, so it may be a Strapi bug or a query that's just too complex...
@@ -223,9 +228,13 @@ export const assessmentStore = defineStore('assessment', {
             // Retrieve patient data
             ret = await this.patientListBuild()
           } 
-          if (ret === true)         {
+          if (ret === true) {
             // Retrieve scenario data TODO
             //ret = await this.getScenarios()
+          }
+          if (ret === true) {
+            // Retrieve config question data
+            ret = await this.getConfigQuestionData()
           }
         } else {
           ret = `Assessment with id ${this.assessmentData.selection.assessmentId} not found in list of assessments for this institution/hospital`
@@ -240,6 +249,36 @@ export const assessmentStore = defineStore('assessment', {
       return ret
 
     },
+    // Get user responses to configuration questions
+    async getConfigQuestionData(recordLoading = false)  {
+
+      let ret = true
+
+      // NOTE: recordLoading flag eliminates runaway watcher calls when multiple async methods are called in one store operation
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
+
+      console.group('getConfigQuestionData()')
+      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
+
+      const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=config_error_data`, 'GET')
+      if (confQuestionResponse.status < 400) {
+        // Convert the 0/1 responses in the results to no/yes
+        this.$patch((state) => {
+          state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data.map(cq => (cq.result == 1 ? 'yes' : 'no'))
+        })
+      } else {
+        ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+      }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
     // Get the system data (may be used standalone - setting dataReady, or as part of another method)
     async getSystemData(recordLoading = false) {
 
@@ -251,6 +290,7 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       console.group('getSystemData()')
+      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
 
       // Retrieve stored system info
       const systemResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=system`, 'GET')

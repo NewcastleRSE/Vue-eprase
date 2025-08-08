@@ -1,5 +1,5 @@
 <template>
-  <GroupElement name="patientBuildGroup" :class="'mb-4'">  
+  <GroupElement ref="patientBuildGroup" name="patientBuildGroup" :class="'mb-4'">  
     <StaticElement name="patientBuildHeading">
       <h2>Patient Build</h2>
     </StaticElement>
@@ -149,7 +149,7 @@
                           <th>Route</th>
                           <th>Frequency</th>
                           <th>Duration</th>
-                          <th>Justification</th>
+                          <th>Indication</th>
                         </tr>
                         <tr v-for="prescription in patientMedicationHistory">
                           <td>{{ prescription.name }}</td>
@@ -259,6 +259,10 @@ export default {
         'prescription': 'Current Medication',
         'clinical_data': 'Clinical Data'
       }
+    },
+    completedPatientsHidden() {
+      console.log('Hidden element is', this.$refs.patientBuildGroup)
+      return this.$refs.patientBuildGroup
     }
   },  
   data() {
@@ -328,6 +332,8 @@ export default {
   },
   async mounted() {
     console.group('AssessmentPatientBuild mounted()')  
+    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
+    this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
     if (loadPatientsResponse !== true) {
       throw new Error(loadPatientsResponse)

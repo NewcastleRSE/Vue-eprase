@@ -14,7 +14,7 @@
       </p>
       <h3>User Instructions</h3>
       <p class="fw-bold">
-        The assessment consists of 4 parts: 
+        The assessment comprises 4 parts: 
       </p>
       <ol class="list-group list-group-numbered">
         <li class="list-group-item d-flex justify-content-between align-items-start">

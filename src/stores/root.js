@@ -84,6 +84,11 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
     },
+    // Get list of configuration questions (UPDATED Strapi)
+    async getConfigQuestions() {
+      const response = await this.apiCall('config-errors?fields[0]=config_error_code&fields[1]=description&sort[0]=config_error_code', 'GET')
+      return response
+    },
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })

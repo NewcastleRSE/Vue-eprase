@@ -94,25 +94,25 @@
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="500" />
           <ToggleElement name="penicillinResults"
-            :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
+            :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="500" />
           <ToggleElement name="antiMicReviewTime"
-            :label="embolden('Does your EPMA system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?')"
+            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicReviewComments"
-            :label="embolden('Additional comments', true)"
+            :label="embolden('Additional comments')"
             :debounce="500" />
           <ToggleElement name="antiMicInterpretResults"
-            :label="embolden('Is your EP system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?')"
+            :label="embolden('Is your ePrescribing system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicInterpretComments"
-            :label="embolden('Additional comments', true)"
+            :label="embolden('Additional comments')"
             :debounce="500" />
         </GroupElement>      
         <CheckboxgroupElement name="highRiskMeds"
