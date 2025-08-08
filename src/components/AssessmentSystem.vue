@@ -9,8 +9,8 @@
     </StaticElement>
     <GroupElement name="systemGroupLoaded" v-if="dataLoaded">
       <StaticElement name="epSystemHeading">
-        <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
-        <h3>Please fill in the following additional information:</h3>
+        <h2><span class="fst-italic">{{ epSystemName }}</span> ePrescribing System information</h2>
+        <h3>Please answer the following questions about your ePrescribing System:</h3>
       </StaticElement>
       <ObjectElement ref="systemObject" name="system">              
         <DateElement name="epServiceImplemented"

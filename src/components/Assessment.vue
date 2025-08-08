@@ -15,34 +15,34 @@
             <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
-              :labels="{ next: 'Continue to assessment selection' }" />
+              :labels="{ next: 'Continue to Assessment Selection' }" />
             <FormStep name="selectAssessmentStep" label="Start or continue an assessment" 
               :elements="['selectAssessmentEl']" 
               :buttons="{ previous: false, next: assessmentOption != 'continue' }"
-              :labels="{ next: 'Continue to system information' }" />
-            <FormStep name="systemInfoStep" label="ePrescribing system information"               
+              :labels="{ next: 'Continue to System Information' }" />
+            <FormStep name="systemInfoStep" label="System Information"               
               :elements="['systemInfoEl']" 
               :buttons="{ previous: false }"
               :labels="{ 
-                next: 'Continue to patient build'
+                next: 'Continue to Patient Build'
               }" />
-            <FormStep name="patientBuildStep" label="Patient entry" 
+            <FormStep name="patientBuildStep" label="Patient Build" 
               :elements="['patientBuildEl']" 
               :labels="{ 
-                next: 'Continue to scenarios',
-                previous: 'Back to system information'
+                next: 'Continue to Scenarios',
+                previous: 'Back to System Information'
               }" />
             <FormStep name="scenarioStep" label="Scenarios" 
               :elements="['scenarioEl']" 
               :labels="{ 
-                next: 'Continue to config errors',
-                previous: 'Back to patient build'
+                next: 'Continue to Configuration Questions',
+                previous: 'Back to Patient Build'
               }" />
-            <FormStep name="configErrorStep" label="Config errors" 
-              :elements="['configErrorEl']" 
+            <FormStep name="configQuestionStep" label="Configuration Questions" 
+              :elements="['configQuestionEl']" 
               :labels="{ 
-                next: 'Continue to reports',
-                previous: 'Back to scenarios'
+                next: 'Continue to Reports',
+                previous: 'Back to Scenarios'
               }" />
           </FormSteps>
           <FormElements>
@@ -51,7 +51,7 @@
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
-            <AssessmentConfigError name="configErrorEl" v-if="activeStep == 5" />
+            <AssessmentConfigError name="configQuestionEl" v-if="activeStep == 5" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -152,7 +152,7 @@ export default {
             toStep = 'scenarioStep'
             break 
           case 'Scenarios complete': 
-            toStep = 'configErrorStep'
+            toStep = 'configQuestionStep'
             break
           case 'Config errors complete': 
             //TODO 

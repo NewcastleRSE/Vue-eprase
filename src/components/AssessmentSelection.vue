@@ -11,6 +11,13 @@
       <StaticElement name="selectionHeading">
         <h2>Assessment Selection</h2>
       </StaticElement>
+      <StaticElement name="assessmentGroupLoadedIntroPara">
+        <p>
+          It is now possible to test more than one type of ePrescribing System for each NHS Trust. If you are wanting to do this 
+          then we advise that you set up and complete the assessment for the first EP System before proceeding to start the next 
+          EP System assessment.
+        </p>
+      </StaticElement>
       <ObjectElement name="selection" ref="selectionData">
         <RadiogroupElement 
           name="assessmentOption"
@@ -66,12 +73,12 @@
               <thead>
                 <tr>
                   <th>&nbsp;</th>
-                  <th>ePrescribing system</th>
-                  <th>Patient type</th>
-                  <th>Assessment state</th>
+                  <th>ePrescribing System</th>
+                  <th>Patient Type</th>
+                  <th>Assessment Status</th>
                   <th>Created on</th>
-                  <th>Last update</th>
-                  <th>Updater</th>
+                  <th>Last Update</th>
+                  <th>User</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,7 +101,7 @@
               </tbody>
             </table>
             <ButtonElement name="reset" :columns="3" @click="continueAssessment(this.$refs.selectionData.data.selection.assessmentId)">
-              <i class="bi bi-check2-circle me-2"></i>Continue selected assessment
+              <i class="bi bi-check2-circle me-2"></i>Continue with selected assessment
             </ButtonElement>  
           </GroupElement>
           <StaticElement name="noAssessments" v-if="updatableAssessments.length == 0">

@@ -1,15 +1,17 @@
 <template>
   <GroupElement name="patientBuildGroup" :class="'mb-4'">  
     <StaticElement name="patientBuildHeading">
-      <h2>Assessment Patient Preparation</h2>
+      <h2>Patient Build</h2>
     </StaticElement>
     <StaticElement name="patientListInfo">
       <div class="alert alert-info mt-2" role="alert">
         Please admit the following test patients into your hospital's patient admissions system (or a test environment). 
         When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
-        You will need to enter additional clinical information for each test patient (presented in the other named tabs) in order
-        for the subsequent scenarios to work correctly. When you have finished entering all the data, click the <span class="fw-bold">'Data entry in progress...'</span> button
-        to move to the next patient.
+        You will need to enter additional clinical information for each test patient, these are presented in the other named tabs. 
+        Please work carefully through these in order for the subsequent scenarios to work correctly. When you have finished entering all 
+        the information for a patient, click the <span class="fw-bold">Data entry in progress</span> button which will change to 
+        <span class="fw-bold">Data entry complete</span> and move you to the next patient. If you need to go back to a previous patient 
+        you can navigate back and forth between all patients within the patient build section.
       </div>
     </StaticElement>
     <StaticElement name="patientBuildBody">
@@ -134,11 +136,11 @@
                 <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-prescription'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Medication History...</span>
+                      <span class="visually-hidden">Loading Current Medication...</span>
                     </div>
                   </div>
                   <div v-if="dataLoaded">
-                    <p v-if="patientMedicationHistory.length == 0">No medication history</p>
+                    <p v-if="patientMedicationHistory.length == 0">No current medication</p>
                     <table class="table table-striped" v-if="patientMedicationHistory.length != 0">
                       <tbody>
                         <tr>
@@ -253,9 +255,9 @@ export default {
         'profile': 'Profile',
         'allergy': 'Allergies',
         'comorbidity': 'Comorbidities',
-        'diagnosis': 'Presenting complaints',
-        'prescription': 'Medication history',
-        'clinical_data': 'Clinical data'
+        'diagnosis': 'Presenting Complaints',
+        'prescription': 'Current Medication',
+        'clinical_data': 'Clinical Data'
       }
     }
   },  
