@@ -458,6 +458,30 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
+    // Retrieve all scenarios for a patient
+    async getPatientScenarios(patientCode, recordLoading = false) {
+
+      let ret = false
+
+      console.group('getPatientScenarios()')
+      console.debug('Patient code', patientCode)
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      } 
+
+      const sppResponse = await rootStore().apiCall(`scenarios?[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+      if (sppResponse.status < 400) {
+        ret = sppResponse.data.data
+      } 
+      if (recordLoading) {
+        this.setDataReady(true)
+      }  
+      console.debug('Returned data was', ret)
+      console.groupEnd()
+
+      return ret
+    },
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
       let ret = true

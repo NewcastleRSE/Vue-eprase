@@ -14,6 +14,14 @@
         you can navigate back and forth between all patients within the patient build section.
       </div>
     </StaticElement>
+    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
+    <SliderElement name="numCompletedPatients" class="my-4"
+      :columns="{ container: 9 }"
+      :format="{prefix: 'You have entered ', suffix: ` of ${patientData.length} patients`, decimals: 0}" 
+      :min="0" 
+      :max="patientData.length"
+      :value="this.completedPatientsArray().length" 
+    />
     <StaticElement name="patientBuildBody">
       <div class="accordion" id="patientAccordion">
         <div class="accordion-item" v-for="(patient, idx) in patientData" :key="patient.id">
@@ -82,6 +90,7 @@
                     </div>
                   </div>                    
                 </div>
+                <!-- Allergy tab -->
                 <div class="tab-pane fade mt-2 " :id="'patient-' + patient.patient_code + '-allergy'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
@@ -99,6 +108,7 @@
                     </table>
                   </div>
                 </div>
+                <!-- Comorbidity tab -->
                 <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-comorbidity'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
@@ -116,6 +126,7 @@
                     </table>
                   </div>
                 </div>
+                <!-- Presenting complaints tab -->
                 <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-diagnosis'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
@@ -133,6 +144,7 @@
                     </table>
                   </div>
                 </div>
+                <!-- Current medication tab -->
                 <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-prescription'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
@@ -163,6 +175,7 @@
                     </table>
                   </div>
                 </div>
+                <!-- Clinical data tab -->
                 <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-clinical_data'" role="tabpanel" tabindex="0">
                   <div v-if="!dataLoaded" class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
@@ -194,15 +207,7 @@
           </div>
         </div>
       </div>
-    </StaticElement>
-    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
-    <SliderElement name="numCompletedPatients" 
-      :columns="{ container: 9 }"
-      :format="{prefix: 'Patients entered: ', decimals: 0}" 
-      :min="0" 
-      :max="patientData.length"
-      :value="this.completedPatientsArray().length" 
-    />
+    </StaticElement>    
   </GroupElement>  
 </template>
 
