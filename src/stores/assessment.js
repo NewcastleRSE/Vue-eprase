@@ -74,6 +74,7 @@ const EMPTY_DATA = {
   system: EMPTY_SYSTEM,
   config: EMPTY_CONFIG_DATA,
   patients: [],  
+  scenarios: {},
   completedPatients: '',
   numCompletedPatients: 0
 }
@@ -458,22 +459,35 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
-    // Retrieve all scenarios for a patient
-    async getPatientScenarios(patientCode, recordLoading = false) {
+    // Retrieve all scenarios for an assessment's patients
+    async populatePatientScenarios(recordLoading = false) {
 
-      let ret = false
+      let ret = true
 
       console.group('getPatientScenarios()')
-      console.debug('Patient code', patientCode)
 
       if (recordLoading) {
         this.setDataReady(false)
       } 
 
-      const sppResponse = await rootStore().apiCall(`scenarios?[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-      if (sppResponse.status < 400) {
-        ret = sppResponse.data.data
-      } 
+      const scenarioDataByPatientCode = {}
+
+      for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
+        const patientCode = this.assessmentData.patients[idx].patient_code
+        const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+        if (sppResponse.status < 400) {
+          scenarioDataByPatientCode[patientCode] = sppResponse.data.data
+        } else {
+          ret = `Failed to retrieve scenario data for patient code ${patientCode}`
+        }
+      }
+
+      if (ret === true) {
+        this.$patch((state) => {
+          state.assessmentData.scenarios = scenarioDataByPatientCode
+        })
+      }
+      
       if (recordLoading) {
         this.setDataReady(true)
       }  

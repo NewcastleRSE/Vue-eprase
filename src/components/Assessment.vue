@@ -208,21 +208,21 @@ export default {
     console.group('Assessment top-level mounted() hook')
     console.groupEnd()
   },
-  errorCaptured(...args) {
+  // errorCaptured(...args) {
 
-    console.group('errorCaptured()')
-    console.debug(args)
+  //   console.group('errorCaptured()')
+  //   console.debug(args)
 
-    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
-    const activeElement = document.activeElement
-    if (activeElement) {
-      activeElement.blur();
-    }
-    this.errorAlertModal.show(args[0].message)
+  //   // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+  //   const activeElement = document.activeElement
+  //   if (activeElement) {
+  //     activeElement.blur();
+  //   }
+  //   this.errorAlertModal.show(args[0].message)
 
-    console.groupEnd()
-    return false
-  }
+  //   console.groupEnd()
+  //   return false
+  // }
 }
 </script>
 

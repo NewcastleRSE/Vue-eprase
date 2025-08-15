@@ -74,6 +74,7 @@ import AppLogo from './AppLogo'
 import { usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
+import { assessmentStore } from '../stores/assessment'
 
 export default {
   name: 'AppLogin',
@@ -130,6 +131,10 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword
     }
+  },
+  mounted() {
+    // Clear any assessment data that may be around
+    assessmentStore().reset()
   }
 }
 </script>
