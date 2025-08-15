@@ -89,6 +89,11 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('config-errors?fields[0]=config_error_code&fields[1]=description&sort[0]=config_error_code', 'GET')
       return response
     },
+    // Get mitigation code mapping
+    async getMitigations() {
+      const response = await this.apiCall('mitigations', 'GET')
+      return response
+    },
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })
