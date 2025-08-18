@@ -103,7 +103,7 @@
                           <tr>
                             <td rowspan="5">
                               <RadiogroupElement 
-                                :name="'outcome-' + scenarioData.scenario_code" 
+                                name="outcomes[]" 
                                 :items="systemResponses" 
                                 @change="(newVal, oldVal, el$) => console.log('Changed radio to', newVal, 'from', oldVal, 'element', el$)"
                               />
@@ -130,7 +130,7 @@
                         <tbody>
                           <tr>
                             <td :rowspan="categoryCount + 1">
-                              <MatrixElement name="scenarioResponseCategories" 
+                              <MatrixElement name="scenarioResponseCategories[]"
                                 :presets="['matrix-table']" 
                                 :rows="matrixCategories" 
                                 :cols="[ { value: 'alert', label: embolden('Alert') }, { value: 'advisory', label: embolden('Advisory') } ]"
@@ -180,7 +180,7 @@ export default {
       return this.assessmentData.patients
     },
     patientScenarios() {
-      return this.assessmentData.scenarios
+      return this.assessmentData.scenarios.patientScenarios
     },
     systemResponses() {
       return [

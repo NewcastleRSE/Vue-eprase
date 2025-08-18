@@ -53,6 +53,13 @@ const EMPTY_CONFIG_DATA = {
   configQuestionResults: []
 }
 
+const EMPTY_SCENARIO_DATA = {
+  patientScenarios: {},  
+  outcomes: [],
+  scenarioResponseCategories: []
+
+}
+
 const EMPTY_SELECTION = {
   assessmentId: null,
   assessmentOption: '',
@@ -73,6 +80,7 @@ const EMPTY_DATA = {
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
   config: EMPTY_CONFIG_DATA,
+  scenarios: EMPTY_SCENARIO_DATA,
   patients: [],  
   scenarios: {},
   completedPatients: '',
@@ -484,7 +492,7 @@ export const assessmentStore = defineStore('assessment', {
 
       if (ret === true) {
         this.$patch((state) => {
-          state.assessmentData.scenarios = scenarioDataByPatientCode
+          state.assessmentData.scenarios.patientScenarios = scenarioDataByPatientCode
         })
       }
       
