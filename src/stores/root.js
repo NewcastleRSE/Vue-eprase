@@ -89,10 +89,15 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('config-errors?fields[0]=config_error_code&fields[1]=description&sort[0]=config_error_code', 'GET')
       return response
     },
-    // Get mitigation code mapping
+    // Get mitigation code mapping (UPDATED Strapi)
     async getMitigations() {
       const response = await this.apiCall('mitigations', 'GET')
       return response
+    },
+    // Categories (UPDATED Strapi) 
+    async getCategories() {
+      const response = await this.apiCall('categories?fields[0]=category_code&fields[1]=name&fields[2]=description&sort[0]=name', 'GET')
+      return response     
     },
     // Audit action (UPDATED Strapi)
     async audit(action, uri, result) {
@@ -101,23 +106,7 @@ export const rootStore = defineStore('root', {
         // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
         console.error(response.message)
       }
-    },   
-    async getCategories() {
-      if (this.categories.length == 0) {
-        const response = await this.apiCall('categories', 'GET')
-        if (response.status < 400) {
-          this.categories = response.data
-          // Removed 04/10/2024 David - this attempted to suppress the 'control' category in the scenario input, but had undesired side-effects
-          // remove the control category, leaves an empty element
-          //delete this.categories[0]
-          // remove the emtpy element 
-          //this.categories.splice(0, 1)
-        }
-        return response
-      } else {
-        return { status: 200, data: this.categories }
-      }      
-    },
+    },      
     async getPrescriptionTestData(id) {
       const response = await this.apiCall('resultCategories?ID=' + id, 'GET')
       return response            

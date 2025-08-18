@@ -9,7 +9,21 @@
     <GroupElement name="scenarioDataLoaded" v-if="dataLoaded">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
-        <h3>Please follow the instructions for each scenario</h3>
+        <div class="alert alert-info mt-2" role="alert">
+          <p>There are 45 test scenarios to complete. This should be carried out in <span class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
+          <p>
+            Please select the first patient's name from those set up in the patient build phase and prescribe the medication exactly as detailed in the scenario 1 tab presented. 
+            Record any relevant advice or information received while completing the test as prompted. Check all responses and then click <span class="fw-bold">Save</span>.
+          </p>
+          <p>
+            Please note once you have clicked <span class="fw-bold">Save</span> you will <span class="fw-bold">not</span> be able to return to this page again to change your response.
+          </p>
+          <p>
+            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should complete the same process. 
+            On completion of the three scenario tests you will be prompted to move onto the next patient.
+          </p>
+          <p>Please work through all of the patients until all test scenarios are complete</p>
+        </div>
       </StaticElement>
       <ObjectElement ref="scenariosObject" name="scenarios">
         <StaticElement name="scenarioDataBody">
@@ -85,26 +99,55 @@
                       <span
                         v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
                       <table class="table">
-                        <tr>
-                          <td rowspan="5">
-                            <RadiogroupElement name="outcome" :items="systemResponses" />
-                          </td>
-                          <td>
-                            <span data-bs-toggle="tooltip" data-bs-placement="right"
-                              :data-bs-title="systemResponseTips[0]">
-                              <i class="bi bi-info-circle-fill"></i>
-                            </span>
-                          </td>
-                        </tr>
-                        <tr v-for="tip in systemResponseTips.slice(1)">
-                          <td>
-                            <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
-                              :data-bs-title="tip">
-                              <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
-                            </span>
-                          </td>
-                        </tr>
+                        <tbody>
+                          <tr>
+                            <td rowspan="5">
+                              <RadiogroupElement 
+                                :name="'outcome-' + scenarioData.scenario_code" 
+                                :items="systemResponses" 
+                                @change="(newVal, oldVal, el$) => console.log('Changed radio to', newVal, 'from', oldVal, 'element', el$)"
+                              />
+                            </td>
+                            <td>
+                              <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                :data-bs-title="systemResponseTips[0]">
+                                <i class="bi bi-info-circle-fill"></i>
+                              </span>
+                            </td>
+                          </tr>
+                          <tr v-for="tip in systemResponseTips.slice(1)">
+                            <td>
+                              <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
+                                :data-bs-title="tip">
+                                <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>                        
                       </table>
+                      <!-- Alert/advisory checkboxes -->
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <td :rowspan="categoryCount + 1">
+                              <MatrixElement name="scenarioResponseCategories" 
+                                :presets="['matrix-table']" 
+                                :rows="matrixCategories" 
+                                :cols="[ { value: 'alert', label: embolden('Alert') }, { value: 'advisory', label: embolden('Advisory') } ]"
+                              />
+                            </td>
+                            <td>&nbsp;</td>                            
+                          </tr>
+                          <tr v-for="tip in categoryTips">
+                            <td>
+                              <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
+                                :data-bs-title="tip">
+                                <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>                      
                     </div>
                   </div>
                 </div>
@@ -128,10 +171,10 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'populatePatientScenarios']),
-    ...mapState(rootStore, ['getMitigations']),
+    ...mapState(assessmentStore, ['setDataReady', 'dataReady', 'assessmentData', 'updateAssessmentStatus', 'populatePatientScenarios']),
+    ...mapState(rootStore, ['getMitigations', 'getCategories']),
     dataLoaded() {
-      return this.dataReady
+      return this.dataReady && this.auxiliaryDataReady
     },
     patientData() {
       return this.assessmentData.patients
@@ -156,10 +199,21 @@ export default {
         '',
         ''
       ]
+    },
+    matrixCategories() {
+      return this.categories
+    },
+    categoryCount() {
+      return this.categories.length
+    },
+    categoryTips() {
+      return this.categories.map(c => { c.tip })
     }
   },
   data() {
     return {
+      auxiliaryDataReady: false,
+      categories: [],
       mitigationCodes: {},
       currentPatient: null,
       currentScenario: 1,
@@ -194,19 +248,31 @@ export default {
     //   }
     //   this.openNextUnenteredPatient()
     // }
+    raiseDataError(msg) {
+      this.auxiliaryDataReady = true
+      throw new Error(msg)
+    }
   },
   async mounted() {
     console.group('AssessmentScenario mounted()')
+    this.auxiliaryDataReady = false
     const mitResponse = await this.getMitigations()
     if (mitResponse.status < 400) {
       this.mitigationCodes = Object.fromEntries(mitResponse.data.data.map(m => [m.mitigation_code, m.mitigation]))
     } else {
-      throw new Error('Failed to retrieve mitigation code information')
+      this.raiseDataError('Failed to retrieve mitigation code information')
+    }
+    const catResponse = await this.getCategories()
+    if (catResponse.status < 400) {
+      this.categories = catResponse.data.data.map(c => { return {value: c.category_code, label: c.name, tip: c.description} })
+    } else {
+      this.raiseDataError('Failed to retrieve category information')
     }
     const loadScenariosResponse = await this.populatePatientScenarios(true)
     if (loadScenariosResponse !== true) {
-      throw new Error(loadScenariosResponse)
+      this.raiseDataError(loadScenariosResponse)
     }
+    this.auxiliaryDataReady = true
     console.groupEnd()
   },
   beforeUnmount() {
