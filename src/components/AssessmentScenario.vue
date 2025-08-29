@@ -10,26 +10,31 @@
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
-          <p>There are 45 test scenarios to complete. This should be carried out in <span class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
+          <p>There are 45 test scenarios to complete. This should be carried out in <span
+              class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
           <p>
-            Please select the first patient's name from those set up in the patient build phase and prescribe the medication exactly as detailed in the scenario 1 tab presented. 
-            Record any relevant advice or information received while completing the test as prompted. Check all responses and then click <span class="fw-bold">Save</span>.
+            Please select the first patient's name from those set up in the patient build phase and prescribe the
+            medication exactly as detailed in the scenario 1 tab presented.
+            Record any relevant advice or information received while completing the test as prompted. Check all
+            responses and then click <span class="fw-bold">Save</span>.
           </p>
           <p>
-            Please note once you have clicked <span class="fw-bold">Save</span> you will <span class="fw-bold">not</span> be able to return to this page again to change your response.
+            Please note once you have clicked <span class="fw-bold">Save</span> you will <span
+              class="fw-bold">not</span> be able to return to this page again to change your response.
           </p>
           <p>
-            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should complete the same process. 
+            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should
+            complete the same process.
             On completion of the three scenario tests you will be prompted to move onto the next patient.
           </p>
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
-      </StaticElement>
-      <ObjectElement ref="scenariosObject" name="scenarios">
-        <StaticElement name="scenarioDataBody">
-          <div class="accordion" id="patientAccordion">
-            <div class="accordion-item" v-for="(patient, idx) in patientData" :key="patient.id">
-              <h2 class="accordion-header primary">
+      </StaticElement>  
+      <ObjectElement name="scenarioData">    
+        <div class="accordion vf-col-12" id="patientAccordion">
+          <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
+            <ObjectElement :name="patient.patient_code">
+              <h2 class="accordion-header primary vf-col-12">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
                   :id="'accordion-btn-' + patient.patient_code"
                   :class="currentPatient == patient.patient_code ? '' : 'collapsed'"
@@ -44,25 +49,25 @@
                   </span>
                 </button>
               </h2>
-              <div class="accordion-collapse collapse" data-bs-parent="#patientAccordion"
+              <div class="accordion-collapse collapse vf-col-12" data-bs-parent="#patientAccordion"
                 :id="'patient-' + patient.patient_code" :class="currentPatient == patient.patient_code ? 'show' : ''">
                 <div class="accordion-body">
                   <!-- Scenario navigation tabs -->
                   <ul class="nav nav-tabs" :id="'patient-' + patient.patient_code + '-scenario-tabs'" role="tablist">
-                    <li v-for="(scenarioData, index) in patientScenarios[patient.patient_code]" class="nav-item"
+                    <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
                       <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                        :class="index == 0 ? 'active' : ''" :id="'scenario-' + scenarioData.scenario_code + '-tab'"
-                        :data-bs-target="'#scenario-' + scenarioData.scenario_code">{{ 'Scenario ' + (index + 1) }}
+                        :class="index == 0 ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        :data-bs-target="'#scenario-' + pscd.scenario_code">{{ 'Scenario ' + (index + 1) }}
                       </button>
                     </li>
                   </ul>
 
                   <!-- Scenario tabs -->
-                  <div class="tab-content">
+                  <div class="tab-content vf-col-12">
                     <div class="tab-pane fade mt-2"
-                      v-for="(scenarioData, index) in patientScenarios[patient.patient_code]"
-                      :id="'scenario-' + scenarioData.scenario_code"
+                      v-for="(pscd, index) in patientScenarios[patient.patient_code]"
+                      :id="'scenario-' + pscd.scenario_code"
                       :class="currentScenario == index + 1 ? 'active show' : ''" role="tabpanel" tabindex="0">
                       <p class="my-4">Prescribe the following medication to the specified patient using your normal
                         prescribing practice, then answer the questions below.</p>
@@ -70,94 +75,85 @@
                         <tbody>
                           <tr>
                             <th style="width:200px">Drug</th>
-                            <td>{{ scenarioData.prescriptions.name }}</td>
+                            <td>{{ pscd.prescriptions.name }}</td>
                           </tr>
                           <tr>
                             <th>Dose</th>
-                            <td>{{ scenarioData.prescriptions.dose }}</td>
+                            <td>{{ pscd.prescriptions.dose }}</td>
                           </tr>
                           <tr>
                             <th>Route</th>
-                            <td>{{ scenarioData.prescriptions.route }}</td>
+                            <td>{{ pscd.prescriptions.route }}</td>
                           </tr>
                           <tr>
                             <th>Frequency</th>
-                            <td>{{ scenarioData.prescriptions.frequency }}</td>
+                            <td>{{ pscd.prescriptions.frequency }}</td>
                           </tr>
                           <tr>
                             <th>Duration</th>
-                            <td>{{ scenarioData.prescriptions.duration }}</td>
+                            <td>{{ pscd.prescriptions.duration }}</td>
                           </tr>
                           <tr>
                             <th>Justification</th>
-                            <td>{{ scenarioData.prescriptions.justification }}</td>
+                            <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
                       </table>
                       <!-- Radio group of potential system responses -->
-                      <h4 class="mb-2">Questions</h4>
-                      <span
-                        v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
-                      <table class="table">
-                        <tbody>
-                          <tr>
-                            <td rowspan="5">
-                              <RadiogroupElement 
-                                name="outcomes[]" 
-                                :items="systemResponses" 
-                                @change="(newVal, oldVal, el$) => console.log('Changed radio to', newVal, 'from', oldVal, 'element', el$)"
-                              />
-                            </td>
-                            <td>
-                              <span data-bs-toggle="tooltip" data-bs-placement="right"
-                                :data-bs-title="systemResponseTips[0]">
-                                <i class="bi bi-info-circle-fill"></i>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr v-for="tip in systemResponseTips.slice(1)">
-                            <td>
-                              <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
-                                :data-bs-title="tip">
-                                <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>                        
-                      </table>
-                      <!-- Alert/advisory checkboxes -->
-                      <table class="table">
-                        <tbody>
-                          <tr>
-                            <td :rowspan="categoryCount + 1">
-                              <MatrixElement name="scenarioResponseCategories[]"
-                                :presets="['matrix-table']" 
-                                :rows="matrixCategories" 
-                                :cols="[ { value: 'alert', label: embolden('Alert') }, { value: 'advisory', label: embolden('Advisory') } ]"
-                              />
-                            </td>
-                            <td>&nbsp;</td>                            
-                          </tr>
-                          <tr v-for="tip in categoryTips">
-                            <td>
-                              <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
-                                :data-bs-title="tip">
-                                <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>                      
+                      <ObjectElement :name="pscd.scenario_code">
+                        <h4 class="vf-col-12 mb-2">Questions</h4>
+                        <span class="vf-col-12"
+                          v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
+                        <table class="table table-striped vf-col-12">
+                          <tbody>
+                            <tr v-for="(sysResponse, srIdx) in systemResponses">
+                              <td>                            
+                                <RadioElement 
+                                  name="outcome" 
+                                  :radioValue="sysResponse.value"
+                                  v-html="sysResponse.label"
+                                  @change="(newVal, oldVal, el$) => console.log('Changed radio to', newVal, 'from', oldVal, 'element', el$)">
+                                </RadioElement>
+                              </td>
+                              <td>
+                                <span v-if="systemResponseTips[srIdx] != ''" data-bs-toggle="tooltip" data-bs-placement="right"
+                                  :data-bs-title="systemResponseTips[srIdx]">
+                                  <i class="bi bi-info-circle-fill"></i>
+                                </span>
+                              </td>
+                            </tr>                            
+                          </tbody>
+                        </table>
+                        <!-- Alert/advisory checkboxes -->
+                        <!-- <table class="table">
+                          <tbody>
+                            <tr>
+                              <td :rowspan="categoryCount + 1">
+                                <MatrixElement :name="'responseCategory-' + pscd.scenario_code" :presets="['matrix-table']"
+                                  :rows="matrixCategories"
+                                  :cols="[{ value: 'alert', label: embolden('Alert') }, { value: 'advisory', label: embolden('Advisory') }]" />
+                              </td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr v-for="tip in categoryTips">
+                              <td>
+                                <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
+                                  :data-bs-title="tip">
+                                  <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table> -->
+                      </ObjectElement>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ObjectElement>
           </div>
-        </StaticElement>
+        </div>
       </ObjectElement>
-
-      <!-- TODO -->
     </GroupElement>
   </GroupElement>
 </template>
@@ -171,16 +167,18 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['setDataReady', 'dataReady', 'assessmentData', 'updateAssessmentStatus', 'populatePatientScenarios']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData']),
     ...mapState(rootStore, ['getMitigations', 'getCategories']),
     dataLoaded() {
       return this.dataReady && this.auxiliaryDataReady
     },
     patientData() {
+      console.log('Patients', this.assessmentData.patients)
       return this.assessmentData.patients
     },
     patientScenarios() {
-      return this.assessmentData.scenarios.patientScenarios
+      console.log('Scenarios', this.assessmentData.patientScenarios)
+      return this.assessmentData.patientScenarios
     },
     systemResponses() {
       return [
@@ -195,7 +193,7 @@ export default {
       return [
         'You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system',
         'You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it',
-        'You placed the order and received some system advice or information in relation to  allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring , contraindication or something other , that required you to take some action in order to continue. Please tell us more about what happened,  using the tick box option descriptions  provided and / or the freehand comments box that will appear when you select this response option',
+        'You placed the order and received some system advice or information in relation to allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring, contraindication or something other, that required you to take some action in order to continue. Please tell us more about what happened using the tick box option descriptions provided and / or the freehand comments box that will appear when you select this response option',
         '',
         ''
       ]
@@ -264,11 +262,11 @@ export default {
     }
     const catResponse = await this.getCategories()
     if (catResponse.status < 400) {
-      this.categories = catResponse.data.data.map(c => { return {value: c.category_code, label: c.name, tip: c.description} })
+      this.categories = catResponse.data.data.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })
     } else {
       this.raiseDataError('Failed to retrieve category information')
     }
-    const loadScenariosResponse = await this.populatePatientScenarios(true)
+    const loadScenariosResponse = await this.getPatientScenarioData(true)
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)
     }

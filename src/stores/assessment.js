@@ -53,13 +53,6 @@ const EMPTY_CONFIG_DATA = {
   configQuestionResults: []
 }
 
-const EMPTY_SCENARIO_DATA = {
-  patientScenarios: {},  
-  outcomes: [],
-  scenarioResponseCategories: []
-
-}
-
 const EMPTY_SELECTION = {
   assessmentId: null,
   assessmentOption: '',
@@ -80,11 +73,11 @@ const EMPTY_DATA = {
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
   config: EMPTY_CONFIG_DATA,
-  scenarios: EMPTY_SCENARIO_DATA,
-  patients: [],  
-  scenarios: {},
+  patients: [],    
   completedPatients: '',
-  numCompletedPatients: 0
+  numCompletedPatients: 0,
+  patientScenarios: {},
+  scenarioData: {}
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -174,7 +167,7 @@ export const assessmentStore = defineStore('assessment', {
     },
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
-    async selectAssessment() {
+    async selectAssessment(assessmentId = null) {
 
       console.group('selectAssessment()')
 
@@ -210,14 +203,16 @@ export const assessmentStore = defineStore('assessment', {
         }
       } else if (this.assessmentData.selection.assessmentOption == 'continue') {
         // Continuing existing assessment
-        console.debug('Continuing assessment', this.assessmentData.selection.assessmentId, '=> patch in data')
-        uri = `${uri}/${this.assessmentData.selection.assessmentId}`
-        const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == this.assessmentData.selection.assessmentId)
+        console.assert(assessmentId != null, 'No assessment id supplied!')
+        console.debug('Continuing assessment', assessmentId, '=> patch in data')
+        uri = `${uri}/${assessmentId}`
+        const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
         if (chosenAssessments.length > 0) {
           this.$patch((state) => {
             state.assessmentData = Object.assign(state.assessmentData, {
               assessmentState: chosenAssessments[0].state,
               selection: Object.assign(this.assessmentData.selection, {
+                assessmentId: assessmentId,
                 epService: {
                   value: chosenAssessments[0].ep_service.documentId,
                   label: chosenAssessments[0].ep_service.name
@@ -238,15 +233,15 @@ export const assessmentStore = defineStore('assessment', {
             ret = await this.patientListBuild()
           } 
           if (ret === true) {
-            // Retrieve scenario data TODO
-            //ret = await this.getScenarios()
+            // Retrieve scenarios connected with patients
+            ret = await this.getPatientScenarioData()
           }
           if (ret === true) {
             // Retrieve config question data
             ret = await this.getConfigQuestionData()
           }
         } else {
-          ret = `Assessment with id ${this.assessmentData.selection.assessmentId} not found in list of assessments for this institution/hospital`
+          ret = `Assessment with id ${assessmentId} not found in list of assessments for this institution/hospital`
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
@@ -468,32 +463,37 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Retrieve all scenarios for an assessment's patients
-    async populatePatientScenarios(recordLoading = false) {
+    async getPatientScenarioData(recordLoading = false) {
 
       let ret = true
 
-      console.group('getPatientScenarios()')
+      console.group('getPatientScenarioData()')
+      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
+      console.assert(this.assessmentData.patients.length > 0, 'No patient list present!')
 
       if (recordLoading) {
         this.setDataReady(false)
       } 
+      if (Object.keys(this.assessmentData.patientScenarios).length == 0) {
 
-      const scenarioDataByPatientCode = {}
-
-      for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
-        const patientCode = this.assessmentData.patients[idx].patient_code
-        const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-        if (sppResponse.status < 400) {
-          scenarioDataByPatientCode[patientCode] = sppResponse.data.data
-        } else {
-          ret = `Failed to retrieve scenario data for patient code ${patientCode}`
+        // Load scenarios for each patient
+        const patientScenariosByCode = {}
+        for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
+          const patientCode = this.assessmentData.patients[idx].patient_code
+          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          if (sppResponse.status < 400) {
+            patientScenariosByCode[patientCode] = sppResponse.data.data
+          } else {
+            ret = `Failed to retrieve scenario data for patient code ${patientCode}`
+          }
         }
-      }
-
-      if (ret === true) {
-        this.$patch((state) => {
-          state.assessmentData.scenarios.patientScenarios = scenarioDataByPatientCode
-        })
+        if (ret === true) {
+          this.$patch((state) => {
+            state.assessmentData.patientScenarios = patientScenariosByCode
+          })
+        }
+      } else {
+        console.debug('Patient scenarios already present')
       }
       
       if (recordLoading) {
@@ -610,6 +610,8 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = `Error ${patientResponse.message} while retrieving patients for assessment`
         }
+      } else {
+        console.debug('Patient list already retrieved')
       }
       if (recordLoading) {
         this.setDataReady(true)

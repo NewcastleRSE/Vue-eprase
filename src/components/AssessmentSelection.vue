@@ -72,37 +72,31 @@
               <caption>You can access the following assessments:</caption>
               <thead>
                 <tr>
-                  <th>&nbsp;</th>
                   <th>ePrescribing System</th>
                   <th>Patient Type</th>
                   <th>Assessment Status</th>
                   <th>Created on</th>
                   <th>Last Update</th>
                   <th>User</th>
+                  <th>&nbsp;</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="assessment in updatableAssessments">
-                  <td :rowspan="updatableAssessments.length">
-                    <RadiogroupElement name="assessmentId" 
-                      :label="null"
-                      :items="updatableDocIds"
-                      :messages="{required: 'Select one'}" 
-                      :rules="['filled']"
-                      :class="'me-2'" />
-                  </td>
+                <tr v-for="assessment in updatableAssessments">                  
                   <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
                   <td>{{ assessment.patient_type }}</td>
                   <td>{{ assessment.state }}</td>
                   <td>{{ convertDate(assessment.createdAt, false) }}</td>
                   <td>{{ convertDate(assessment.updatedAt, true) }}</td>
                   <td>{{ assessment.createdBy.username }}</td>
+                  <td>
+                    <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
+                      <i class="bi bi-play-fill"></i>
+                    </ButtonElement>
+                  </td>
                 </tr>
               </tbody>
-            </table>
-            <ButtonElement name="reset" :columns="3" @click="continueAssessment(this.$refs.selectionData.data.selection.assessmentId)">
-              <i class="bi bi-check2-circle me-2"></i>Continue with selected assessment
-            </ButtonElement>  
+            </table>           
           </GroupElement>
           <StaticElement name="noAssessments" v-if="updatableAssessments.length == 0">
             There are no assessments to choose from
@@ -132,9 +126,6 @@ export default {
     },   
     updatableAssessments() {
       return this.listQualifyingAssessments()
-    },
-    updatableDocIds() {
-      return this.listQualifyingAssessments().map(qa => { return { value: qa.documentId, label: '' }})
     },
     allowNew() {
       // New assessment allowed if there is < 2 assessments for the user's hospital (2 patient types - adult & child)
@@ -193,7 +184,7 @@ export default {
       if (this.selectionData.assessmentOption == 'continue') {
         console.debug('Chosen to continue assessment', assessmentId)
         // Select an existing assessment
-        const selectResponse = await this.selectAssessment()        
+        const selectResponse = await this.selectAssessment(assessmentId)        
         if (selectResponse !== true) {
           throw new Error(selectResponse)
         } else {
