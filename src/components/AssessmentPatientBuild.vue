@@ -284,10 +284,16 @@ export default {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
     },      
-    // Patient DOB is random date within last 12 months, adjusted by their stored age
+    // Patient DOB is random date within last 12 months, adjusted by their stored age (modified to account for the 3 possible age fields)
     formatDOB(patient) {
       dayjs.extend(customParseFormat)
-      return dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age, 'year').format('DD/MM/YYYY')
+      if (patient.age_years >0) {
+        return dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age_years, 'year').format('DD/MM/YYYY')
+      } else if (patient.age_days > 0) {
+        return dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
+      } else if (patient.gestational_age > 0) {
+        return dayjs().subtract(patient.gestational_age, 'week').format('DD/MM/YYYY')
+      }      
     },    
     docIdFromTabBtnId(tabId) {
       return tabId.replace(/^accordion-btn-([a-z0-9]+)$/, '\$1')
@@ -334,7 +340,10 @@ export default {
       if (spdeResponse !== true) {
         throw new Error(spdeResponse)
       }
-      this.openNextUnenteredPatient()
+      // Time delay to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+      setTimeout(() => {
+        this.openNextUnenteredPatient()
+      }, 2000)      
     }
   },
   async mounted() {

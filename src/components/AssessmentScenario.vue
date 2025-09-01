@@ -131,7 +131,7 @@
                           </tbody>
                         </table>
                         <!-- Alert/advisory checkboxes -->
-                        <div v-if="interventionSelections['scenarioData.' + patient.patient_code + '.' + pscd.scenario_code]" class="vf-col-12">
+                        <div v-if="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome']" class="vf-col-12">
                           <div class="alert alert-info mt-2" role="alert">
                             Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
                           </div>
@@ -259,8 +259,9 @@ export default {
     // }
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
-      console.debug('New value', newVal, 'old value', oldVal)
-      this.interventionSelections[el$.dataPath] = newVal == 'MT1'
+      console.debug('New value', newVal, 'old value', oldVal, 'element', el$)
+      // This sets the object key to <patient_code>.<scenario_code>.outcome
+      this.interventionSelections[el$.dataPath.split('.').slice(1).join('.')] = newVal == 'MT1'
       console.groupEnd()
     },
     raiseDataError(msg) {
