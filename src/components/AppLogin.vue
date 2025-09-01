@@ -83,7 +83,8 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear']),
-    ...mapState(rootStore, ['audit'])
+    ...mapState(rootStore, ['audit']),
+    ...mapState(assessmentStore, ['reset'])
   },
   data() {
     return {
@@ -134,7 +135,7 @@ export default {
   },
   mounted() {
     // Clear any assessment data that may be around
-    assessmentStore().reset()
+    this.reset()
   }
 }
 </script>

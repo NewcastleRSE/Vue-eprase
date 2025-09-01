@@ -45,7 +45,10 @@
                       src="../assets/images/anon-male.png" alt="male patient" />
                     <img class="img-thumbnail" style="width: 50px; height: 50px" v-if="patient.gender === 'Female'"
                       src="../assets/images/anon-female.png" alt="female-patient" />
-                    Patient: {{ patient.full_name }}, age {{ patient.age }}
+                    Patient: {{ patient.full_name }}, 
+                     <span v-if="patient.age_years != 0"> age: {{ patient.age_years }} years</span>
+                     <span v-if="patient.age_days != 0"> age: {{ patient.age_days }} days</span>
+                     <span v-if="patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
                   </span>
                 </button>
               </h2>
@@ -108,12 +111,15 @@
                           <tbody>
                             <tr v-for="(sysResponse, srIdx) in systemResponses">
                               <td>                            
-                                <RadioElement 
+                                <RadioElement
                                   name="outcome" 
                                   :radioValue="sysResponse.value"
-                                  v-html="sysResponse.label"
-                                  @change="(newVal, oldVal, el$) => console.log('Changed radio to', newVal, 'from', oldVal, 'element', el$)">
-                                </RadioElement>
+                                  :columns="{ container: 12, label: 8, wrapper: 12 }"
+                                  @change="setIntervention">
+                                    <template #label>
+                                      <span v-html="sysResponse.label"></span>
+                                    </template>
+                                </RadioElement>                                
                               </td>
                               <td>
                                 <span v-if="systemResponseTips[srIdx] != ''" data-bs-toggle="tooltip" data-bs-placement="right"
@@ -125,26 +131,29 @@
                           </tbody>
                         </table>
                         <!-- Alert/advisory checkboxes -->
-                        <!-- <table class="table">
-                          <tbody>
-                            <tr>
-                              <td :rowspan="categoryCount + 1">
-                                <MatrixElement :name="'responseCategory-' + pscd.scenario_code" :presets="['matrix-table']"
-                                  :rows="matrixCategories"
-                                  :cols="[{ value: 'alert', label: embolden('Alert') }, { value: 'advisory', label: embolden('Advisory') }]" />
-                              </td>
-                              <td>&nbsp;</td>
-                            </tr>
-                            <tr v-for="tip in categoryTips">
-                              <td>
-                                <span :data-bs-toggle="tip != '' ? 'tooltip' : ''" data-bs-placement="right"
-                                  :data-bs-title="tip">
-                                  <i class="bi bi-info-circle-fill" :class="tip == '' ? 'invisible' : 'visible'"></i>
-                                </span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table> -->
+                        <div v-if="interventionSelections['scenarioData.' + patient.patient_code + '.' + pscd.scenario_code]" class="vf-col-12">
+                          <div class="alert alert-info mt-2" role="alert">
+                            Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
+                          </div>
+                          <TagsElement name="category-alerts"
+                            :max="2"
+                            :search="true"
+                            :id="'alerts-' + pscd.scenario_code"
+                            :label="embolden('System alerts', true)"
+                            :track-by="['label', 'value']"
+                            :items="matrixCategories"
+                            :class="'mb-4'"
+                          />
+                          <TagsElement name="category-advisories"
+                            :max="2"
+                            :search="true"
+                            :id="'advisories-' + pscd.scenario_code"
+                            :label="embolden('System advisories', true)"
+                            :track-by="['label', 'value']"
+                            :items="matrixCategories"
+                            :class="'mb-4'"
+                          /> 
+                        </div>                                          
                       </ObjectElement>
                     </div>
                   </div>
@@ -213,8 +222,10 @@ export default {
       auxiliaryDataReady: false,
       categories: [],
       mitigationCodes: {},
+      interventionSelections: {},
       currentPatient: null,
       currentScenario: 1,
+      allPatientScenarios: {},
       allScenariosCompleted: false  // Pro-tem
     }
   },
@@ -246,6 +257,12 @@ export default {
     //   }
     //   this.openNextUnenteredPatient()
     // }
+    setIntervention(newVal, oldVal, el$) {
+      console.group('setIntervention()')
+      console.debug('New value', newVal, 'old value', oldVal)
+      this.interventionSelections[el$.dataPath] = newVal == 'MT1'
+      console.groupEnd()
+    },
     raiseDataError(msg) {
       this.auxiliaryDataReady = true
       throw new Error(msg)
@@ -265,7 +282,7 @@ export default {
       this.categories = catResponse.data.data.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })
     } else {
       this.raiseDataError('Failed to retrieve category information')
-    }
+    }    
     const loadScenariosResponse = await this.getPatientScenarioData(true)
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)

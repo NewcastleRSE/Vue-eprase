@@ -229,13 +229,9 @@ export const assessmentStore = defineStore('assessment', {
           // Retrieve system data
           ret = await this.getSystemData()
           if (ret === true) {
-            // Retrieve patient data
+            // Retrieve patient and scenario data
             ret = await this.patientListBuild()
           } 
-          if (ret === true) {
-            // Retrieve scenarios connected with patients
-            ret = await this.getPatientScenarioData()
-          }
           if (ret === true) {
             // Retrieve config question data
             ret = await this.getConfigQuestionData()
@@ -504,6 +500,10 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
+    // Retrieve the actual responses for scenarios in current assessment
+    async getPatientScenarioResponses(patientCode, recordLoading = false) {
+
+    },
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
       let ret = true
@@ -538,7 +538,7 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
-    // Retrieve or build the patient list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
+    // Retrieve or build the patient / scenario list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
     async patientListBuild(recordLoading = false) {
 
       let ret = true
@@ -584,19 +584,32 @@ export const assessmentStore = defineStore('assessment', {
                     state.assessmentData.patients = requiredPatients
                   })
                   console.debug('Generated new patient list', this.assessmentData.patients)
-                  // Save to assessment patient list
-                  const response = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', {
-                    data: {
-                      patients: {
-                        connect: this.assessmentData.patients.map(p => p.documentId)
-                      }
+                  // Get the scenarios for the patients chosen
+                  ret = await this.getPatientScenarioData()
+                  if (ret === true) {
+                    // Save to assessment patient / scenario lists
+                    // First get scenario document ids
+                    const scenarioDocIds = []
+                    for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {
+                      scenarioDocIds.push(...scenarios.map(s => s.documentId))
                     }
-                  })
-                  if (response.status >= 400) {
-                    ret = `Failed to save patient list for assesssment : error was ${response.message}`
-                  } 
+                    const response = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', {
+                      data: {
+                        patients: {
+                          connect: this.assessmentData.patients.map(p => p.documentId)
+                        },
+                        scenarios: {
+                          connect: scenarioDocIds
+                        }
+                      }
+                    })
+                    if (response.status >= 400) {
+                      ret = `Failed to save patient list for assesssment : error was ${response.message}`
+                    } 
+                  }
+                  // Else ret is set to any error message from the scenario fetch                                
                 } else {
-                  ret = 'Failed to retrieve required scenario list'
+                  ret = 'Failed to retrieve required patient list'
                 }                
               }              
             } else {          
