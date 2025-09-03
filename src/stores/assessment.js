@@ -82,7 +82,7 @@ const EMPTY_DATA = {
 
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
-    assessmentData: EMPTY_DATA,
+    assessmentData: structuredClone(EMPTY_DATA),
     allPossibleAssessments: [],
     assessmentStates: ASSESSMENT_STATES,
     dataReady: false,
@@ -131,9 +131,10 @@ export const assessmentStore = defineStore('assessment', {
     reset() {
       console.group('reset() on assessment store')
       this.$patch((state) => {
-        state.assessmentData = EMPTY_DATA
+        state.assessmentData = structuredClone(EMPTY_DATA)
         state.allPossibleAssessments = []
         state.dataReady = true
+        state.loggingOut = false
       })
       console.debug(this.assessmentData)
       console.groupEnd()

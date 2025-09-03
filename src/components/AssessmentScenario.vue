@@ -135,24 +135,31 @@
                           <div class="alert alert-info mt-2" role="alert">
                             Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
                           </div>
-                          <TagsElement name="category-alerts"
-                            :max="2"
-                            :search="true"
-                            :id="'alerts-' + pscd.scenario_code"
-                            :label="embolden('System alerts', true)"
-                            :track-by="['label', 'value']"
-                            :items="matrixCategories"
-                            :class="'mb-4'"
-                          />
-                          <TagsElement name="category-advisories"
-                            :max="2"
-                            :search="true"
-                            :id="'advisories-' + pscd.scenario_code"
-                            :label="embolden('System advisories', true)"
-                            :track-by="['label', 'value']"
-                            :items="matrixCategories"
-                            :class="'mb-4'"
-                          /> 
+                          <table class="table table-striped vf-col-12">
+                            <thead>
+                              <tr><th>Alert</th><th>Advisory</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="(mc, mcIdx) in matrixCategories">
+                                <td>
+                                  <CheckboxElement :name="'alert-' + mc.value" align="left">
+                                    {{  mc.name }}
+                                  </CheckboxElement>
+                                </td>
+                                <td>
+                                  <CheckboxElement :name="'alert-' + mc.value" align="left">
+                                    {{  mc.name }}
+                                  </CheckboxElement>
+                                </td>
+                                <td>
+                                  <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    :data-bs-title="mc.tip">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                  </span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>                                          
                       </ObjectElement>
                     </div>
