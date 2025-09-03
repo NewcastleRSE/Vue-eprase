@@ -67,7 +67,7 @@
                   </ul>
 
                   <!-- Scenario tabs -->
-                  <div class="tab-content vf-col-12">
+                  <div v-if="currentPatient == patient.patient_code" class="tab-content vf-col-12">
                     <div class="tab-pane fade mt-2"
                       v-for="(pscd, index) in patientScenarios[patient.patient_code]"
                       :id="'scenario-' + pscd.scenario_code"
@@ -131,26 +131,19 @@
                           </tbody>
                         </table>
                         <!-- Alert/advisory checkboxes -->
-                        <div v-if="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome']" class="vf-col-12">
+                        <div v-if="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome'] === true" class="vf-col-6">
                           <div class="alert alert-info mt-2" role="alert">
                             Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
                           </div>
-                          <table class="table table-striped vf-col-12">
+                          <table class="table table-striped vf-col-6">
                             <thead>
-                              <tr><th>Alert</th><th>Advisory</th><th></th></tr>
+                              <tr><th>Category</th><th>Alert</th><th>Advisory</th><th></th></tr>
                             </thead>
                             <tbody>
                               <tr v-for="(mc, mcIdx) in matrixCategories">
-                                <td>
-                                  <CheckboxElement :name="'alert-' + mc.value" align="left">
-                                    {{  mc.name }}
-                                  </CheckboxElement>
-                                </td>
-                                <td>
-                                  <CheckboxElement :name="'alert-' + mc.value" align="left">
-                                    {{  mc.name }}
-                                  </CheckboxElement>
-                                </td>
+                                <td>{{  mc.label }}</td>
+                                <td><CheckboxElement :name="'alert-' + mc.value" /></td>
+                                <td><CheckboxElement :name="'advisory-' + mc.value" /></td>
                                 <td>
                                   <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
                                     :data-bs-title="mc.tip">
@@ -183,7 +176,7 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses']),
     ...mapState(rootStore, ['getMitigations', 'getCategories']),
     dataLoaded() {
       return this.dataReady && this.auxiliaryDataReady
@@ -294,6 +287,10 @@ export default {
     const loadScenariosResponse = await this.getPatientScenarioData(true)
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)
+    }
+    const storedResultsResponse = await this.getPatientScenarioResponses(true)
+    if (storedResultsResponse !== true) {
+      this.raiseDataError(storedResultsResponse)
     }
     this.auxiliaryDataReady = true
     console.groupEnd()

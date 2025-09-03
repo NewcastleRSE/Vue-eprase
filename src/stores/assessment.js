@@ -76,8 +76,9 @@ const EMPTY_DATA = {
   patients: [],    
   completedPatients: '',
   numCompletedPatients: 0,
-  patientScenarios: {},
-  scenarioData: {}
+  patientScenarios: {},       // The details of the scenarios
+  scenarioData: {},           // Raw user responses to scenarios
+  storedScenarioResponses: {} // Stored responses
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -303,7 +304,7 @@ export const assessmentStore = defineStore('assessment', {
         this.$patch((state) => {
           state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
         })          
-      } else {
+      } else if (systemResponse.data.data.system != null) {   // Null here means a logout before visiting the system page
         ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
       }
       
@@ -501,9 +502,32 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
-    // Retrieve the actual responses for scenarios in current assessment
-    async getPatientScenarioResponses(patientCode, recordLoading = false) {
+    // Retrieve the actual response to all scenarios in current assessment
+    async getPatientScenarioResponses(recordLoading = false) {
 
+      let ret = true
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }      
+      // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
+      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenarios`, 'GET')
+      if (allScenariosResponse.status < 400) {
+        this.$patch((state) => {
+          state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data
+        })
+      } else {
+        ret = 'Failed to retrieve saved scenario responses'
+      }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+
+      console.group('getPatientScenarioResponse()')
+      console.groupEnd()
+
+      return ret
     },
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
@@ -526,7 +550,7 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.numCompletedPatients = enteredCodes.length
           })
         } else {
-          ret = `Failed to updated completed patients list by adding ${patientCode}`
+          ret = `Failed to update completed patients list by adding ${patientCode}`
         }
 
         if (recordLoading) {
