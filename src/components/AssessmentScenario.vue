@@ -6,7 +6,7 @@
         <div class="spinner-border ms-auto" aria-hidden="true"></div>
       </div>
     </StaticElement>
-    <GroupElement name="scenarioDataLoaded" v-if="dataLoaded">
+    <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup" v-if="dataLoaded">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
@@ -167,7 +167,10 @@
                               :attrs="{ maxlength: 500 }" 
                               :label="embolden('Please tell us about the system response', true)" 
                             />
-                          </div>                                          
+                          </div>
+                          <StaticElement>                         
+                            <div class="warning warning-info mb-2" role="alert">Please discontinue the prescription order before proceeding to the next scenario</div>
+                          </StaticElement>                                          
                         </ObjectElement>
                       </div>
                       <div v-if="scenarioCompleted(pscd.scenario_code)">
@@ -180,7 +183,23 @@
                             </tr>
                             <tr>
                               <th>Interventions</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['interventions'] }}</td>
+                              <td>
+                                <ul class="list-group">
+                                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ formatIntervention(scenarioResponse(pscd.scenario_code)['interventionType'])['category'] }}
+                                    <span class="badge text-bg-primary rounded-pill">14</span>
+                                  </li>
+                                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    A second list item
+                                    <span class="badge text-bg-primary rounded-pill">2</span>
+                                  </li>                                  
+                                </ul>
+                              </td>
+                              {{  }}
+                            </tr>
+                            <tr>
+                              <th>Category 2 interventions</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['otherCategory'] }}</td>
                             </tr>
                             <tr>
                               <th>Qualitative data</th>
@@ -193,7 +212,7 @@
                           </tbody>
                         </table>
                       </div>
-                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 6, label: 0, wrapper: 6 }">
+                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 6, label: 0, wrapper: 6 }">                        
                         <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" 
                           :columns="3"
                           :add-class="'me-2'" 
@@ -291,6 +310,10 @@ export default {
     },
     categoryTips() {
       return this.categories.map(c => { c.tip })
+    },
+    completedScenariosHidden() {
+      console.log('Hidden element is', this.$refs.scenarioDataLoadedGroup)
+      return this.$refs.scenarioDataLoadedGroup
     }
   },
   data() {
@@ -373,6 +396,8 @@ export default {
   },
   async mounted() {
     console.group('AssessmentScenario mounted()')
+    // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
+    this.completedScenariosHidden.validate()
     this.auxiliaryDataReady = false
     const mitResponse = await this.getMitigations()
     if (mitResponse.status < 400) {

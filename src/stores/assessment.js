@@ -518,11 +518,12 @@ export const assessmentStore = defineStore('assessment', {
       const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario&[populate][1]=mitigation`, 'GET')
       if (allScenariosResponse.status < 400) {
         // Package the responses by scenario code for convenience
+        // intervention_type and other_category are of form { intervention_type: 'CAT001:alert,advisory,CAT002:alert...' } etc in the db
         const responsesByCode = {}
         allScenariosResponse.data.data.scenario_data.forEach(asr => {
           responsesByCode[asr.scenario.scenario_code] = {
-            outcome: asr.result,
-            interventions: asr.intervention_type,
+            result: asr.result,
+            interventions: [asr.intervention_type, asr.other_category],
             qualitativeData: asr.qualitative_data,
             mitigation: asr.mitigation
           }
@@ -554,9 +555,30 @@ export const assessmentStore = defineStore('assessment', {
       } 
 
       // Form data will be of form { outcome: <outcome_value>, alert-<category>: <true_false>, advisory-<category: <true_false>, qualitative-data: <text> }
-      // Massage it into db form
-      
-
+      // Massage it into db form { <category_code>:alert,advisory|... }, and record in storedScenarioResponses
+      const interventionsByCategoryCode = {}      
+      for (const [formKey, formValue] of Object.entries(formData)) {
+        if (formValue === true) {
+          const catCode = formKey.substring(formKey.indexOf('-'))
+          if (!( catCode in interventionsByCategoryCode)) {
+            interventionsByCategoryCode[catCode] = []
+          }
+          if (formKey.startsWith('alert-')) {
+            interventionsByCategoryCode[catCode].push('alert')
+          } else if (formKey.startsWith('advisory-')) {
+            interventionsByCategoryCode[catCode].push('advisory')
+          }
+        }
+      }
+      // Only record the first two categories (user has been instructed to check up to two), discard the rest!
+      const recordedCategories = Object.keys(interventionsByCategoryCode)
+      const nCategories = Math.min(recordedCategories.length, 2)
+      const interventions = []
+      for (let i = 0; i < nCategories; i++) {
+        interventions.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
+        //HERE
+      }
+        
       if (recordLoading) {
         this.setDataReady(true)
       }
