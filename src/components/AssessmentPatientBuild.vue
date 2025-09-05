@@ -343,7 +343,7 @@ export default {
       // Time delay to allow user to see the 'Data entry complete' message on the button before moving to the next one...
       setTimeout(() => {
         this.openNextUnenteredPatient()
-      }, 2000)      
+      }, 1000)      
     }
   },
   async mounted() {

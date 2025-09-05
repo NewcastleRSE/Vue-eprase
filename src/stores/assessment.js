@@ -77,7 +77,8 @@ const EMPTY_DATA = {
   completedPatients: '',
   numCompletedPatients: 0,
   patientScenarios: {},       // The details of the scenarios
-  scenarioData: {},           // Raw user responses to scenarios
+  numScenarios: 0,
+  scenarioData: {},           // Raw user responses to scenarios prior to saving
   storedScenarioResponses: {} // Stored responses
 }
 
@@ -142,7 +143,7 @@ export const assessmentStore = defineStore('assessment', {
     },
     resetSystemData() {
       this.$patch((state) => {
-        state.assessmentData.system = EMPTY_SYSTEM
+        state.assessmentData.system = structuredClone(EMPTY_SYSTEM)
       })
     },
     convertArrayFields(obj, toArray) {
@@ -475,19 +476,22 @@ export const assessmentStore = defineStore('assessment', {
       if (Object.keys(this.assessmentData.patientScenarios).length == 0) {
 
         // Load scenarios for each patient
+        let nScenarios = 0
         const patientScenariosByCode = {}
         for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
           const patientCode = this.assessmentData.patients[idx].patient_code
           const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
           if (sppResponse.status < 400) {
             patientScenariosByCode[patientCode] = sppResponse.data.data
+            nScenarios += patientScenariosByCode[patientCode].length
           } else {
             ret = `Failed to retrieve scenario data for patient code ${patientCode}`
           }
         }
         if (ret === true) {
           this.$patch((state) => {
-            state.assessmentData.patientScenarios = patientScenariosByCode
+            state.assessmentData.patientScenarios = patientScenariosByCode,
+            state.assessmentData.numScenarios = nScenarios
           })
         }
       } else {
@@ -511,10 +515,20 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(false)
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
-      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenarios`, 'GET')
+      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario&[populate][1]=mitigation`, 'GET')
       if (allScenariosResponse.status < 400) {
+        // Package the responses by scenario code for convenience
+        const responsesByCode = {}
+        allScenariosResponse.data.data.scenario_data.forEach(asr => {
+          responsesByCode[asr.scenario.scenario_code] = {
+            outcome: asr.result,
+            interventions: asr.intervention_type,
+            qualitativeData: asr.qualitative_data,
+            mitigation: asr.mitigation
+          }
+        })
         this.$patch((state) => {
-          state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data
+          state.assessmentData.storedScenarioResponses = responsesByCode
         })
       } else {
         ret = 'Failed to retrieve saved scenario responses'
@@ -525,6 +539,29 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       console.group('getPatientScenarioResponse()')
+      console.groupEnd()
+
+      return ret
+    },
+    async savePatientScenarioResponse(patientCode, scenarioCode, formData, recordLoading = false) {
+
+      let ret = true
+
+      console.group('savePatientScenarioResponse()')
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      } 
+
+      // Form data will be of form { outcome: <outcome_value>, alert-<category>: <true_false>, advisory-<category: <true_false>, qualitative-data: <text> }
+      // Massage it into db form
+      
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+
+      console.debug('Returning', ret)
       console.groupEnd()
 
       return ret

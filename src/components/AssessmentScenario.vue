@@ -30,16 +30,26 @@
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
       </StaticElement>  
-      <ObjectElement name="scenarioData">    
+      <ObjectElement name="scenarioData">
+        <HiddenElement name="completedScenarios" :rules="[allScenariosCompleted]" />
+        <SliderElement name="numCompletedScenarios" class="my-4"
+          :columns="{ container: 9 }"
+          :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
+          :min="0" 
+          :max="scenarioCount"
+          :value="Object.keys(scenarioResponses).length" 
+        />   
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
             <ObjectElement :name="patient.patient_code">
               <h2 class="accordion-header primary vf-col-12">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                  :id="'accordion-btn-' + patient.patient_code"
+                  :id="'scenario-accordion-btn-' + patient.patient_code"
                   :class="currentPatient == patient.patient_code ? '' : 'collapsed'"
-                  :data-bs-target="'#patient-' + patient.patient_code"
-                  :aria-expanded="currentPatient == patient.patient_code" :aria-controls="patient.patient_code">
+                  :data-bs-target="'#scenario-patient-' + patient.patient_code"
+                  :aria-expanded="currentPatient == patient.patient_code" :aria-controls="patient.patient_code"
+                  @click="openPatientScenarios(patient.patient_code)"
+                >
                   <span class="fw-bold">
                     <img class="img-thumbnail" style="width: 50px; height: 50px" v-if="patient.gender === 'Male'"
                       src="../assets/images/anon-male.png" alt="male patient" />
@@ -53,10 +63,10 @@
                 </button>
               </h2>
               <div class="accordion-collapse collapse vf-col-12" data-bs-parent="#patientAccordion"
-                :id="'patient-' + patient.patient_code" :class="currentPatient == patient.patient_code ? 'show' : ''">
+                :id="'scenario-patient-' + patient.patient_code" :class="currentPatient == patient.patient_code ? 'show' : ''">
                 <div class="accordion-body">
                   <!-- Scenario navigation tabs -->
-                  <ul class="nav nav-tabs" :id="'patient-' + patient.patient_code + '-scenario-tabs'" role="tablist">
+                  <ul class="nav nav-tabs" :id="'scenario-patient-' + patient.patient_code + '-scenario-tabs'" role="tablist">
                     <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
                       <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
@@ -71,9 +81,11 @@
                     <div class="tab-pane fade mt-2"
                       v-for="(pscd, index) in patientScenarios[patient.patient_code]"
                       :id="'scenario-' + pscd.scenario_code"
-                      :class="currentScenario == index + 1 ? 'active show' : ''" role="tabpanel" tabindex="0">
-                      <p class="my-4">Prescribe the following medication to the specified patient using your normal
+                      :class="currentScenario == pscd.scenario_code ? 'active show' : ''" role="tabpanel" tabindex="0">
+                      <!-- New response form -->
+                      <p v-if="!scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
                         prescribing practice, then answer the questions below.</p>
+                      <p v-if="scenarioCompleted(pscd.scenario_code)" class="my-4">Your recorded responses to the scenario below.</p>
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
                           <tr>
@@ -102,59 +114,100 @@
                           </tr>
                         </tbody>
                       </table>
-                      <!-- Radio group of potential system responses -->
-                      <ObjectElement :name="pscd.scenario_code">
-                        <h4 class="vf-col-12 mb-2">Questions</h4>
-                        <span class="vf-col-12"
-                          v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
-                        <table class="table table-striped vf-col-12">
-                          <tbody>
-                            <tr v-for="(sysResponse, srIdx) in systemResponses">
-                              <td>                            
-                                <RadioElement
-                                  name="outcome" 
-                                  :radioValue="sysResponse.value"
-                                  :columns="{ container: 12, label: 8, wrapper: 12 }"
-                                  @change="setIntervention">
-                                    <template #label>
-                                      <span v-html="sysResponse.label"></span>
-                                    </template>
-                                </RadioElement>                                
-                              </td>
-                              <td>
-                                <span v-if="systemResponseTips[srIdx] != ''" data-bs-toggle="tooltip" data-bs-placement="right"
-                                  :data-bs-title="systemResponseTips[srIdx]">
-                                  <i class="bi bi-info-circle-fill"></i>
-                                </span>
-                              </td>
-                            </tr>                            
-                          </tbody>
-                        </table>
-                        <!-- Alert/advisory checkboxes -->
-                        <div v-if="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome'] === true" class="vf-col-6">
-                          <div class="alert alert-info mt-2" role="alert">
-                            Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
-                          </div>
-                          <table class="table table-striped vf-col-6">
-                            <thead>
-                              <tr><th>Category</th><th>Alert</th><th>Advisory</th><th></th></tr>
-                            </thead>
+                      <div v-if="!scenarioCompleted(pscd.scenario_code)">
+                        <!-- Radio group of potential system responses -->
+                        <ObjectElement :name="pscd.scenario_code">
+                          <h4 class="vf-col-12 mb-2">Questions</h4>
+                          <span class="vf-col-12"
+                            v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
+                          <table class="table table-striped vf-col-12">
                             <tbody>
-                              <tr v-for="(mc, mcIdx) in matrixCategories">
-                                <td>{{  mc.label }}</td>
-                                <td><CheckboxElement :name="'alert-' + mc.value" /></td>
-                                <td><CheckboxElement :name="'advisory-' + mc.value" /></td>
+                              <tr v-for="(sysResponse, srIdx) in systemResponses">
+                                <td>                            
+                                  <RadioElement
+                                    name="outcome" 
+                                    :radioValue="sysResponse.value"
+                                    @change="setIntervention">                                      
+                                  </RadioElement>                                
+                                </td>
+                                <td v-html="sysResponse.label"></td>
                                 <td>
-                                  <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
-                                    :data-bs-title="mc.tip">
+                                  <span v-if="systemResponseTips[srIdx] != ''" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    :data-bs-title="systemResponseTips[srIdx]">
                                     <i class="bi bi-info-circle-fill"></i>
                                   </span>
                                 </td>
-                              </tr>
+                              </tr>                            
                             </tbody>
                           </table>
-                        </div>                                          
-                      </ObjectElement>
+                          <!-- Alert/advisory checkboxes -->
+                          <div v-show="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome'] === true" class="vf-col-6">
+                            <div class="alert alert-info mt-2" role="alert">
+                              Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
+                            </div>
+                            <table class="table table-striped vf-col-6">
+                              <thead>
+                                <tr><th>Category</th><th>Alert</th><th>Advisory</th><th></th></tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(mc, mcIdx) in matrixCategories">
+                                  <td>{{  mc.label }}</td>
+                                  <td><CheckboxElement :name="'alert-' + mc.value" /></td>
+                                  <td><CheckboxElement :name="'advisory-' + mc.value" /></td>
+                                  <td>
+                                    <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
+                                      :data-bs-title="mc.tip">
+                                      <i class="bi bi-info-circle-fill"></i>
+                                    </span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <TextareaElement name="qualitative-data" :rows="5" class="mb-2"
+                              :attrs="{ maxlength: 500 }" 
+                              :label="embolden('Please tell us about the system response', true)" 
+                            />
+                          </div>                                          
+                        </ObjectElement>
+                      </div>
+                      <div v-if="scenarioCompleted(pscd.scenario_code)">
+                        <!-- Recorded responses (need some guidance as to how to express this - this is only the raw data at the moment... -->
+                        <table class="table table-striped" style="table-layout: fixed;">
+                          <tbody>
+                            <tr>
+                              <th style="width:200px">Outcome</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['outcome'] }}</td>
+                            </tr>
+                            <tr>
+                              <th>Interventions</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['interventions'] }}</td>
+                            </tr>
+                            <tr>
+                              <th>Qualitative data</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['qualitativeData'] }}</td>
+                            </tr>
+                            <tr>
+                              <th>Mitigation</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['mitigation']['mitigation'] }}</td>
+                            </tr>                           
+                          </tbody>
+                        </table>
+                      </div>
+                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 6, label: 0, wrapper: 6 }">
+                        <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" 
+                          :columns="3"
+                          :add-class="'me-2'" 
+                          @click="saveScenarioResponse(patient.patient_code, pscd.scenario_code)"
+                        >
+                          <i class="bi bi-floppy-fill me-2"></i>Save response
+                        </ButtonElement>
+                        <ButtonElement name="nextIncompleteScenario" 
+                          :columns="3"
+                          @click="openNextUnenteredScenario"
+                        >
+                          <i class="bi bi-play-fill me-2"></i>Next scenario
+                        </ButtonElement>
+                      </GroupElement>                      
                     </div>
                   </div>
                 </div>
@@ -172,22 +225,45 @@
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { rootStore } from '../stores/root'
+import { Validator } from '@vueform/vueform'
+
+const allScenariosCompleted = class extends Validator {
+  get msg() {
+    return 'Please complete all scenario questions'
+  }
+  check(value) {
+    console.debug('allScenariosCompleted() validator entered with', value)
+    return value && value.split(',').length == assessmentStore().assessmentData.numScenarios
+  }
+}
 
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
     ...mapState(rootStore, ['getMitigations', 'getCategories']),
     dataLoaded() {
       return this.dataReady && this.auxiliaryDataReady
     },
     patientData() {
-      console.log('Patients', this.assessmentData.patients)
+      console.debug('Patients', this.assessmentData.patients)
       return this.assessmentData.patients
     },
     patientScenarios() {
-      console.log('Scenarios', this.assessmentData.patientScenarios)
+      console.debug('Scenarios', this.assessmentData.patientScenarios)
       return this.assessmentData.patientScenarios
+    },
+    scenarioCount() {
+      console.debug('Number of scenarios', this.assessmentData.numScenarios)
+      return this.assessmentData.numScenarios
+    },
+    rawScenarioFormData() {
+      console.debug('Raw form scenario data', this.assessmentData.scenarioData)
+      return this.assessmentData.scenarioData
+    },
+    scenarioResponses() {
+      console.debug('User scenario responses', this.assessmentData.storedScenarioResponses)
+      return this.assessmentData.storedScenarioResponses
     },
     systemResponses() {
       return [
@@ -224,44 +300,70 @@ export default {
       mitigationCodes: {},
       interventionSelections: {},
       currentPatient: null,
-      currentScenario: 1,
-      allPatientScenarios: {},
-      allScenariosCompleted: false  // Pro-tem
+      currentScenario: null,
+      scenarioPatientLink: {},
+      allScenariosCompleted
     }
   },
   methods: {
-    // openNextUnenteredPatient() {
+    async saveScenarioResponse(patientCode, scenarioCode) {
+      
+      console.group('saveScenarioResponse()')
 
-    //   //TODO
-    //   console.group('openNextUnenteredPatient()')
+      // Assemble the raw form data into recording form
+      // { outcome, interventions, qualitativeData, mitigation }
+      const saveResponse = await this.savePatientScenarioResponse(patientCode, scenarioCode, this.rawScenarioFormData[patientCode][scenarioCode], true)
+      if (saveResponse !== true) {
+        this.raiseDataError(saveResponse)
+      }
 
-    //   const allCodes = this.patientData.map(p => p.patient_code)
-    //   const doneCodes = this.completedPatientsArray()
+      console.groupEnd()
+    },
+    // Determine the next incomplete scenario and open it
+    openNextUnenteredScenario() {
 
-    //   if (allCodes.length > doneCodes.length) {
-    //     // Still some to do
-    //     const notDoneCodes = allCodes.filter(c => !doneCodes.includes(c))
-    //     const nextCode = notDoneCodes.shift()
-    //     const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
-    //     this.patientRelations(docId)  
-    //     document.getElementById('patient-' + nextCode).scrollIntoView()    
-    //   } else {
-    //     console.debug('No unentered patients left')
-    //   }
-    //   console.groupEnd()
-    // },
-    // async setPatientDataEntered(patientCode) {
-    //   const spdeResponse = await this.setPatientEntryComplete(patientCode)
-    //   if (spdeResponse !== true) {
-    //     throw new Error(spdeResponse)
-    //   }
-    //   this.openNextUnenteredPatient()
-    // }
+      console.group('openNextUnenteredScenario()')
+
+      const doneScenarios = Object.keys(this.scenarioResponses)
+
+      if (doneScenarios.length < this.scenarioCount) {
+        // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
+        const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
+        console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
+        // 
+        this.currentScenario = incompleteScenarioCodes[0]
+        this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
+        const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
+        if (patientElement != null) {
+          patientElement.scrollIntoView()
+        }
+        console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
+      } else {
+        console.debug('All scenarios have now been completed')
+      }
+      console.groupEnd()
+    },
+    // Allow user to simply click on any patient within the list e.g. to review responses
+    openPatientScenarios(patientCode) {
+      this.currentPatient = patientCode
+      this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
+    },  
+    scenarioResponse(scenarioCode) {
+      return this.scenarioResponses[scenarioCode]
+    },
+    scenarioCompleted(scenarioCode) {
+      return scenarioCode in this.scenarioResponses
+    },
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
-      console.debug('New value', newVal, 'old value', oldVal, 'element', el$)
+      const identifier = el$.dataPath.split('.').slice(1).join('.')
+      const isIntervention = newVal == 'MT1'
       // This sets the object key to <patient_code>.<scenario_code>.outcome
-      this.interventionSelections[el$.dataPath.split('.').slice(1).join('.')] = newVal == 'MT1'
+      if (this.interventionSelections[identifier] != isIntervention) {
+        // Only set this reactive quantity if its value has actually changed - 'change' event is fired multiple times for radios
+        console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
+        this.interventionSelections[identifier] = isIntervention
+      }
       console.groupEnd()
     },
     raiseDataError(msg) {
@@ -288,11 +390,17 @@ export default {
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)
     }
+    for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
+      scenarios.forEach(s => {
+        this.scenarioPatientLink[s.scenario_code] = patientCode
+      })      
+    }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)
     if (storedResultsResponse !== true) {
       this.raiseDataError(storedResultsResponse)
     }
     this.auxiliaryDataReady = true
+    this.openNextUnenteredScenario()
     console.groupEnd()
   },
   beforeUnmount() {

@@ -91,7 +91,7 @@
                   <td>{{ assessment.createdBy.username }}</td>
                   <td>
                     <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
-                      <i class="bi bi-play-fill"></i>
+                      <i class="bi bi-play-fill me-2"></i>Select
                     </ButtonElement>
                   </td>
                 </tr>
