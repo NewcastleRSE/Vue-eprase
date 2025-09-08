@@ -115,8 +115,8 @@
                         </tbody>
                       </table>
                       <div v-if="!scenarioCompleted(pscd.scenario_code)">
-                        <!-- Radio group of potential system responses -->
-                        <ObjectElement :name="pscd.scenario_code">
+                        <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
+                        <ObjectElement :name="pscd.scenario_code" :ref="pscd.scenario_code">
                           <h4 class="vf-col-12 mb-2">Questions</h4>
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
@@ -125,7 +125,7 @@
                               <tr v-for="(sysResponse, srIdx) in systemResponses">
                                 <td>                            
                                   <RadioElement
-                                    name="outcome" 
+                                    name="interventionType" 
                                     :radioValue="sysResponse.value"
                                     @change="setIntervention">                                      
                                   </RadioElement>                                
@@ -140,7 +140,10 @@
                               </tr>                            
                             </tbody>
                           </table>
-                          <!-- Alert/advisory checkboxes -->
+                          <!-- 
+                          Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
+                          Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
+                          -->
                           <div v-show="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome'] === true" class="vf-col-6">
                             <div class="alert alert-info mt-2" role="alert">
                               Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
@@ -152,8 +155,8 @@
                               <tbody>
                                 <tr v-for="(mc, mcIdx) in matrixCategories">
                                   <td>{{  mc.label }}</td>
-                                  <td><CheckboxElement :name="'alert-' + mc.value" /></td>
-                                  <td><CheckboxElement :name="'advisory-' + mc.value" /></td>
+                                  <td><CheckboxElement :name="'alert' + mc.value" /></td>
+                                  <td><CheckboxElement :name="'advisory' + mc.value" /></td>
                                   <td>
                                     <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
                                       :data-bs-title="mc.tip">
@@ -163,7 +166,7 @@
                                 </tr>
                               </tbody>
                             </table>
-                            <TextareaElement name="qualitative-data" :rows="5" class="mb-2"
+                            <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                               :attrs="{ maxlength: 500 }" 
                               :label="embolden('Please tell us about the system response', true)" 
                             />
@@ -184,7 +187,7 @@
                             <tr>
                               <th>Interventions</th>
                               <td>
-                                <ul class="list-group">
+                                <!-- <ul class="list-group">
                                   <li class="list-group-item d-flex justify-content-between align-items-center">
                                     {{ formatIntervention(scenarioResponse(pscd.scenario_code)['interventionType'])['category'] }}
                                     <span class="badge text-bg-primary rounded-pill">14</span>
@@ -193,7 +196,7 @@
                                     A second list item
                                     <span class="badge text-bg-primary rounded-pill">2</span>
                                   </li>                                  
-                                </ul>
+                                </ul> -->
                               </td>
                               {{  }}
                             </tr>
@@ -216,7 +219,7 @@
                         <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" 
                           :columns="3"
                           :add-class="'me-2'" 
-                          @click="saveScenarioResponse(patient.patient_code, pscd.scenario_code)"
+                          @click="saveScenarioResponse(patient, pscd)"
                         >
                           <i class="bi bi-floppy-fill me-2"></i>Save response
                         </ButtonElement>
@@ -275,16 +278,13 @@ export default {
     scenarioCount() {
       console.debug('Number of scenarios', this.assessmentData.numScenarios)
       return this.assessmentData.numScenarios
-    },
-    rawScenarioFormData() {
-      console.debug('Raw form scenario data', this.assessmentData.scenarioData)
-      return this.assessmentData.scenarioData
-    },
+    },    
     scenarioResponses() {
       console.debug('User scenario responses', this.assessmentData.storedScenarioResponses)
       return this.assessmentData.storedScenarioResponses
     },
     systemResponses() {
+      // This undesirably hard-codes the mitigation codes in order to associate them with labels - perhaps label text better stored in the database?
       return [
         { value: 'MT2', label: 'You were able to complete the prescription (includes followed order sentence) <span class="fw-bold">without any additional user or system input</span>' },
         { value: 'MT4', label: 'You were able to complete the prescription, <span class="fw-bold">but had to override components of the order sentence</span>' },
@@ -320,7 +320,6 @@ export default {
     return {
       auxiliaryDataReady: false,
       categories: [],
-      mitigationCodes: {},
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
@@ -329,17 +328,14 @@ export default {
     }
   },
   methods: {
-    async saveScenarioResponse(patientCode, scenarioCode) {
+    async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
-
-      // Assemble the raw form data into recording form
-      // { outcome, interventions, qualitativeData, mitigation }
-      const saveResponse = await this.savePatientScenarioResponse(patientCode, scenarioCode, this.rawScenarioFormData[patientCode][scenarioCode], true)
+     
+      const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[scenario.scenario_code].data, true)
       if (saveResponse !== true) {
         this.raiseDataError(saveResponse)
       }
-
       console.groupEnd()
     },
     // Determine the next incomplete scenario and open it
@@ -383,7 +379,7 @@ export default {
       const isIntervention = newVal == 'MT1'
       // This sets the object key to <patient_code>.<scenario_code>.outcome
       if (this.interventionSelections[identifier] != isIntervention) {
-        // Only set this reactive quantity if its value has actually changed - 'change' event is fired multiple times for radios
+        // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
         this.interventionSelections[identifier] = isIntervention
       }
@@ -398,13 +394,7 @@ export default {
     console.group('AssessmentScenario mounted()')
     // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
     this.completedScenariosHidden.validate()
-    this.auxiliaryDataReady = false
-    const mitResponse = await this.getMitigations()
-    if (mitResponse.status < 400) {
-      this.mitigationCodes = Object.fromEntries(mitResponse.data.data.map(m => [m.mitigation_code, m.mitigation]))
-    } else {
-      this.raiseDataError('Failed to retrieve mitigation code information')
-    }
+    this.auxiliaryDataReady = false   
     const catResponse = await this.getCategories()
     if (catResponse.status < 400) {
       this.categories = catResponse.data.data.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })

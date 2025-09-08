@@ -18,6 +18,36 @@ const ASSESSMENT_STATES = {
   'Assessment complete': 6
 }
 
+// Done as <recorded_response> : { <expected_response1>: <mitigation_result1>, ... }
+// Transcription of document posted on Slack eprase2 channel by Becky 18/08/2025
+const MITIGATION_MATRIX = {
+  'MT2': { // Recorded response : You were able to complete the prescription without any additional user or system input
+    'MT2': 'Good mitigation',     // Expected response : No intervention
+    'MT1': 'Fail/No mitigation',  // Expected response : User/system intervention
+    'MT3': 'Fail/No mitigation'   // Expected response : Prescribing prevented
+  },
+  'MT4': { // Recorded response : You were able to complete the prescription, but had to override components of the order sentence
+    'MT2': 'Over mitigation',     // Expected response : No intervention
+    'MT1': 'Good mitigation',     // Expected response : User/system intervention
+    'MT3': 'Some mitigation'      // Expected response : Prescribing prevented
+  },
+  'MT1': { // Recorded response : You were able to complete the prescription, with system/user intervention
+    'MT2': 'Over mitigation',     // Expected response : No intervention
+    'MT1': 'Some mitigation',     // Expected response : User/system intervention
+    'MT3': 'Some mitigation'      // Expected response : Prescribing prevented
+  },
+  'MT3': { // Recorded response : Prevented from prescribing
+    'MT2': 'Over mitigation',     // Expected response : No intervention
+    'MT1': 'Some mitigation',     // Expected response : User/system intervention
+    'MT3': 'Good mitigation'      // Expected response : Prescribing prevented
+  },
+  'MT99': { // Recorded response : Medicine or formulary alternative not available in the system
+    'MT2': 'Fail/No mitigation',  // Expected response : No intervention
+    'MT1': 'Fail/No mitigation',  // Expected response : User/system intervention
+    'MT3': 'Fail/No mitigation'   // Expected response : Prescribing prevented
+  }
+}
+
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
 
 const EMPTY_SYSTEM = {
@@ -78,15 +108,15 @@ const EMPTY_DATA = {
   numCompletedPatients: 0,
   patientScenarios: {},       // The details of the scenarios
   numScenarios: 0,
-  scenarioData: {},           // Raw user responses to scenarios prior to saving
-  storedScenarioResponses: {} // Stored responses
+  storedScenarioResponses: {} // Stored responses  
 }
 
 export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
     assessmentData: structuredClone(EMPTY_DATA),
     allPossibleAssessments: [],
-    assessmentStates: ASSESSMENT_STATES,
+    assessmentStates: ASSESSMENT_STATES,  
+    mitigations: [],
     dataReady: false,
     loggingOut: false
   }),
@@ -398,6 +428,37 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
+    // Get all mitigations
+    async getMitigationDetails(recordLoading = false) {
+
+      let ret = true
+      
+      console.group('getMitigationDetails()')
+
+      if (!Array.isArray(this.mitigations) || this.mitigations.length == 0) {
+
+        if (recordLoading) {
+          this.setDataReady(false)
+        }
+      
+        const mitResponse = rootStore().getMitigations()
+        if (mitResponse.status < 400) {
+          this.$patch((state) => {
+            state.mitigations = mitResponse.data.data
+          })
+        } else {
+          ret = mitResponse
+        }
+
+        if (recordLoading) {
+          this.setDataReady(true)
+        }  
+      }              
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+
+    },
     // Get all patients of the required type
     async getPatientPool(patientType) {
 
@@ -480,7 +541,7 @@ export const assessmentStore = defineStore('assessment', {
         const patientScenariosByCode = {}
         for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
           const patientCode = this.assessmentData.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
           if (sppResponse.status < 400) {
             patientScenariosByCode[patientCode] = sppResponse.data.data
             nScenarios += patientScenariosByCode[patientCode].length
@@ -518,15 +579,11 @@ export const assessmentStore = defineStore('assessment', {
       const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario&[populate][1]=mitigation`, 'GET')
       if (allScenariosResponse.status < 400) {
         // Package the responses by scenario code for convenience
-        // intervention_type and other_category are of form { intervention_type: 'CAT001:alert,advisory,CAT002:alert...' } etc in the db
+        // Data is of form:
+        // { intervention_type: MT<code>, result: <category_code>:alert[,advisory], other_category: <category_code>:alert[,advisory], qualitative_data: <text> }
         const responsesByCode = {}
         allScenariosResponse.data.data.scenario_data.forEach(asr => {
-          responsesByCode[asr.scenario.scenario_code] = {
-            result: asr.result,
-            interventions: [asr.intervention_type, asr.other_category],
-            qualitativeData: asr.qualitative_data,
-            mitigation: asr.mitigation
-          }
+          responsesByCode[asr.scenario.scenario_code] = asr
         })
         this.$patch((state) => {
           state.assessmentData.storedScenarioResponses = responsesByCode
@@ -544,41 +601,73 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
-    async savePatientScenarioResponse(patientCode, scenarioCode, formData, recordLoading = false) {
+    async savePatientScenarioResponse(patient, scenario, formData, recordLoading = false) {
 
       let ret = true
 
       console.group('savePatientScenarioResponse()')
+      console.debug('Patient', patient, 'scenario', scenario, 'form data', formData)
 
       if (recordLoading) {
         this.setDataReady(false)
       } 
 
-      // Form data will be of form { outcome: <outcome_value>, alert-<category>: <true_false>, advisory-<category: <true_false>, qualitative-data: <text> }
-      // Massage it into db form { <category_code>:alert,advisory|... }, and record in storedScenarioResponses
-      const interventionsByCategoryCode = {}      
-      for (const [formKey, formValue] of Object.entries(formData)) {
-        if (formValue === true) {
-          const catCode = formKey.substring(formKey.indexOf('-'))
-          if (!( catCode in interventionsByCategoryCode)) {
-            interventionsByCategoryCode[catCode] = []
+      ret = await this.getMitigationDetails(false)
+      if (ret === true) {
+
+        // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text> }
+        // Massage it into db form:
+        // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
+        const dataOut = {
+          intervention_type: formData.interventionType,
+          result: '',
+          other_category: '',
+          qualitative_data: formData.qualitativeData
+        }
+
+        if (formData.interventionType == 'MT1') {
+          // System intervention, so look at alerts and advisories
+          const interventionsByCategoryCode = {}
+          for (const [formKey, formValue] of Object.entries(formData)) {
+            if (formValue === true) {            
+              let isAlert = formKey.startsWith('alert')
+              let catCode = formKey.replace(isAlert ? 'alert' : 'advisory', '')
+              if (!( catCode in interventionsByCategoryCode )) {
+                interventionsByCategoryCode[catCode] = []
+              }
+              interventionsByCategoryCode[catCode].push(isAlert ? 'alert' : 'advisory')
+            }          
           }
-          if (formKey.startsWith('alert-')) {
-            interventionsByCategoryCode[catCode].push('alert')
-          } else if (formKey.startsWith('advisory-')) {
-            interventionsByCategoryCode[catCode].push('advisory')
-          }
+          // Only two categories are allowed - any further ticked ones are ignored completely...
+          const recordedCategories = Object.keys(interventionsByCategoryCode)
+          console.assert(recordedCategories.length > 0, 'Should have at least 1 category alert / advisory boxes ticked')
+          let prompts = []
+          for (let i = 0; i < Math.min(recordedCategories.length, 2); i++) {
+            prompts.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
+          }          
+          dataOut['other_category'] = prompts.join('|') 
+          // Scream about this before Postgres does... 
+          console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!')        
+        }
+
+        // Next, calculate mitigation (field 'result')
+        const expectedResponse = scenario.mitigations.mitigation_code
+        dataOut['result'] = MITIGATION_MATRIX[formData.interventionType][expectedResponse]
+
+        // Connect the scenario and mitigation
+        dataOut['scenario'] = { connect: [scenario.documentId] }
+        dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == dataOut['interventionType'])[0].documentId] }
+        
+        const response = await rootStore().apiCall('scenario_data', 'POST', { data: dataOut })
+        if (response.status < 400) {
+          this.$patch((state) => {
+            //state.assessmentData.system.systemId = response.data.data.documentId
+          })                      
+        } else {
+          ret = `Failed to save system data, error ${response.message}`
         }
       }
-      // Only record the first two categories (user has been instructed to check up to two), discard the rest!
-      const recordedCategories = Object.keys(interventionsByCategoryCode)
-      const nCategories = Math.min(recordedCategories.length, 2)
-      const interventions = []
-      for (let i = 0; i < nCategories; i++) {
-        interventions.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
-        //HERE
-      }
-        
+
       if (recordLoading) {
         this.setDataReady(true)
       }
