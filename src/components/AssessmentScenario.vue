@@ -1,5 +1,6 @@
 <template>
   <GroupElement name="scenarioGroup" :class="'mb-4'">
+    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />
     <StaticElement name="scenarioDataLoading" v-if="!dataLoaded">
       <div class="d-flex align-items-center">
         <strong role="status">Loading scenario data for assessment...</strong>
@@ -30,15 +31,14 @@
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
       </StaticElement>  
-      <ObjectElement name="scenarioData">
-        <HiddenElement name="completedScenarios" :rules="[allScenariosCompleted]" />
-        <SliderElement name="numCompletedScenarios" class="my-4"
-          :columns="{ container: 9 }"
-          :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
-          :min="0" 
-          :max="scenarioCount"
-          :value="Object.keys(scenarioResponses).length" 
-        />   
+      <SliderElement name="numCompletedScenarios" class="my-4"
+        :columns="{ label: 3, container: 9, wrapper: 12 }"
+        :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
+        :min="0" 
+        :max="scenarioCount"
+        :value="Object.keys(scenarioResponses).length" 
+      />   
+      <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
             <ObjectElement :name="patient.patient_code">
@@ -116,7 +116,7 @@
                       </table>
                       <div v-if="!scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
-                        <ObjectElement :name="pscd.scenario_code" :ref="pscd.scenario_code">
+                        <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
                           <h4 class="vf-col-12 mb-2">Questions</h4>
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
@@ -144,7 +144,7 @@
                           Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
                           Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
                           -->
-                          <div v-show="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.outcome'] === true" class="vf-col-6">
+                          <div v-show="interventionSelections[patient.patient_code + '.' + pscd.scenario_code + '.interventionType'] === true" class="vf-col-6">
                             <div class="alert alert-info mt-2" role="alert">
                               Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
                             </div>
@@ -159,7 +159,7 @@
                                   <td><CheckboxElement :name="'advisory' + mc.value" /></td>
                                   <td>
                                     <span v-if="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
-                                      :data-bs-title="mc.tip">
+                                      :data-bs-title="mc.tip.replace('Tip: ', '')">
                                       <i class="bi bi-info-circle-fill"></i>
                                     </span>
                                   </td>
@@ -171,7 +171,7 @@
                               :label="embolden('Please tell us about the system response', true)" 
                             />
                           </div>
-                          <StaticElement>                         
+                          <StaticElement name="discontinuePrescriptionWarning">                         
                             <div class="warning warning-info mb-2" role="alert">Please discontinue the prescription order before proceeding to the next scenario</div>
                           </StaticElement>                                          
                         </ObjectElement>
@@ -312,8 +312,8 @@ export default {
       return this.categories.map(c => { c.tip })
     },
     completedScenariosHidden() {
-      console.log('Hidden element is', this.$refs.scenarioDataLoadedGroup)
-      return this.$refs.scenarioDataLoadedGroup
+      console.log('Hidden element is', this.$refs.completedScenariosHidden)
+      return this.$refs.completedScenariosHidden
     }
   },
   data() {
@@ -331,8 +331,9 @@ export default {
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
      
-      const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[scenario.scenario_code].data, true)
+      const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], true)
       if (saveResponse !== true) {
         this.raiseDataError(saveResponse)
       }
@@ -391,9 +392,7 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentScenario mounted()')
-    // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-    this.completedScenariosHidden.validate()
+    console.group('AssessmentScenario mounted()')  
     this.auxiliaryDataReady = false   
     const catResponse = await this.getCategories()
     if (catResponse.status < 400) {
@@ -415,6 +414,8 @@ export default {
       this.raiseDataError(storedResultsResponse)
     }
     this.auxiliaryDataReady = true
+    // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
+    this.completedScenariosHidden.validate()
     this.openNextUnenteredScenario()
     console.groupEnd()
   },

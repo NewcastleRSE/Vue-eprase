@@ -256,7 +256,9 @@ export const assessmentStore = defineStore('assessment', {
                 shareSuppliersOptOut: chosenAssessments[0].share_suppliers_opt_out
               }),                            
               hospital: authenticationStore().hospital,
-              institution: authenticationStore().orgDocId
+              institution: authenticationStore().orgDocId,
+              completedPatients: chosenAssessments[0].completed_patients,
+              numCompletedPatients: chosenAssessments[0].completed_patients == '' ? 0 : chosenAssessments[0].completed_patients.split(',').length
             })
           })
           // Retrieve system data
@@ -441,7 +443,7 @@ export const assessmentStore = defineStore('assessment', {
           this.setDataReady(false)
         }
       
-        const mitResponse = rootStore().getMitigations()
+        const mitResponse = await rootStore().getMitigations()
         if (mitResponse.status < 400) {
           this.$patch((state) => {
             state.mitigations = mitResponse.data.data
@@ -627,6 +629,7 @@ export const assessmentStore = defineStore('assessment', {
 
         if (formData.interventionType == 'MT1') {
           // System intervention, so look at alerts and advisories
+          console.debug('System or user intervention - process alerts and advisories')
           const interventionsByCategoryCode = {}
           for (const [formKey, formValue] of Object.entries(formData)) {
             if (formValue === true) {            
@@ -647,7 +650,8 @@ export const assessmentStore = defineStore('assessment', {
           }          
           dataOut['other_category'] = prompts.join('|') 
           // Scream about this before Postgres does... 
-          console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!')        
+          console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!') 
+          console.debug('Alert / advisory record by category', interventionsByCategoryCode)       
         }
 
         // Next, calculate mitigation (field 'result')
@@ -656,15 +660,25 @@ export const assessmentStore = defineStore('assessment', {
 
         // Connect the scenario and mitigation
         dataOut['scenario'] = { connect: [scenario.documentId] }
-        dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == dataOut['interventionType'])[0].documentId] }
-        
-        const response = await rootStore().apiCall('scenario_data', 'POST', { data: dataOut })
-        if (response.status < 400) {
-          this.$patch((state) => {
-            //state.assessmentData.system.systemId = response.data.data.documentId
-          })                      
+        dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == formData.interventionType)[0].documentId] }
+
+        const saveScenarioDataResponse = await rootStore().apiCall('scenario_data', 'POST', { data: dataOut })
+        if (saveScenarioDataResponse.status < 400) {
+          const scenarioDataRecord = response.data.data
+          // Write new scenario data record into the assessment
+          const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
+            scenario_data: { connect: [scenarioDataRecord.documentId] }
+          }})
+          if (updateAssessmentResponse.status < 400) {
+            this.$patch((state) => {
+              state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
+            }) 
+          } else {
+            ret = `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`
+          }
+                               
         } else {
-          ret = `Failed to save system data, error ${response.message}`
+          ret = `Failed to save scenario response, error ${saveScenarioDataResponse.message}`
         }
       }
 
