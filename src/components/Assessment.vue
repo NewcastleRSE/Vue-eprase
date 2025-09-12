@@ -95,7 +95,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
+    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex', 'getCategoryDetails', 'getMitigationDetails']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },
@@ -204,8 +204,17 @@ export default {
       console.groupEnd()
     }
   },
-  mounted() {
+  async mounted() {
     console.group('Assessment top-level mounted() hook')
+    // Get mitigation and category base data
+    const mitResponse = await this.getMitigationDetails()
+    if (mitResponse !== true) {
+      throw new Error(mitResponse)
+    }
+    const catResponse = await this.getCategoryDetails()
+    if (catResponse !== true) {
+      throw new Error(catResponse)
+    }
     console.groupEnd()
   },
   // errorCaptured(...args) {

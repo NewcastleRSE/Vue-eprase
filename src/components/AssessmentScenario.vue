@@ -239,7 +239,6 @@
 
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
-import { rootStore } from '../stores/root'
 import { Validator } from '@vueform/vueform'
 
 const allScenariosCompleted = class extends Validator {
@@ -255,8 +254,7 @@ const allScenariosCompleted = class extends Validator {
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
-    ...mapState(rootStore, ['getCategories']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
     dataLoaded() {
       return this.dataReady && this.auxiliaryDataReady
     },
@@ -299,7 +297,7 @@ export default {
       ]
     },
     matrixCategories() {
-      return this.categories
+      return this.displayCategories
     },
     categoryCount() {
       return this.categories.length
@@ -315,7 +313,7 @@ export default {
   data() {
     return {
       auxiliaryDataReady: false,
-      categories: [],
+      displayCategories: [],
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
@@ -341,7 +339,7 @@ export default {
       if (interventions != null && interventions.length > 0) {
         // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
         interventions.split('|').forEach(intn => {
-          const catDesc = this.categories.filter(c => c.value == intn.split(':').shift())[0].label
+          const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
           const prompts = intn.split(':').pop().split(',')
           intObj[catDesc] = prompts
         })
@@ -401,14 +399,10 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentScenario mounted()')  
-    this.auxiliaryDataReady = false   
-    const catResponse = await this.getCategories()
-    if (catResponse.status < 400) {
-      this.categories = catResponse.data.data.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })
-    } else {
-      this.raiseDataError('Failed to retrieve category information')
-    }    
+    console.group('AssessmentScenario mounted()')
+    // Massage the category list for better use in Vueform components      
+    this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })    
+    this.auxiliaryDataReady = false
     const loadScenariosResponse = await this.getPatientScenarioData(true)
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)

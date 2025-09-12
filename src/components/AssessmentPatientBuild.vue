@@ -209,6 +209,11 @@
           </div>
         </div>
       </div>
+    </StaticElement>
+    <StaticElement v-show="this.completedPatientsArray().length == patientData.length" name="patientListEntryComplete">
+      <div class="alert alert-info mt-2" role="alert">
+        You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios
+      </div>
     </StaticElement>    
   </GroupElement>  
 </template>

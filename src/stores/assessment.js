@@ -117,6 +117,7 @@ export const assessmentStore = defineStore('assessment', {
     allPossibleAssessments: [],
     assessmentStates: ASSESSMENT_STATES,  
     mitigations: [],
+    categories: [],
     dataReady: false,
     loggingOut: false
   }),
@@ -166,6 +167,7 @@ export const assessmentStore = defineStore('assessment', {
         state.assessmentData = structuredClone(EMPTY_DATA)
         state.allPossibleAssessments = []
         state.mitigations = []
+        state.categories = []
         state.dataReady = true
         state.loggingOut = false
       })
@@ -401,6 +403,36 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
+    // Get all categories
+    async getCategoryDetails(recordLoading = false) {
+
+      let ret = true
+      
+      console.group('getCategoryDetails()')
+
+      if (!Array.isArray(this.categories) || this.categories.length == 0) {
+
+        if (recordLoading) {
+          this.setDataReady(false)
+        }
+      
+        const catResponse = await rootStore().getCategories()
+        if (catResponse.status < 400) {
+          this.$patch((state) => {
+            state.categories = catResponse.data.data
+          })
+        } else {
+          ret = catResponse
+        }
+
+        if (recordLoading) {
+          this.setDataReady(true)
+        }  
+      }              
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
     // Get all mitigations
     async getMitigationDetails(recordLoading = false) {
 
@@ -430,7 +462,6 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
-
     },
     // Get all patients of the required type
     async getPatientPool(patientType) {
@@ -585,73 +616,69 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(false)
       } 
 
-      ret = await this.getMitigationDetails(false)
-      if (ret === true) {
+      // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text> }
+      // Massage it into db form:
+      // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
+      const dataOut = {
+        intervention_type: formData.interventionType,
+        result: '',
+        result_score: 0,  // Not sure whether this is required any more?
+        other_category: '',
+        qualitative_data: formData.qualitativeData
+      }
 
-        // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text> }
-        // Massage it into db form:
-        // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
-        const dataOut = {
-          intervention_type: formData.interventionType,
-          result: '',
-          result_score: 0,  // Not sure whether this is required any more?
-          other_category: '',
-          qualitative_data: formData.qualitativeData
-        }
-
-        if (formData.interventionType == 'MT1') {
-          // System intervention, so look at alerts and advisories
-          console.debug('System or user intervention - process alerts and advisories')
-          const interventionsByCategoryCode = {}
-          for (const [formKey, formValue] of Object.entries(formData)) {
-            if (formValue === true) {            
-              let isAlert = formKey.startsWith('alert')
-              let catCode = formKey.replace(isAlert ? 'alert' : 'advisory', '')
-              if (!( catCode in interventionsByCategoryCode )) {
-                interventionsByCategoryCode[catCode] = []
-              }
-              interventionsByCategoryCode[catCode].push(isAlert ? 'alert' : 'advisory')
-            }          
-          }
-          // Only two categories are allowed - any further ticked ones are ignored completely...
-          const recordedCategories = Object.keys(interventionsByCategoryCode)
-          console.assert(recordedCategories.length > 0, 'Should have at least 1 category alert / advisory boxes ticked')
-          let prompts = []
-          for (let i = 0; i < Math.min(recordedCategories.length, 2); i++) {
-            prompts.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
+      if (formData.interventionType == 'MT1') {
+        // System intervention, so look at alerts and advisories
+        console.debug('System or user intervention - process alerts and advisories')
+        const interventionsByCategoryCode = {}
+        for (const [formKey, formValue] of Object.entries(formData)) {
+          if (formValue === true) {            
+            let isAlert = formKey.startsWith('alert')
+            let catCode = formKey.replace(isAlert ? 'alert' : 'advisory', '')
+            if (!( catCode in interventionsByCategoryCode )) {
+              interventionsByCategoryCode[catCode] = []
+            }
+            interventionsByCategoryCode[catCode].push(isAlert ? 'alert' : 'advisory')
           }          
-          dataOut['other_category'] = prompts.join('|') 
-          // Scream about this before Postgres does... 
-          console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!') 
-          console.debug('Alert / advisory record by category', interventionsByCategoryCode)       
         }
+        // Only two categories are allowed - any further ticked ones are ignored completely...
+        const recordedCategories = Object.keys(interventionsByCategoryCode)
+        console.assert(recordedCategories.length > 0, 'Should have at least 1 category alert / advisory boxes ticked')
+        let prompts = []
+        for (let i = 0; i < Math.min(recordedCategories.length, 2); i++) {
+          prompts.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
+        }          
+        dataOut['other_category'] = prompts.join('|') 
+        // Scream about this before Postgres does... 
+        console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!') 
+        console.debug('Alert / advisory record by category', interventionsByCategoryCode)       
+      }
 
-        // Next, calculate mitigation (field 'result')
-        const expectedResponse = scenario.mitigations.mitigation_code
-        dataOut['result'] = MITIGATION_MATRIX[formData.interventionType][expectedResponse]
+      // Next, calculate mitigation (field 'result')
+      const expectedResponse = scenario.mitigations.mitigation_code
+      dataOut['result'] = MITIGATION_MATRIX[formData.interventionType][expectedResponse]
 
-        // Connect the scenario and mitigation
-        dataOut['scenario'] = { connect: [scenario.documentId] }
-        dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == formData.interventionType)[0].documentId] }
+      // Connect the scenario and mitigation
+      dataOut['scenario'] = { connect: [scenario.documentId] }
+      dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == formData.interventionType)[0].documentId] }
 
-        const saveScenarioDataResponse = await rootStore().apiCall('scenario-data', 'POST', { data: dataOut })
-        if (saveScenarioDataResponse.status < 400) {
-          const scenarioDataRecord = saveScenarioDataResponse.data.data
-          // Write new scenario data record into the assessment
-          const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
-            scenario_data: { connect: [scenarioDataRecord.documentId] }
-          }})
-          if (updateAssessmentResponse.status < 400) {
-            this.$patch((state) => {
-              state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
-            }) 
-          } else {
-            ret = `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`
-          }
-                               
+      const saveScenarioDataResponse = await rootStore().apiCall('scenario-data', 'POST', { data: dataOut })
+      if (saveScenarioDataResponse.status < 400) {
+        const scenarioDataRecord = saveScenarioDataResponse.data.data
+        // Write new scenario data record into the assessment
+        const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
+          scenario_data: { connect: [scenarioDataRecord.documentId] }
+        }})
+        if (updateAssessmentResponse.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
+          }) 
         } else {
-          ret = `Failed to save scenario response, error ${saveScenarioDataResponse.message}`
+          ret = `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`
         }
+                              
+      } else {
+        ret = `Failed to save scenario response, error ${saveScenarioDataResponse.message}`
       }
 
       if (recordLoading) {
