@@ -30,14 +30,15 @@
           </p>
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
-      </StaticElement>  
+      </StaticElement> 
       <SliderElement name="numCompletedScenarios" class="my-4"
-        :columns="{ label: 3, container: 9, wrapper: 12 }"
+        :label="' '"
+        :columns="{ label: 1, container: 11, wrapper: 12 }"
         :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
         :min="0" 
         :max="scenarioCount"
         :value="Object.keys(scenarioResponses).length" 
-      />   
+      />      
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
@@ -181,32 +182,24 @@
                         <table class="table table-striped" style="table-layout: fixed;">
                           <tbody>
                             <tr>
-                              <th style="width:200px">Outcome</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['outcome'] }}</td>
+                              <th style="width:200px">Intervention type</th>
+                              <td>{{ mitigations[scenarioResponse(pscd.scenario_code)['intervention_type']] }}</td>
                             </tr>
-                            <tr>
+                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
                               <th>Interventions</th>
                               <td>
-                                <!-- <ul class="list-group">
-                                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {{ formatIntervention(scenarioResponse(pscd.scenario_code)['interventionType'])['category'] }}
-                                    <span class="badge text-bg-primary rounded-pill">14</span>
-                                  </li>
-                                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    A second list item
-                                    <span class="badge text-bg-primary rounded-pill">2</span>
-                                  </li>                                  
-                                </ul> -->
+                                <ul class="list-group">
+                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(catDesc, prompts) in formatRecordedInterventions(pscd.scenario_code)">
+                                    {{  catDesc }}
+                                    <span v-for="p in prompts" class="badge text-bg-primary rounded-pill">{{ p }}</span>
+                                  </li>                                                         
+                                </ul>
                               </td>
                               {{  }}
-                            </tr>
-                            <tr>
-                              <th>Category 2 interventions</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['otherCategory'] }}</td>
-                            </tr>
+                            </tr>                           
                             <tr>
                               <th>Qualitative data</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['qualitativeData'] }}</td>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] }}</td>
                             </tr>
                             <tr>
                               <th>Mitigation</th>
@@ -262,10 +255,13 @@ const allScenariosCompleted = class extends Validator {
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
-    ...mapState(rootStore, ['getMitigations', 'getCategories']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
+    ...mapState(rootStore, ['getCategories']),
     dataLoaded() {
       return this.dataReady && this.auxiliaryDataReady
+    },
+    mitigations() {
+      return this.mitigations
     },
     patientData() {
       console.debug('Patients', this.assessmentData.patients)
@@ -338,6 +334,19 @@ export default {
         this.raiseDataError(saveResponse)
       }
       console.groupEnd()
+    },
+    formatRecordedInterventions(scenarioCode) {
+      let intObj = {}
+      const interventions = this.scenarioResponse(scenarioCode)['other_category']
+      if (interventions != null && interventions.length > 0) {
+        // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
+        interventions.split('|').forEach(intn => {
+          const catDesc = this.categories.filter(c => c.value == intn.split(':').shift())[0].label
+          const prompts = intn.split(':').pop().split(',')
+          intObj[catDesc] = prompts
+        })
+      }
+      return intObj
     },
     // Determine the next incomplete scenario and open it
     openNextUnenteredScenario() {

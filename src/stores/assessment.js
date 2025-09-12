@@ -582,7 +582,7 @@ export const assessmentStore = defineStore('assessment', {
       if (allScenariosResponse.status < 400) {
         // Package the responses by scenario code for convenience
         // Data is of form:
-        // { intervention_type: MT<code>, result: <category_code>:alert[,advisory], other_category: <category_code>:alert[,advisory], qualitative_data: <text> }
+        // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
         const responsesByCode = {}
         allScenariosResponse.data.data.scenario_data.forEach(asr => {
           responsesByCode[asr.scenario.scenario_code] = asr
