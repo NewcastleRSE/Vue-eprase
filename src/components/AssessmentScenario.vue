@@ -428,8 +428,16 @@ export default {
     this.openNextUnenteredScenario()
     console.groupEnd()
   },
-  beforeUnmount() {
+  async beforeUnmount() {
     console.group('AssessmentScenario beforeUnmount()')
+    console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
+    if (Object.keys(this.scenarioResponses).length == this.scenarioCount) {
+      // We have done all the data entry now
+      const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
+      if (updateResponse !== true) {
+        this.raiseDataError(updateResponse)
+      }
+    }    
     console.groupEnd()
   }
 }

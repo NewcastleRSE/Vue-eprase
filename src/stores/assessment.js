@@ -165,6 +165,7 @@ export const assessmentStore = defineStore('assessment', {
       this.$patch((state) => {
         state.assessmentData = structuredClone(EMPTY_DATA)
         state.allPossibleAssessments = []
+        state.mitigations = []
         state.dataReady = true
         state.loggingOut = false
       })
@@ -283,37 +284,7 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
 
-    },
-    // Get user responses to configuration questions
-    async getConfigQuestionData(recordLoading = false)  {
-
-      let ret = true
-
-      // NOTE: recordLoading flag eliminates runaway watcher calls when multiple async methods are called in one store operation
-      if (recordLoading) {
-        this.setDataReady(false)
-      }
-
-      console.group('getConfigQuestionData()')
-      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
-
-      const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=config_error_data`, 'GET')
-      if (confQuestionResponse.status < 400) {
-        // Convert the 0/1 responses in the results to no/yes
-        this.$patch((state) => {
-          state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data.map(cq => (cq.result == 1 ? 'yes' : 'no'))
-        })
-      } else {
-        ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
-      }
-
-      if (recordLoading) {
-        this.setDataReady(true)
-      }
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
+    },    
     // Get the system data (may be used standalone - setting dataReady, or as part of another method)
     async getSystemData(recordLoading = false) {
 
@@ -623,6 +594,7 @@ export const assessmentStore = defineStore('assessment', {
         const dataOut = {
           intervention_type: formData.interventionType,
           result: '',
+          result_score: 0,  // Not sure whether this is required any more?
           other_category: '',
           qualitative_data: formData.qualitativeData
         }
@@ -662,9 +634,9 @@ export const assessmentStore = defineStore('assessment', {
         dataOut['scenario'] = { connect: [scenario.documentId] }
         dataOut['mitigation'] = { connect: [this.mitigations.filter(m => m.mitigation_code == formData.interventionType)[0].documentId] }
 
-        const saveScenarioDataResponse = await rootStore().apiCall('scenario_data', 'POST', { data: dataOut })
+        const saveScenarioDataResponse = await rootStore().apiCall('scenario-data', 'POST', { data: dataOut })
         if (saveScenarioDataResponse.status < 400) {
-          const scenarioDataRecord = response.data.data
+          const scenarioDataRecord = saveScenarioDataResponse.data.data
           // Write new scenario data record into the assessment
           const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
             scenario_data: { connect: [scenarioDataRecord.documentId] }
@@ -689,6 +661,63 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
 
+      return ret
+    },    
+    // Get user responses to configuration questions
+    async getConfigQuestionData(recordLoading = false)  {
+
+      let ret = true
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
+
+      console.group('getConfigQuestionData()')
+      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
+
+      const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
+      if (confQuestionResponse.status < 400) {
+        this.$patch((state) => {
+          state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data
+        })
+      } else {
+        ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+      }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
+    // Save new config error responses
+    async saveConfigQuestionData(cqData, recordLoading = false) {
+
+      let ret = true
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
+
+      console.group('saveConfigQuestionData()')
+      console.debug('Responses', cqData)
+
+      //TODO
+      // const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
+      // if (confQuestionResponse.status < 400) {
+      //   this.$patch((state) => {
+      //     state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data
+      //   })
+      // } else {
+      //   ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+      // }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+      console.debug('Returning', ret)
+      console.groupEnd()
       return ret
     },
     async setPatientEntryComplete(patientCode, recordLoading = false) {
