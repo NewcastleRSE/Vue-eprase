@@ -1,13 +1,13 @@
 <template>
   <GroupElement name="scenarioGroup" :class="'mb-4'">
     <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />
-    <StaticElement name="scenarioDataLoading" v-if="!dataLoaded">
+    <StaticElement name="scenarioDataLoading" v-if="!auxiliaryDataReady">
       <div class="d-flex align-items-center">
         <strong role="status">Loading scenario data for assessment...</strong>
         <div class="spinner-border ms-auto" aria-hidden="true"></div>
       </div>
     </StaticElement>
-    <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup" v-if="dataLoaded">
+    <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup" v-if="auxiliaryDataReady">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
@@ -31,13 +31,13 @@
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
       </StaticElement> 
-      <SliderElement name="numCompletedScenarios" class="my-4"
+      <SliderElement name="numCompletedScenariosSlider" class="my-4"
         :label="' '"
         :columns="{ label: 1, container: 11, wrapper: 12 }"
         :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
         :min="0" 
         :max="scenarioCount"
-        :value="Object.keys(scenarioResponses).length" 
+        :value="numCompletedScenarios" 
       />      
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
@@ -48,7 +48,8 @@
                   :id="'scenario-accordion-btn-' + patient.patient_code"
                   :class="currentPatient == patient.patient_code ? '' : 'collapsed'"
                   :data-bs-target="'#scenario-patient-' + patient.patient_code"
-                  :aria-expanded="currentPatient == patient.patient_code" :aria-controls="patient.patient_code"
+                  :aria-expanded="currentPatient == patient.patient_code" 
+                  :aria-controls="patient.patient_code"
                   @click="openPatientScenarios(patient.patient_code)"
                 >
                   <span class="fw-bold">
@@ -71,14 +72,14 @@
                     <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
                       <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                        :class="index == 0 ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        :class="currentScenario == pscd.scenario_code ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
                         :data-bs-target="'#scenario-' + pscd.scenario_code">{{ 'Scenario ' + (index + 1) }}
                       </button>
                     </li>
                   </ul>
 
                   <!-- Scenario tabs -->
-                  <div v-if="currentPatient == patient.patient_code" class="tab-content vf-col-12">
+                  <div v-show="currentPatient == patient.patient_code" class="tab-content vf-col-12">
                     <div class="tab-pane fade mt-2"
                       v-for="(pscd, index) in patientScenarios[patient.patient_code]"
                       :id="'scenario-' + pscd.scenario_code"
@@ -86,7 +87,6 @@
                       <!-- New response form -->
                       <p v-if="!scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
                         prescribing practice, then answer the questions below.</p>
-                      <p v-if="scenarioCompleted(pscd.scenario_code)" class="my-4">Your recorded responses to the scenario below.</p>
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
                           <tr>
@@ -179,23 +179,23 @@
                       </div>
                       <div v-if="scenarioCompleted(pscd.scenario_code)">
                         <!-- Recorded responses (need some guidance as to how to express this - this is only the raw data at the moment... -->
+                        <h4 class="my-4">Your responses to the scenario:</h4>
                         <table class="table table-striped" style="table-layout: fixed;">
                           <tbody>
                             <tr>
                               <th style="width:200px">Intervention type</th>
-                              <td>{{ mitigations[scenarioResponse(pscd.scenario_code)['intervention_type']] }}</td>
+                              <td>{{ mitigationDescription(scenarioResponse(pscd.scenario_code)['intervention_type']) }}</td>
                             </tr>
                             <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
                               <th>Interventions</th>
                               <td>
                                 <ul class="list-group">
-                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(catDesc, prompts) in formatRecordedInterventions(pscd.scenario_code)">
+                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(prompts, catDesc) in formatRecordedInterventions(pscd.scenario_code)">
                                     {{  catDesc }}
-                                    <span v-for="p in prompts" class="badge text-bg-primary rounded-pill">{{ p }}</span>
+                                    <span class="badge text-bg-primary rounded-pill">{{ prompts }}</span>
                                   </li>                                                         
                                 </ul>
                               </td>
-                              {{  }}
                             </tr>                           
                             <tr>
                               <th>Qualitative data</th>
@@ -203,7 +203,7 @@
                             </tr>
                             <tr>
                               <th>Mitigation</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['mitigation']['mitigation'] }}</td>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['result'] }}</td>
                             </tr>                           
                           </tbody>
                         </table>
@@ -216,7 +216,7 @@
                         >
                           <i class="bi bi-floppy-fill me-2"></i>Save response
                         </ButtonElement>
-                        <ButtonElement name="nextIncompleteScenario" 
+                        <ButtonElement v-if="scenarioCompleted(pscd.scenario_code)" name="nextIncompleteScenario" 
                           :columns="3"
                           @click="openNextUnenteredScenario"
                         >
@@ -256,11 +256,8 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
     dataLoaded() {
-      return this.dataReady && this.auxiliaryDataReady
-    },
-    mitigations() {
-      return this.mitigations
-    },
+      return this.dataReady
+    },        
     patientData() {
       console.debug('Patients', this.assessmentData.patients)
       return this.assessmentData.patients
@@ -317,11 +314,20 @@ export default {
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
+      numCompletedScenarios: 0,
       scenarioPatientLink: {},
       allScenariosCompleted
     }
   },
   methods: {
+    mitigationDescription(mitigationCode) {
+      let description = ''
+      const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
+      if (mitigation.length > 0) {
+        description = mitigation[0].mitigation
+      }
+      return description
+    },
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
@@ -330,6 +336,8 @@ export default {
       const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], true)
       if (saveResponse !== true) {
         this.raiseDataError(saveResponse)
+      } else {
+        this.numCompletedScenarios++
       }
       console.groupEnd()
     },
@@ -341,7 +349,7 @@ export default {
         interventions.split('|').forEach(intn => {
           const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
           const prompts = intn.split(':').pop().split(',')
-          intObj[catDesc] = prompts
+          intObj[catDesc] = prompts.join(' + ')
         })
       }
       return intObj
@@ -352,6 +360,7 @@ export default {
       console.group('openNextUnenteredScenario()')
 
       const doneScenarios = Object.keys(this.scenarioResponses)
+      this.completedScenariosHidden.update(doneScenarios.join(','))
 
       if (doneScenarios.length < this.scenarioCount) {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
@@ -403,7 +412,7 @@ export default {
     // Massage the category list for better use in Vueform components      
     this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })    
     this.auxiliaryDataReady = false
-    const loadScenariosResponse = await this.getPatientScenarioData(true)
+    const loadScenariosResponse = await this.getPatientScenarioData()
     if (loadScenariosResponse !== true) {
       this.raiseDataError(loadScenariosResponse)
     }
@@ -412,20 +421,22 @@ export default {
         this.scenarioPatientLink[s.scenario_code] = patientCode
       })      
     }
-    const storedResultsResponse = await this.getPatientScenarioResponses(true)
+    const storedResultsResponse = await this.getPatientScenarioResponses()
     if (storedResultsResponse !== true) {
       this.raiseDataError(storedResultsResponse)
+    } else {
+      this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
     }
     this.auxiliaryDataReady = true
     // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-    this.completedScenariosHidden.validate()
+    this.completedScenariosHidden.validate()    
     this.openNextUnenteredScenario()
     console.groupEnd()
   },
   async beforeUnmount() {
     console.group('AssessmentScenario beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
-    if (Object.keys(this.scenarioResponses).length == this.scenarioCount) {
+    if (this.numCompletedScenarios == this.scenarioCount) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
       if (updateResponse !== true) {

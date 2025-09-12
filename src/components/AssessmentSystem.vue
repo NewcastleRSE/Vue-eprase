@@ -27,7 +27,7 @@
           :rules="['required', 'dateIsSameOrAfter:system.epServiceImplemented,service implementation date']" /> 
         <TextElement name="numMaintainers"
           :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
-          :debounce="500" 
+          :debounce="200" 
           :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0 and 10', min: 'Must be >= 0', max: 'Must be < 10' }" 
           :rules="['required', 'numeric', 'min:0.0', 'max:10']" /> 
         <SelectElement name="epUsage"
@@ -46,7 +46,7 @@
         />   
         <TextElement name="otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
           :label="embolden('Other ePrescribing systems in use')" 
-          :debounce="500" />
+          :debounce="200" />
         <GroupElement name="labResultsGroup" :class="'mt-2'">
           <ToggleElement name="labResults"
             :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?', true)"
@@ -92,28 +92,28 @@
             v-if="systemData.penicillinDescription.includes('other')"
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
-            :debounce="500" />
+            :debounce="200" />
           <ToggleElement name="penicillinResults"
             :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
-            :debounce="500" />
+            :debounce="200" />
           <ToggleElement name="antiMicReviewTime"
             :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicReviewComments"
             :label="embolden('Additional comments')"
-            :debounce="500" />
+            :debounce="200" />
           <ToggleElement name="antiMicInterpretResults"
             :label="embolden('Is your ePrescribing system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicInterpretComments"
             :label="embolden('Additional comments')"
-            :debounce="500" />
+            :debounce="200" />
         </GroupElement>      
         <CheckboxgroupElement name="highRiskMeds"
           :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
@@ -136,7 +136,7 @@
           v-if="systemData.clinicalAreas.includes('Other')"
           :messages="{required: 'Other clinical area needs to be specified'}" 
           :rules="['required', 'fieldIsOther:system.clinicalAreas']"
-          :debounce="500" />
+          :debounce="200" />
         <StaticElement name="nextStep">
           <div class="alert alert-info mt-4" role="alert">
             When you have answered all the questions, click <span class="fw-bold">Continue to patient build</span>

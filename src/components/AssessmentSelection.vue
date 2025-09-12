@@ -45,7 +45,7 @@
           />
           <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
             :label="embolden('Name of ePrescribing system', true)"
-            :debounce="500" 
+            :debounce="200" 
             :messages="{required: 'Other eP system name is required'}" 
             :rules="['required', 'fieldIsOther:selection.epService']" />
           <RadiogroupElement name="patientType"

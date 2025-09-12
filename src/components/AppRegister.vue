@@ -18,7 +18,7 @@
           <Vueform ref="registerForm" :endpoint="false" @submit="onRegisterClick" v-model="user" sync>
             <TextElement name="email" placeholder="Valid NHS email address"
               :label="embolden('Email address', true)"
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Email is required'}" 
               :rules="['required', $vueform.rules.nhsEmail]" />
             <SelectElement name="institution"
@@ -49,7 +49,7 @@
             <TextElement name="password" autocomplete="on"
               :label="embolden('Password', true)"
               :input-type="showPassword ? 'text' : 'password'"            
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
               <template #addon-after="scope">
@@ -61,7 +61,7 @@
             <TextElement name="password_confirmation" autocomplete="on"
               :label="embolden('Confirm password', true)"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
               <template #addon-after="scope">
