@@ -15,7 +15,7 @@
       </div>
     </StaticElement>
     <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
-    <StaticElement name="patientBuildProgress" class="mb-4">
+    <StaticElement name="patientBuildProgress" class="sticky-top opacity-100 mb-4">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
       </div>
@@ -335,7 +335,11 @@ export default {
         const nextCode = notDoneCodes.shift()
         const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
         this.patientRelations(docId)  
-        document.getElementById('patient-' + nextCode).scrollIntoView()    
+        document.getElementById('patient-' + nextCode).scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        })    
       } else {
         console.debug('No unentered patients left')
       }
@@ -346,7 +350,7 @@ export default {
       if (spdeResponse !== true) {
         throw new Error(spdeResponse)
       }
-      // Time delay to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+      // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
       setTimeout(() => {
         this.openNextUnenteredPatient()
       }, 1000)      

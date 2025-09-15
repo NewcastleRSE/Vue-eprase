@@ -1,12 +1,12 @@
 <template>
   <GroupElement name="configQuestionGroup" :class="'mb-4'">
-    <StaticElement name="configQuestionDataLoading" v-if="!auxiliaryDataReady">
+    <StaticElement name="configQuestionDataLoading" v-if="!dataLoaded">
       <div class="d-flex align-items-center">
         <strong role="status">Loading config question data for assessment...</strong>
         <div class="spinner-border ms-auto" aria-hidden="true"></div>
       </div>
     </StaticElement>
-    <GroupElement name="configQuestionDataLoaded" v-if="auxiliaryDataReady">
+    <GroupElement name="configQuestionDataLoaded" v-if="dataLoaded">
       <StaticElement name="configQuestionHeading">
         <h2>Configuration Questions</h2>
         <h3>Please answer the following questions about your ePrescribing System:</h3>
@@ -26,6 +26,9 @@
           </tbody>
         </table>                
       </ObjectElement>
+      <StaticElement v-show="!savedResponseData" name="savingAlert" class="mt-4">
+        <div class="alert alert-info w-25">Saving your response...</div>
+      </StaticElement> 
     </GroupElement>    
   </GroupElement>
 </template>
@@ -39,10 +42,13 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentConfigQuestion',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
     ...mapState(rootStore, ['getConfigQuestions']),
     dataLoaded() {
-      return this.dataReady && this.auxiliaryDataReady
+      return this.dataReady
+    },
+    configQuestionData() {
+      return this.assessmentData.config.configQuestions
     },
     matrixQuestionRows() {
       return this.questionRows
@@ -50,8 +56,8 @@ export default {
   },
   data() {
     return {
-      auxiliaryDataReady: false,
-      questionRows: []
+      questionRows: [],
+      savedResponseData: true
     }
   },
   methods: {   
@@ -59,33 +65,27 @@ export default {
       
       console.group('saveScenarioResponse()')
       console.debug('Form part-object', this.$refs['configObject'])
+
+      this.savedResponseData = false
      
       const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
       if (saveResponse !== true) {
-        this.raiseDataError(saveResponse)
+        throw new Error(saveResponse)
       }
+
+      setTimeout(() => {
+        this.savedResponseData = true
+      }, 500)
       console.groupEnd()
-    },
-    raiseDataError(msg) {
-      this.auxiliaryDataReady = true
-      throw new Error(msg)
-    }   
+    }
   },
   async mounted() {
     console.group('AssessmentConfigQuestion mounted()')
-    this.auxiliaryDataReady = false
-    // Get actual questions   
-    const loadConfigQuestionsResponse = await this.getConfigQuestions()
-    if (loadConfigQuestionsResponse.status >= 400) {      
-      throw new Error(loadConfigQuestionsResponse)
-    } else {      
-      this.questionRows = loadConfigQuestionsResponse.data.data.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, true) } })
-    }
+    this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, true) } })
     const loadCqDataResponse = await this.getConfigQuestionData(true)
     if (loadCqDataResponse !== true) {
-      this.raiseDataError(loadCqDataResponse)
+      throw new Error(loadCqDataResponse)
     }    
-    this.auxiliaryDataReady = true   
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -94,7 +94,7 @@ export default {
     await this.saveConfigQuestionResponses()   
     const updateResponse = await this.updateAssessmentStatus('Config errors complete', true)
     if (updateResponse !== true) {
-      this.raiseDataError(updateResponse)
+      throw new Error(updateResponse)
     }
     console.groupEnd()
   }

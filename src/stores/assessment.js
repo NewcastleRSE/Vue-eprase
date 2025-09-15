@@ -80,6 +80,7 @@ const EMPTY_SYSTEM = {
 }
 
 const EMPTY_CONFIG_DATA = {
+  configQuestions: [],
   configQuestionResults: []
 }
 
@@ -464,6 +465,36 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
     },
+    // Get all configuration questions
+    async getConfigQuestionDetails(recordLoading = false) {
+
+      let ret = true
+      
+      console.group('getConfigQuestionDetails()')
+
+      if (!Array.isArray(this.assessmentData.config.configQuestions) || this.assessmentData.config.configQuestions.length == 0) {
+
+        if (recordLoading) {
+          this.setDataReady(false)
+        }
+      
+        const cfgResponse = await rootStore().getConfigQuestions()
+        if (cfgResponse.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.config.configQuestions = cfgResponse.data.data
+          })
+        } else {
+          ret = cfgResponse
+        }
+
+        if (recordLoading) {
+          this.setDataReady(true)
+        }  
+      }              
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
     // Get all patients of the required type
     async getPatientPool(patientType) {
 
@@ -577,11 +608,13 @@ export const assessmentStore = defineStore('assessment', {
 
       let ret = true
 
+      console.group('getPatientScenarioResponse()')
+
       if (recordLoading) {
         this.setDataReady(false)
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
-      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario&[populate][1]=mitigation`, 'GET')
+      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')
       if (allScenariosResponse.status < 400) {
         // Package the responses by scenario code for convenience
         // Data is of form:
@@ -599,10 +632,8 @@ export const assessmentStore = defineStore('assessment', {
 
       if (recordLoading) {
         this.setDataReady(true)
-      }
-
-      console.group('getPatientScenarioResponse()')
-      console.groupEnd()
+      }            
+      console.groupEnd()      
 
       return ret
     },
@@ -729,17 +760,26 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       console.group('saveConfigQuestionData()')
-      console.debug('Responses', cqData)
+      console.debug('Responses to config questions are', cqData)
 
-      //TODO
-      // const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
-      // if (confQuestionResponse.status < 400) {
-      //   this.$patch((state) => {
-      //     state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data
-      //   })
-      // } else {
-      //   ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
-      // }
+      // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }      
+      for ([cfgCode, cfgResponse] in Object.keys(cqData.config)) {
+        let dataOut = {
+          config_error_code: cfgCode,
+          result: cfgResponse === true ? 1 : 0,
+          config_error: {
+            connect: [this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode)[0].documentId]
+          }
+        }
+        let newConfResponseDocIds = []
+        const savedCfgResponse = await rootStore().apiCall('config-error-data', 'POST', { data: dataOut })
+        if (savedCfgResponse.status >= 400)  {
+          throw new Error(`Failed to save config question response - message was ${savedCfgResponse.message}`)
+        } else {
+          newConfResponseDocIds.push(savedCfgResponse.data.data.documentId)
+        }
+      }
+      // HERE - write each of these into assessment...
 
       if (recordLoading) {
         this.setDataReady(true)
@@ -794,6 +834,7 @@ export const assessmentStore = defineStore('assessment', {
       console.group('patientListBuild()') 
       console.debug('Assessment ID', this.assessmentData.selection.assessmentId)     
 
+      // Get patient list
       if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')
@@ -827,31 +868,7 @@ export const assessmentStore = defineStore('assessment', {
                   this.$patch((state) => {
                     state.assessmentData.patients = requiredPatients
                   })
-                  console.debug('Generated new patient list', this.assessmentData.patients)
-                  // Get the scenarios for the patients chosen
-                  ret = await this.getPatientScenarioData()
-                  if (ret === true) {
-                    // Save to assessment patient / scenario lists
-                    // First get scenario document ids
-                    const scenarioDocIds = []
-                    for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {
-                      scenarioDocIds.push(...scenarios.map(s => s.documentId))
-                    }
-                    const response = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', {
-                      data: {
-                        patients: {
-                          connect: this.assessmentData.patients.map(p => p.documentId)
-                        },
-                        scenarios: {
-                          connect: scenarioDocIds
-                        }
-                      }
-                    })
-                    if (response.status >= 400) {
-                      ret = `Failed to save patient list for assesssment : error was ${response.message}`
-                    } 
-                  }
-                  // Else ret is set to any error message from the scenario fetch                                
+                  console.debug('Generated new patient list', this.assessmentData.patients)                                                  
                 } else {
                   ret = 'Failed to retrieve required patient list'
                 }                
@@ -870,6 +887,33 @@ export const assessmentStore = defineStore('assessment', {
       } else {
         console.debug('Patient list already retrieved')
       }
+
+      // Ensure scenario details present for each patient
+      if (ret === true && Object.keys(this.assessmentData.patientScenarios).length == 0) {
+        ret = await this.getPatientScenarioData()
+        if (ret === true) {
+          // Save to assessment patient / scenario lists
+          // First get scenario document ids
+          const scenarioDocIds = []
+          for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {
+            scenarioDocIds.push(...scenarios.map(s => s.documentId))
+          }
+          const response = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', {
+            data: {
+              patients: {
+                connect: this.assessmentData.patients.map(p => p.documentId)
+              },
+              scenarios: {
+                connect: scenarioDocIds
+              }
+            }
+          })
+          if (response.status >= 400) {
+            ret = `Failed to save patient list for assesssment : error was ${response.message}`
+          } 
+        }
+      }
+
       if (recordLoading) {
         this.setDataReady(true)
       }      

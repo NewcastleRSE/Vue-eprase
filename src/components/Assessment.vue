@@ -1,7 +1,7 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"><img src="../assets/images/pills-bw.png" alt="image showing white pills"></div>
+    <div class="pills-banner"><img src="../assets/images/pills-bw.jpg" alt="image showing white pills"></div>
 
     <div class="content p-4">
 
@@ -95,7 +95,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex', 'getCategoryDetails', 'getMitigationDetails']),
+    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },
@@ -214,6 +214,10 @@ export default {
     const catResponse = await this.getCategoryDetails()
     if (catResponse !== true) {
       throw new Error(catResponse)
+    }    
+    const configResponse = await this.getConfigQuestionDetails()
+    if (configResponse !== true) {
+      throw new Error(configResponse)
     }
     console.groupEnd()
   },
