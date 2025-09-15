@@ -58,10 +58,10 @@
           />
           <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
             <CheckboxElement name="shareTrustsOptOut">
-              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box', true)"></span>
+              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>          
             <CheckboxElement name="shareSuppliersOptOut">
-              <span v-html="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box', true)"></span>
+              <span v-html="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation. If you do not consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>   
           </GroupElement>            
         </GroupElement>

@@ -31,14 +31,22 @@
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
       </StaticElement> 
-      <SliderElement name="numCompletedScenariosSlider" class="my-4"
+      <!-- <SliderElement name="numCompletedScenariosSlider" class="my-4"
         :label="' '"
         :columns="{ label: 1, container: 11, wrapper: 12 }"
         :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
         :min="0" 
         :max="scenarioCount"
         :value="numCompletedScenarios" 
-      />      
+      />       -->
+      <StaticElement name="scenariosProgress" class="mb-4">
+        <div class="alert alert-info fw-bold" role="alert">
+          {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
+        </div>
+        <div v-show="numCompletedScenarios != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" :style="'width: ' + ((numCompletedScenarios / scenarioCount) * 100) + '%'"></div>
+        </div>
+      </StaticElement>
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
@@ -208,16 +216,16 @@
                           </tbody>
                         </table>
                       </div>
-                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 6, label: 0, wrapper: 6 }">                        
+                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" 
-                          :columns="3"
+                          :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
                         >
                           <i class="bi bi-floppy-fill me-2"></i>Save response
                         </ButtonElement>
                         <ButtonElement v-if="scenarioCompleted(pscd.scenario_code)" name="nextIncompleteScenario" 
-                          :columns="3"
+                          :columns="4"
                           @click="openNextUnenteredScenario"
                         >
                           <i class="bi bi-play-fill me-2"></i>Next scenario

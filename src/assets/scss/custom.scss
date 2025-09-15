@@ -158,3 +158,12 @@ input[type="checkbox"], input[type="radio"] {
   /* Darken the borders of radios and checkboxes to make them easier to see */
   --vf-border-color-input: var(--vf-gray-500); 
 }
+
+/* Give navigation tabs a permanent border - https://github.com/NewcastleRSE/Vue-eprase/issues/230 */
+.nav-tabs .nav-link:not(.active) {
+  border: var(--bs-nav-tabs-border-width) solid !important;
+}
+
+.nav-tabs .nav-link:not(.active):hover {
+  background-color: $primary-bg-subtle !important;
+}

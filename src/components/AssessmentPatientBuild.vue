@@ -15,13 +15,21 @@
       </div>
     </StaticElement>
     <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
-    <SliderElement name="numCompletedPatients" class="my-4"
+    <!-- <SliderElement name="numCompletedPatients" class="my-4"
       :columns="{ container: 9 }"
       :format="{prefix: 'You have entered ', suffix: ` of ${patientData.length} patients`, decimals: 0}" 
       :min="0" 
       :max="patientData.length"
       :value="this.completedPatientsArray().length" 
-    />
+    /> -->
+    <StaticElement name="patientBuildProgress" class="mb-4">
+      <div class="alert alert-info fw-bold" role="alert">
+        {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
+      </div>
+      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" :style="'width: ' + ((completedPatientsArray().length / patientData.length) * 100) + '%'"></div>
+      </div>
+    </StaticElement>
     <StaticElement name="patientBuildBody">
       <div class="accordion" id="patientAccordion">
         <div class="accordion-item" v-for="(patient, idx) in patientData" :key="patient.id">
@@ -211,7 +219,7 @@
       </div>
     </StaticElement>
     <StaticElement v-show="this.completedPatientsArray().length == patientData.length" name="patientListEntryComplete">
-      <div class="alert alert-info mt-2" role="alert">
+      <div class="alert alert-info" role="alert">
         You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios
       </div>
     </StaticElement>    

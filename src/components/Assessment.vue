@@ -16,11 +16,11 @@
               :elements="['epraseIntroEl']"
               :buttons="{ previous: false }"
               :labels="{ next: 'Continue to Assessment Selection' }" />
-            <FormStep name="selectAssessmentStep" label="Start Or Continue Assessment" 
+            <FormStep name="selectAssessmentStep" label="Start Or Continue<br>Assessment" 
               :elements="['selectAssessmentEl']" 
               :buttons="{ previous: false, next: assessmentOption != 'continue' }"
               :labels="{ next: 'Continue to System Information' }" />
-            <FormStep name="systemInfoStep" label="ePrescribing System Information"               
+            <FormStep name="systemInfoStep" label="ePrescribing System<br>Information"               
               :elements="['systemInfoEl']" 
               :buttons="{ previous: false }"
               :labels="{ 
