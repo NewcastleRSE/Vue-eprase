@@ -418,8 +418,9 @@ export const assessmentStore = defineStore('assessment', {
       
         const catResponse = await rootStore().getCategories()
         if (catResponse.status < 400) {
+          // 'Control' category filtered out as requested by Steph - 15/09/2025
           this.$patch((state) => {
-            state.categories = catResponse.data.data
+            state.categories = catResponse.data.data.filter(c => c.name != 'Control')
           })
         } else {
           ret = catResponse

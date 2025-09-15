@@ -30,15 +30,7 @@
           </p>
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
-      </StaticElement> 
-      <!-- <SliderElement name="numCompletedScenariosSlider" class="my-4"
-        :label="' '"
-        :columns="{ label: 1, container: 11, wrapper: 12 }"
-        :format="{prefix: 'You have completed ', suffix: ` of ${scenarioCount} scenarios`, decimals: 0}" 
-        :min="0" 
-        :max="scenarioCount"
-        :value="numCompletedScenarios" 
-      />       -->
+      </StaticElement>       
       <StaticElement name="scenariosProgress" class="mb-4">
         <div class="alert alert-info fw-bold" role="alert">
           {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
@@ -177,12 +169,17 @@
                             </table>
                             <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                               :attrs="{ maxlength: 500 }" 
-                              :label="embolden('Please tell us about the system response', true)" 
+                              :label="embolden('Please tell us about the system response', false)" 
                             />
                           </div>
-                          <StaticElement name="discontinuePrescriptionWarning">                         
-                            <div class="warning warning-info mb-2" role="alert">Please discontinue the prescription order before proceeding to the next scenario</div>
-                          </StaticElement>                                          
+                          <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
+                            <StaticElement name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
+                            <CheckboxElement name="haveDiscontinuedPrescription"
+                              @change="(newValue) => { allowCurrentScenarioSave = newValue }"
+                            >
+                              I have done this
+                            </CheckboxElement>                           
+                          </GroupElement>
                         </ObjectElement>
                       </div>
                       <div v-if="scenarioCompleted(pscd.scenario_code)">
@@ -208,16 +205,13 @@
                             <tr>
                               <th>Qualitative data</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] }}</td>
-                            </tr>
-                            <tr>
-                              <th>Mitigation</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['result'] }}</td>
-                            </tr>                           
+                            </tr>                                                    
                           </tbody>
                         </table>
                       </div>
                       <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
-                        <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" 
+                        <ButtonElement v-if="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
+                          :disabled="!allowCurrentScenarioSave"
                           :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
@@ -322,12 +316,20 @@ export default {
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
+      allowCurrentScenarioSave: false,
       numCompletedScenarios: 0,
       scenarioPatientLink: {},
       allScenariosCompleted
     }
   },
   methods: {
+    // Determine if user has ticked 'discontinue prescription' box and enable/disable 'save response' button accordingly
+    setSaveButtonState(scenarioCode, disable) {
+      console.debug(scenarioCode, disable)
+      const saveBtn = this.$refs[scenarioCode + 'Save']
+      console.debug('Save btn', saveBtn)
+      saveBtn[0].disabled = disable
+    },
     mitigationDescription(mitigationCode) {
       let description = ''
       const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
@@ -374,7 +376,7 @@ export default {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
-        // 
+        this.allowCurrentScenarioSave = false
         this.currentScenario = incompleteScenarioCodes[0]
         this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
         const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)

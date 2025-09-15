@@ -14,14 +14,7 @@
         you can navigate back and forth between all patients within the patient build section.
       </div>
     </StaticElement>
-    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
-    <!-- <SliderElement name="numCompletedPatients" class="my-4"
-      :columns="{ container: 9 }"
-      :format="{prefix: 'You have entered ', suffix: ` of ${patientData.length} patients`, decimals: 0}" 
-      :min="0" 
-      :max="patientData.length"
-      :value="this.completedPatientsArray().length" 
-    /> -->
+    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
     <StaticElement name="patientBuildProgress" class="mb-4">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
