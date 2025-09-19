@@ -222,7 +222,7 @@
                         >
                           <i class="bi bi-floppy-fill me-2"></i>Save response
                         </ButtonElement>
-                        <ButtonElement v-show="scenarioCompleted(pscd.scenario_code)" name="nextIncompleteScenario" 
+                        <ButtonElement v-show="scenarioCompleted(pscd.scenario_code) && numCompletedScenarios != scenarioCount" name="nextIncompleteScenario" 
                           :columns="4"
                           @click="openNextUnenteredScenario"
                         >
@@ -231,7 +231,10 @@
                       </GroupElement>
                       <StaticElement v-show="!savedResponseData" name="savingAlert" class="mt-4">
                         <div class="alert alert-info w-25">Saving your response...</div>
-                      </StaticElement>                    
+                      </StaticElement>
+                      <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
+                        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Configuration Questions' below to answer further questions about your system.</div>
+                      </StaticElement>
                     </div>
                   </div>
                 </div>

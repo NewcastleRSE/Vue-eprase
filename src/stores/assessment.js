@@ -760,18 +760,21 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       console.group('saveConfigQuestionData()')
-      console.debug('Responses to config questions are', cqData)
+      console.debug('Responses to config questions are', cqData.config)
+      console.debug('Config questions', this.assessmentData.config.configQuestions)
 
-      // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }      
-      for ([cfgCode, cfgResponse] in Object.keys(cqData.config)) {
+      // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }   
+      let newConfResponseDocIds = []   
+      for (const [cfgCode, cfgResponse] of Object.entries(cqData.config)) {
+        console.debug('About to save', cfgCode, 'response', cfgResponse)
+        console.debug('Filter', this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode))
         let dataOut = {
           config_error_code: cfgCode,
           result: cfgResponse === true ? 1 : 0,
           config_error: {
             connect: [this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode)[0].documentId]
           }
-        }
-        let newConfResponseDocIds = []
+        }        
         const savedCfgResponse = await rootStore().apiCall('config-error-data', 'POST', { data: dataOut })
         if (savedCfgResponse.status >= 400)  {
           throw new Error(`Failed to save config question response - message was ${savedCfgResponse.message}`)
@@ -779,7 +782,13 @@ export const assessmentStore = defineStore('assessment', {
           newConfResponseDocIds.push(savedCfgResponse.data.data.documentId)
         }
       }
-      // HERE - write each of these into assessment...
+      // Write each new config question response into assessment
+      const updatedAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
+        config_error_data: { connect: newConfResponseDocIds }
+      }})
+      if (updatedAssessmentResponse.status >= 400) {
+        throw new Error(`Failed to update assessment with config question response - message was ${updatedAssessmentResponse.message}`)
+      }
 
       if (recordLoading) {
         this.setDataReady(true)
