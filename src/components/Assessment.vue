@@ -164,11 +164,9 @@ export default {
           case 'Scenarios complete': 
             toStep = 'configQuestionStep'
             break
-          case 'Config errors complete': 
-            //TODO 
-            break
+          case 'Config errors complete':             
           case 'Assessment complete':
-            //TODO
+            toStep = 'finalReportStep'
             break
           default: 
             console.assert(this.assessmentState == 'Not started')
