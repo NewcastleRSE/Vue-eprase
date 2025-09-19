@@ -18,7 +18,7 @@
               :labels="{ next: 'Continue to Assessment Selection' }" />
             <FormStep name="selectAssessmentStep" label="Start Or Continue<br>Assessment" 
               :elements="['selectAssessmentEl']" 
-              :buttons="{ previous: false, next: assessmentOption != 'continue' }"
+              :buttons="{ previous: false }"
               :labels="{ next: 'Continue to System Information' }" />
             <FormStep name="systemInfoStep" label="ePrescribing System<br>Information"               
               :elements="['systemInfoEl']" 
@@ -98,10 +98,7 @@ export default {
     ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
-    },
-    assessmentOption() {
-      return this.assessmentData.selection.assessmentOption
-    },
+    },   
     assessmentState() {
       return this.assessmentData.assessmentState
     },
@@ -148,7 +145,7 @@ export default {
     goToStep(assessmentId) {
       console.group('goToStep()')
       console.log('Assessment ID', assessmentId, 'currently stored', this.assessmentId)
-      if (this.activeStep == 1 && this.assessmentOption == 'continue') {
+      if (this.activeStep == 1) {
         // Jump to where the user left off if continuing an assessment
         console.debug('Continuing an assessment, jump to where user left off...')
         console.debug('Assessment state is', this.assessmentState)

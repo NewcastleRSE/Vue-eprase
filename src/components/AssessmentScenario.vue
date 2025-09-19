@@ -31,7 +31,7 @@
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
       </StaticElement>       
-      <StaticElement name="scenariosProgress" class="sticky-top opacity-100 mb-4">
+      <StaticElement name="scenariosProgress" class="mb-4">
         <div class="alert alert-info fw-bold" role="alert">
           {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
         </div>
@@ -79,13 +79,13 @@
                   </ul>
 
                   <!-- Scenario tabs -->
-                  <div v-if="currentPatient == patient.patient_code" class="tab-content vf-col-12">
+                  <div v-show="currentPatient == patient.patient_code" class="tab-content vf-col-12">
                     <div class="tab-pane fade mt-2"
                       v-for="(pscd, index) in patientScenarios[patient.patient_code]"
                       :id="'scenario-' + pscd.scenario_code"
                       :class="currentScenario == pscd.scenario_code ? 'active show' : ''" role="tabpanel" tabindex="0">
                       <!-- New response form -->
-                      <p v-show="!scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
+                      <p v-if="!scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
                         prescribing practice, then answer the questions below.</p>
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
@@ -115,7 +115,7 @@
                           </tr>
                         </tbody>
                       </table>
-                      <div v-show="!scenarioCompleted(pscd.scenario_code)">
+                      <div v-if="!scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
                         <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
                           <h4 class="vf-col-12 mb-2">Questions</h4>
@@ -189,9 +189,9 @@
                           <tbody>
                             <tr>
                               <th style="width:200px">Intervention type</th>
-                              <td>{{ mitigationDescription(scenarioResponse(pscd.scenario_code)['intervention_type']) }}</td>
+                              <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
+                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
                               <th>Interventions</th>
                               <td>
                                 <ul class="list-group">
@@ -202,7 +202,7 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
+                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
                               <th>Interventions</th>
                               <td>None</td>
                             </tr>                                                   
@@ -341,12 +341,15 @@ export default {
       console.debug('Save btn', saveBtn)
       saveBtn[0].disabled = disable
     },
-    mitigationDescription(mitigationCode) {
+    mitigationDescription(scenarioCode) {
       let description = ''
-      const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
-      if (mitigation.length > 0) {
-        description = mitigation[0].mitigation
-      }
+      if (this.scenarioResponse(scenarioCode)) {
+        const mitigationCode = this.scenarioResponse(scenarioCode)['intervention_type']
+        const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
+        if (mitigation.length > 0) {
+          description = mitigation[0].mitigation
+        }
+      }                  
       return description
     },
     async saveScenarioResponse(patient, scenario) {
@@ -445,12 +448,15 @@ export default {
         this.scenarioPatientLink[s.scenario_code] = patientCode
       })      
     }
-    const storedResultsResponse = await this.getPatientScenarioResponses(true)
+    console.time('Execution Time 1')  // This call is responsible for the long load time...
+    const storedResultsResponse = await this.getPatientScenarioResponses(true) 
+    console.timeEnd('Execution Time 1')   
     if (storedResultsResponse !== true) {
       throw new Error(storedResultsResponse)
     } else {
       this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
     }
+    
     // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
     this.completedScenariosHidden.validate()    
     this.openNextUnenteredScenario()

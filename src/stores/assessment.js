@@ -86,7 +86,6 @@ const EMPTY_CONFIG_DATA = {
 
 const EMPTY_SELECTION = {
   assessmentId: null,
-  assessmentOption: '',
   epService: {},
   otherEpService: '',
   patientType: '',  
@@ -213,7 +212,7 @@ export const assessmentStore = defineStore('assessment', {
       let action = 'select_assessment'
       this.setDataReady(false)
 
-      if (this.assessmentData.selection.assessmentOption == 'new') {
+      if (assessmentId == null) {
         // New assessment
         console.debug('New assessment => save data')
         const response = await rootStore().apiCall('assessments', 'POST', {
@@ -238,7 +237,7 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = response.message
         }
-      } else if (this.assessmentData.selection.assessmentOption == 'continue') {
+      } else {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
@@ -262,7 +261,7 @@ export const assessmentStore = defineStore('assessment', {
               hospital: authenticationStore().hospital,
               institution: authenticationStore().orgDocId,
               completedPatients: chosenAssessments[0].completed_patients,
-              numCompletedPatients: chosenAssessments[0].completed_patients == '' ? 0 : chosenAssessments[0].completed_patients.split(',').length
+              numCompletedPatients: !chosenAssessments[0].completed_patients ? 0 : chosenAssessments[0].completed_patients.split(',').length
             })
           })
           // Retrieve system data
@@ -276,7 +275,7 @@ export const assessmentStore = defineStore('assessment', {
             ret = await this.getConfigQuestionData()
           }
         } else {
-          ret = `Assessment with id ${assessmentId} not found in list of assessments for this institution/hospital`
+          ret = `Assessment with id ${assessmentId} not found in list of assessments for this institution`
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
@@ -614,7 +613,7 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(false)
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
-      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')
+      const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')      
       if (allScenariosResponse.status < 400) {
         // Package the responses by scenario code for convenience
         // Data is of form:
@@ -632,7 +631,7 @@ export const assessmentStore = defineStore('assessment', {
 
       if (recordLoading) {
         this.setDataReady(true)
-      }            
+      }                  
       console.groupEnd()      
 
       return ret
@@ -804,7 +803,7 @@ export const assessmentStore = defineStore('assessment', {
       console.group('setPatientEntryComplete()')
       console.debug('Patient code', patientCode)      
 
-      const enteredCodes = this.assessmentData.completedPatients == '' ? [] : this.assessmentData.completedPatients.split(',')
+      const enteredCodes = !this.assessmentData.completedPatients ? [] : this.assessmentData.completedPatients.split(',')
       if (!enteredCodes.includes(patientCode)) {
 
         if (recordLoading) {
@@ -852,12 +851,12 @@ export const assessmentStore = defineStore('assessment', {
           const patients = patientResponse.data.data.patients
           if (patients.length == 0) {
             // Generate patient list
-            const poolRet = await this.getPatientPool(this.assessmentData.patientType)
+            const poolRet = await this.getPatientPool(this.assessmentData.selection.patientType)
             if (poolRet !== false) {
               const patientPool = poolRet
               if (patientPool.length < appSettingsStore().assessmentNumPatients) {
-                console.warn(`Not enough patients of patient type : ${this.assessmentData.patientType} in database`)
-                ret = `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.patientType}`
+                console.warn(`Not enough patients of patient type : ${this.assessmentData.selection.patientType} in database`)
+                ret = `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.selection.patientType}`
               } else {
                 // Get those whose scenarios include a required one
                 const requiredPatientCodes = await this.getRequiredScenarioPatientCodes()

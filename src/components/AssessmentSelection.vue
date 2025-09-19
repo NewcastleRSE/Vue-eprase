@@ -83,14 +83,13 @@
         </table>           
       </GroupElement>
 
-      <GroupElement name="newAssessmentGroup" v-if="allowNew">
+      <GroupElement name="newAssessmentGroup">
         <StaticElement name="newAssessmentCaption">
           <h3>Start a new assessment</h3>
         </StaticElement>
         <ObjectElement name="selection" ref="selectionData"> 
-          <HiddenElement name="assessmentOption" default="new" />
           <SelectElement name="epService"
-            @change="(newVal) => { isOtherEpSystem = newVal.label == 'Other' }"
+            @change="changedEpSystem"
             :label="embolden('For ePrescribing system', true)"
             :native="false" 
             :search="true"
@@ -105,17 +104,14 @@
             :debounce="200" 
             :messages="{required: 'Other eP system name is required'}" 
             :rules="['required', 'fieldIsOther:selection.epService']" />
-          <RadiogroupElement v-if="!adultAssessmentExists && !paediatricAssessmentExists" name="patientType"
+          <RadiogroupElement name="patientType"
             :label="embolden('For patient type', true)"      
             :items="[
-              { value: 'Adult', label: 'Adults', disabled: adultAssessmentExists },
-              { value: 'Paediatric', label: 'Paediatrics', disabled: paediatricAssessmentExists }]"
-            :messages="{required: 'Select an option'}" 
-            :rules="[{ 'required': ['assessmentOption', '==', 'new'] }]"
-          />
-          <StaticElement v-if="adultAssessmentExists || paediatricAssessmentExists" name="patientTypePlaceholder">
-            <span class="fw-bold">For patient type : </span>{{ adultAssessmentExists ? 'Paediatrics' : 'Adults' }}
-          </StaticElement>
+              { value: 'Adult', label: 'Adults', disabled: !adultAssessmentAllowed },
+              { value: 'Paediatric', label: 'Paediatrics', disabled: !paediatricAssessmentAllowed }]"
+            :messages="{required: 'Select an option'}"
+            :rules="['required']"
+          />          
           <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
             <CheckboxElement name="shareTrustsOptOut">
               <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
@@ -149,17 +145,9 @@ export default {
       return this.assessmentData.selection
     },      
     allowNew() {
-      // New assessment allowed if there is < 2 assessments for the user's hospital (2 patient types - adult & child)
+      // New assessment allowed if there is < 2 assessments for the user's institution (2 patient types - adult & child)
       return this.allPossibleAssessments.length < 2
-    },
-    adultAssessmentExists() {
-      // New adult assessment barred if one already exists
-      return this.allPossibleAssessments.filter(assessment => assessment.patient_type == 'Adult').length > 0
-    },
-    paediatricAssessmentExists() {
-      // New paediatric assessment barred if one already exists
-      return this.allPossibleAssessments.filter(assessment => assessment.patient_type == 'Paediatric').length > 0
-    },
+    },   
     incompleteAssessments() {
       // Continue allowed if there are non-completed assessments
       return this.allPossibleAssessments.filter(assessment => assessment.state != 'Assessment complete')
@@ -174,14 +162,14 @@ export default {
   },
   data() {
     return {
-      isOtherEpSystem: false
+      isOtherEpSystem: false,
+      adultAssessmentAllowed: true,
+      paediatricAssessmentAllowed: true,
+      continuingExistingAssessment: false
     }
   },
   emits: ['jumpToStep'],
-  methods: {
-    setOption(optionValue) {
-      this.selectionData.assessmentOption = optionValue
-    },     
+  methods: {      
     async continueAssessment(assessmentId) {
 
       console.group('continueAssessment()')
@@ -189,7 +177,7 @@ export default {
       console.assert(assessmentId != null, 'No assessment ID supplied!')
 
       // Select an existing assessment
-      this.setOption('continue')            
+      this.continuingExistingAssessment = true
       const selectResponse = await this.selectAssessment(assessmentId)        
       if (selectResponse !== true) {
         throw new Error(selectResponse)
@@ -202,8 +190,17 @@ export default {
       let epSystems = []
       const response = await this.getEpSystems()
       if (response.status < 400) {
-        // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)        
-        epSystems = response.data.data.map(ep => { return { value: ep.documentId, label: ep.name } })
+        // Filter out all system names that have existing assessments for both adults and paediatrics for this institution
+        // Thanks to https://bobbyhadz.com/blog/javascript-count-occurrences-of-each-element-in-array
+        const excludeEpSystemCodes = this.allPossibleAssessments.map(pa => pa.ep_service.documentId)
+        const frequencyCounts = excludeEpSystemCodes.reduce((accumulator, value) => {
+          accumulator[value] = ++accumulator[value] || 1
+          return accumulator
+        }, {})
+        // Don't offer EP system codes which already have 2 assessments         
+        const validEpSystems = response.data.data.filter(ep => !Object.keys(frequencyCounts).includes(ep.documentId) || frequencyCounts[ep.documentId] < 2)       
+        epSystems = validEpSystems.map(ep => { return { value: ep.documentId, label: ep.name } })
+        // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)
         const otherIdx = epSystems.findIndex(ep => ep.label == 'Other')
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})       
@@ -212,16 +209,20 @@ export default {
       }
       return epSystems
     },
+    changedEpSystem(newValue, oldValue) {
+      this.isOtherEpSystem = newValue.label == 'Other'
+      this.paediatricAssessmentAllowed = this.allPossibleAssessments.filter(pa => pa.patient_type == 'Paediatric' && pa.ep_service.documentId == newValue.value).length == 0
+      this.adultAssessmentAllowed = this.allPossibleAssessments.filter(pa => pa.patient_type == 'Adult' && pa.ep_service.documentId == newValue.value).length == 0       
+    },
     convertDate(d, useTime) {
       return isoToUkDate(d, useTime)
     }
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
-    console.debug(this.selectionData)
-    if (this.selectionData.assessmentOption == 'new') {
-      // Create a new assessment
+    if (!this.continuingExistingAssessment) {
+      // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
+      console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()        
       if (selectResponse !== true) {
         throw new Error(selectResponse)

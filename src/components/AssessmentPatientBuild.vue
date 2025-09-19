@@ -15,7 +15,7 @@
       </div>
     </StaticElement>
     <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
-    <StaticElement name="patientBuildProgress" class="sticky-top opacity-100 mb-4">
+    <StaticElement name="patientBuildProgress" class="mb-4">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
       </div>
@@ -305,7 +305,7 @@ export default {
       return tabId.replace(/^accordion-btn-([a-z0-9]+)$/, '\$1')
     },
     completedPatientsArray() {
-      return this.assessmentData.completedPatients == '' ? [] : this.assessmentData.completedPatients.split(',')
+      return !this.assessmentData.completedPatients ? [] : this.assessmentData.completedPatients.split(',')
     },
     async patientRelations(docId) {
       this.currentPatient = docId
