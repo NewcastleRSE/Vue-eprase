@@ -1,13 +1,7 @@
 <template>
   <GroupElement name="scenarioGroup" :class="'mb-4'">
-    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />
-    <StaticElement name="scenarioDataLoading" v-if="!dataLoaded">
-      <div class="d-flex align-items-center">
-        <strong role="status">Loading scenario data for assessment...</strong>
-        <div class="spinner-border ms-auto" aria-hidden="true"></div>
-      </div>
-    </StaticElement>
-    <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup" v-if="dataLoaded">
+    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />    
+    <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
@@ -85,7 +79,7 @@
                       :id="'scenario-' + pscd.scenario_code"
                       :class="currentScenario == pscd.scenario_code ? 'active show' : ''" role="tabpanel" tabindex="0">
                       <!-- New response form -->
-                      <p v-if="!scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
+                      <p v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
                         prescribing practice, then answer the questions below.</p>
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
@@ -115,7 +109,7 @@
                           </tr>
                         </tbody>
                       </table>
-                      <div v-if="!scenarioCompleted(pscd.scenario_code)">
+                      <div v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
                         <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
                           <h4 class="vf-col-12 mb-2">Questions</h4>
@@ -141,11 +135,17 @@
                               </tr>                            
                             </tbody>
                           </table>
+                          <StaticElement name="scenarioDataLoading" v-if="!dataLoaded">
+                            <div class="d-flex align-items-center">
+                              <strong role="status">Loading scenario responses for assessment...</strong>
+                              <div class="spinner-border ms-auto" aria-hidden="true"></div>
+                            </div>
+                          </StaticElement>
                           <!-- 
                           Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
                           Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
                           -->
-                          <div v-show="hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
+                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
                             <div class="alert alert-info mt-2" role="alert">
                               Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
                             </div>
@@ -173,7 +173,7 @@
                             />
                           </div>
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
-                            <StaticElement name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
+                            <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
@@ -182,7 +182,7 @@
                           </GroupElement>
                         </ObjectElement>
                       </div>
-                      <div v-if="scenarioCompleted(pscd.scenario_code)">
+                      <div v-if="dataLoaded && scenarioCompleted(pscd.scenario_code)">
                         <!-- Recorded responses (need some guidance as to how to express this - this is only the raw data at the moment... -->
                         <h4 class="my-4">Your responses to the scenario:</h4>
                         <table class="table table-striped" style="table-layout: fixed;">
@@ -214,7 +214,7 @@
                         </table>
                       </div>
                       <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
-                        <ButtonElement v-show="!scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
+                        <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
                           :disabled="!allowCurrentScenarioSave"
                           :columns="4"
                           :add-class="'me-2'" 
@@ -222,7 +222,7 @@
                         >
                           <i class="bi bi-floppy-fill me-2"></i>Save response
                         </ButtonElement>
-                        <ButtonElement v-show="scenarioCompleted(pscd.scenario_code) && numCompletedScenarios != scenarioCount" name="nextIncompleteScenario" 
+                        <ButtonElement v-show="dataLoaded && scenarioCompleted(pscd.scenario_code) && numCompletedScenarios != scenarioCount" name="nextIncompleteScenario" 
                           :columns="4"
                           @click="openNextUnenteredScenario"
                         >
@@ -467,6 +467,7 @@ export default {
     console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
     if (this.numCompletedScenarios == this.scenarioCount) {
       // We have done all the data entry now
+      this.completedScenariosHidden.validate()    
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
       if (updateResponse !== true) {
         throw new Error(updateResponse)
