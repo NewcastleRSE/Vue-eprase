@@ -4,7 +4,8 @@ import { defineStore } from 'pinia'
 import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
-import { shuffle } from '../helpers/utils'
+import { shuffle, calcPercentage } from '../helpers/utils'
+import bsColors from '../assets/scss/variables.scss'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -20,31 +21,37 @@ const ASSESSMENT_STATES = {
 
 // Done as <recorded_response> : { <expected_response1>: <mitigation_result1>, ... }
 // Transcription of document posted on Slack eprase2 channel by Becky 18/08/2025
+const GOOD_MITIGATION = 'Good mitigation'
+const SOME_MITIGATION = 'Some mitigation'
+const OVER_MITIGATION = 'Over mitigation'
+const NO_MITIGATION = 'Fail/No mitigation'
+const INVALID_TEST = 'Invalid test'
+const MITIGATION_DESCRIPTIONS = [NO_MITIGATION, GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, INVALID_TEST]
 const MITIGATION_MATRIX = {
   'MT2': { // Recorded response : You were able to complete the prescription without any additional user or system input
-    'MT2': 'Good mitigation',     // Expected response : No intervention
-    'MT1': 'Fail/No mitigation',  // Expected response : User/system intervention
-    'MT3': 'Fail/No mitigation'   // Expected response : Prescribing prevented
+    'MT2': GOOD_MITIGATION,     // Expected response : No intervention
+    'MT1': NO_MITIGATION,       // Expected response : User/system intervention
+    'MT3': NO_MITIGATION        // Expected response : Prescribing prevented
   },
   'MT4': { // Recorded response : You were able to complete the prescription, but had to override components of the order sentence
-    'MT2': 'Over mitigation',     // Expected response : No intervention
-    'MT1': 'Good mitigation',     // Expected response : User/system intervention
-    'MT3': 'Some mitigation'      // Expected response : Prescribing prevented
+    'MT2': OVER_MITIGATION,     // Expected response : No intervention
+    'MT1': GOOD_MITIGATION,     // Expected response : User/system intervention
+    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT1': { // Recorded response : You were able to complete the prescription, with system/user intervention
-    'MT2': 'Over mitigation',     // Expected response : No intervention
-    'MT1': 'Some mitigation',     // Expected response : User/system intervention
-    'MT3': 'Some mitigation'      // Expected response : Prescribing prevented
+    'MT2': OVER_MITIGATION,     // Expected response : No intervention
+    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
+    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT3': { // Recorded response : Prevented from prescribing
-    'MT2': 'Over mitigation',     // Expected response : No intervention
-    'MT1': 'Some mitigation',     // Expected response : User/system intervention
-    'MT3': 'Good mitigation'      // Expected response : Prescribing prevented
+    'MT2': OVER_MITIGATION,     // Expected response : No intervention
+    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
+    'MT3': GOOD_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT99': { // Recorded response : Medicine or formulary alternative not available in the system
-    'MT2': 'Fail/No mitigation',  // Expected response : No intervention
-    'MT1': 'Fail/No mitigation',  // Expected response : User/system intervention
-    'MT3': 'Fail/No mitigation'   // Expected response : Prescribing prevented
+    'MT2': INVALID_TEST,        // Expected response : No intervention
+    'MT1': INVALID_TEST,        // Expected response : User/system intervention
+    'MT3': INVALID_TEST         // Expected response : Prescribing prevented
   }
 }
 
@@ -132,9 +139,32 @@ export const assessmentStore = defineStore('assessment', {
       this.$patch((state) => {
         state.loggingOut = logoutStatus
       })
-    },
+    },    
     assessmentStateIndex() {
       return ASSESSMENT_STATES[this.assessmentData.assessmentState]
+    },
+    // Create a summary of mitigation results from the stored scenario responses
+    mitigationSummary() {
+
+      console.group('mitigationSummary()')
+
+      const numCompletedScenarios = this.assessmentData.storedScenarioResponses.length
+      //console.assert(numCompletedScenarios == this.assessmentData.patientScenarios.length, 'Not all scenarios were completed!')
+
+      const summary = {
+        mitigations: MITIGATION_DESCRIPTIONS,
+        frequencies: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
+        colors: [bsColors.dangerColor, bsColors.successColor, bsColors.warningColor, bsColors.infoColor, bsColors.invalidColor]
+      }
+
+      if (numCompletedScenarios > 0) {
+        for (let i = 0; i < MITIGATION_DESCRIPTIONS.length; i++) {
+          summary.frequencies[i] = calcPercentage(this.assessmentData.storedScenarioResponses.filter(sr => sr.result == MITIGATION_DESCRIPTIONS[i]).length, numCompletedScenarios)
+        }
+      }
+      console.debug('Returning', summary)
+      console.groupEnd()
+      return summary
     },
     async getAssessmentsForInstitution() {
 
@@ -613,16 +643,9 @@ export const assessmentStore = defineStore('assessment', {
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
       const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')      
-      if (allScenariosResponse.status < 400) {
-        // Package the responses by scenario code for convenience
-        // Data is of form:
-        // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
-        const responsesByCode = {}
-        allScenariosResponse.data.data.scenario_data.forEach(asr => {
-          responsesByCode[asr.scenario.scenario_code] = asr
-        })
+      if (allScenariosResponse.status < 400) {        
         this.$patch((state) => {
-          state.assessmentData.storedScenarioResponses = responsesByCode
+          state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data.scenario_data
         })
       } else {
         ret = 'Failed to retrieve saved scenario responses'

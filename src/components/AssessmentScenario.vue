@@ -268,23 +268,19 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
     dataLoaded() {
-      return this.dataReady
+      return this.auxiliaryDataReady && this.dataReady
     },        
     patientData() {
-      console.debug('Patients', this.assessmentData.patients)
       return this.assessmentData.patients
     },
     patientScenarios() {
-      console.debug('Scenarios', this.assessmentData.patientScenarios)
       return this.assessmentData.patientScenarios
     },
     scenarioCount() {
-      console.debug('Number of scenarios', this.assessmentData.numScenarios)
       return this.assessmentData.numScenarios
     },    
     scenarioResponses() {
-      console.debug('User scenario responses', this.assessmentData.storedScenarioResponses)
-      return this.assessmentData.storedScenarioResponses
+      return this.storedResponsesByCode
     },
     systemResponses() {
       // This undesirably hard-codes the mitigation codes in order to associate them with labels - perhaps label text better stored in the database?
@@ -327,6 +323,7 @@ export default {
       currentPatient: null,
       currentScenario: null,
       allowCurrentScenarioSave: false,
+      storedResponsesByCode: {},
       numCompletedScenarios: 0,
       scenarioPatientLink: {},
       savedResponseData: true,
@@ -440,7 +437,11 @@ export default {
     }
   },
   async mounted() {
+
     console.group('AssessmentScenario mounted()')
+
+    this.auxiliaryDataReady = false
+
     // Massage the category list for better use in Vueform components      
     this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })        
     for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
@@ -448,18 +449,24 @@ export default {
         this.scenarioPatientLink[s.scenario_code] = patientCode
       })      
     }
-    console.time('Execution Time 1')  // This call is responsible for the long load time...
-    const storedResultsResponse = await this.getPatientScenarioResponses(true) 
-    console.timeEnd('Execution Time 1')   
+    const storedResultsResponse = await this.getPatientScenarioResponses(true)
     if (storedResultsResponse !== true) {
       throw new Error(storedResultsResponse)
     } else {
+      // Package the responses by scenario code for convenience - data is of form:
+      // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
+      this.assessmentData.storedScenarioResponses.forEach(asr => {
+        this.storedResponsesByCode[asr.scenario.scenario_code] = asr
+      })
       this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
     }
     
     // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-    this.completedScenariosHidden.validate()    
+    this.completedScenariosHidden.validate()
+
+    this.auxiliaryDataReady = true
     this.openNextUnenteredScenario()
+    
     console.groupEnd()
   },
   async beforeUnmount() {
