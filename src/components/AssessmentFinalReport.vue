@@ -27,7 +27,7 @@
           Over mitigation indicates tests where scores are accrued when an intervention is recorded when none is expected from the control items. 
         </p>
         <p>
-          Invalid results are where a test presented a medicine which was not in the users’ EP system and the question was passed over. 
+          Invalid results are where a test presented a medicine which was not in the user's EP system and the question was passed over. 
         </p>
         <p>
           Table (1) below illustrates how the scores are allocated based on the users recorded response to a test scenario compared to the predesignated 
@@ -50,7 +50,7 @@
               <td class="bg-info p-2 w-25">Prescription completed without system intervention (control questions)</td>
             </tr>
             <tr>
-              <td class="bg-primary p-2" rowspan="4"><div class="fw-bold text-white" style="transform: rotate(270deg)"><span>User recorded response</span></div></td>
+              <td class="bg-primary p-2" rowspan="4"><div class="fw-bold text-white" style="writing-mode: vertical-lr; transform: rotate(180deg)"><span>User recorded response</span></div></td>
               <td class="bg-info-subtle p-2">You were able to complete the prescription without any additional user or system input</td>
               <td class="bg-info-subtle p-2 w-25">No mitigation</td>
               <td class="bg-info-subtle p-2 w-25">No mitigation</td>
@@ -82,7 +82,7 @@
         <h3>EPRaSE Assessment breakdown of results for {{ new Date().getFullYear() }}</h3>
         <h4>Overview of prescribing test results</h4>
         <p>
-          The total number of valid prescribing tests completed (excluding configuration questions) = {{ scenarioTotal }}
+          The total number of valid prescribing tests completed (excluding configuration questions) = {{ scenarioTotal - excludedTests() }}
         </p>
         <p>
           The total number of prescribing tests excluded (described as invalid test in the pie chart) due to medication not being available in the 
@@ -97,15 +97,16 @@
             <tr><th>Prescribing risk category</th><th>Outcome</th></tr>
           </thead>
           <tbody>
-            <tr><td>Extreme risk</td><td>You completed {{ }} extreme risk scenarios. Out of these {{  }} were correctly mitigated.</td></tr>
-            <tr><td>High risk</td><td>You completed {{ }} high risk scenarios. Out of these {{  }} were correctly mitigated.</td></tr>
-            <tr><td>No risk (controls)</td><td>You completed {{ }} control scenarios. Out of these {{  }} were correctly mitigated.</td></tr>
+            <tr><td>Extreme risk</td><td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these {{ goodMitigationAnalysis['Extreme'].good }} were correctly mitigated.</td></tr>
+            <tr><td>High risk</td><td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} were correctly mitigated.</td></tr>
+            <tr><td>No risk (controls)</td><td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} were correctly mitigated.</td></tr>
             <tr>
               <td>Alert / advisory intervention types</td>
               <td>
                 <p>
-                  Out of {{  }} valid prescribing tests completed, {{  }} were recorded as completed with system/user intervention. 
-                  {{  }} of these responses were reported as alerts, {{  }} reported as advisory notifications and {{  }} reported as both.
+                  Out of {{ scenarioTotal - excludedTests() }} valid prescribing tests completed, {{ systemInterventionAnalysis.total }} were recorded as completed with system/user intervention. 
+                  {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
+                  {{ systemInterventionAnalysis.both }} reported as both.
                 </p>                
                 <p>
                   This would be considered as a {{  }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
@@ -114,9 +115,104 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="2">Table 2</td></tr>
+            <tr class="border-white text-center"><td colspan="2">Table 2. Breakdown of prescribing tests taken</td></tr>
           </tfoot>
         </table>
+        <h3>Mandatory Questions</h3>
+        <p>
+          In the ePRaSE tool all users complete the same 5 mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
+          results and explanatory outcomes is detail below in table 3. 
+        </p>
+        <table class="table table-bordered">
+          <thead>
+            <tr><th>Drug name</th><th>Test</th><th>Your result / Outcome</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Methotrexate</td>
+              <td>Methotrexate tablets prescribed for a patient with an inappropriate daily frequency. Increased risk of severe toxicity. Can be fatal.</td>
+              <td v-if="requiredScenarioAnalysis['sc56'] === true">Good mitigation</td>
+              <td v-if="requiredScenarioAnalysis['sc56'] !== true">Some / no mitigation - please review your EP system to ensure mechanisms are in place to prevent methotrexate overdose.</td>
+            </tr>
+            <tr>
+              <td>Insulin Glargine (Toujeo SoloStar)</td>
+              <td>Insulin Glargine (Toujeo) prescribed as the dose form i.e., the full pen contents as presented and not the actual dose. Risk of severe overdose and hypoglycaemia.</td>
+              <td v-if="requiredScenarioAnalysis['sc112'] === true">Good mitigation</td>
+              <td v-if="requiredScenarioAnalysis['sc112'] !== true">Some / no mitigation - please review your EP system to ensure mechanisms are in place to prevent insulin overdose when using pen devices.</td>
+            </tr>
+            <tr>
+              <td>Topiramate (Topamax)</td>
+              <td>
+                Topiramate prescribed in woman of child-bearing age. Should not be used in pregnancy unless there is no other suitable treatment. 
+                Pregnancy Prevention Programme requirements must be met due to teratogenic risk.
+              </td>
+              <td v-if="requiredScenarioAnalysis['sc130'] === true">Good mitigation</td>
+              <td v-if="requiredScenarioAnalysis['sc130'] !== true">
+                Some / no mitigation - please review your EP system to ensure mechanisms are in place to prompt prescribers to follow Pregnancy Prevention Programme 
+                requirements for all Topiramate (Topamax) prescriptions.
+              </td>
+            </tr>
+            <tr>
+              <td>Insulin Aspart (NovoRapid - any pen device)</td>
+              <td>Insulin prescribed to be administered subcutaneously by pen device in millilitres (ml) instead of units. Risk of severe overdose and hypoglycaemia.</td>
+              <td v-if="requiredScenarioAnalysis['sc55'] === true">Good mitigation</td>
+              <td v-if="requiredScenarioAnalysis['sc55'] !== true">Some / no mitigation - please review your EP system to ensure insulin cannot be prescribed in ml. Risk of severe overdose.</td>
+            </tr>
+            <tr>
+              <td>Sodium Valproate (Epilim Chrono) Modified-Release</td>
+              <td>
+                Sodium Valproate prescribed in woman of child-bearing age. Should not be used in pregnancy unless there is no other suitable treatment. 
+                Pregnancy Prevention Programme requirements must be met due to teratogenic risk. 
+              </td>
+              <td v-if="requiredScenarioAnalysis['sc55'] === true">Good mitigation</td>
+              <td v-if="requiredScenarioAnalysis['sc55'] !== true">
+                Some / no mitigation - please review your EP system to ensure mechanisms are in place to prompt prescribers to follow Pregnancy Prevention Programme requirements 
+                for all Sodium Valproate prescriptions.
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="border-white text-center"><td colspan="2">Table 3. Mandatory question results</td></tr>
+          </tfoot>
+        </table>
+        <h3>Configuration test results</h3>
+        <p>
+          In the ePRaSE tool users are presented with a block of direct questions configuration tests, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
+          Your configuration tests results are presented on table 4 below.
+        </p>
+        <table class="table table-bordered">
+          <thead>
+            <tr><th>Question</th><th>Result</th><th>Outcome / advice</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="cqa in configQuestionAnalysis">
+              <td>{{ cqa.description }}</td>
+              <td>{{ cqa.actualAnswer.substr(0, 1).toUpperCase() + cqa.actualAnswer.substr(1) }}</td>
+              <td>{{ cqa.actualAnswer == cqa.goodAnswer ? cqa.desirableResponse : cqa.undesirableResponse }}</td>
+            </tr>                
+          </tbody>
+          <tfoot>
+            <tr class="border-white text-center"><td colspan="2">Table 4. Configuration tests results</td></tr>
+          </tfoot>
+        </table>
+        <h3>Clinical Decision Support Category Results</h3>
+        <p>
+          The Clinical Decision Support (CDS) stacked chart 1. below illustrates the different levels of  mitigation (good, some, no and over mitigation) within each category. 
+          Please review your results, bearing in mind what you know about how your system is built and in the context of the number of questions you have executed in each category 
+          which can be seen by hovering over the bars on the online tool chart. 
+        </p>
+        <div ref="barChartContainer"></div>
+        <p>Chart 1. Overview of mitigation scores within CDS categories</p>
+        <p>
+          On completion of each annual campaign the ePRaSE team will pool all data to provide an anonymised set of reports for benchmarking purposes. 
+          These will be published on the <a href="https://eprase.info" target="_blank">eprase.info</a> website. Where you have provided consent, your 
+          data may be shared at later date with other users and or EP system suppliers to  support learning on EP system optimisation.
+        </p>
+        <h3>Saving your assessment results</h3>
+        <p>
+          Please print your report in PDF landscape format and save for future reference. The tool is closed at the end of each annual campaign for development and users 
+          will not be able to access the online platform. 
+        </p>
       </StaticElement>
       <!-- TODO -->
     </GroupElement>    
@@ -125,11 +221,13 @@
 
 <script>
 
+import { calcNum } from '../helpers/utils'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
+import bsColors from '../assets/scss/variables.scss'
 
 export default {
   name: 'AssessmentFinalReport',  
@@ -147,30 +245,62 @@ export default {
     },
     scenarioTotal() {
       return this.scenarioResponses.length
+    },
+    goodMitigationAnalysis() {
+      return this.mitigationSummaries.goodMitigationByRiskAnalysis
+    },
+    systemInterventionAnalysis() {
+      return this.mitigationSummaries.systemInterventionAnalysis
+    },
+    requiredScenarioAnalysis() {
+      return this.mitigationSummaries.requiredScenarioAnalysis
+    },
+    configQuestionAnalysis() {
+      return this.mitigationSummaries.configQuestionAnalysis
+    },
+    mitigationByCategoryAnalysis() {
+      return this.mitigationSummaries.mitigationByCategoryAnalysis
     }
   },
   data() {
     return {
-      auxiliaryDataReady: false
+      auxiliaryDataReady: false,
+      mitigationSummaries: null
     }
   },
   methods: {
     excludedTests() {
       return this.scenarioResponses.filter(sr => sr.result == 'Invalid test').length
     },
+    getHeading() {
+      //TODO
+      return `<h2>Assessment Report</h2><h3>Institution: ${this.institution}</h3><h4>EP System: ${this.ep_service !== 'Other' ? this.ep_service : this.other_ep_system}</h4>`
+    },
+    assemblePrintableReport() {
+      //TODO
+      const tpl = document.createElement('template')
+      document.querySelectorAll('div[role="tabpanel"]').forEach(tbp => {
+        const article = document.createElement('article')
+        article.setAttribute('style', 'page-break-after: always')
+        article.innerHTML = tbp.innerHTML
+        tpl.appendChild(article)
+      })
+      rootStore().storePrintableReportData(this.getHeading(), tpl.innerHTML, 'Preview')
+      window.open(this.$router.resolve({
+        path: '/printablepdf'
+      }).href, '_blank')
+    },
     renderPieChart() {
 
-      console.group('PieChart - renderChart()')
+      console.group('renderPieChart()')
 
-      // Create hash object to count mitigation types
-      const mitigationHash = this.mitigationSummary()
       const plotDiv = this.$refs.pieChartContainer
 
       const piePlot = Plotly.newPlot(plotDiv, [{
-        values: mitigationHash.frequencies,       
-        labels: mitigationHash.mitigations,
+        values: this.mitigationSummaries.mitigationFrequencyAnalysis.percentages,       
+        labels: this.mitigationSummaries.mitigationFrequencyAnalysis.mitigations,
         marker: {
-          colors: mitigationHash.colors
+          colors: this.mitigationSummaries.mitigationFrequencyAnalysis.colors
         },        
         type: 'pie'
       }], {
@@ -182,19 +312,62 @@ export default {
       plotDiv.on('plotly_legendclick', () => { return false })
       plotDiv.on('plotly_legenddoubleclick', () => { return false })
 
-      // plotDiv.on('plotly_afterplot', () => {
-      //   // Desperate attempt to get round the plotly legend label cutoff problem - see final contribution at
-      //   // https://community.plotly.com/t/legend-text-is-being-truncated-cut-off/41207/9
-      //   plotDiv.querySelectorAll('g.traces').forEach(entry => {         
-      //     entry.setAttribute('transform', entry.getAttribute('transform').replace('(0', '(-25'))
-      //     // Adjust the swatch
-      //     entry.querySelector('path.legendpie').setAttribute('transform', 'translate(30,0)')
-      //   })
-      // })
+      console.groupEnd()
+    },  
+    renderCdsBarChart() {
+
+      console.group('renderCdsBarChart()')
+
+      const plotDiv = this.$refs.barChartContainer
+      const categoryNames = Object.keys(this.mitigationByCategoryAnalysis)
+      const categorySubkeys = ['good', 'some', 'not', 'over']
+      const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor]
+      const mitigationByCategoryData = []
+
+      categorySubkeys.forEach((csk, cskIdx) => {
+        const yArr = [], customdata = []
+        for (const [categoryName, analysis] of Object.entries(this.mitigationByCategoryAnalysis)) {
+          const percentInCat = calcNum(analysis[csk], analysis.total)
+          yArr.push(percentInCat)
+          customdata.push(`${percentInCat}% of ${analysis.total} question${analysis.total != 1 ? 's' : ''}`)
+        }
+        mitigationByCategoryData.push({
+          x: categoryNames,
+          y: yArr,
+          customdata: customdata,
+          marker: {
+            color: colorMapping[cskIdx]
+          },
+          hovertemplate: '%{customdata}', // See e.g. https://codepen.io/etpinard/pen/zXLEXJ?editors=0010
+          name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
+          type: 'bar',
+          orientation: 'v'
+        })
+      })
+
+      Plotly.newPlot(plotDiv, mitigationByCategoryData, {
+        barmode: 'stack',
+        width: 1280,
+        height: 800,
+        showlegend: true,
+        legend: {
+          entrywidth: 400
+        },
+        title: {
+          text: 'Overview of mitigation scores within clinical decision support (CDS) categories',
+          font: { size: 24, weight: 700 }
+        },
+        // https://stackoverflow.com/questions/36596947/long-tick-labels-getting-cut-off-in-plotly-js-chart
+        xaxis: { title: { text: 'CDS Category', standoff: 50, font: { size: 16, weight: 700 } }, automargin: true, tickangle: -90 },
+        yaxis: { title: { text: 'Tests completed (%)', font: { size: 16, weight: 700 } } }
+      }, { displayModeBar: false })
+
+      // Disable nonsense events clicking on the legend
+      plotDiv.on('plotly_legendclick', () => { return false })
+      plotDiv.on('plotly_legenddoubleclick', () => { return false })
 
       console.groupEnd()
-    }  
-    
+    }
   },
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
@@ -210,10 +383,14 @@ export default {
       throw new Error(storedConfigResponse)
     } 
 
-    this.auxiliaryDataReady = true
+    // Create hash object to count mitigation types
+    this.mitigationSummaries = this.mitigationSummary()
 
+    this.auxiliaryDataReady = true
     await nextTick()
+
     this.renderPieChart()
+    this.renderCdsBarChart()
 
     console.groupEnd()
   },

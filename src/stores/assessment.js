@@ -149,19 +149,122 @@ export const assessmentStore = defineStore('assessment', {
       console.group('mitigationSummary()')
 
       const numCompletedScenarios = this.assessmentData.storedScenarioResponses.length
-      //console.assert(numCompletedScenarios == this.assessmentData.patientScenarios.length, 'Not all scenarios were completed!')
 
       const summary = {
-        mitigations: MITIGATION_DESCRIPTIONS,
-        frequencies: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
-        colors: [bsColors.dangerColor, bsColors.successColor, bsColors.warningColor, bsColors.infoColor, bsColors.invalidColor]
+        mitigationFrequencyAnalysis: {
+          mitigations: MITIGATION_DESCRIPTIONS,
+          frequencies: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
+          percentages: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
+          colors: [bsColors.dangerColor, bsColors.successColor, bsColors.warningColor, bsColors.infoColor, bsColors.invalidColor],
+        },        
+        goodMitigationByRiskAnalysis: { 
+          'Extreme': { total: 0, good: 0 }, 
+          'High': { total: 0, good: 0 }, 
+          'Medium': { total: 0, good: 0 }, 
+          'N/A': { total: 0, good: 0 } 
+        },
+        systemInterventionAnalysis: {
+          total: 0,
+          alertOnly: 0,
+          advisoryOnly: 0,
+          both: 0
+        },
+        requiredScenarioAnalysis: {},
+        mitigationByCategoryAnalysis: {},
+        configQuestionAnalysis: []        
       }
-
+      
       if (numCompletedScenarios > 0) {
+
+        // Create the overall mitigation summary for the pie chart report
         for (let i = 0; i < MITIGATION_DESCRIPTIONS.length; i++) {
-          summary.frequencies[i] = calcPercentage(this.assessmentData.storedScenarioResponses.filter(sr => sr.result == MITIGATION_DESCRIPTIONS[i]).length, numCompletedScenarios)
+          summary.mitigationFrequencyAnalysis.frequencies[i] = this.assessmentData.storedScenarioResponses.filter(sr => sr.result == MITIGATION_DESCRIPTIONS[i]).length
+          summary.mitigationFrequencyAnalysis.percentages[i] = calcPercentage(summary.mitigationFrequencyAnalysis.frequencies[i], numCompletedScenarios)
+        }
+
+        const mitigationTotalsByScenario = {}
+
+        // Create the summary analyses
+        this.assessmentData.storedScenarioResponses.forEach(ssr => {
+
+          // Look at scenario risk and look for good mitigation
+          const riskLevel = ssr.scenario.risk_level
+          console.assert(riskLevel in summary.goodMitigationByRiskAnalysis, 'Unrecognised risk level: ' + riskLevel)
+          if (ssr.result == 'Good mitigation') {
+            summary.goodMitigationByRiskAnalysis[riskLevel].good++
+          }
+          summary.goodMitigationByRiskAnalysis[riskLevel].total++
+
+          // Look at system interventions
+          if (ssr.intervention_type == 'MT1') {   // NOTE: don't change these codes in Strapi!!!
+            // Record prompt
+            summary.systemInterventionAnalysis.total++            
+            if (ssr.other_category) {
+              const hasAlert = ssr.other_category.indexOf('alert') != -1
+              const hasAdvisory = ssr.other_category.indexOf('advisory') != -1
+              if (hasAlert && hasAdvisory) {
+                summary.systemInterventionAnalysis.both++
+              } else if (hasAlert) {
+                summary.systemInterventionAnalysis.alertOnly++
+              } else if (hasAdvisory) {
+                summary.systemInterventionAnalysis.advisoryOnly++
+              }
+            }
+          }
+          
+          // Look at required scenarios
+          if (ssr.scenario.required === true) {
+            summary.requiredScenarioAnalysis[ssr.scenario.scenario_code] = ssr.result == 'Good mitigation'
+          }
+
+          // Compile hash of mitigation totals by scenario code
+          if (!( ssr.scenario.scenario_code in mitigationTotalsByScenario )) {
+            mitigationTotalsByScenario[ssr.scenario.scenario_code] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+          }
+          mitigationTotalsByScenario[ssr.scenario.scenario_code].total++
+          switch(ssr.result) {
+            case GOOD_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].good++; break
+            case SOME_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].some++; break
+            case OVER_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].over++; break
+            case NO_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].not++; break
+            default: break
+          }
+        }) 
+        
+        // Construct stacked bar chart data giving mitigation data by category
+        // Initialise the hash
+        this.categories.forEach(c => {
+          summary.mitigationByCategoryAnalysis[c.name] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+        })
+        summary.mitigationByCategoryAnalysis['Control'] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+        // Group patient scenarios by category
+        for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {          
+          scenarios.forEach(sc => {
+            const scCategory = sc.categories == null ? 'Control' : sc.categories.name
+            summary.mitigationByCategoryAnalysis[scCategory].total += mitigationTotalsByScenario[sc.scenario_code].total
+            summary.mitigationByCategoryAnalysis[scCategory].good += mitigationTotalsByScenario[sc.scenario_code].good
+            summary.mitigationByCategoryAnalysis[scCategory].some += mitigationTotalsByScenario[sc.scenario_code].some
+            summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].over
+            summary.mitigationByCategoryAnalysis[scCategory].not += mitigationTotalsByScenario[sc.scenario_code].not
+            if (sc.categories == null) {
+              // Need to investigate these...
+              console.warn(sc.scenario_code, 'has null category!')
+            }                        
+          })  
         }
       }
+
+      // Construct config question analysis
+      this.assessmentData.config.configQuestionResults.forEach(cqr => {
+        summary.configQuestionAnalysis.push({
+          actualAnswer: cqr.result == 1 ? 'yes' : 'no',
+          goodAnswer: cqr.config_error.good_answer,
+          description: cqr.config_error.description,
+          desirableResponse: cqr.config_error.good_answer_response,
+          undesirableResponse: cqr.config_error.undesirable_answer_response
+        })
+      })
+
       console.debug('Returning', summary)
       console.groupEnd()
       return summary
@@ -605,7 +708,7 @@ export const assessmentStore = defineStore('assessment', {
         const patientScenariosByCode = {}
         for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
           const patientCode = this.assessmentData.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
           if (sppResponse.status < 400) {
             patientScenariosByCode[patientCode] = sppResponse.data.data
             nScenarios += patientScenariosByCode[patientCode].length
@@ -758,7 +861,7 @@ export const assessmentStore = defineStore('assessment', {
       const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
       if (confQuestionResponse.status < 400) {
         this.$patch((state) => {
-          state.assessmentData.config.configErrorResults = confQuestionResponse.data.data.config_error_data
+          state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
         })
       } else {
         ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`

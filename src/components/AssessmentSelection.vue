@@ -183,7 +183,10 @@ export default {
         throw new Error(selectResponse)
       } else {
         console.groupEnd()
-        this.dataLoaded && this.$emit('jumpToStep', assessmentId)
+        if (this.dataLoaded) {
+          console.debug('Data loaded')
+          this.$emit('jumpToStep', assessmentId)
+        }
       } 
     },
     async getEpSystemNames() {
