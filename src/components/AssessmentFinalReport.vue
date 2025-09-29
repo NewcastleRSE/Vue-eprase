@@ -115,7 +115,7 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="2">Table 2. Breakdown of prescribing tests taken</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 2. Breakdown of prescribing tests taken</td></tr>
           </tfoot>
         </table>
         <h3>Mandatory Questions</h3>
@@ -172,7 +172,7 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="2">Table 3. Mandatory question results</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 3. Mandatory question results</td></tr>
           </tfoot>
         </table>
         <h3>Configuration test results</h3>
@@ -192,7 +192,7 @@
             </tr>                
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="2">Table 4. Configuration tests results</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 4. Configuration tests results</td></tr>
           </tfoot>
         </table>
         <h3>Clinical Decision Support Category Results</h3>

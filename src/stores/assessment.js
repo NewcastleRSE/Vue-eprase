@@ -231,6 +231,8 @@ export const assessmentStore = defineStore('assessment', {
           }
         }) 
         
+        console.debug('Mitigation totals by scenario', mitigationTotalsByScenario)
+        
         // Construct stacked bar chart data giving mitigation data by category
         // Initialise the hash
         this.categories.forEach(c => {
