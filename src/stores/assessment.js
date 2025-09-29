@@ -24,7 +24,7 @@ const ASSESSMENT_STATES = {
 const GOOD_MITIGATION = 'Good mitigation'
 const SOME_MITIGATION = 'Some mitigation'
 const OVER_MITIGATION = 'Over mitigation'
-const NO_MITIGATION = 'Fail/No mitigation'
+const NO_MITIGATION = 'No mitigation'
 const INVALID_TEST = 'Invalid test'
 const MITIGATION_DESCRIPTIONS = [NO_MITIGATION, GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, INVALID_TEST]
 const MITIGATION_MATRIX = {
@@ -243,9 +243,17 @@ export const assessmentStore = defineStore('assessment', {
             const scCategory = sc.categories == null ? 'Control' : sc.categories.name
             summary.mitigationByCategoryAnalysis[scCategory].total += mitigationTotalsByScenario[sc.scenario_code].total
             summary.mitigationByCategoryAnalysis[scCategory].good += mitigationTotalsByScenario[sc.scenario_code].good
-            summary.mitigationByCategoryAnalysis[scCategory].some += mitigationTotalsByScenario[sc.scenario_code].some
-            summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].over
-            summary.mitigationByCategoryAnalysis[scCategory].not += mitigationTotalsByScenario[sc.scenario_code].not
+            if (scCategory == 'Control') {
+              // Controls have only good or over mitigation - 
+              summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].some
+              summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].over
+              summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].not
+            } else {
+              summary.mitigationByCategoryAnalysis[scCategory].some += mitigationTotalsByScenario[sc.scenario_code].some
+              summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].over
+              summary.mitigationByCategoryAnalysis[scCategory].not += mitigationTotalsByScenario[sc.scenario_code].not
+            }
+            
             if (sc.categories == null) {
               // Need to investigate these...
               console.warn(sc.scenario_code, 'has null category!')

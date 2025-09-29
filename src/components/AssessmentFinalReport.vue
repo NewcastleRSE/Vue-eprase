@@ -177,7 +177,7 @@
         </table>
         <h3>Configuration test results</h3>
         <p>
-          In the ePRaSE tool users are presented with a block of direct questions configuration tests, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
+          In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
           Your configuration tests results are presented on table 4 below.
         </p>
         <table class="table table-bordered">
@@ -323,6 +323,7 @@ export default {
       const categorySubkeys = ['good', 'some', 'not', 'over']
       const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor]
       const mitigationByCategoryData = []
+      const legendText = { 'good': 'Good mitigation', 'some': 'Some mitigation', 'not': 'No mitigation', 'over': 'Over mitigation' }
 
       categorySubkeys.forEach((csk, cskIdx) => {
         const yArr = [], customdata = []
@@ -339,7 +340,7 @@ export default {
             color: colorMapping[cskIdx]
           },
           hovertemplate: '%{customdata}', // See e.g. https://codepen.io/etpinard/pen/zXLEXJ?editors=0010
-          name: csk.substring(0, 1).toUpperCase() + csk.substring(1),
+          name: legendText[csk],
           type: 'bar',
           orientation: 'v'
         })

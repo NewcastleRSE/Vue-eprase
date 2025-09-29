@@ -359,6 +359,7 @@ export default {
       if (saveResponse !== true) {
         throw new Error(saveResponse)
       } else {
+        this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]
         this.numCompletedScenarios++
       }
       setTimeout(() => {
