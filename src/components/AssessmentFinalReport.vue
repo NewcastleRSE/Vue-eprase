@@ -109,7 +109,7 @@
                   {{ systemInterventionAnalysis.both }} reported as both.
                 </p>                
                 <p>
-                  This would be considered as a {{  }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
+                  This would be considered as a {{ alertRelianceLevel() }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
                 </p>
               </td>
             </tr>
@@ -221,7 +221,7 @@
 
 <script>
 
-import { calcNum } from '../helpers/utils'
+import { calcNum, calcPercentage } from '../helpers/utils'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
@@ -289,6 +289,10 @@ export default {
       window.open(this.$router.resolve({
         path: '/printablepdf'
       }).href, '_blank')
+    },
+    alertRelianceLevel() {
+      const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.scenarioTotal - this.excludedTests())
+      return percentageAlerted <= 33 ? 'low' : (percentageAlerted <= 66 ? 'medium' : 'high')
     },
     renderPieChart() {
 
