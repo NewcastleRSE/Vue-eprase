@@ -1,7 +1,7 @@
 <template>
   <main class="leftalign">
 
-    <div class="pills-banner"><img src="../assets/images/pills-bw.jpg" alt="image showing white pills"></div>
+    <div class="pills-banner"><img src="../assets/images/EPrase banner-01.jpg" alt="ePRaSE banner"></div>
 
     <div class="content p-4">
 
