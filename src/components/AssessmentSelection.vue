@@ -53,7 +53,7 @@
 
       <GroupElement name="reportAssessmentGroup" v-if="completeAssessments.length != 0">
         <table class="table table-striped caption-top vf-col-12">
-          <caption><h3>You <canvas id=""></canvas> view the final reports for the following assessments:</h3></caption>
+          <caption><h3>You can view the final reports for the following assessments:</h3></caption>
           <thead>
             <tr>
               <th>ePrescribing System</th>

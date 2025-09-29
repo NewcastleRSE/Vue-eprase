@@ -46,11 +46,14 @@
               }" />
             <FormStep name="finalReportStep" label="Final Report" 
               :elements="['finalReportEl']" 
-              :buttons="{ next: false, finish: true }"
               :labels="{ 
-                finish: 'Complete assessment',
+                next: 'Complete assessment',
                 previous: 'Back to Configuration Questions'
               }" />
+            <FormStep name="toolExitStep" label="Exit" 
+              :elements="['toolExitEl']" 
+              :buttons="{ previous: false, next: false }"
+            />
           </FormSteps>
           <FormElements>
             <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
@@ -60,6 +63,7 @@
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
             <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
             <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
+            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -86,6 +90,7 @@ import AssessmentPatientBuild from './AssessmentPatientBuild'
 import AssessmentScenario from './AssessmentScenario'
 import AssessmentConfigQuestion from './AssessmentConfigQuestion'
 import AssessmentFinalReport from './AssessmentFinalReport'
+import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
@@ -127,6 +132,7 @@ export default {
     AssessmentScenario,
     AssessmentConfigQuestion,
     AssessmentFinalReport,
+    AssessmentToolExit,
     LoginInfo,
     AppFooter,
     AppLogo,
@@ -161,9 +167,11 @@ export default {
           case 'Scenarios complete': 
             toStep = 'configQuestionStep'
             break
-          case 'Config errors complete':             
+          case 'Config errors complete': 
+            toStep = 'finalReportStep'            
+            break
           case 'Assessment complete':
-            toStep = 'finalReportStep'
+            toStep = 'toolExitStep'
             break
           default: 
             console.assert(this.assessmentState == 'Not started')

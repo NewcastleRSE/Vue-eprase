@@ -1,37 +1,26 @@
 <template>
-  <GroupElement name="configQuestionGroup" :class="'mb-4'">
-    <StaticElement name="configQuestionDataLoading" v-if="!dataLoaded">
-      <div class="d-flex align-items-center">
-        <strong role="status">Loading config question data for assessment...</strong>
-        <div class="spinner-border ms-auto" aria-hidden="true"></div>
+  <GroupElement name="toolExitGroup" :class="'mb-4'">
+    <StaticElement name="configQuestionDataLoading">
+      <h2>Assessment Complete</h2>
+      <div class="alert alert-info mt-2" role="alert">
+        Thank you for completing this assessment, you can now exit the tool where you can leave feedback via the user survey, or you can start a new 
+        assessment for any additional adult EP systems or start a paediatric assessment from the Assessment Selection page. Please select using the buttons below.
       </div>
-    </StaticElement>
-    <GroupElement name="configQuestionDataLoaded" v-if="dataLoaded">
-      <StaticElement name="configQuestionHeading">
-        <h2>Configuration Questions</h2>
-        <h3 v-if="!onOrPassedAssessmentStage('Config errors complete')">Please answer the following questions about your ePrescribing System:</h3>
-        <h3 v-if="onOrPassedAssessmentStage('Config errors complete')">Your responses to questions about your ePrescribing System:</h3>
-      </StaticElement>
-      <ObjectElement ref="configObject" name="config">
-        <table class="table table-striped vf-col-12">
-          <tbody>
-            <tr v-for="qr in matrixQuestionRows">
-              <td v-if="!hasExistingResponse(qr.value)">                            
-                <ToggleElement 
-                  :name="qr.value"
-                  :label="qr.label"
-                  :labels="{ on: 'Yes', off: 'No' }"
-                />
-              </td>
-              <td v-if="hasExistingResponse(qr.value)" v-html="qr.label + '  ' + getExistingResponse(qr.value)" />             
-            </tr>                            
-          </tbody>
-        </table>                
-      </ObjectElement>
-      <StaticElement v-show="!savedResponseData" name="savingAlert" class="mt-4">
-        <div class="alert alert-info w-25">Saving your response...</div>
-      </StaticElement> 
-    </GroupElement>    
+      <GroupElement name="exitButtonBar">
+        <!-- TO DO -->
+        <ButtonElement name="about" title="About" full
+          :columns="3" 
+          :add-class="'me-2'">
+          <i class="bi bi-box-arrow-right me-lg-2"></i><span class="d-lg-block d-none">Exit tool</span>
+        </ButtonElement>
+        <ButtonElement name="about" title="About" full
+          data-bs-toggle="modal" data-bs-target="#aboutModal"
+          :columns="3" 
+          :add-class="'me-2'">
+          <i class="bi bi-info-circle me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment</span>
+        </ButtonElement>
+      </GroupElement>
+    </StaticElement>       
   </GroupElement>
 </template>
 

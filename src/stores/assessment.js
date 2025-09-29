@@ -214,7 +214,11 @@ export const assessmentStore = defineStore('assessment', {
           
           // Look at required scenarios
           if (ssr.scenario.required === true) {
-            summary.requiredScenarioAnalysis[ssr.scenario.scenario_code] = ssr.result == 'Good mitigation'
+            summary.requiredScenarioAnalysis[ssr.scenario.scenario_code] = {
+              drugName: '', // NOTE: this gets filled in later from the scan of patient scenarios, as it is contained in the prescription, not the scenario itself!
+              explanation: ssr.scenario.explanation,
+              result: ssr.result == 'Good mitigation'
+            }
           }
 
           // Compile hash of mitigation totals by scenario code
@@ -232,7 +236,7 @@ export const assessmentStore = defineStore('assessment', {
         }) 
         
         console.debug('Mitigation totals by scenario', mitigationTotalsByScenario)
-        
+
         // Construct stacked bar chart data giving mitigation data by category
         // Initialise the hash
         this.categories.forEach(c => {
@@ -246,7 +250,7 @@ export const assessmentStore = defineStore('assessment', {
             summary.mitigationByCategoryAnalysis[scCategory].total += mitigationTotalsByScenario[sc.scenario_code].total
             summary.mitigationByCategoryAnalysis[scCategory].good += mitigationTotalsByScenario[sc.scenario_code].good
             if (scCategory == 'Control') {
-              // Controls have only good or over mitigation - 
+              // Controls have only good or over mitigation - Steph 29/09/2025, https://github.com/NewcastleRSE/Vue-eprase/issues/235
               summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].some
               summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].over
               summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].not
@@ -259,7 +263,12 @@ export const assessmentStore = defineStore('assessment', {
             if (sc.categories == null) {
               // Need to investigate these...
               console.warn(sc.scenario_code, 'has null category!')
-            }                        
+            }
+            
+            if (sc.scenario_code in summary.requiredScenarioAnalysis) {
+              // Required scenario => fill in the drug name from the prescription data available here
+              summary.requiredScenarioAnalysis[sc.scenario_code].drugName = sc.prescriptions.name
+            }
           })  
         }
       }

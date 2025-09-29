@@ -231,10 +231,7 @@
                       </GroupElement>
                       <StaticElement v-show="!savedResponseData" name="savingAlert" class="mt-4">
                         <div class="alert alert-info w-25">Saving your response...</div>
-                      </StaticElement>
-                      <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
-                        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Configuration Questions' below to answer further questions about your system.</div>
-                      </StaticElement>
+                      </StaticElement>                      
                     </div>
                   </div>
                 </div>
@@ -243,6 +240,9 @@
           </div>
         </div>
       </ObjectElement>
+      <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
+        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Configuration Questions' below to answer further questions about your system.</div>
+      </StaticElement>
     </GroupElement>
   </GroupElement>
 </template>
