@@ -20,7 +20,7 @@
         title="User Guide as PDF - opens in a new tab"
         :columns="3" 
         :add-class="'mx-2'">
-        <i class="bi bi-question-circle me-lg-2"></i><span class="d-lg-block d-none">User guide</span>
+        <i class="bi bi-question-circle me-lg-2"></i><span class="d-lg-block d-none">User Guide</span>
       </ButtonElement>
       <ButtonElement name="contact" title="Contact details" full 
         data-bs-toggle="modal" data-bs-target="#contactModal"

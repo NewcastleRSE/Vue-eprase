@@ -7,6 +7,7 @@ $info: #66b4ea;
 $light: #808080;
 $dark: #2c3e50;
 $invalid: #6f42c1;
+$primary-bg-subtle: tint-color($primary, 80%);
 
 /* Checkbox outlines are so light by default they are difficult to see */
 $form-check-input-border: 2px solid rgba($dark, .50);
@@ -37,4 +38,5 @@ $dropdown-item-padding-x: 0.5rem;
   lightColor: $light;
   darkColor: $dark;
   invalidColor: $invalid;
+  primarySubtleColor: $primary-bg-subtle
 }

@@ -49,7 +49,7 @@
 <script>
 
 import bsColors from '../assets/scss/variables.scss'
-import Plotly from 'plotly.js-cartesian-dist-min'
+import Plotly from 'plotly.js-dist-min'
 import { mapStores, mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { appSettingsStore } from '../stores/appSettings'

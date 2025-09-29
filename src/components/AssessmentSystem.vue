@@ -9,16 +9,10 @@
     </StaticElement>
     <GroupElement name="systemGroupLoaded" v-if="dataLoaded">
       <StaticElement name="epSystemHeading">
-        <h2>Assessment for ePrescribing System <span class="fst-italic">{{ epSystemName }}</span></h2>
-        <h3>Please fill in the following additional information:</h3>
+        <h2><span class="fst-italic">{{ epSystemName }}</span> ePrescribing System information</h2>
+        <h3>Please answer the following questions about your ePrescribing System:</h3>
       </StaticElement>
-      <ObjectElement ref="systemObject" name="system" @before-unmount="async (el$) => { await el$.validate() }">      
-        <TextElement name="addEpSystem" placeholder="Name of additional eP system"
-          :label="embolden('Do you use an additional ePrescribing service?', true)"
-          :debounce="500" />
-        <TextElement name="localEpSystemName" placeholder="Local name for the ePrescribing system, if different from the official name" 
-          :label="embolden('Local name for ePrescribing service')"
-          :debounce="500" />
+      <ObjectElement ref="systemObject" name="system">              
         <DateElement name="epServiceImplemented"
           :max="new Date()"
           :label="embolden('ePrescribing system implementation date', true)" 
@@ -33,7 +27,7 @@
           :rules="['required', 'dateIsSameOrAfter:system.epServiceImplemented,service implementation date']" /> 
         <TextElement name="numMaintainers"
           :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
-          :debounce="500" 
+          :debounce="200" 
           :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0 and 10', min: 'Must be >= 0', max: 'Must be < 10' }" 
           :rules="['required', 'numeric', 'min:0.0', 'max:10']" /> 
         <SelectElement name="epUsage"
@@ -52,7 +46,7 @@
         />   
         <TextElement name="otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
           :label="embolden('Other ePrescribing systems in use')" 
-          :debounce="500" />
+          :debounce="200" />
         <GroupElement name="labResultsGroup" :class="'mt-2'">
           <ToggleElement name="labResults"
             :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?', true)"
@@ -98,14 +92,28 @@
             v-if="systemData.penicillinDescription.includes('other')"
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
-            :debounce="500" />
+            :debounce="200" />
           <ToggleElement name="penicillinResults"
-            :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
+            :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
-            :debounce="500" />
+            :debounce="200" />
+          <ToggleElement name="antiMicReviewTime"
+            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
+            :labels="{ on: 'Yes', off: 'No' }"
+          />
+          <TextElement name="antiMicReviewComments"
+            :label="embolden('Additional comments')"
+            :debounce="200" />
+          <ToggleElement name="antiMicInterpretResults"
+            :label="embolden('Is your ePrescribing system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?', true)"
+            :labels="{ on: 'Yes', off: 'No' }"
+          />
+          <TextElement name="antiMicInterpretComments"
+            :label="embolden('Additional comments')"
+            :debounce="200" />
         </GroupElement>      
         <CheckboxgroupElement name="highRiskMeds"
           :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
@@ -128,7 +136,7 @@
           v-if="systemData.clinicalAreas.includes('Other')"
           :messages="{required: 'Other clinical area needs to be specified'}" 
           :rules="['required', 'fieldIsOther:system.clinicalAreas']"
-          :debounce="500" />
+          :debounce="200" />
         <StaticElement name="nextStep">
           <div class="alert alert-info mt-4" role="alert">
             When you have answered all the questions, click <span class="fw-bold">Continue to patient build</span>
@@ -173,8 +181,11 @@ export default {
     systemForm() {
       return this.$refs.systemObject
     },
+    selectionData() {
+      return this.assessmentData.selection
+    },
     epSystemName() {
-      return this.assessmentData.epService.label == 'Other' ? this.assessmentData.otherEpService : this.assessmentData.epService.label
+      return this.selectionData.epService.label == 'Other' ? this.selectionData.otherEpService : this.selectionData.epService.label
     },
     systemData() {
       return this.assessmentData.system
@@ -215,8 +226,8 @@ export default {
     },
     async onResetClick() {      
       this.resetSystemData()
-      this.$refs.systemObject.form$.clean()
-      this.$refs.systemObject.form$.resetValidators()
+      this.systemForm.form$.clean()
+      this.systemForm.form$.resetValidators()
     },
     selectUnselect(cbGroup, check) {
       if (check) {
@@ -228,11 +239,11 @@ export default {
       cbGroup.resetValidators()   
     },
     hrmBulkSelect() {
-      this.selectUnselect(this.$refs.systemObject.children$['highRiskMeds'], !this.checkedAllHrm)
+      this.selectUnselect(this.systemForm.children$['highRiskMeds'], !this.checkedAllHrm)
       this.checkedAllHrm = ! this.checkedAllHrm  
     },
     caBulkSelect() {
-      this.selectUnselect(this.$refs.systemObject.children$['clinicalAreas'], !this.checkedAllCa)
+      this.selectUnselect(this.systemForm.children$['clinicalAreas'], !this.checkedAllCa)
       this.checkedAllCa = ! this.checkedAllCa      
     }
   }, 

@@ -73,7 +73,7 @@ export const authenticationStore = defineStore('authentication', {
       console.group('logout()')
       this.clear()
       console.groupEnd()
-    },
+    },    
     async isLoggedIn() {
 
       let ret = false

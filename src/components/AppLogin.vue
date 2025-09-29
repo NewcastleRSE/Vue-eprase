@@ -19,13 +19,13 @@
         <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
           <TextElement name="email" placeholder="Valid NHS email address"
             :label="embolden('Email address', true)" 
-            :debounce="500" 
+            :debounce="200" 
             :messages="{required: 'Email is required'}" 
             :rules="['required', $vueform.rules.nhsEmail]" />
           <TextElement name="password" autocomplete="on"
             :label="embolden('Password', true)"
             :input-type="showPassword ? 'text' : 'password'"            
-            :debounce="500" 
+            :debounce="200" 
             :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
             :rules="['required', 'between:6,50']">
             <template #addon-after="scope">
@@ -74,6 +74,7 @@ import AppLogo from './AppLogo'
 import { usernameFromEmail } from '../helpers/utils'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
+import { assessmentStore } from '../stores/assessment'
 
 export default {
   name: 'AppLogin',
@@ -82,7 +83,8 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear']),
-    ...mapState(rootStore, ['audit'])
+    ...mapState(rootStore, ['audit']),
+    ...mapState(assessmentStore, ['reset'])
   },
   data() {
     return {
@@ -130,6 +132,10 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword
     }
+  },
+  mounted() {
+    // Clear any assessment data that may be around
+    this.reset()
   }
 }
 </script>

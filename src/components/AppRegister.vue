@@ -18,7 +18,7 @@
           <Vueform ref="registerForm" :endpoint="false" @submit="onRegisterClick" v-model="user" sync>
             <TextElement name="email" placeholder="Valid NHS email address"
               :label="embolden('Email address', true)"
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Email is required'}" 
               :rules="['required', $vueform.rules.nhsEmail]" />
             <SelectElement name="institution"
@@ -27,14 +27,9 @@
               :search="true"
               :track-by="['label', 'value']"
               :items="institutions" 
-              :messages="{required: 'Institution is required'}" 
-              @change="(newVal, oldVal, el$) => {
-                const hospital = el$.form$.el$('hospital')
-                hospital.clear()
-                hospital.updateItems()
-              }"
+              :messages="{required: 'Institution is required'}"               
               :rules="['required']" />
-            <SelectElement v-if="user.institution != ''" name="hospital"
+            <!-- <SelectElement v-if="user.institution != ''" name="hospital"
               :label="embolden('Your hospital site (add manually if not in list)', true)"
               :native="false"
               :search="true"
@@ -45,11 +40,13 @@
                 return getHospitals(institution.value)
               }" 
               :messages="{required: 'Hospital is required'}" 
-              :rules="[{ 'required': ['institution', '!=', ''] }]" />
+              :rules="[{ 'required': ['institution', '!=', ''] }]" /> -->
+            <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/232 - have to send a placeholder to avoid late stage strapi change -->
+            <HiddenElement name="hospital" value="hospital_placeholder" />
             <TextElement name="password" autocomplete="on"
               :label="embolden('Password', true)"
               :input-type="showPassword ? 'text' : 'password'"            
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
               <template #addon-after="scope">
@@ -61,7 +58,7 @@
             <TextElement name="password_confirmation" autocomplete="on"
               :label="embolden('Confirm password', true)"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
-              :debounce="500" 
+              :debounce="200" 
               :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
               <template #addon-after="scope">

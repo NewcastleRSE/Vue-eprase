@@ -7,16 +7,10 @@ import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
 import Assessment from "../components/Assessment"
 import PrintablePdf from "../components/PrintablePdf"
-import VueformTest from "../components/VueformTest"
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: "/test",
-      name: "test",
-      component: VueformTest
-    },
+  routes: [  
     {
       path: "/login/:action?",
       name: "login",

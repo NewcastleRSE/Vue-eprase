@@ -17,7 +17,7 @@ import dayjs from 'dayjs'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapStores } from 'pinia'
-import Plotly from 'plotly.js-cartesian-dist-min'
+import Plotly from 'plotly.js-dist-min'
 import PrintJS from 'print-js'
 
 export default {

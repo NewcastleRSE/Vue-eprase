@@ -6,7 +6,7 @@
 
 <script>
 
-import Plotly from 'plotly.js-cartesian-dist-min'
+import Plotly from 'plotly.js-dist-min'
 
 export default {
   name: "StackedChart",
