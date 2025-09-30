@@ -664,7 +664,7 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('getRequiredScenarios()')
       
-      const response = await rootStore().apiCall('scenarios?filters[required][$eq]=true&populate[patients][fields][0]=patient_code', 'GET')
+      const response = await rootStore().apiCall('scenarios?filters[required][$eq]=true&populate[patients][fields][0]=patient_code&filters[patients][$notNull]=true', 'GET')
       if (response.status < 400) {
         ret = response.data.data.map(rsc => rsc.patients.patient_code)
       } else {
