@@ -24,9 +24,9 @@ Email: dnsteam@nhs.net
 
 Email the DNS team and ask them to add the code snippet to the DNS records for eprase.nhs.uk. You should get an email from england.dnsteam@nhs.net confirming that they have updated the DNS record. They usually have a fairly quick response time. 
 
-At some point you will receive an email from Sectigo.com labelled 'Sectigo Certificate Subscriber Agreement 'with a link and verification code. Log into this and authenticate the certificate.
-
 ![CNAME details](/readme-images/cname-details.png)
+
+At some point you will receive an email from Sectigo.com labelled 'Sectigo Certificate Subscriber Agreement 'with a link and verification code. Log into this and authenticate the certificate.
 
 The address used to authenticate the Cert is :
 
