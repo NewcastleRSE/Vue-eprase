@@ -8,7 +8,7 @@
     </StaticElement>
     <GroupElement name="finalReportDataLoaded" v-if="dataLoaded">
       <StaticElement name="finalReportHeading">
-        <h2>ePRaSE Tool Assessment Report {{ new Date().getFullYear() }}</h2>
+        <h2>ePRaSE Tool Assessment Report {{ epSystemYear }}</h2>
         <h3>Trust: {{ orgName }}</h3>
         <h3>EP System: {{ epSystemName }}</h3>
         <h3>Type of assessment: {{ assessmentData.selection.patientType }} inpatient</h3>
@@ -79,7 +79,7 @@
             <tr><td colspan="5">Table 1</td></tr>
           </tfoot>
         </table>
-        <h3>EPRaSE Assessment breakdown of results for {{ new Date().getFullYear() }}</h3>
+        <h3>EPRaSE Assessment breakdown of results for {{ epSystemYear }}</h3>
         <h4>Overview of prescribing test results</h4>
         <p>
           The total number of valid prescribing tests completed (excluding configuration questions) = {{ scenarioTotal - excludedTests() }}
@@ -198,10 +198,12 @@ import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
 import bsColors from '../assets/scss/variables.scss'
+import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: 'AssessmentFinalReport',  
   computed: {
+    ...mapState(appSettingsStore, ['year']),
     ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName']),
     dataLoaded() {
@@ -209,6 +211,9 @@ export default {
     },
     epSystemName() {
       return this.assessmentData.selection.otherEpService || this.assessmentData.selection.epService.label
+    },
+    epSystemYear() {
+      return this.year
     },
     scenarioResponses() {
       return this.assessmentData.storedScenarioResponses
@@ -366,11 +371,10 @@ export default {
     this.mitigationSummaries = this.mitigationSummary()
 
     this.auxiliaryDataReady = true
-    await nextTick()
-
-    this.renderPieChart()
-    this.renderCdsBarChart()
-
+    this.$nextTick(() => {
+      this.renderPieChart()
+      this.renderCdsBarChart()
+    })
     console.groupEnd()
   },
   beforeUnmount() {

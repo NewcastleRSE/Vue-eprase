@@ -52,7 +52,7 @@
               }" />
             <FormStep name="toolExitStep" label="Exit" 
               :elements="['toolExitEl']" 
-              :buttons="{ previous: false, next: false }"
+              :buttons="{ previous: false, next: false, finish: false }"
             />
           </FormSteps>
           <FormElements>
@@ -63,7 +63,7 @@
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
             <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
             <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
-            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" />
+            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" @jump-to-step="goToStep" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -171,7 +171,7 @@ export default {
             toStep = 'finalReportStep'            
             break
           case 'Assessment complete':
-            toStep = 'toolExitStep'
+            toStep = 'finalReportStep'
             break
           default: 
             console.assert(this.assessmentState == 'Not started')
@@ -180,6 +180,9 @@ export default {
             break
         }
         this.formSteps.goTo(toStep, enableAll)
+      } else if (this.activeStep == 7) {
+        // Tool exit step allows user to start a new assessment
+        this.formSteps.goTo('epraseIntroStep', true)
       }
       console.groupEnd()
     },     

@@ -359,12 +359,14 @@ export default {
       if (saveResponse !== true) {
         throw new Error(saveResponse)
       } else {
-        this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]
+        this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
         this.numCompletedScenarios++
+        this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
+        this.completedScenariosHidden.validate()
       }
       setTimeout(() => {
         this.savedResponseData = true
-      }, 500)
+      }, 200)
       
       console.groupEnd()
     },
@@ -408,8 +410,6 @@ export default {
           })
         }
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
-      } else {
-        console.debug('All scenarios have now been completed')
       }
       console.groupEnd()
     },
@@ -474,8 +474,7 @@ export default {
     console.group('AssessmentScenario beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
     if (this.numCompletedScenarios == this.scenarioCount) {
-      // We have done all the data entry now
-      this.completedScenariosHidden.validate()    
+      // We have done all the data entry now          
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
       if (updateResponse !== true) {
         throw new Error(updateResponse)

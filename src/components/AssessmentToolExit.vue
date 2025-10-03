@@ -14,10 +14,10 @@
           <i class="bi bi-box-arrow-right me-lg-2"></i><span class="d-lg-block d-none">Exit tool</span>
         </ButtonElement>
         <ButtonElement name="about" title="About" full
-          data-bs-toggle="modal" data-bs-target="#aboutModal"
+          @click="startNewAssessment"
           :columns="3" 
           :add-class="'me-2'">
-          <i class="bi bi-info-circle me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment</span>
+          <i class="bi bi-play-fill me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment</span>
         </ButtonElement>
       </GroupElement>
     </StaticElement>       
@@ -51,51 +51,18 @@ export default {
       savedResponseData: true
     }
   },
+  emits: ['jumpToStep'],
   methods: { 
-    getExistingResponse(cqCode) {
-      const cqResults = this.assessmentData.config.configQuestionResults || []
-      const exResponses = cqResults.filter(cqr => cqr.config_error_code == cqCode)
-      return exResponses.length > 0 ? (exResponses[0].result == 1 ? 'Yes' : 'No') : ''     
+    startNewAssessment() {
+      this.$emit('jumpToStep', null)
     },
-    hasExistingResponse(cqCode) {
-      const cqResults = this.assessmentData.config.configQuestionResults || []
-      return cqResults.filter(cqr => cqr.config_error_code == cqCode).length > 0
-    },
-    async saveConfigQuestionResponses() {
-      
-      console.group('saveScenarioResponse()')
-      console.debug('Form part-object', this.$refs['configObject'])
-
-      this.savedResponseData = false
-     
-      const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
-      if (saveResponse !== true) {
-        throw new Error(saveResponse)
-      }
-
-      setTimeout(() => {
-        this.savedResponseData = true
-      }, 500)
-      console.groupEnd()
-    }
   },
   async mounted() {
-    console.group('AssessmentConfigQuestion mounted()')
-    this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, false) } })
-    const loadCqDataResponse = await this.getConfigQuestionData(true)
-    if (loadCqDataResponse !== true) {
-      throw new Error(loadCqDataResponse)
-    }    
+    console.group('AssessmentToolExit mounted()')    
     console.groupEnd()
   },
   async beforeUnmount() {
-    console.group('AssessmentConfigQuestion beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentConfigQuestion beforeUnmount() hook - dataReady flag is false')
-    await this.saveConfigQuestionResponses()   
-    const updateResponse = await this.updateAssessmentStatus('Config errors complete', true)
-    if (updateResponse !== true) {
-      throw new Error(updateResponse)
-    }
+    console.group('AssessmentToolExit beforeUnmount()')    
     console.groupEnd()
   }
 }
