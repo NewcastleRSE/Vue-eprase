@@ -182,7 +182,8 @@ export default {
         this.formSteps.goTo(toStep, enableAll)
       } else if (this.activeStep == 7) {
         // Tool exit step allows user to start a new assessment
-        this.formSteps.goTo('epraseIntroStep', true)
+        this.formSteps.reset()
+        this.formSteps.goTo('epraseIntroStep', false)
       }
       console.groupEnd()
     },     
