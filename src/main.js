@@ -26,13 +26,6 @@ const app = createApp(App)
 const pinia = createPinia()
 pinia.use(createPersistedState({storage: localStorage}))
 
-configure({
-  validateOnBlur: false,
-  validateOnChange: false,
-  validateOnInput: true,
-  validateOnModelUpdate: true
-})
-
 axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'

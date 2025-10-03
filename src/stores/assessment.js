@@ -297,11 +297,12 @@ export const assessmentStore = defineStore('assessment', {
       this.setDataReady(false)
 
       const instCode = authenticationStore().orgCode
+      console.debug('Institution code', instCode)
       // Note: there are some redundant database calls in this store ('system', 'patients', 'scenarios' and 'config questions' are retrieved separately) - the full call here was once:
       // assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service&populate=system&populate=patients
       // If anyone can enlighten me on the "Invalid Key Error 2" this reliably gives unless one of the 'populate' or 'filter' terms is removed I (David) would be interested
       // Does not seems to matter which term goes, so it may be a Strapi bug or a query that's just too complex...
-      const response = await rootStore().apiCall(`assessments?populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
+      const response = await rootStore().apiCall(`assessments?populate[institution][fields][0]=institution_code&filters[institution][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
         this.$patch((state) => { state.allPossibleAssessments = response.data.data })

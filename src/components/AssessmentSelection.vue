@@ -138,7 +138,7 @@ import { isoToUkDate } from '../helpers/utils'
 export default {
   name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
@@ -223,7 +223,7 @@ export default {
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')
-    if (!this.continuingExistingAssessment) {
+    if (!this.loggingOut && !this.continuingExistingAssessment) {
       // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()        
