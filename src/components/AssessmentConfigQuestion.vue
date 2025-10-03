@@ -9,19 +9,21 @@
     <GroupElement name="configQuestionDataLoaded" v-if="dataLoaded">
       <StaticElement name="configQuestionHeading">
         <h2>Configuration Questions</h2>
-        <h3>Please answer the following questions about your ePrescribing System:</h3>
+        <h3 v-if="!onOrPassedAssessmentStage('Config errors complete')">Please answer the following questions about your ePrescribing System:</h3>
+        <h3 v-if="onOrPassedAssessmentStage('Config errors complete')">Your responses to questions about your ePrescribing System:</h3>
       </StaticElement>
       <ObjectElement ref="configObject" name="config">
         <table class="table table-striped vf-col-12">
           <tbody>
             <tr v-for="qr in matrixQuestionRows">
-              <td>                            
+              <td v-if="!hasExistingResponse(qr.value)">                            
                 <ToggleElement 
                   :name="qr.value"
                   :label="qr.label"
                   :labels="{ on: 'Yes', off: 'No' }"
                 />
               </td>
+              <td v-if="hasExistingResponse(qr.value)" v-html="qr.label + '  ' + getExistingResponse(qr.value)" />             
             </tr>                            
           </tbody>
         </table>                
@@ -42,7 +44,7 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentConfigQuestion',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
     ...mapState(rootStore, ['getConfigQuestions']),
     dataLoaded() {
       return this.dataReady
@@ -60,7 +62,16 @@ export default {
       savedResponseData: true
     }
   },
-  methods: {   
+  methods: { 
+    getExistingResponse(cqCode) {
+      const cqResults = this.assessmentData.config.configQuestionResults || []
+      const exResponses = cqResults.filter(cqr => cqr.config_error_code == cqCode)
+      return exResponses.length > 0 ? (exResponses[0].result == 1 ? 'Yes' : 'No') : ''     
+    },
+    hasExistingResponse(cqCode) {
+      const cqResults = this.assessmentData.config.configQuestionResults || []
+      return cqResults.filter(cqr => cqr.config_error_code == cqCode).length > 0
+    },
     async saveConfigQuestionResponses() {
       
       console.group('saveScenarioResponse()')
@@ -81,7 +92,7 @@ export default {
   },
   async mounted() {
     console.group('AssessmentConfigQuestion mounted()')
-    this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, true) } })
+    this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, false) } })
     const loadCqDataResponse = await this.getConfigQuestionData(true)
     if (loadCqDataResponse !== true) {
       throw new Error(loadCqDataResponse)

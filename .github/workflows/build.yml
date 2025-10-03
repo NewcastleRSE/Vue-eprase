@@ -20,37 +20,38 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
           buildargs: TARGET,VERSION
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update CLIENT_VERSION
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          # command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=${{ github.event.release.tag_name }}/' .env
-          command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=latest/' .env
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
-      - name: Compose Down
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          # Got rid of -v switch here as do not want to delete database when live content being entered!
-          command: sudo docker compose down
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
-      - name: Compose Pull
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: sudo docker compose pull
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
-      - name: Compose Up
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: sudo -E docker compose up -d
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.PRIVATE_KEY}}
+  # Commented out David 03/10/2025 - Don't disturb the docker stack on staging while Ellie/Steph working on Strapi - manually update client
+  # release:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Update CLIENT_VERSION
+  #       uses: garygrossgarten/github-action-ssh@release
+  #       with:
+  #         # command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=${{ github.event.release.tag_name }}/' .env
+  #         command: sed -i 's/CLIENT_VERSION\=.*/CLIENT_VERSION=latest/' .env
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         privateKey: ${{ secrets.PRIVATE_KEY}}
+  #     - name: Compose Down
+  #       uses: garygrossgarten/github-action-ssh@release
+  #       with:
+  #         # Got rid of -v switch here as do not want to delete database when live content being entered!
+  #         command: sudo docker compose down
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         privateKey: ${{ secrets.PRIVATE_KEY}}
+  #     - name: Compose Pull
+  #       uses: garygrossgarten/github-action-ssh@release
+  #       with:
+  #         command: sudo docker compose pull
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         privateKey: ${{ secrets.PRIVATE_KEY}}
+  #     - name: Compose Up
+  #       uses: garygrossgarten/github-action-ssh@release
+  #       with:
+  #         command: sudo -E docker compose up -d
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         privateKey: ${{ secrets.PRIVATE_KEY}}

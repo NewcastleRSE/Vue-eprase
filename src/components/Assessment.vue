@@ -46,11 +46,14 @@
               }" />
             <FormStep name="finalReportStep" label="Final Report" 
               :elements="['finalReportEl']" 
-              :buttons="{ next: false, finish: true }"
               :labels="{ 
-                finish: 'Complete assessment',
+                next: 'Complete assessment',
                 previous: 'Back to Configuration Questions'
               }" />
+            <FormStep name="toolExitStep" label="Exit" 
+              :elements="['toolExitEl']" 
+              :buttons="{ previous: false, next: false, finish: false }"
+            />
           </FormSteps>
           <FormElements>
             <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
@@ -60,6 +63,7 @@
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
             <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
             <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
+            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" @jump-to-step="goToStep" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -86,6 +90,7 @@ import AssessmentPatientBuild from './AssessmentPatientBuild'
 import AssessmentScenario from './AssessmentScenario'
 import AssessmentConfigQuestion from './AssessmentConfigQuestion'
 import AssessmentFinalReport from './AssessmentFinalReport'
+import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
@@ -127,6 +132,7 @@ export default {
     AssessmentScenario,
     AssessmentConfigQuestion,
     AssessmentFinalReport,
+    AssessmentToolExit,
     LoginInfo,
     AppFooter,
     AppLogo,
@@ -161,7 +167,9 @@ export default {
           case 'Scenarios complete': 
             toStep = 'configQuestionStep'
             break
-          case 'Config errors complete':             
+          case 'Config errors complete': 
+            toStep = 'finalReportStep'            
+            break
           case 'Assessment complete':
             toStep = 'finalReportStep'
             break
@@ -172,6 +180,9 @@ export default {
             break
         }
         this.formSteps.goTo(toStep, enableAll)
+      } else if (this.activeStep == 7) {
+        // Tool exit step allows user to start a new assessment
+        this.formSteps.goTo('epraseIntroStep', true)
       }
       console.groupEnd()
     },     
@@ -216,21 +227,21 @@ export default {
     }
     console.groupEnd()
   },
-  // errorCaptured(...args) {
+  errorCaptured(...args) {
 
-  //   console.group('errorCaptured()')
-  //   console.debug(args)
+    console.group('errorCaptured()')
+    console.debug(args)
 
-  //   // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
-  //   const activeElement = document.activeElement
-  //   if (activeElement) {
-  //     activeElement.blur();
-  //   }
-  //   this.errorAlertModal.show(args[0].message)
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+    const activeElement = document.activeElement
+    if (activeElement) {
+      activeElement.blur();
+    }
+    this.errorAlertModal.show(args[0].message)
 
-  //   console.groupEnd()
-  //   return false
-  // }
+    console.groupEnd()
+    return false
+  }
 }
 </script>
 

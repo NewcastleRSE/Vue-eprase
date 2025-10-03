@@ -335,11 +335,14 @@ export default {
         const nextCode = notDoneCodes.shift()
         const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
         this.patientRelations(docId)  
-        document.getElementById('patient-' + nextCode).scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        })    
+        const patientElement = document.getElementById('patient-' + nextCode)
+        if (patientElement != null) {
+            document.getElementById('patient-' + nextCode).scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+          })
+        }            
       } else {
         console.debug('No unentered patients left')
       }
@@ -365,7 +368,7 @@ export default {
       throw new Error(loadPatientsResponse)
     }       
     // Get the details for the first (unentered) patient
-    this.openNextUnenteredPatient()      
+    this.$nextTick(() => { this.openNextUnenteredPatient() })      
     console.groupEnd()
   }, 
   async beforeUnmount() {

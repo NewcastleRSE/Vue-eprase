@@ -8,7 +8,7 @@
     </StaticElement>
     <GroupElement name="finalReportDataLoaded" v-if="dataLoaded">
       <StaticElement name="finalReportHeading">
-        <h2>ePRaSE Tool Assessment Report {{ new Date().getFullYear() }}</h2>
+        <h2>ePRaSE Tool Assessment Report {{ epSystemYear }}</h2>
         <h3>Trust: {{ orgName }}</h3>
         <h3>EP System: {{ epSystemName }}</h3>
         <h3>Type of assessment: {{ assessmentData.selection.patientType }} inpatient</h3>
@@ -79,7 +79,7 @@
             <tr><td colspan="5">Table 1</td></tr>
           </tfoot>
         </table>
-        <h3>EPRaSE Assessment breakdown of results for {{ new Date().getFullYear() }}</h3>
+        <h3>EPRaSE Assessment breakdown of results for {{ epSystemYear }}</h3>
         <h4>Overview of prescribing test results</h4>
         <p>
           The total number of valid prescribing tests completed (excluding configuration questions) = {{ scenarioTotal - excludedTests() }}
@@ -128,48 +128,12 @@
             <tr><th>Drug name</th><th>Test</th><th>Your result / Outcome</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Methotrexate</td>
-              <td>Methotrexate tablets prescribed for a patient with an inappropriate daily frequency. Increased risk of severe toxicity. Can be fatal.</td>
-              <td v-if="requiredScenarioAnalysis['sc56'] === true">Good mitigation</td>
-              <td v-if="requiredScenarioAnalysis['sc56'] !== true">Some / no mitigation - please review your EP system to ensure mechanisms are in place to prevent methotrexate overdose.</td>
-            </tr>
-            <tr>
-              <td>Insulin Glargine (Toujeo SoloStar)</td>
-              <td>Insulin Glargine (Toujeo) prescribed as the dose form i.e., the full pen contents as presented and not the actual dose. Risk of severe overdose and hypoglycaemia.</td>
-              <td v-if="requiredScenarioAnalysis['sc112'] === true">Good mitigation</td>
-              <td v-if="requiredScenarioAnalysis['sc112'] !== true">Some / no mitigation - please review your EP system to ensure mechanisms are in place to prevent insulin overdose when using pen devices.</td>
-            </tr>
-            <tr>
-              <td>Topiramate (Topamax)</td>
-              <td>
-                Topiramate prescribed in woman of child-bearing age. Should not be used in pregnancy unless there is no other suitable treatment. 
-                Pregnancy Prevention Programme requirements must be met due to teratogenic risk.
-              </td>
-              <td v-if="requiredScenarioAnalysis['sc130'] === true">Good mitigation</td>
-              <td v-if="requiredScenarioAnalysis['sc130'] !== true">
-                Some / no mitigation - please review your EP system to ensure mechanisms are in place to prompt prescribers to follow Pregnancy Prevention Programme 
-                requirements for all Topiramate (Topamax) prescriptions.
-              </td>
-            </tr>
-            <tr>
-              <td>Insulin Aspart (NovoRapid - any pen device)</td>
-              <td>Insulin prescribed to be administered subcutaneously by pen device in millilitres (ml) instead of units. Risk of severe overdose and hypoglycaemia.</td>
-              <td v-if="requiredScenarioAnalysis['sc55'] === true">Good mitigation</td>
-              <td v-if="requiredScenarioAnalysis['sc55'] !== true">Some / no mitigation - please review your EP system to ensure insulin cannot be prescribed in ml. Risk of severe overdose.</td>
-            </tr>
-            <tr>
-              <td>Sodium Valproate (Epilim Chrono) Modified-Release</td>
-              <td>
-                Sodium Valproate prescribed in woman of child-bearing age. Should not be used in pregnancy unless there is no other suitable treatment. 
-                Pregnancy Prevention Programme requirements must be met due to teratogenic risk. 
-              </td>
-              <td v-if="requiredScenarioAnalysis['sc55'] === true">Good mitigation</td>
-              <td v-if="requiredScenarioAnalysis['sc55'] !== true">
-                Some / no mitigation - please review your EP system to ensure mechanisms are in place to prompt prescribers to follow Pregnancy Prevention Programme requirements 
-                for all Sodium Valproate prescriptions.
-              </td>
-            </tr>
+            <tr v-for="(value, key) in requiredScenarioAnalysis">
+              <td>{{ value.drugName }}</td>
+              <td>{{ value.explanation }}</td>
+              <td v-if="value.result === true">Good mitigation</td>
+              <td v-if="value.result !== true">Some / no mitigation - please review your EP system (NEED TEXT IN STRAPI)</td>
+            </tr>            
           </tbody>
           <tfoot>
             <tr class="border-white text-center"><td colspan="3">Table 3. Mandatory question results</td></tr>
@@ -213,6 +177,12 @@
           Please print your report in PDF landscape format and save for future reference. The tool is closed at the end of each annual campaign for development and users 
           will not be able to access the online platform. 
         </p>
+        <ButtonElement name="assemblePrintablePdf"
+          :disabled="!dataLoaded"
+          :columns="4"
+          @click="() => { console.warn('Not implemented!') }"
+        >Create printable PDF
+        </ButtonElement>
       </StaticElement>
       <!-- TODO -->
     </GroupElement>    
@@ -228,17 +198,22 @@ import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
 import bsColors from '../assets/scss/variables.scss'
+import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: 'AssessmentFinalReport',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioResponses', 'getConfigQuestionData']),
+    ...mapState(appSettingsStore, ['year']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
     },
     epSystemName() {
       return this.assessmentData.selection.otherEpService || this.assessmentData.selection.epService.label
+    },
+    epSystemYear() {
+      return this.year
     },
     scenarioResponses() {
       return this.assessmentData.storedScenarioResponses
@@ -379,6 +354,10 @@ export default {
 
     this.auxiliaryDataReady = false
 
+    const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
+    if (updateResponse !== true) {
+      throw new Error(updateResponse)
+    }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)
     if (storedResultsResponse !== true) {
       throw new Error(storedResultsResponse)
@@ -392,11 +371,10 @@ export default {
     this.mitigationSummaries = this.mitigationSummary()
 
     this.auxiliaryDataReady = true
-    await nextTick()
-
-    this.renderPieChart()
-    this.renderCdsBarChart()
-
+    this.$nextTick(() => {
+      this.renderPieChart()
+      this.renderCdsBarChart()
+    })
     console.groupEnd()
   },
   beforeUnmount() {

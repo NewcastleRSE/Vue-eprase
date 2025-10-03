@@ -53,7 +53,7 @@
 
       <GroupElement name="reportAssessmentGroup" v-if="completeAssessments.length != 0">
         <table class="table table-striped caption-top vf-col-12">
-          <caption><h3>You <canvas id=""></canvas> view the final reports for the following assessments:</h3></caption>
+          <caption><h3>You can view the final reports for the following assessments:</h3></caption>
           <thead>
             <tr>
               <th>ePrescribing System</th>
@@ -138,7 +138,7 @@ import { isoToUkDate } from '../helpers/utils'
 export default {
   name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'dataReady', 'selectAssessment']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'audit']),
     selectionData() {
@@ -223,7 +223,7 @@ export default {
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')
-    if (!this.continuingExistingAssessment) {
+    if (!this.loggingOut && !this.continuingExistingAssessment) {
       // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()        
