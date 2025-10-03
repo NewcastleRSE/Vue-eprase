@@ -354,6 +354,7 @@ export default {
       console.group('saveScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
      
+      //TODO - need to validate this data and flag any problems (at moment 03/10/2025 it just stays on the scenario and doesn't inform the user)
       this.savedResponseData = false
       const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
       if (saveResponse !== true) {
