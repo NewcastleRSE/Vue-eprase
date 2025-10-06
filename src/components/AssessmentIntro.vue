@@ -58,11 +58,24 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: "AssessmentIntro", 
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset']),
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
   }, 
   async mounted() {
     console.group('AssessmentIntro mounted hook')
     this.reset()
+    // Get mitigation and category base data
+    const mitResponse = await this.getMitigationDetails()
+    if (mitResponse !== true) {
+      throw new Error(mitResponse)
+    }
+    const catResponse = await this.getCategoryDetails()
+    if (catResponse !== true) {
+      throw new Error(catResponse)
+    }    
+    const configResponse = await this.getConfigQuestionDetails()
+    if (configResponse !== true) {
+      throw new Error(configResponse)
+    }
     const instResponse = await this.getAssessmentsForInstitution()
     if (instResponse !== true) {      
       throw new Error(instResponse)

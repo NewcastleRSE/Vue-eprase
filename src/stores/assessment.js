@@ -217,6 +217,7 @@ export const assessmentStore = defineStore('assessment', {
             summary.requiredScenarioAnalysis[ssr.scenario.scenario_code] = {
               drugName: '', // NOTE: this gets filled in later from the scan of patient scenarios, as it is contained in the prescription, not the scenario itself!
               explanation: ssr.scenario.explanation,
+              badMitigationFeedback: ssr.scenario.bad_mitigation_feedback,
               result: ssr.result == 'Good mitigation'
             }
           }
@@ -240,15 +241,16 @@ export const assessmentStore = defineStore('assessment', {
         // Construct stacked bar chart data giving mitigation data by category
         // Initialise the hash
         this.categories.forEach(c => {
-          summary.mitigationByCategoryAnalysis[c.name] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+          summary.mitigationByCategoryAnalysis[c.name] = { total: 0, good: 0, some: 0, over: 0, not: 0, invalid: 0 }
         })
-        summary.mitigationByCategoryAnalysis['Control'] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+        summary.mitigationByCategoryAnalysis['Control'] = { total: 0, good: 0, some: 0, over: 0, not: 0, invalid: 0 }
         // Group patient scenarios by category
         for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {          
           scenarios.forEach(sc => {
             const scCategory = sc.categories == null ? 'Control' : sc.categories.name
             summary.mitigationByCategoryAnalysis[scCategory].total += mitigationTotalsByScenario[sc.scenario_code].total
             summary.mitigationByCategoryAnalysis[scCategory].good += mitigationTotalsByScenario[sc.scenario_code].good
+            summary.mitigationByCategoryAnalysis[scCategory].invalid += mitigationTotalsByScenario[sc.scenario_code].invalid
             if (scCategory == 'Control') {
               // Controls have only good or over mitigation - Steph 29/09/2025, https://github.com/NewcastleRSE/Vue-eprase/issues/235
               summary.mitigationByCategoryAnalysis[scCategory].over += mitigationTotalsByScenario[sc.scenario_code].some
@@ -674,7 +676,7 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('getRequiredScenarios()')
       
-      const response = await rootStore().apiCall('scenarios?filters[required][$eq]=true&populate[patients][fields][0]=patient_code', 'GET')
+      const response = await rootStore().apiCall('scenarios?filters[required][$eq]=true&populate[patients][fields][0]=patient_code&filters[patients][$notNull]=true', 'GET')
       if (response.status < 400) {
         ret = response.data.data.map(rsc => rsc.patients.patient_code)
       } else {

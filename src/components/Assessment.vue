@@ -100,7 +100,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
+    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },   
@@ -212,37 +212,24 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')
-    // Get mitigation and category base data
-    const mitResponse = await this.getMitigationDetails()
-    if (mitResponse !== true) {
-      throw new Error(mitResponse)
-    }
-    const catResponse = await this.getCategoryDetails()
-    if (catResponse !== true) {
-      throw new Error(catResponse)
-    }    
-    const configResponse = await this.getConfigQuestionDetails()
-    if (configResponse !== true) {
-      throw new Error(configResponse)
-    }
+    console.group('Assessment top-level mounted() hook')    
     console.groupEnd()
   },
-  errorCaptured(...args) {
+  // errorCaptured(...args) {
 
-    console.group('errorCaptured()')
-    console.debug(args)
+  //   console.group('errorCaptured()')
+  //   console.debug(args)
 
-    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
-    const activeElement = document.activeElement
-    if (activeElement) {
-      activeElement.blur();
-    }
-    this.errorAlertModal.show(args[0].message)
+  //   // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+  //   const activeElement = document.activeElement
+  //   if (activeElement) {
+  //     activeElement.blur();
+  //   }
+  //   this.errorAlertModal.show(args[0].message)
 
-    console.groupEnd()
-    return false
-  }
+  //   console.groupEnd()
+  //   return false
+  // }
 }
 </script>
 

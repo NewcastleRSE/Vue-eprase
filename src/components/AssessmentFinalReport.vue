@@ -132,7 +132,7 @@
               <td>{{ value.drugName }}</td>
               <td>{{ value.explanation }}</td>
               <td v-if="value.result === true">Good mitigation</td>
-              <td v-if="value.result !== true">Some / no mitigation - please review your EP system (NEED TEXT IN STRAPI)</td>
+              <td v-if="value.result !== true">{{ value.badMitigationFeedback }}</td>
             </tr>            
           </tbody>
           <tfoot>
@@ -299,10 +299,10 @@ export default {
 
       const plotDiv = this.$refs.barChartContainer
       const categoryNames = Object.keys(this.mitigationByCategoryAnalysis)
-      const categorySubkeys = ['good', 'some', 'not', 'over']
-      const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor]
+      const categorySubkeys = ['good', 'some', 'not', 'over', 'invalid']
+      const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
       const mitigationByCategoryData = []
-      const legendText = { 'good': 'Good mitigation', 'some': 'Some mitigation', 'not': 'No mitigation', 'over': 'Over mitigation' }
+      const legendText = { 'good': 'Good mitigation', 'some': 'Some mitigation', 'not': 'No mitigation', 'over': 'Over mitigation', 'invalid': 'Invalid test' }
 
       categorySubkeys.forEach((csk, cskIdx) => {
         const yArr = [], customdata = []

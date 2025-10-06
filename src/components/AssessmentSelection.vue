@@ -40,7 +40,7 @@
               <td>{{ assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
               <td>{{ convertDate(assessment.updatedAt, true) }}</td>
-              <td>{{ assessment.createdBy.username }}</td>
+              <td>{{ assessment.eprase_creator_id.username }}</td>
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
@@ -72,7 +72,7 @@
               <td>{{ assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
               <td>{{ convertDate(assessment.updatedAt, true) }}</td>
-              <td>{{ assessment.createdBy.username }}</td>
+              <td>{{ assessment.eprase_creator_id.username }}</td>
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
