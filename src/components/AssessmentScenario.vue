@@ -415,9 +415,11 @@ export default {
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
-    openPatientScenarios(patientCode) {
-      this.currentPatient = patientCode
-      this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
+    async openPatientScenarios(patientCode) {
+      await this.$nextTick(() => {
+        this.currentPatient = patientCode
+        this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
+      })      
     },  
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode]
