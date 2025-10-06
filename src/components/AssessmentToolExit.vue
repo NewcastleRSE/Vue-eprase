@@ -9,6 +9,7 @@
       <GroupElement name="exitButtonBar">
         <!-- TO DO -->
         <ButtonElement name="about" title="About" full
+          data-bs-toggle="modal" data-bs-target="#surveyLinkModal"
           :columns="3" 
           :add-class="'me-2'">
           <i class="bi bi-box-arrow-right me-lg-2"></i><span class="d-lg-block d-none">Exit tool</span>
@@ -20,6 +21,7 @@
           <i class="bi bi-play-fill me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment</span>
         </ButtonElement>
       </GroupElement>
+      <SurveyLinkModal ref="surveyLinkModal" :showActionBtn="true" @modal-actioned="exit()" />
     </StaticElement>       
   </GroupElement>
 </template>
@@ -29,11 +31,12 @@
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { rootStore } from '../stores/root'
+import SurveyLinkModal from './SurveyLinkModal'
 
 export default {
   name: 'AssessmentConfigQuestion',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData', 'setLoggingOut']),
     ...mapState(rootStore, ['getConfigQuestions']),
     dataLoaded() {
       return this.dataReady
@@ -44,6 +47,9 @@ export default {
     matrixQuestionRows() {
       return this.questionRows
     }
+  },
+  components: {
+    SurveyLinkModal
   },
   data() {
     return {
@@ -56,6 +62,10 @@ export default {
     startNewAssessment() {
       this.$emit('jumpToStep', null)
     },
+    exit() {
+      this.setLoggingOut(true)
+      this.$router.push('/logout')
+    }
   },
   async mounted() {
     console.group('AssessmentToolExit mounted()')    
