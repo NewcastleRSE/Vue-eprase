@@ -224,7 +224,7 @@ export const assessmentStore = defineStore('assessment', {
 
           // Compile hash of mitigation totals by scenario code
           if (!( ssr.scenario.scenario_code in mitigationTotalsByScenario )) {
-            mitigationTotalsByScenario[ssr.scenario.scenario_code] = { total: 0, good: 0, some: 0, over: 0, not: 0 }
+            mitigationTotalsByScenario[ssr.scenario.scenario_code] = { total: 0, good: 0, some: 0, over: 0, not: 0, invalid: 0 }
           }
           mitigationTotalsByScenario[ssr.scenario.scenario_code].total++
           switch(ssr.result) {
@@ -232,6 +232,7 @@ export const assessmentStore = defineStore('assessment', {
             case SOME_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].some++; break
             case OVER_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].over++; break
             case NO_MITIGATION: mitigationTotalsByScenario[ssr.scenario.scenario_code].not++; break
+            case INVALID_TEST: mitigationTotalsByScenario[ssr.scenario.scenario_code].invalid++; break
             default: break
           }
         }) 
