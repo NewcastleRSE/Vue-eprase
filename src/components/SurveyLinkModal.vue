@@ -1,7 +1,7 @@
 <template>
   <GenericModal :modalName="'SurveyLinkModal'" :modalId="'surveyLinkModal'" :title="'Before you leave'"
     :actionBtnText="'Log out'" :closeBtnText="'Close'">
-    Please take a few moments to <a href="JavaScript:alert('Need URL for the survey here')">complete the ePRaSE user experience survey</a>.
+    Please take a few moments to <a href="https://forms.cloud.microsoft/e/4Z8dRDzv4e" target="_blank">complete the ePRaSE user experience survey</a>.
   </GenericModal>
 </template>
 
