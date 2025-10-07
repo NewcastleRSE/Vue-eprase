@@ -52,9 +52,9 @@
                     <img class="img-thumbnail" style="width: 50px; height: 50px" v-show="patient.gender === 'Female'"
                       src="../assets/images/anon-female.png" alt="female-patient" />
                     Patient: {{ patient.full_name }}, 
-                     <span v-show="patient.age_years != 0"> age: {{ patient.age_years }} years</span>
-                     <span v-show="patient.age_days != 0"> age: {{ patient.age_days }} days</span>
-                     <span v-show="patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
+                     <span v-show="patient.age_years != null && patient.age_years != 0"> age: {{ patient.age_years }} years</span>
+                     <span v-show="patient.age_days != null && patient.age_days != 0"> age: {{ patient.age_days }} days</span>
+                     <span v-show="patient.gestational_age != null && patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
                   </span>
                 </button>
               </h2>
@@ -354,6 +354,7 @@ export default {
       console.group('saveScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
      
+      //TODO - need to validate this data and flag any problems (at moment 03/10/2025 it just stays on the scenario and doesn't inform the user)
       this.savedResponseData = false
       const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
       if (saveResponse !== true) {
@@ -414,9 +415,11 @@ export default {
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
-    openPatientScenarios(patientCode) {
-      this.currentPatient = patientCode
-      this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
+    async openPatientScenarios(patientCode) {
+      await this.$nextTick(() => {
+        this.currentPatient = patientCode
+        this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
+      })      
     },  
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode]

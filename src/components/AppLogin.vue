@@ -55,16 +55,18 @@
               <i class="bi bi-person-fill-add me-2"></i>Register
             </ButtonElement>
             <ButtonElement name="forgotpassword" full 
+              data-bs-toggle="modal" data-bs-target="#forgotPasswordModal"
               :columns="3" 
-              :add-class="'ms-2'" 
-              :disabled="$route.query.action === 'registered'" 
-              @click="onForgotPasswordClick">
+              :add-class="'ms-2'"               
+              :disabled="$route.query.action === 'registered'"> 
               <i class="bi bi-key-fill me-2"></i>Forgot password?
             </ButtonElement>
+            <ForgotPasswordModal ref="forgotPasswordModal" />
           </GroupElement>
         </Vueform>
       </div>
     </div>
+    
   </main>
 </template>
 
@@ -72,6 +74,7 @@
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
 import { usernameFromEmail } from '../helpers/utils'
+import ForgotPasswordModal from './ForgotPasswordModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
@@ -79,7 +82,8 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AppLogin',
   components: {
-    AppLogo
+    AppLogo,
+    ForgotPasswordModal
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear']),
@@ -122,10 +126,7 @@ export default {
         }
       })      
       console.groupEnd()
-    },
-    onForgotPasswordClick() {
-      this.$router.push('/forgotpassword')
-    },
+    },   
     onRegisterClick() {
       this.$router.push('/register')
     },

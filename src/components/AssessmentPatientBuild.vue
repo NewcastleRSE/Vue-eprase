@@ -81,11 +81,11 @@
                             <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
                             <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
                             <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
-                            <tr v-if="patient.age_years != 0"><th>Age</th><td>{{ patient.age_years }} years</td></tr>
-                            <tr v-if="patient.age_days != 0"><th>Age</th><td>{{ patient.age_days }} days</td></tr>
-                            <tr v-if="patient.gestational_age != 0"><th>Gestational age</th><td>{{ patient.gestational_age }} weeks</td></tr>
+                            <tr v-if="patient.age_years != null && patient.age_years != 0"><th>Age</th><td>{{ patient.age_years }} years</td></tr>
+                            <tr v-if="patient.age_days != null && patient.age_days != 0"><th>Age</th><td>{{ patient.age_days }} days</td></tr>
+                            <tr v-if="patient.gestational_age != null && patient.gestational_age != 0"><th>Gestational age</th><td>{{ patient.gestational_age }} weeks</td></tr>
                             <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
-                            <tr><th>Height (m)</th><td>{{ patient.height }}</td></tr>
+                            <tr><th>Height (cm)</th><td>{{ patient.height }}</td></tr>
                             <tr><th>Weight (kg)</th><td>{{ patient.weight }}</td></tr>
                           </tbody>
                         </table>
