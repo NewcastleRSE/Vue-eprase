@@ -94,14 +94,14 @@
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
           <ToggleElement name="penicillinResults"
-            :label="embolden('Thinking about when you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
+            :label="embolden('When you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />
           <ToggleElement name="antiMicReviewTime"
-            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial presecriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
+            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial prescriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicReviewComments"
