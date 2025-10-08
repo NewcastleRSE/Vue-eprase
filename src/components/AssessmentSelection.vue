@@ -13,11 +13,11 @@
       </StaticElement>
       <StaticElement name="assessmentGroupLoadedIntroPara">
         <p>
-          It is now possible to test more than one type of ePrescribing System deployed in 
-          your trust. Users can also do both an adult and a separate paediatric assessment 
+          It is now possible to test more than one type of ePrescribing System deployed 
+          in your trust. Users can also do both an adult and a separate paediatric assessment 
           for an individual EP system. If both adult and paediatric prescribing are undertaken, 
-          both assessments should be completed. Please work through each assessment one at a 
-          time i.e., complete one assessment fully before starting the next.
+          <strong>both assessments should be completed</strong>. Please work through each 
+          assessment one at a time i.e., complete one assessment fully before starting the next.
         </p>
       </StaticElement>
                       
