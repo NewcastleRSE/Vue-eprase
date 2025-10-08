@@ -13,9 +13,11 @@
       </StaticElement>
       <StaticElement name="assessmentGroupLoadedIntroPara">
         <p>
-          It is now possible to test more than one type of ePrescribing System for each NHS Trust. If you are wanting to do this 
-          then we advise that you set up and complete the assessment for the first EP System before proceeding to start the next 
-          EP System assessment.
+          It is now possible to test more than one type of ePrescribing System deployed in 
+          your trust. Users can also do both an adult and a separate paediatric assessment 
+          for an individual EP system. If both adult and paediatric prescribing are undertaken, 
+          both assessments should be completed. Please work through each assessment one at a 
+          time i.e., complete one assessment fully before starting the next.
         </p>
       </StaticElement>
                       
@@ -206,7 +208,7 @@ export default {
         // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)
         const otherIdx = epSystems.findIndex(ep => ep.label == 'Other')
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
-        epSystems.unshift({value: '', label: 'Please select...', disabled: true})       
+        epSystems.unshift({value: '', label: 'Please select...', disabled: true})
       } else {
         throw new Error(response.message)
       }
