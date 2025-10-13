@@ -49,21 +49,21 @@
           :debounce="200" />
         <GroupElement name="labResultsGroup" :class="'mt-2'">
           <ToggleElement name="labResults"
-            :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?', true)"
+            :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <ToggleElement name="manResults"
-            :label="embolden('Are you able to manually enter laboratory results into your patient admin and/ or ePrescribing test system that you are using to do this assessment?', true)"
+            :label="embolden('Are you able to manually enter laboratory results into your patient admin and/ or ePrescribing test system that you are using to do this assessment?')"
             :labels="{ on: 'Yes', off: 'No' }"
             v-if="systemData.labResults === true" />
         </GroupElement> 
         <GroupElement name="diagnosisResultsGroup" :class="'mt-2'">
           <ToggleElement name="medHistory"
-            :label="embolden('Are you able to manually enter diagnosis and medical history into your test system?', true)"
+            :label="embolden('Are you able to manually enter diagnosis and medical history into your test system?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <ToggleElement name="diagnosisResults"
-            :label="embolden('Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessment?', true)"
+            :label="embolden('Are you able to enter diagnosis or comorbidities into your test system that you are using to do this assessment?')"
             :labels="{ on: 'Yes', off: 'No' }"
             v-if="systemData.medHistory === true" />
         </GroupElement>
@@ -94,21 +94,21 @@
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
           <ToggleElement name="penicillinResults"
-            :label="embolden('When you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?', true)"
+            :label="embolden('When you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />
           <ToggleElement name="antiMicReviewTime"
-            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial prescriptions that have reached the review time window e.g. 48-72 hours after initiation?', true)"
+            :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial prescriptions that have reached the review time window e.g. 48-72 hours after initiation?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicReviewComments"
             :label="embolden('Additional comments')"
             :debounce="200" />
           <ToggleElement name="antiMicInterpretResults"
-            :label="embolden('Is your ePrescribing system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?', true)"
+            :label="embolden('Is your ePrescribing system able to access laboratory produced antimicrobial susceptibility testing results and link through any form of decision support to direct which medicine will effectively treat a patients infection?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="antiMicInterpretComments"
