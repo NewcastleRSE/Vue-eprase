@@ -47,7 +47,7 @@
             <FormStep name="finalReportStep" label="Final Report" 
               :elements="['finalReportEl']" 
               :labels="{ 
-                next: 'Complete assessment',
+                next: 'Assessment complete',
                 previous: 'Back to Configuration Questions'
               }" />
             <FormStep name="toolExitStep" label="Exit" 
