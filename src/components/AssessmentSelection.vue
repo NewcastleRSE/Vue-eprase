@@ -39,7 +39,7 @@
             <tr v-for="assessment in incompleteAssessments">                  
               <td>{{ assessment.ep_service.name == 'Other' ? assessment.other_ep_service : assessment.ep_service.name }}</td>
               <td>{{ assessment.patient_type }}</td>
-              <td>{{ assessment.state }}</td>
+              <td>{{ assessment.state == 'System complete' ? 'System information completed' : assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
               <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_creator_email || 'Not recorded' }}</td>
