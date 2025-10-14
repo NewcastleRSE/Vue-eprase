@@ -15,4 +15,5 @@ ARG VERSION
 ARG TARGET
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx/nginx.${TARGET}.conf /etc/nginx/nginx.conf
+COPY nginx/ssl /etc/nginx/ssl
 RUN sed -i "s|APPVERSION|${VERSION}|g" /usr/share/nginx/html/index.html
