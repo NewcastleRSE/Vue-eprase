@@ -19,3 +19,4 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
           tag_semver: true
           buildargs: TARGET
+          buildoptions: "--no-cache"
