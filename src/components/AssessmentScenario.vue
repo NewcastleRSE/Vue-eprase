@@ -296,9 +296,9 @@ export default {
       return [
         'You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system',
         'You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it',
-        'You placed the order and received some system advice or information in relation to allergies, abnormal lab results, dosing, route, age of patient, therapeutic duplication, monitoring, contraindication or something other, that required you to take some action in order to continue. Please tell us more about what happened using the tick box option descriptions provided and / or the freehand comments box that will appear when you select this response option',
-        '',
-        ''
+        'You prescribed the medicine and received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, monitoring, contraindication or something else, which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, to mitigate risk without outright prevention.',
+        'These are prescribing actions that should never occur, where it is clear cut with no additional prescriber decision point. The EP system blocks completion of the prescriptions entirely.',
+        'Where the medicine presented in the test is not available in your system, the question will be passed over. This will be classed as an invalid test. It will not affect the overall mitigation results, which are calculated on the valid tests taken.'
       ]
     },
     matrixCategories() {
