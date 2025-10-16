@@ -207,7 +207,7 @@
                               <td>None</td>
                             </tr>                                                   
                             <tr>
-                              <th>Qualitative data</th>
+                              <th>Your notes</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
                             </tr>                                                    
                           </tbody>
