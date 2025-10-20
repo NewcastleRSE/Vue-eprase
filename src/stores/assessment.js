@@ -35,17 +35,17 @@ const MITIGATION_MATRIX = {
   },
   'MT4': { // Recorded response : You were able to complete the prescription, but had to override components of the order sentence
     'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': GOOD_MITIGATION,     // Expected response : User/system intervention
+    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
     'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT1': { // Recorded response : You were able to complete the prescription, with system/user intervention
     'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
+    'MT1': GOOD_MITIGATION,     // Expected response : User/system intervention
     'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT3': { // Recorded response : Prevented from prescribing
     'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
+    'MT1': OVER_MITIGATION,     // Expected response : User/system intervention
     'MT3': GOOD_MITIGATION      // Expected response : Prescribing prevented
   },
   'MT99': { // Recorded response : Medicine or formulary alternative not available in the system

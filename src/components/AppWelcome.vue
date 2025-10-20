@@ -11,18 +11,19 @@
           <Vueform>          
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
               <ButtonElement name="login" full
-                :columns="4" 
+                :columns="6" 
                 :add-class="'me-2'" 
                 @click="onLoginClick">
                 <i class="bi bi-person-circle me-2"></i>Log in
               </ButtonElement>            
               <ButtonElement name="register" full 
-                :columns="4" 
+                :columns="6" 
                 :add-class="'mx-2'" 
                 :disabled="$route.query.action === 'registered'" 
                 @click="onRegisterClick">
                 <i class="bi bi-person-fill-add me-2"></i>Register
               </ButtonElement>
+              <!--
               <ButtonElement name="forgotpassword" full 
                 :columns="4" 
                 :add-class="'ms-2'" 
@@ -30,6 +31,7 @@
                 @click="onForgotPasswordClick">
                 <i class="bi bi-key-fill me-2"></i>Forgot password?
               </ButtonElement>
+              -->
             </GroupElement>
           </Vueform>  
         </div>

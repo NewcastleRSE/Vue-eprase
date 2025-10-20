@@ -29,56 +29,7 @@
         <p>
           Invalid results are where a test presented a medicine which was not in the user's EP system and the question was passed over. 
         </p>
-        <p>
-          Table (1) below illustrates how the scores are allocated based on the users recorded response to a test scenario compared to the predesignated 
-          expected response for a particular test scenario.
-        </p>
-        <table class="table table-bordered border-white text-center">
-          <thead>
-            <tr>
-              <th class="bg-primary p-2"></th>
-              <th class="bg-primary p-2"></th>
-              <th class="bg-primary p-2 w-75 text-white" colspan="3">Prescribing risk test scenario predesignated expected EP system response</th>
-            </tr>            
-          </thead>
-          <tbody>
-            <tr>
-              <td class="bg-primary p-2"></td>
-              <td class="bg-info p-2"></td>
-              <td class="bg-info p-2 w-25">Prescription prevented</td>
-              <td class="bg-info p-2 w-25">Prescription completed with system/user intervention</td>
-              <td class="bg-info p-2 w-25">Prescription completed without system intervention (control questions)</td>
-            </tr>
-            <tr>
-              <td class="bg-primary p-2" rowspan="4"><div class="fw-bold text-white" style="writing-mode: vertical-lr; transform: rotate(180deg)"><span>User recorded response</span></div></td>
-              <td class="bg-info-subtle p-2">You were able to complete the prescription without any additional user or system input</td>
-              <td class="bg-info-subtle p-2 w-25">No mitigation</td>
-              <td class="bg-info-subtle p-2 w-25">No mitigation</td>
-              <td class="bg-info-subtle p-2 w-25">Good mitigation</td>
-            </tr>
-            <tr>
-              <td class="bg-info p-2">You were able to complete the prescription, but had to override components of the order sentence</td>
-              <td class="bg-info p-2 w-25">Some mitigation</td>
-              <td class="bg-info p-2 w-25">Some mitigation</td>
-              <td class="bg-info p-2 w-25">Over mitigation</td>
-            </tr>
-            <tr>
-              <td class="bg-info-subtle p-2">You were able to complete the prescription, with system/user intervention</td>
-              <td class="bg-info-subtle p-2 w-25">Some mitigation</td>
-              <td class="bg-info-subtle p-2 w-25">Good mitigation</td>
-              <td class="bg-info-subtle p-2 w-25">Over mitigation</td>
-            </tr>
-            <tr>
-              <td class="bg-info p-2">Prevented from prescribing</td>
-              <td class="bg-info p-2 w-25">Good mitigation</td>
-              <td class="bg-info p-2 w-25">Over mitigation</td>
-              <td class="bg-info p-2 w-25">Over mitigation</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr><td colspan="5">Table 1</td></tr>
-          </tfoot>
-        </table>
+        
         <h3>EPRaSE Assessment breakdown of results for {{ epSystemYear }}</h3>
         <h4>Overview of prescribing test results</h4>
         <p>
@@ -89,7 +40,7 @@
           users EP system or the user skipped the question for another reason = {{ excludedTests() }}
         </p>
         <p>
-          Table (2) below details the total number of prescribing tests completed, broken down by risk category. In addition, information is provided 
+          Table (1) below details the total number of prescribing tests completed, broken down by risk category. In addition, information is provided 
           on the number and type of alerts record by your trust where an intervention was recorded.
         </p>
         <table class="table table-bordered">
@@ -115,13 +66,13 @@
             </tr>
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="3">Table 2. Breakdown of prescribing tests taken</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 1. Breakdown of prescribing tests taken</td></tr>
           </tfoot>
         </table>
         <h3>Mandatory Questions</h3>
         <p>
           In the ePRaSE tool all users complete the same 5 mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
-          results and explanatory outcomes is detail below in table 3. 
+          results and explanatory outcomes is detail below in Table 2. 
         </p>
         <table class="table table-bordered">
           <thead>
@@ -136,13 +87,13 @@
             </tr>            
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="3">Table 3. Mandatory question results</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 2. Mandatory question results</td></tr>
           </tfoot>
         </table>
         <h3>Configuration test results</h3>
         <p>
           In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
-          Your configuration tests results are presented on table 4 below.
+          Your configuration tests results are presented on Table 3 below.
         </p>
         <table class="table table-bordered">
           <thead>
@@ -156,7 +107,7 @@
             </tr>                
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="3">Table 4. Configuration tests results</td></tr>
+            <tr class="border-white text-center"><td colspan="3">Table 3. Configuration tests results</td></tr>
           </tfoot>
         </table>
         <h3>Clinical Decision Support Category Results</h3>
