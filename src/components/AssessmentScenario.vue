@@ -146,8 +146,16 @@
                           Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
                           -->
                           <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
-                            <div class="alert alert-info mt-2" role="alert">
-                              Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
+                            <div class="alert alert-warning mt-2" role="alert">
+                              If the system were to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
+                              <ul class="list-group mt-4">
+                                <li class="list-group-item">
+                                  <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action e.g. pop-up boxes or requiring password entry
+                                </li>
+                                <li class="list-group-item">
+                                  <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. a passive dialogue, maybe a banner message on the bottom of the screen
+                                </li>
+                              </ul>
                             </div>
                             <table class="table table-striped vf-col-6">
                               <thead>
