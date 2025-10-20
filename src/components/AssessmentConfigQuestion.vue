@@ -27,10 +27,7 @@
             </tr>                            
           </tbody>
         </table>                
-      </ObjectElement>
-      <StaticElement v-show="!savedResponseData" name="savingAlert" class="mt-4">
-        <div class="alert alert-info w-25">Saving your response...</div>
-      </StaticElement> 
+      </ObjectElement>      
     </GroupElement>    
   </GroupElement>
 </template>
@@ -58,8 +55,7 @@ export default {
   },
   data() {
     return {
-      questionRows: [],
-      savedResponseData: true
+      questionRows: []
     }
   },
   methods: { 
@@ -74,19 +70,13 @@ export default {
     },
     async saveConfigQuestionResponses() {
       
-      console.group('saveScenarioResponse()')
+      console.group('saveConfigQuestionResponses()')
       console.debug('Form part-object', this.$refs['configObject'])
-
-      this.savedResponseData = false
      
       const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
       if (saveResponse !== true) {
         throw new Error(saveResponse)
       }
-
-      setTimeout(() => {
-        this.savedResponseData = true
-      }, 500)
       console.groupEnd()
     }
   },

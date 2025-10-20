@@ -1,4 +1,3 @@
-import { stringTrueFalseToBoolean } from '../helpers/utils'
 import { authenticationStore } from './authentication'
 import { defineStore } from 'pinia'
 import axios from 'axios'
@@ -7,21 +6,7 @@ const API = process.env.BASE_URL
 const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
-  state: () => ({
-    // OLD
-    assessmentId: null,
-    assessmentStatus: null,
-    assessmentComplete: false,    
-    part1complete: false,
-    part2complete: false,
-    part3complete: false,
-    part4complete: false,
-    configErrorComplete: false,
-    categories: [],
-    mitigationData: [],
-    stackedChartData: null,
-    mitigationChartData: null,
-    printableReportData: null
+  state: () => ({    
   }),
   persist: true, 
   actions: {
@@ -86,7 +71,7 @@ export const rootStore = defineStore('root', {
     },
     // Get list of configuration questions (UPDATED Strapi)
     async getConfigQuestions() {
-      const response = await this.apiCall('config-errors?fields[0]=config_error_code&fields[1]=description&sort[0]=config_error_code', 'GET')
+      const response = await this.apiCall('config-errors?sort[0]=config_error_code', 'GET')
       return response
     },
     // Get mitigation code mapping (UPDATED Strapi)
@@ -106,123 +91,6 @@ export const rootStore = defineStore('root', {
         // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
         console.error(response.message)
       }
-    },      
-    async getPrescriptionTestData(id) {
-      const response = await this.apiCall('resultCategories?ID=' + id, 'GET')
-      return response            
-    },
-    async getMitigationResults(id) {
-      const response = await this.apiCall('getMitigationResults?ID=' + id, 'GET')
-      return response                
-    },
-    async getAllMitigationResults() {
-      const response = await this.apiCall('getAllMitigationResults', 'GET')
-      return response       
-    },
-    async getAllInstitutionAssessments() {
-      const response = await this.apiCall('getAllInstitutionAssessments', 'GET')
-      return response
-    },
-    async getConfigErrors() {
-      const response = await this.apiCall('configerrors', 'GET')
-      return response      
-    },
-    async getConfigErrorByCode(code){
-      const response = await this.apiCall('configerrorbycode?CODE=' + code, 'GET')
-      return response     
-    },
-    async getAssessmentProgress() {
-      let ret = null
-      const instId = authenticationStore().institutionId
-      const response1 = await this.apiCall('getAssessmentStatus?INSTITUTION_ID=' + instId, 'GET') 
-      const response2 = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + instId, 'GET')
-      if (response1.status < 400 && response2.status < 400) {
-          this.assessmentId = response1.data ? response1.data.id : -1,
-          // Sigh - the return from the API is a string "true" or "false"...
-          this.assessmentComplete = response1.data ? stringTrueFalseToBoolean(response1.data.status) : false,
-          this.assessmentStatus = response2.data ? response2.data.status : 'Not Started'
-          const data = {}
-          const reqKeys = ['assessmentId', 'assessmentComplete', 'assessmentStatus']
-          reqKeys.forEach(k => data[k] = this[k])         
-        ret = { status: 200, data: data }
-      } else {
-        ret = { status: 500, message: 'Failed to get assessment progress for institution', instId}
-      }
-      return ret   
-    },
-    async updateAssessmentProgress() {
-      const instId = authenticationStore().institutionId
-      const response = await this.apiCall('updateInstitutionAssessment?INSTITUTION_ID=' + instId, 'POST') 
-      return response      
-    },
-    async getAssessmentLatestCompletedPart() {
-      const response = await this.apiCall('getAssessmentLatestCompletedPart?INSTITUTION_ID=' + authenticationStore().institutionId, 'GET')
-      if (response.status < 400) {
-        // This call returns no data if no assessment is open for institution
-        this.assessmentStatus = response.data ? response.data.status : 'Not Started'
-      }
-      return response           
-    },
-    async getReportByInstitutionId() {
-      const response = await this.apiCall('resultByInstitutionId?ID=' + authenticationStore().institutionId, 'GET')
-      return response          
-    },
-    async getAssessmentIdByInstitutionId(institution_id) {
-      const response = await this.apiCall('assessmentIdByInstitutionId?ID=' + institution_id, 'GET')
-      return response
-    },
-    async getAllReports() {
-      const response = await this.apiCall('results', 'GET')
-      return response        
-    },
-    async saveSystemData(ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, 
-      add_ep_system, patient_type, lab_results, man_results, diagnosis_results, penicillin_description, penicillin_description_other, penicillin_results, penicillin_comment, 
-      med_history, high_risk_meds, clinical_areas, time_taken) {
-      const response = await this.apiCall('system', 'POST', { 
-        ep_service, ep_service_implemented, ep_service_updated, other_ep_system, local_ep_system_name, ep_version, ep_usage, num_maintainers, add_ep_system, patient_type, lab_results, 
-        man_results, diagnosis_results, penicillin_description, penicillin_description_other, penicillin_results, penicillin_comment, 
-        med_history, high_risk_meds, clinical_areas, time_taken 
-      })
-      if (response.status < 400) {
-        const assessmentId = JSON.stringify(response.data)
-        console.debug('Assessment ID', assessmentId)
-        this.assessmentId = assessmentId
-        this.part1complete = true
-      }
-      return(response)
-    },    
-    async saveConfigError(test_id, result, time_taken, index) {
-      const assessmentId = await this.getAssessmentId()
-      const response = await this.apiCall('config?ID=' + assessmentId, 'POST', { test_id, result, time_taken })   
-      if (response.status < 400) {
-        this.configErrorComplete = true
-        this.testIndex = index + 1
-      }
-      return(response)   
-    },
-    async saveMitigationResults(assessmentId, epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests) {
-      const institutionId = authenticationStore().institutionId
-      const response = await this.apiCall('saveMitigationResults?ID=' + assessmentId + '&INSTITUTION_ID='  + institutionId, 'POST', { epSystem, goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests })   
-      if (response.status < 400) {
-        this.storeMitigationData(goodMitigation, someMitigation, notMitigated, overMitigated, invalidTests)
-      }
-      return(response)
-    },     
-    storeAssessmentId(id) { this.assessmentId = id },
-    storeAssessmentStatus(status) { this.assessmentStatus = status },
-    storeAssessmentComplete(complete) { this.assessmentComplete = complete },    
-    storeMitigationData(goodPercentage, somePercentage, notPercentage, overPercentage, percentageNulls) {
-      this.mitigationData[0] = goodPercentage
-      this.mitigationData[1] = somePercentage
-      this.mitigationData[2] = notPercentage
-      this.mitigationData[3] = overPercentage
-      this.mitigationData[4] = percentageNulls
-    },
-    storeStackedChartData(stackedChartData) { this.stackedChartData = stackedChartData },
-    storeMitigationChartData(mitigationChartData) { this.mitigationChartData = mitigationChartData },
-    storePrintableReportData(heading, content, buttonCaption) {
-      console.log(heading, content, buttonCaption)
-      this.printableReportData = { heading, content, buttonCaption }
     }
   }
 })
