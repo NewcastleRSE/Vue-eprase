@@ -131,7 +131,7 @@ if (process.env.NODE_ENV === "production") {
     baseURL = '"https://eprase.ncldata.dev/strapi/api/"'
     sentryENV = "staging"
   } else if (process.env.TARGET === "production") {
-    baseURL = '"https://eprase.nhs.uk/api/"'
+    baseURL = '"https://eprase.nhs.uk/strapi/api/"'
     sentryENV = "production"
   }
 
