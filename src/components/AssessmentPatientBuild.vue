@@ -337,6 +337,7 @@ export default {
         this.patientRelations(docId)  
         const patientElement = document.getElementById('patient-' + nextCode)
         if (patientElement != null) {
+            console.debug('Scroll patient', nextCode, 'into view')
             document.getElementById('patient-' + nextCode).scrollIntoView({
             behavior: 'smooth',
             block: 'center',

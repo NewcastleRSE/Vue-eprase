@@ -146,8 +146,16 @@
                           Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
                           -->
                           <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
-                            <div class="alert alert-info mt-2" role="alert">
-                              Please tell us about the system response by selecting <span class="fw-bold">up to two</span> clinical decision support categories from the list below:
+                            <div class="alert alert-warning mt-2" role="alert">
+                              If the system were to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
+                              <ul class="list-group mt-4">
+                                <li class="list-group-item">
+                                  <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action e.g. pop-up boxes or requiring password entry
+                                </li>
+                                <li class="list-group-item">
+                                  <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. a passive dialogue, maybe a banner message on the bottom of the screen
+                                </li>
+                              </ul>
                             </div>
                             <table class="table table-striped vf-col-6">
                               <thead>
@@ -174,7 +182,7 @@
                           </div>
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
-                            <CheckboxElement name="haveDiscontinuedPrescription"
+                            <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
                               I have done this
@@ -322,6 +330,7 @@ export default {
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
+      currentScenarioInterventionSelected: false,
       allowCurrentScenarioSave: false,
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
@@ -331,13 +340,6 @@ export default {
     }
   },
   methods: {
-    // Determine if user has ticked 'discontinue prescription' box and enable/disable 'save response' button accordingly
-    setSaveButtonState(scenarioCode, disable) {
-      console.debug(scenarioCode, disable)
-      const saveBtn = this.$refs[scenarioCode + 'Save']
-      console.debug('Save btn', saveBtn)
-      saveBtn[0].disabled = disable
-    },
     mitigationDescription(scenarioCode) {
       let description = ''
       if (this.scenarioResponse(scenarioCode)) {
@@ -400,6 +402,7 @@ export default {
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         this.allowCurrentScenarioSave = false
+        this.currentScenarioInterventionSelected = false
         this.currentScenario = incompleteScenarioCodes[0]
         this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
         const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
@@ -436,6 +439,7 @@ export default {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
         this.interventionSelections[identifier] = isIntervention
+        this.currentScenarioInterventionSelected = true
       }
       console.groupEnd()
     }
