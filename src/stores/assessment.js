@@ -218,6 +218,7 @@ export const assessmentStore = defineStore('assessment', {
               drugName: '', // NOTE: this gets filled in later from the scan of patient scenarios, as it is contained in the prescription, not the scenario itself!
               explanation: ssr.scenario.explanation,
               badMitigationFeedback: ssr.scenario.bad_mitigation_feedback,
+              userResponse: ssr.result,
               result: ssr.result == 'Good mitigation'
             }
           }

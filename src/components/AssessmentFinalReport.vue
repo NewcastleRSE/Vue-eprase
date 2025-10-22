@@ -71,17 +71,18 @@
         </table>
         <h3>Mandatory Questions</h3>
         <p>
-          In the ePRaSE tool all users complete the same 5 mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
-          results and explanatory outcomes is detail below in Table 2. 
+          In the ePRaSE tool all users complete the same mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
+          results, and explanatory outcomes is detailed below in Table 2. 
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Drug name</th><th>Test</th><th>Your result / Outcome</th></tr>
+            <tr><th>Drug name</th><th>Test</th><th>Result</th><th>Advice</th></tr>
           </thead>
           <tbody>
             <tr v-for="(value, key) in requiredScenarioAnalysis">
               <td>{{ value.drugName }}</td>
               <td>{{ value.explanation }}</td>
+              <td>{{ value.userResponse }}</td>
               <td v-if="value.result === true">Good mitigation</td>
               <td v-if="value.result !== true">{{ value.badMitigationFeedback }}</td>
             </tr>            
@@ -97,7 +98,7 @@
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Question</th><th>Result</th><th>Outcome / advice</th></tr>
+            <tr><th>Question</th><th>Result</th><th>Advice</th></tr>
           </thead>
           <tbody>
             <tr v-for="cqa in configQuestionAnalysis">

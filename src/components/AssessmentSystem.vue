@@ -100,6 +100,13 @@
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />
+          <StaticElement name="antimicrobialWarning">
+            <div class="alert alert-warning mt-4" role="alert">
+              We are hoping to learn about any build users may have within their electronic 
+              prescribing system in relation to antimicrobial stewardship with the following 
+              two questions.
+            </div>
+          </StaticElement>
           <ToggleElement name="antiMicReviewTime"
             :label="embolden('Does your ePrescribing system have a mechanism in place to automatically identify antimicrobial prescriptions that have reached the review time window e.g. 48-72 hours after initiation?')"
             :labels="{ on: 'Yes', off: 'No' }"

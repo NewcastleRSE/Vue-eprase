@@ -26,7 +26,7 @@ Email the DNS team and ask them to add the code snippet to the DNS records for e
 
 ![CNAME details](/readme-images/cname-details.png)
 
-At some point you will receive an email from Sectigo.com labelled 'Sectigo Certificate Subscriber Agreement 'with a link and verification code. Log into this and authenticate the certificate.
+At some point you will receive an email from Sectigo.com labelled 'Sectigo Certificate Subscriber Agreement 'with a link and verification code. Log into this and try and authenticate the certificate. You'll need to keep logging in using the code to check the status of the order.
 
 <img width="927" height="1075" alt="Sectigo order verification" src="https://github.com/user-attachments/assets/cad6bc79-66c7-4f58-91bf-10b5fb354ed9" />
 
