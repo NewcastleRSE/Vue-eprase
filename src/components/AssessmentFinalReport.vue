@@ -76,12 +76,13 @@
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Drug name</th><th>Test</th><th>Your result / Outcome</th></tr>
+            <tr><th>Drug name</th><th>Test</th><th>Your result</th><th>Outcome</th></tr>
           </thead>
           <tbody>
             <tr v-for="(value, key) in requiredScenarioAnalysis">
               <td>{{ value.drugName }}</td>
               <td>{{ value.explanation }}</td>
+              <td>{{ value.userResponse }}</td>
               <td v-if="value.result === true">Good mitigation</td>
               <td v-if="value.result !== true">{{ value.badMitigationFeedback }}</td>
             </tr>            
