@@ -76,7 +76,7 @@
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Drug name</th><th>Test</th><th>Your result</th><th>Feedback</th></tr>
+            <tr><th>Drug name</th><th>Test</th><th>Result</th><th>Advice</th></tr>
           </thead>
           <tbody>
             <tr v-for="(value, key) in requiredScenarioAnalysis">
@@ -98,7 +98,7 @@
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Question</th><th>Result</th><th>Outcome / advice</th></tr>
+            <tr><th>Question</th><th>Result</th><th>Advice</th></tr>
           </thead>
           <tbody>
             <tr v-for="cqa in configQuestionAnalysis">
