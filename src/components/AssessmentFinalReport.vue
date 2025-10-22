@@ -71,12 +71,12 @@
         </table>
         <h3>Mandatory Questions</h3>
         <p>
-          In the ePRaSE tool all users complete the same 5 mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
-          results and explanatory outcomes is detail below in Table 2. 
+          In the ePRaSE tool all users complete the same mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
+          results, and explanatory outcomes is detailed below in Table 2. 
         </p>
         <table class="table table-bordered">
           <thead>
-            <tr><th>Drug name</th><th>Test</th><th>Your result</th><th>Outcome</th></tr>
+            <tr><th>Drug name</th><th>Test</th><th>Your result</th><th>Feedback</th></tr>
           </thead>
           <tbody>
             <tr v-for="(value, key) in requiredScenarioAnalysis">
