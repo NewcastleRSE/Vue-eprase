@@ -18,7 +18,7 @@
           @click="startNewAssessment"
           :columns="3" 
           :add-class="'me-2'">
-          <i class="bi bi-play-fill me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment</span>
+          <i class="bi bi-play-fill me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment or access completed assessment reports</span>
         </ButtonElement>
       </GroupElement>
       <SurveyLinkModal ref="surveyLinkModal" :showActionBtn="true" @modal-actioned="exit()" />

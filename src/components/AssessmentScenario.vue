@@ -156,7 +156,8 @@
                                   <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. a passive dialogue, maybe a banner message on the bottom of the screen
                                 </li>
                               </ul>
-                              Please select <strong>up to two</strong> clinical decision support categories from the list below:
+                              <br/>
+                              <p>Please select <strong>up to two</strong> clinical decision support categories from the list below:</p>
                             </div>
                             <table class="table table-striped vf-col-6">
                               <thead>
