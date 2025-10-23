@@ -94,7 +94,7 @@
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
           <ToggleElement name="penicillinResults"
-            :label="embolden('When you enter Penicill (exactly as stated) in your allergy recording function, is Penicillamine visible as an option to select?')"
+            :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <TextElement name="penicillinComment"
