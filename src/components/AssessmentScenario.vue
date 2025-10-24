@@ -66,7 +66,7 @@
                   <ul class="nav nav-tabs" :id="'scenario-patient-' + patient.patient_code + '-scenario-tabs'" role="tablist">
                     <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
-                      <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                      <button class="nav-link scenario" data-bs-toggle="tab" type="button" role="tab"
                         :class="currentScenario == pscd.scenario_code ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
                         :data-bs-target="'#scenario-' + pscd.scenario_code">{{ 'Scenario ' + (index + 1) }}
                       </button>
