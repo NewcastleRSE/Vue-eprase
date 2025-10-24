@@ -88,7 +88,7 @@
             </tr>            
           </tbody>
           <tfoot>
-            <tr class="border-white text-center"><td colspan="3">Table 2. Mandatory question results</td></tr>
+            <tr class="border-white text-center"><td colspan="4">Table 2. Mandatory question results</td></tr>
           </tfoot>
         </table>
         <h3>Configuration test results</h3>
@@ -96,15 +96,21 @@
           In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
           Your configuration tests results are presented on Table 3 below.
         </p>
-        <table class="table table-bordered">
+        <div v-if="!Array.isArray(configQuestionAnalysis) || configQuestionAnalysis.length == 0">
+          <div class="d-flex align-items-center">
+            <strong role="status">Loading configuration analysis...</strong>
+            <div class="spinner-border ms-auto" aria-hidden="true"></div>
+          </div>
+        </div>
+        <table v-if="Array.isArray(configQuestionAnalysis) && configQuestionAnalysis.length != 0" class="table table-bordered">
           <thead>
             <tr><th>Question</th><th>Result</th><th>Advice</th></tr>
           </thead>
-          <tbody>
+          <tbody>        
             <tr v-for="cqa in configQuestionAnalysis">
-              <td>{{ cqa.description }}</td>
-              <td>{{ cqa.actualAnswer.substr(0, 1).toUpperCase() + cqa.actualAnswer.substr(1) }}</td>
-              <td>{{ cqa.actualAnswer == cqa.goodAnswer ? cqa.desirableResponse : cqa.undesirableResponse }}</td>
+              <td>{{ cqa.config_error.description }}</td>
+              <td>{{ cqa.result == 1 ? 'Yes' : 'No' }}</td>
+              <td>{{ (cqa.result == 1 ? 'yes' : 'no') == cqa.config_error.good_answer ? cqa.config_error.good_answer_response : cqa.config_error.undesirable_answer_response }}</td>
             </tr>                
           </tbody>
           <tfoot>
@@ -141,7 +147,7 @@
   </GroupElement>
 </template>
 
-<script>
+<script>      
 
 import { calcNum, calcPercentage } from '../helpers/utils'
 import { mapState } from 'pinia'
@@ -183,7 +189,7 @@ export default {
       return this.mitigationSummaries.requiredScenarioAnalysis
     },
     configQuestionAnalysis() {
-      return this.mitigationSummaries.configQuestionAnalysis
+      return this.assessmentData.config.configQuestionResults
     },
     mitigationByCategoryAnalysis() {
       return this.mitigationSummaries.mitigationByCategoryAnalysis
