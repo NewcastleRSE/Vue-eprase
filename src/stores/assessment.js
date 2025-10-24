@@ -170,8 +170,7 @@ export const assessmentStore = defineStore('assessment', {
           both: 0
         },
         requiredScenarioAnalysis: {},
-        mitigationByCategoryAnalysis: {},
-        configQuestionAnalysis: []        
+        mitigationByCategoryAnalysis: {}
       }
       
       if (numCompletedScenarios > 0) {
@@ -276,17 +275,6 @@ export const assessmentStore = defineStore('assessment', {
           })  
         }
       }
-
-      // Construct config question analysis
-      this.assessmentData.config.configQuestionResults.forEach(cqr => {
-        summary.configQuestionAnalysis.push({
-          actualAnswer: cqr.result == 1 ? 'yes' : 'no',
-          goodAnswer: cqr.config_error.good_answer,
-          description: cqr.config_error.description,
-          desirableResponse: cqr.config_error.good_answer_response,
-          undesirableResponse: cqr.config_error.undesirable_answer_response
-        })
-      })
 
       console.debug('Returning', summary)
       console.groupEnd()
@@ -882,15 +870,17 @@ export const assessmentStore = defineStore('assessment', {
       console.group('getConfigQuestionData()')
       console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
 
-      const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
-      if (confQuestionResponse.status < 400) {
-        this.$patch((state) => {
-          state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
-        })
-      } else {
-        ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+      if (!Array.isArray(this.assessmentData.config.configQuestionResults) || (this.assessmentData.config.configQuestionResults.length != this.assessmentData.config.configQuestions.length)) {
+        const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
+        if (confQuestionResponse.status < 400) {
+          this.$patch((state) => {
+            state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
+          })
+        } else {
+          ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+        }
       }
-
+      
       if (recordLoading) {
         this.setDataReady(true)
       }
@@ -937,6 +927,9 @@ export const assessmentStore = defineStore('assessment', {
       if (updatedAssessmentResponse.status >= 400) {
         throw new Error(`Failed to update assessment with config question response - message was ${updatedAssessmentResponse.message}`)
       }
+
+      // Update store with new complete records
+      this.getConfigQuestionData()
 
       if (recordLoading) {
         this.setDataReady(true)

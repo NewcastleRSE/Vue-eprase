@@ -7,6 +7,7 @@ const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({    
+    printableReportData: null
   }),
   persist: true, 
   actions: {
@@ -49,48 +50,52 @@ export const rootStore = defineStore('root', {
 
       return ret
     },    
-    // Get list of institutions (UPDATED Strapi)
+    // Get list of institutions
     async getInstitutions() {
       const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
-    // Get list of ePrescribing system names (UPDATED Strapi)
+    // Get list of ePrescribing system names
     async getEpSystems() {
       const response = await this.apiCall('ep-services?fields[0]=name&sort[0]=name:asc', 'GET')
       return response
     },
-    // Get list of high risk meds (UPDATED Strapi)
+    // Get list of high risk meds
     async getHighRiskMeds() {
       const response = await this.apiCall('high-risk-meds?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
     },
-    // Get list of clinical areas (UPDATED Strapi)
+    // Get list of clinical areas
     async getClinicalAreas() {
       const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
     },
-    // Get list of configuration questions (UPDATED Strapi)
+    // Get list of configuration questions
     async getConfigQuestions() {
       const response = await this.apiCall('config-errors?sort[0]=config_error_code', 'GET')
       return response
     },
-    // Get mitigation code mapping (UPDATED Strapi)
+    // Get mitigation code mapping
     async getMitigations() {
       const response = await this.apiCall('mitigations', 'GET')
       return response
     },
-    // Categories (UPDATED Strapi) 
+    // Categories
     async getCategories() {
       const response = await this.apiCall('categories?fields[0]=category_code&fields[1]=name&fields[2]=description&sort[0]=name', 'GET')
       return response     
     },
-    // Audit action (UPDATED Strapi)
+    // Audit action
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })
       if (response.status >= 400) {
         // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
         console.error(response.message)
       }
+    },
+    // Final report in a print-friendly form
+    storePrintableReportData(heading, content, buttonCaption) {
+      this.printableReportData = { heading, content, buttonCaption }
     }
   }
 })

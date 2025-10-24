@@ -81,6 +81,7 @@
                             <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
                             <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
                             <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
+                            <tr v-if="patient.age_years == 0 && patient.age_days == 0 && patient.gestational_age == 0"><th>Age</th><td>Unspecified</td></tr>
                             <tr v-if="patient.age_years != null && patient.age_years != 0"><th>Age</th><td>{{ patient.age_years }} years</td></tr>
                             <tr v-if="patient.age_days != null && patient.age_days != 0"><th>Age</th><td>{{ patient.age_days }} days</td></tr>
                             <tr v-if="patient.gestational_age != null && patient.gestational_age != 0"><th>Gestational age</th><td>{{ patient.gestational_age }} weeks</td></tr>

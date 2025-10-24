@@ -7,7 +7,6 @@
         assessment for any additional adult EP systems or start a paediatric assessment from the Assessment Selection page. Please select using the buttons below.
       </div>
       <GroupElement name="exitButtonBar">
-        <!-- TO DO -->
         <ButtonElement name="about" title="About" full
           data-bs-toggle="modal" data-bs-target="#surveyLinkModal"
           :columns="3" 
@@ -16,8 +15,8 @@
         </ButtonElement>
         <ButtonElement name="about" title="About" full
           @click="startNewAssessment"
-          :columns="3" 
-          :add-class="'me-2'">
+          :columns="6" 
+          :add-class="'ms-2'">
           <i class="bi bi-play-fill me-lg-2"></i><span class="d-lg-block d-none">Start a new assessment or access completed assessment reports</span>
         </ButtonElement>
       </GroupElement>

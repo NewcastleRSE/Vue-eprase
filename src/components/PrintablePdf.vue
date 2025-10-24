@@ -16,14 +16,14 @@
 import dayjs from 'dayjs'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
-import { mapStores } from 'pinia'
-import Plotly from 'plotly.js-dist-min'
+import { mapState } from 'pinia'
 import PrintJS from 'print-js'
 
 export default {
   name: "PrintablePdf",
   computed: {
-    ...mapStores(authenticationStore, rootStore)
+    ...mapState(authenticationStore, ['user']),
+    ...mapState(rootStore, ['printableReportData'])
   },
   data() {
     return {
@@ -37,8 +37,8 @@ export default {
     }
   },
   mounted( ){
-    const printableData = rootStore().printableReportData    
-    this.heading = (printableData.heading || 'Please supply a meaningful heading') + `<h5>Prepared for ${authenticationStore().user} on ${dayjs().format('DD/MM/YYYY HH:mm')}</h5>`
+    const printableData = this.printableReportData    
+    this.heading = (printableData.heading || 'Please supply a meaningful heading')
     this.buttonCaption = printableData.buttonCaption || 'Preview'
     this.$refs.printableReportHeading.innerHTML = this.heading
     this.$refs.printableReportContainer.innerHTML = printableData.content || 'No content supplied'
