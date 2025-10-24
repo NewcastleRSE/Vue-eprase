@@ -429,7 +429,8 @@ export default {
           this.allowCurrentScenarioSave = false
           this.currentScenarioInterventionSelected = false
           this.currentScenario = incompleteScenarioCodes[0]
-          this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
+          this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
+          this.showUniqueScenario()       
           const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
           if (patientElement != null) {
             patientElement.scrollIntoView({
