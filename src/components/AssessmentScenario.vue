@@ -51,10 +51,11 @@
                       src="../assets/images/anon-male.png" alt="male patient" />
                     <img class="img-thumbnail" style="width: 50px; height: 50px" v-show="patient.gender === 'Female'"
                       src="../assets/images/anon-female.png" alt="female-patient" />
-                    Patient: {{ patient.full_name }}, 
-                     <span v-show="patient.age_years != null && patient.age_years != 0"> age: {{ patient.age_years }} years</span>
-                     <span v-show="patient.age_days != null && patient.age_days != 0"> age: {{ patient.age_days }} days</span>
-                     <span v-show="patient.gestational_age != null && patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
+                    Patient: {{ patient.full_name }},
+                    <span v-show="patient.age_years == 0 && patient.age_days == 0 && patient.gestational_age == 0"> age: unspecified</span> 
+                    <span v-show="patient.age_years != null && patient.age_years != 0"> age: {{ patient.age_years }} years</span>
+                    <span v-show="patient.age_days != null && patient.age_days != 0"> age: {{ patient.age_days }} days</span>
+                    <span v-show="patient.gestational_age != null && patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
                   </span>
                 </button>
               </h2>
