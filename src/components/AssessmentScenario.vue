@@ -391,8 +391,29 @@ export default {
       }
       return intObj
     },
+    showUniqueScenario() {
+      // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
+      // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
+      console.group('showUniqueScenario() - HACK')
+      const scenarioTabs = document.getElementById('scenario-patient-' + this.currentPatient + '-scenario-tabs')
+      if (scenarioTabs) {
+        console.debug('Processing scenario buttons, ensure only current scenario active...')
+        scenarioTabs.querySelectorAll('button').forEach(btn => {
+          const scenarioCode = btn.id.replace('scenario-', '').replace('-tab', '')
+          const scenarioDiv = document.getElementById('scenario-' + scenarioCode)
+          console.debug('Scenario', scenarioCode)
+          if (scenarioCode != this.currentScenario) {
+            btn.classList.remove('active')
+            if (scenarioDiv) {
+              scenarioDiv.classList.remove('active', 'show')
+            }          
+          }
+        })
+      }
+      console.groupEnd()
+    },
     // Determine the next incomplete scenario and open it
-    openNextUnenteredScenario() {
+    async openNextUnenteredScenario() {
 
       console.group('openNextUnenteredScenario()')
 
@@ -403,28 +424,39 @@ export default {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
-        this.allowCurrentScenarioSave = false
-        this.currentScenarioInterventionSelected = false
-        this.currentScenario = incompleteScenarioCodes[0]
-        this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
-        const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
-        if (patientElement != null) {
-          patientElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
-          })
-        }
+        await this.$nextTick(() => { 
+          this.allowCurrentScenarioSave = false
+          this.currentScenarioInterventionSelected = false
+          this.currentScenario = incompleteScenarioCodes[0]
+          this.currentPatient = this.scenarioPatientLink[this.currentScenario]        
+          const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
+          if (patientElement != null) {
+            patientElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest'
+            })
+          }
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
+        })       
       }
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
     async openPatientScenarios(patientCode) {
+
+      console.group('openPatientScenarios()')
+
       await this.$nextTick(() => {
+        this.allowCurrentScenarioSave = false
+        this.currentScenarioInterventionSelected = false
         this.currentPatient = patientCode
         this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
-      })      
+        this.showUniqueScenario()
+        console.debug('openPatientScenarios - set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
+      })  
+      
+      console.groupEnd()
     },  
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode]
