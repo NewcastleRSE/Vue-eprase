@@ -252,7 +252,7 @@ export default {
     alertRelianceLevel() {
       // Fix for #327 - should be calculated with the denominator equal to no of interventions, not total tests
       //const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.scenarioTotal - this.excludedTests())
-      const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.systemInterventionTests())
+      const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.alertOnly + this.systemInterventionAnalysis.both, this.systemInterventionTests())
       return percentageAlerted <= 33 ? 'low' : (percentageAlerted <= 66 ? 'medium' : 'high')
     },
     renderPieChart() {
