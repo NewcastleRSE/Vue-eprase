@@ -28,7 +28,7 @@
         <TextElement name="numMaintainers"
           :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
           :debounce="200" 
-          :messages="{required: 'Other eP system name is required', numeric: 'Must be a number between 0 and 20', min: 'Must be >= 0', max: 'Must be < 20' }" 
+          :messages="{required: 'Number of WTE is required', numeric: 'Must be a number between 0 and 20', min: 'Must be >= 0', max: 'Must be < 20' }" 
           :rules="['required', 'numeric', 'min:0.0', 'max:20']" /> 
         <SelectElement name="epUsage"
           :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?', true)"
