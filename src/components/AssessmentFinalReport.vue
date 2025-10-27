@@ -222,6 +222,10 @@ export default {
     excludedTests() {
       return this.scenarioResponses.filter(sr => sr.result == 'Invalid test').length
     },
+    // All scenarios that resulted in alert or advisory from the ePrescribing system
+    systemInterventionTests() {
+      return this.scenarioResponses.filter(sr => sr.intervention_type == 'MT1').length
+    },
     getHeading() {
       return `
         <h2>Assessment Report ${this.epSystemYear}</h2>
@@ -246,7 +250,9 @@ export default {
       }).href, '_blank')
     },
     alertRelianceLevel() {
-      const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.scenarioTotal - this.excludedTests())
+      // Fix for #327 - should be calculated with the denominator equal to no of interventions, not total tests
+      //const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.scenarioTotal - this.excludedTests())
+      const percentageAlerted = calcPercentage(this.systemInterventionAnalysis.total, this.systemInterventionTests())
       return percentageAlerted <= 33 ? 'low' : (percentageAlerted <= 66 ? 'medium' : 'high')
     },
     renderPieChart() {
