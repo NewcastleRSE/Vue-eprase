@@ -199,11 +199,11 @@
                         <table class="table table-striped" style="table-layout: fixed;">
                           <tbody>
                             <tr>
-                              <th style="width:200px">Intervention type</th>
+                              <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
                             <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
-                              <th>Interventions</th>
+                              <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
                                   <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(prompts, catDesc) in formatRecordedInterventions(pscd.scenario_code)">
@@ -214,7 +214,7 @@
                               </td>
                             </tr>
                             <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
-                              <th>Interventions</th>
+                              <th>Category/intervention type</th>
                               <td>None</td>
                             </tr>                                                   
                             <tr>
