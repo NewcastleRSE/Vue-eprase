@@ -238,7 +238,7 @@ export default {
       const tpl = new DocumentFragment()
       document.querySelectorAll('div.report-page').forEach(tbp => {
         const article = document.createElement('article')
-        article.setAttribute('style', 'page-break-after: always')
+        article.setAttribute('style', 'page-break-after: always; max-width: 1400px')
         article.innerHTML = tbp.innerHTML
         tpl.appendChild(article)
       })

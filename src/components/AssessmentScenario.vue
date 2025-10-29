@@ -214,7 +214,7 @@
                               </td>
                             </tr>
                             <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
-                              <th>Interventions</th>
+                              <th>Category/intervention type</th>
                               <td>None</td>
                             </tr>                                                   
                             <tr>
