@@ -122,7 +122,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const changePassRes = await axios.post(`${process.env.BASE_URL}credentials/change-password`, payload)        
+        const changePassRes = await axios.post(`${process.env.BASE_URL}credentials/change-password`, payload, { headers: this.authTokenHeader })        
         ret = { status: changePassRes.status, data: changePassRes.data }
       } catch (err) {
         ret = this.triageError(err)

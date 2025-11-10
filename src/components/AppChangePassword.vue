@@ -42,25 +42,26 @@
               :messages="{required: 'New password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
               :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
               <template #addon-after="scope">
-                <i style="cursor:pointer" @click="togglePasswordVisibility('new')"
+                <i style="cursor:pointer" @click="togglePasswordVisibility('newConfirm')"
                   :class="showPassword['newConfirm'] ? 'bi bi-eye-slash' : 'bi-eye'" 
                   :title="(showPassword['newConfirm'] ? 'Hide' : 'Show') + ' password'"></i>
               </template>
             </TextElement>
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
               <ButtonElement name="submit" full 
-                :columns="3" 
+                :columns="4" 
                 :add-class="'me-2'" 
                 :submits="true">
-                <i class="bi bi-person-lock me-2"></i>Register
+                <i class="bi bi-person-lock me-2"></i>Change password
               </ButtonElement>
               <ButtonElement name="reset" full 
-                :columns="3" 
+                :columns="4" 
+                :add-class="'me-2'"
                 :resets="true">
                 <i class="bi bi-x-circle-fill me-2"></i>Clear form
               </ButtonElement>
               <ButtonElement name="cancel" full @click="onCancelClick"
-                :columns="3">
+                :columns="4">
                 <i class="bi bi bi-backspace-fill me-2"></i>Cancel
               </ButtonElement>
             </GroupElement>
@@ -122,7 +123,7 @@ export default {
             await this.audit('changePassword:' + this.email, '/change-password')
             this.$router.push('/login?action=changedPassword')
           } else {
-            this.serverError = 'An error occured during registration:' + changePassResponse.message
+            this.serverError = 'An error occured while changing your password:' + changePassResponse.message
             await this.audit('changePasswordFail:' + this.email, '/change-password')
           }
         }
