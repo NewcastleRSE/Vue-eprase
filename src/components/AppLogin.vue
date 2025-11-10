@@ -6,6 +6,7 @@
 
       <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
       <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
+      <h3 v-if="$route.query.action === 'changedPassword'" class="text-success">Successfully changed your password, please sign in again</h3>
       <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
       <h1 class="mt-4">Log-in to ePRaSE</h1>

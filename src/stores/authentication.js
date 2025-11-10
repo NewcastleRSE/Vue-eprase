@@ -111,7 +111,28 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return ret
-    },        
+    },   
+    // Enable an already logged in user to change their password
+    async changePassword(currentPassword, newPassword, confirmNewPassword) {
+
+      let ret = {}
+      const payload = { currentPassword, newPassword, confirmNewPassword }
+      
+      console.group('changePassword()')
+      console.debug('Data payload', payload)
+
+      try {
+        const changePassRes = await axios.post(`${process.env.BASE_URL}credentials/change-password`, payload)        
+        ret = { status: changePassRes.status, data: changePassRes.data }
+      } catch (err) {
+        ret = this.triageError(err)
+      }
+
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    }, 
     triageError(err) {
 
       console.group('triageError()')

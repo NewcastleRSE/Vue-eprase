@@ -6,6 +6,7 @@ import AppLogin from "../components/AppLogin"
 import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
 import Assessment from "../components/Assessment"
+import AppChangePassword from "../components/AppChangePassword"
 import PrintablePdf from "../components/PrintablePdf"
 
 export const router = createRouter({
@@ -31,6 +32,10 @@ export const router = createRouter({
     {
       path: "/assessment",
       component: Assessment,
+    },  
+    {
+      path: "/change-password",
+      component: AppChangePassword,
     },   
     {
       path: "/printablepdf",
