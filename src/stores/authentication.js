@@ -3,6 +3,7 @@ import axios from 'axios'
 import { assessmentStore } from './assessment'
 
 const API = process.env.BASE_URL
+const STRAPI_BASE = API.replace('/api', '')
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
