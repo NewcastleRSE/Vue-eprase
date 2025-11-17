@@ -85,6 +85,11 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('categories?fields[0]=category_code&fields[1]=name&fields[2]=description&sort[0]=name', 'GET')
       return response     
     },
+    // Overall progress report for dashboard
+    async progressReport() {
+      const progressResponse = await rootStore().apiCall('assessment-progress-report', 'GET') 
+      return progressResponse
+    },
     // Audit action
     async audit(action, uri, result) {
       const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })

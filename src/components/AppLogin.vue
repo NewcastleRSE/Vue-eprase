@@ -87,7 +87,7 @@ export default {
     ForgotPasswordModal
   },
   computed: {
-    ...mapState(authenticationStore, ['login', 'clear']),
+    ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
     ...mapState(rootStore, ['audit']),
     ...mapState(assessmentStore, ['reset'])
   },
@@ -117,8 +117,13 @@ export default {
           const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            await this.audit('login:' + this.user.email, '/login')
-            this.$router.push('/')
+            if (this.isReporter) {
+              await this.audit('reporter-login:' + this.user.email, '/login')
+              this.$router.push('/assessment-dashboard')
+            } else {
+              await this.audit('login:' + this.user.email, '/login')
+              this.$router.push('/')
+            }             
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message
             await this.audit('loginfail:' + this.user.email, '/login')

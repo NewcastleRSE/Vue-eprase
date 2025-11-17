@@ -9,6 +9,7 @@ export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
     userId: null,
+    role: null,
     email: null, 
     institutionId: null,
     hospital: null,
@@ -25,6 +26,9 @@ export const authenticationStore = defineStore('authentication', {
   },
   persist: true, 
   actions: {
+    isReporter() {
+      return this.role == 'Reporter'
+    },
     async login(identifier, password) {
 
       let ret = {}
@@ -42,11 +46,12 @@ export const authenticationStore = defineStore('authentication', {
         this.$patch({token: signinRes.data.jwt})  // Store the JWT
 
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users/me?populate=institution`, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
         
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
+          role: instRes.data.role.name,
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,

@@ -142,7 +142,7 @@ export const assessmentStore = defineStore('assessment', {
     },    
     assessmentStateIndex() {
       return ASSESSMENT_STATES[this.assessmentData.assessmentState]
-    },
+    },    
     // Create a summary of mitigation results from the stored scenario responses
     mitigationSummary() {
 
@@ -344,7 +344,7 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return currentState >= requiredState
-    },
+    },  
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
     async selectAssessment(assessmentId = null) {
