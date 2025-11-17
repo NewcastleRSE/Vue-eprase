@@ -51,7 +51,7 @@ export const authenticationStore = defineStore('authentication', {
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
-          role: instRes.data.role.name,
+          role: instRes.data.role ? instRes.data.role.name : 'Authenticated',
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,
