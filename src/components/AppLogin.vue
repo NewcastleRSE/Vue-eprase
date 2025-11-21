@@ -117,7 +117,7 @@ export default {
           const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            if (this.isReporter) {
+            if (this.isReporter()) {
               await this.audit('reporter-login:' + this.user.email, '/login')
               this.$router.push('/assessment-dashboard')
             } else {

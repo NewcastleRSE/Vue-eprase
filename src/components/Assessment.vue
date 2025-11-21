@@ -95,10 +95,12 @@ import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
+import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: 'Assessment',
   computed: {
+    ...mapState(authenticationStore, ['isReporter']),
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
     assessmentId() {
@@ -213,6 +215,10 @@ export default {
   },
   async mounted() {
     console.group('Assessment top-level mounted() hook')    
+    if (this.isReporter()) {
+      // Reporter users can't complete assessments
+      this.$router.push('/assessment-dashboard')
+    }
     console.groupEnd()
   },
   errorCaptured(...args) {

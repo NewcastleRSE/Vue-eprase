@@ -3,7 +3,6 @@ import axios from 'axios'
 import { assessmentStore } from './assessment'
 
 const API = process.env.BASE_URL
-const STRAPI_BASE = API.replace('/api', '')
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
@@ -40,7 +39,7 @@ export const authenticationStore = defineStore('authentication', {
       try {
         // NOTE: this uses the standard authentication pathway which doesn't restrict institutions to one logged-in user at a time
         // Will need to develop a plugin to do the signin in order to implement this - David 21/03/2025
-        const signinRes = await axios.post(API + 'auth/local', payload)
+        const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
         this.$patch({token: signinRes.data.jwt})  // Store the JWT
@@ -87,7 +86,7 @@ export const authenticationStore = defineStore('authentication', {
       console.group('isLoggedIn()')
 
       try {
-        const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
+        const res = await axios.get(`${API}users/me?populate=*`, { headers: this.authTokenHeader })
         ret = true
       } catch (err) {
         console.error(err)
@@ -107,7 +106,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const signupRes = await axios.post('auth/local/register', payload)        
+        const signupRes = await axios.post(`${API}auth/local/register`, payload)        
         ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
@@ -128,7 +127,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const changePassRes = await axios.post(`${process.env.BASE_URL}auth/change-password`, payload, { headers: this.authTokenHeader })        
+        const changePassRes = await axios.post(`${API}auth/change-password`, payload, { headers: this.authTokenHeader })        
         ret = { status: changePassRes.status, data: changePassRes.data }
       } catch (err) {
         ret = this.triageError(err)
