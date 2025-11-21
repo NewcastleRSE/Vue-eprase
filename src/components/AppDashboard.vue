@@ -57,9 +57,12 @@
                     
                     <tr v-for="aa in dashboardData.adultAssessments">
                       <td :title="aa.institution.name">{{ aa.institution.institution_code }}</td>
-                      <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : aa.ep_service.name }}</td>
-                      <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)"></td>
-                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
+                      <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</td>
+                      <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
+                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window">View report</button>
+                      </td>
+                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell">
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -84,11 +87,13 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="aa in dashboardData.paediatricAssessments">
-                      <td :title="aa.institution.name">{{ aa.institution.institution_code }}</td>
-                      <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : aa.ep_service.name }}</td>
-                      <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)"></td>
-                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
+                    <tr v-for="pa in dashboardData.paediatricAssessments">
+                      <td :title="pa.institution.name">{{ pa.institution.institution_code }}</td>
+                      <td>{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</td>
+                      <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
+                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window">View report</button>
+                      </td>
+                      <td v-for="n in range(pa.stateIndex + 1, 6)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
