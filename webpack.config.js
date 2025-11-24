@@ -142,6 +142,7 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"production"',
         BASE_URL: baseURL,
+        MAINTENANCE_MODE: false
       },
     }),
     new webpack.LoaderOptionsPlugin({
@@ -157,10 +158,11 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"development"',
         BASE_URL: '"http://localhost:1337/api/"',
+        MAINTENANCE_MODE: false
       },
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: true,
+      minimize: false,
     }),
   ])
 }

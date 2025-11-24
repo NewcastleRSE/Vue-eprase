@@ -8,6 +8,7 @@ import AppRegister from "../components/AppRegister"
 import Assessment from "../components/Assessment"
 import AppDashboard from "../components/AppDashboard"
 import AppChangePassword from "../components/AppChangePassword"
+import AppMaintenanceMode from "../components/AppMaintenanceMode"
 import PrintablePdf from "../components/PrintablePdf"
 
 export const router = createRouter({
@@ -46,6 +47,10 @@ export const router = createRouter({
       path: "/printablepdf",
       component: PrintablePdf,
     },
+    {
+      path: "/maintenance",
+      component: AppMaintenanceMode,
+    },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ]
@@ -57,7 +62,11 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword']
+  if (to.path != '/maintenance' && process.env.MAINTENANCE_MODE) {
+    return next('/maintenance')
+  }
+
+  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword', '/maintenance']
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
