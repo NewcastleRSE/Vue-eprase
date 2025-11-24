@@ -12,7 +12,7 @@ export const rootStore = defineStore('root', {
   persist: true, 
   actions: {
   
-    async apiCall(url, method = 'POST', body = null) {
+    async apiCall(url, method = 'POST', body = null, responseType = 'json') {
 
       console.group('apiCall()')
       // Added to help debug problems with paths when transferring to staging server
@@ -24,7 +24,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
+      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: responseType } : {}
 
       try {
         if (method == 'GET') {

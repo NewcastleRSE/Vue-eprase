@@ -31,6 +31,13 @@
                   id="patient-type-paediatric-tab" 
                   data-bs-target="#patient-type-paediatric-content">All Paediatric Assessments
                 </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button 
+                  class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                  id="patient-type-csv-downloads-tab" 
+                  data-bs-target="#patient-type-csv-downloads">Download data as CSV
+                </button>
               </li>                  
             </ul>
             <div class="tab-content">
@@ -67,7 +74,7 @@
                   </tbody>
                 </table>
               </div>
-              <div class="tab-pane fade mt-2 " id="patient-type-paediatric-content" role="tabpanel" tabindex="1">
+              <div class="tab-pane fade mt-2" id="patient-type-paediatric-content" role="tabpanel" tabindex="1">
                 <div v-if="dashboardData.paediatricAssessments.length == 0" class="mt-2">No assessments created so far</div>
                 <table v-if="dashboardData.paediatricAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
@@ -98,6 +105,11 @@
                   </tbody>
                 </table>
               </div>
+              <div class="tab-pane fade mt-2" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
+                <a class="btn btn-primary col-3 me-2" @click="scenarioData()" role="button">Scenario data</a>
+                <a class="btn btn-primary col-3 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
+                <a class="btn btn-primary col-3" @click="configQuestionData()" role="button">Config Questions</a>
+              </div>
             </div>
           </div>                  
         </div>
@@ -117,12 +129,13 @@ import { appSettingsStore } from '../stores/appSettings'
 import ErrorAlertModal from './ErrorAlertModal'
 import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
+import { saveAs } from 'file-saver-es'
 
 export default {
   name: 'AssessmentDashboard',  
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport']),   
+    ...mapState(rootStore, ['progressReport', 'apiCall']),   
     epSystemYear() {
       return this.year
     },
@@ -146,6 +159,18 @@ export default {
     },
     progressBarClass(idx) {
       return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 6 ? 'in-progress' : 'complete'))
+    },    
+    async scenarioData() {
+      const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
+      saveAs(response.data, 'scenario_data.csv')
+    },
+    async mitigationPercentages() {
+      const response = await this.apiCall('assessment-mitigation-percentages', 'GET', null, 'blob')
+      saveAs(response.data, 'mitigation_percentages.csv')
+    },
+    async configQuestionData() {
+      const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
+      saveAs(response.data, 'config_question_data.csv')
     }
   },  
   async mounted() {
