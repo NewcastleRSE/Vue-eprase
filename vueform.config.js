@@ -22,6 +22,18 @@ const nhsEmail = class extends Validator {
   }
 }
 
+const nonEmptyObject = class extends Validator {
+  get msg() {
+    return 'Please fill in this value'
+  }
+  check(value) {
+    if (typeof(value) === 'object') {
+      return Object.keys(value).length > 0
+    }
+    return false
+  }
+}
+
 const fieldIsOther = class extends Validator {
 
   get msg() {
@@ -99,6 +111,6 @@ export default defineConfig({
   displayMessages: false,
   floatPlaceholders: false,
   rules: {
-    nhsEmail, dateIsSameOrAfter, fieldIsOther
+    nhsEmail, nonEmptyObject, dateIsSameOrAfter, fieldIsOther
   }
 })
