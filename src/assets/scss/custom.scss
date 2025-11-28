@@ -179,3 +179,19 @@ input[type="checkbox"], input[type="radio"] {
 button.scenario {
   pointer-events: none !important;
 }
+
+td.assessment-not-started {
+  background-color: $danger;
+}
+
+td.assessment-in-progress {
+  background-color: $warning;
+}
+
+td.assessment-complete {
+  background-color: $success;
+}
+
+td.assessment-padding-cell {
+  background-color: $light;
+}

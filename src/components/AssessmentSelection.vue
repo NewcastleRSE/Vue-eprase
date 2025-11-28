@@ -99,7 +99,7 @@
             :items="getEpSystemNames"
             :object="true"
             :messages="{required: 'Name of ePrescribing system is required'}"           
-            :rules="['required', $vueform.rules.nonEmptyObject]"          
+            :rules="['required', $vueform.rules.nonEmptyObject]"
           />
           <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
             :label="embolden('Name of ePrescribing system', true)"

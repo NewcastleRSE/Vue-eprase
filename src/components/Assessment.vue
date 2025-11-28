@@ -95,10 +95,12 @@ import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './ErrorAlertModal'
+import { authenticationStore } from '../stores/authentication'
 
 export default {
   name: 'Assessment',
   computed: {
+    ...mapState(authenticationStore, ['isReporter']),
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
     assessmentId() {
@@ -212,7 +214,7 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')    
+    console.group('Assessment top-level mounted() hook')       
     console.groupEnd()
   },
   errorCaptured(...args) {

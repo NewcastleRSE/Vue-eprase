@@ -6,7 +6,11 @@ import AppLogin from "../components/AppLogin"
 import AppLogout from "../components/AppLogout"
 import AppRegister from "../components/AppRegister"
 import Assessment from "../components/Assessment"
+import AppDashboard from "../components/AppDashboard"
+import AppChangePassword from "../components/AppChangePassword"
+import AppMaintenanceMode from "../components/AppMaintenanceMode"
 import PrintablePdf from "../components/PrintablePdf"
+import AppDashboardReport from "../components/AppDashboardReport"
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -31,10 +35,26 @@ export const router = createRouter({
     {
       path: "/assessment",
       component: Assessment,
-    },   
+    },  
+    {
+      path: "/change-password",
+      component: AppChangePassword,
+    },  
+    {
+      path: "/assessment-dashboard",
+      component: AppDashboard,
+    }, 
     {
       path: "/printablepdf",
       component: PrintablePdf,
+    },
+    {
+      path: "/maintenance",
+      component: AppMaintenanceMode,
+    },
+    {
+      path: "/assessment-report",
+      component: AppDashboardReport
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
@@ -47,7 +67,11 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword']
+  if (to.path != '/maintenance' && process.env.MAINTENANCE_MODE) {
+    return next('/maintenance')
+  }
+
+  const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword', '/maintenance']
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
@@ -70,6 +94,9 @@ router.beforeEach(async (to, from, next) => {
     console.debug('Routing logged in user to assessment page, skip welcome')
     console.groupEnd()
 
+    if (authenticationStore().isReporter()) {
+      return next('/assessment-dashboard')
+    }
     return next('/assessment')
 
   } else {

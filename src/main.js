@@ -21,6 +21,7 @@ if (process.env.NODE_ENV === 'production') {
   console.group = function() {}
   console.groupEnd = function() {}
 }
+console.dir(process.env)
 
 const app = createApp(App)
 const pinia = createPinia()

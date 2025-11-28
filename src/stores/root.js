@@ -12,7 +12,7 @@ export const rootStore = defineStore('root', {
   persist: true, 
   actions: {
   
-    async apiCall(url, method = 'POST', body = null) {
+    async apiCall(url, method = 'POST', body = null, responseType = 'json') {
 
       console.group('apiCall()')
       // Added to help debug problems with paths when transferring to staging server
@@ -24,7 +24,7 @@ export const rootStore = defineStore('root', {
 
       let response = null, ret = {}
       const auth = authenticationStore()
-      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
+      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: responseType } : {}
 
       try {
         if (method == 'GET') {
@@ -53,6 +53,11 @@ export const rootStore = defineStore('root', {
     // Get list of institutions
     async getInstitutions() {
       const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
+      return response
+    },
+    // Get institution details
+    async getInstitutionDetails(id) {
+      const response = await this.apiCall(`institutions/${id}`, 'GET')
       return response
     },
     // Get list of ePrescribing system names
@@ -84,6 +89,11 @@ export const rootStore = defineStore('root', {
     async getCategories() {
       const response = await this.apiCall('categories?fields[0]=category_code&fields[1]=name&fields[2]=description&sort[0]=name', 'GET')
       return response     
+    },
+    // Overall progress report for dashboard
+    async progressReport() {
+      const progressResponse = await rootStore().apiCall('assessment-progress-report', 'GET') 
+      return progressResponse
     },
     // Audit action
     async audit(action, uri, result) {

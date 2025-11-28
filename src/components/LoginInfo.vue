@@ -9,6 +9,9 @@
             'Logged in as ' + user : 'Not logged in' }}
           </button>
           <ul class="dropdown-menu">
+            <li v-if="isLoggedIn">
+              <a class="dropdown-item" @click="changePassword">Change my password</a>
+            </li>
             <li>
               <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress &amp; log out' : 'Log in ' }}</a>
             </li>
@@ -62,6 +65,9 @@ export default {
       } else {
         this.$router.push('/login')
       }
+    },
+    changePassword() {
+      this.$router.push('/change-password')
     }
   },  
   mounted() {

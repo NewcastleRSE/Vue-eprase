@@ -8,6 +8,7 @@ export const authenticationStore = defineStore('authentication', {
   state: () => ({
     user: null,
     userId: null,
+    role: null,
     email: null, 
     institutionId: null,
     hospital: null,
@@ -24,6 +25,9 @@ export const authenticationStore = defineStore('authentication', {
   },
   persist: true, 
   actions: {
+    isReporter() {
+      return this.role == 'Reporter'
+    },
     async login(identifier, password) {
 
       let ret = {}
@@ -35,17 +39,18 @@ export const authenticationStore = defineStore('authentication', {
       try {
         // NOTE: this uses the standard authentication pathway which doesn't restrict institutions to one logged-in user at a time
         // Will need to develop a plugin to do the signin in order to implement this - David 21/03/2025
-        const signinRes = await axios.post(API + 'auth/local', payload)
+        const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
         this.$patch({token: signinRes.data.jwt})  // Store the JWT
 
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users/me?populate=institution`, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
         
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
+          role: instRes.data.role.name,
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,
@@ -81,7 +86,8 @@ export const authenticationStore = defineStore('authentication', {
       console.group('isLoggedIn()')
 
       try {
-        const res = await axios.get(API + 'users/me?populate=*', { headers: this.authTokenHeader })
+        const res = await axios.get(`${API}users/me?populate=*`, { headers: this.authTokenHeader })
+        this.$patch({ role: res.data.role.name })
         ret = true
       } catch (err) {
         console.error(err)
@@ -101,7 +107,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const signupRes = await axios.post('auth/local/register', payload)        
+        const signupRes = await axios.post(`${API}auth/local/register`, payload)        
         ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
@@ -111,7 +117,28 @@ export const authenticationStore = defineStore('authentication', {
       console.groupEnd()
 
       return ret
-    },        
+    },   
+    // Enable an already logged in user to change their password
+    async changePassword(currentPassword, password, passwordConfirmation) {
+
+      let ret = {}
+      const payload = { currentPassword, password, passwordConfirmation }
+      
+      console.group('changePassword()')
+      console.debug('Data payload', payload)
+
+      try {
+        const changePassRes = await axios.post(`${API}auth/change-password`, payload, { headers: this.authTokenHeader })        
+        ret = { status: changePassRes.status, data: changePassRes.data }
+      } catch (err) {
+        ret = this.triageError(err)
+      }
+
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    }, 
     triageError(err) {
 
       console.group('triageError()')

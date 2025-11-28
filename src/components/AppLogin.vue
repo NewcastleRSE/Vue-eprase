@@ -6,6 +6,7 @@
 
       <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
       <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
+      <h3 v-if="$route.query.action === 'changedPassword'" class="text-success">Successfully changed your password, please sign in again</h3>
       <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
       <h1 class="mt-4">Log-in to ePRaSE</h1>
@@ -86,7 +87,7 @@ export default {
     ForgotPasswordModal
   },
   computed: {
-    ...mapState(authenticationStore, ['login', 'clear']),
+    ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
     ...mapState(rootStore, ['audit']),
     ...mapState(assessmentStore, ['reset'])
   },
@@ -116,8 +117,13 @@ export default {
           const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            await this.audit('login:' + this.user.email, '/login')
-            this.$router.push('/')
+            if (this.isReporter()) {
+              await this.audit('reporter-login:' + this.user.email, '/login')
+              this.$router.push('/assessment-dashboard')
+            } else {
+              await this.audit('login:' + this.user.email, '/login')
+              this.$router.push('/')
+            }             
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message
             await this.audit('loginfail:' + this.user.email, '/login')
