@@ -174,7 +174,7 @@ export default {
       const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
       saveAs(response.data, 'config_question_data.csv')
     },
-    async viewAssessmentReport(assessmentId, instName) {
+    async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
       const selectResponse = await this.loadCompletedAssessment(assessmentId)        
       if (selectResponse !== true) {
