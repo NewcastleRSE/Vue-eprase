@@ -10,7 +10,7 @@
       <StaticElement name="finalReportHeading">
 
         <h2>ePRaSE Tool Assessment Report {{ epSystemYear }}</h2>
-        <h3>Trust: {{ orgName }}</h3>
+        <h3>Trust: {{ institutionName }}</h3>
         <h3>EP System: {{ epSystemName }}</h3>
         <h3>Type of assessment: {{ assessmentData.selection.patientType }} inpatient</h3>
 
@@ -179,8 +179,8 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['year']),
     ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
-    ...mapState(authenticationStore, ['orgName']),
-    ...mapState(rootStore, ['storePrintableReportData']),
+    ...mapState(authenticationStore, ['orgName', 'isReporter']),
+    ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
     },
@@ -214,6 +214,7 @@ export default {
   },
   data() {
     return {
+      institutionName: '',
       auxiliaryDataReady: false,
       mitigationSummaries: null
     }
@@ -226,10 +227,22 @@ export default {
     systemInterventionTests() {
       return this.scenarioResponses.filter(sr => sr.intervention_type == 'MT1').length
     },
+    async getInstitutionName() {
+      this.institutionName = this.orgName
+      if (this.isReporter()) {
+        // Get institution name from assessment
+        const iresponse = await this.getInstitutionDetails(this.assessmentData.institution)
+        if (iresponse.status < 400) {
+          this.institutionName = iresponse.data.data.name
+        } else {
+          this.institutionName = 'Failed to get institution name'
+        }
+      } 
+    },
     getHeading() {
       return `
         <h2>Assessment Report ${this.epSystemYear}</h2>
-        <h3>Trust: ${this.orgName}</h3>
+        <h3>Trust: ${this.institutionName()}</h3>
         <h4>EP System: ${this.epSystemName}</h4>
         <h4>Type of assessment: ${this.assessmentData.selection.patientType} inpatient</h4>
       `
@@ -351,7 +364,8 @@ export default {
     const storedConfigResponse = await this.getConfigQuestionData(true)
     if (storedConfigResponse !== true) {
       throw new Error(storedConfigResponse)
-    } 
+    }
+    await this.getInstitutionName()
 
     // Create hash object to count mitigation types
     this.mitigationSummaries = this.mitigationSummary()

@@ -430,7 +430,58 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
 
-    },    
+    }, 
+    // For reporters only
+    async loadCompletedAssessment(assessmentId) {
+      let ret = false
+      if (authenticationStore().isLoggedIn() && authenticationStore().isReporter()) {
+        // Permissions ok, so get the assessment data
+        console.debug('Extracting data for assessment id', assessmentId)
+        const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
+        if (assessmentResponse.status < 400) {
+          // Check assessment is complete
+          const completedAssessmentData = assessmentResponse.data.data
+          if (completedAssessmentData.state == 'Assessment complete') {
+            // Patch in data
+            console.debug('Assessment is complete - patching in data')
+            this.$patch((state) => {
+              state.assessmentData = Object.assign(state.assessmentData, {
+                assessmentState: completedAssessmentData.state,
+                selection: Object.assign(this.assessmentData.selection, {
+                  assessmentId: assessmentId,
+                  epService: {
+                    value: completedAssessmentData.ep_service.documentId,
+                    label: completedAssessmentData.ep_service.name
+                  },
+                  otherEpService: completedAssessmentData.other_ep_service,
+                  patientType: completedAssessmentData.patient_type,
+                  shareTrustsOptOut: completedAssessmentData.share_trusts_opt_out,
+                  shareSuppliersOptOut: completedAssessmentData.share_suppliers_opt_out
+                }),                            
+                hospital: '',
+                institution: completedAssessmentData.institution.documentId,
+                completedPatients: completedAssessmentData.completed_patients,
+                numCompletedPatients: !completedAssessmentData.completed_patients ? 0 : completedAssessmentData.completed_patients.split(',').length,
+                system: completedAssessmentData.system,
+                patients: completedAssessmentData.patients,
+                patientScenarios: {}, // Reload these for each assessment
+                numScenarios: 0
+              })
+            })
+            const scenarioResponse = await this.getPatientScenarioData()
+            if (scenarioResponse !== true) {
+              throw new Error('Failed to retrieve patient scenario data')
+            }
+            ret = true
+          } else {
+            throw new Error('Assessment is not complete')
+          }
+        }
+      } else {
+        throw new Error('You are not authorised access to this data')
+      }
+      return ret
+    },
     // Get the system data (may be used standalone - setting dataReady, or as part of another method)
     async getSystemData(recordLoading = false) {
 
@@ -751,7 +802,7 @@ export const assessmentStore = defineStore('assessment', {
 
       let ret = true
 
-      console.group('getPatientScenarioResponse()')
+      console.group('getPatientScenarioResponses()')
 
       if (recordLoading) {
         this.setDataReady(false)

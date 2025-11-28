@@ -10,6 +10,7 @@ import AppDashboard from "../components/AppDashboard"
 import AppChangePassword from "../components/AppChangePassword"
 import AppMaintenanceMode from "../components/AppMaintenanceMode"
 import PrintablePdf from "../components/PrintablePdf"
+import AppDashboardReport from "../components/AppDashboardReport"
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -51,6 +52,10 @@ export const router = createRouter({
       path: "/maintenance",
       component: AppMaintenanceMode,
     },
+    {
+      path: "/assessment-report",
+      component: AppDashboardReport
+    },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ]
@@ -89,6 +94,9 @@ router.beforeEach(async (to, from, next) => {
     console.debug('Routing logged in user to assessment page, skip welcome')
     console.groupEnd()
 
+    if (authenticationStore().isReporter()) {
+      return next('/assessment-dashboard')
+    }
     return next('/assessment')
 
   } else {

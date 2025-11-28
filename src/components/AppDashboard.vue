@@ -66,7 +66,7 @@
                       <td :title="aa.institution.name">{{ aa.institution.institution_code }}</td>
                       <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</td>
                       <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window">View report</button>
+                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
                       </td>
                       <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell">
                       </td>
@@ -105,7 +105,7 @@
                   </tbody>
                 </table>
               </div>
-              <div class="tab-pane fade mt-2" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
+              <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
                 <a class="btn btn-primary col-3 me-2" @click="scenarioData()" role="button">Scenario data</a>
                 <a class="btn btn-primary col-3 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
                 <a class="btn btn-primary col-3" @click="configQuestionData()" role="button">Config Questions</a>
@@ -130,12 +130,14 @@ import ErrorAlertModal from './ErrorAlertModal'
 import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
+import { assessmentStore } from '../stores/assessment'
 
 export default {
   name: 'AssessmentDashboard',  
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall']),   
+    ...mapState(rootStore, ['progressReport', 'apiCall']), 
+    ...mapState(assessmentStore, ['loadCompletedAssessment', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
     epSystemYear() {
       return this.year
     },
@@ -171,6 +173,18 @@ export default {
     async configQuestionData() {
       const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
       saveAs(response.data, 'config_question_data.csv')
+    },
+    async viewAssessmentReport(assessmentId, instName) {
+      console.group('viewAssessmentReport()')
+      const selectResponse = await this.loadCompletedAssessment(assessmentId)        
+      if (selectResponse !== true) {
+        throw new Error('Failed to load assessment data')
+      } else {
+        window.open(this.$router.resolve({
+        path: '/assessment-report'
+      }).href, '_blank')
+      } 
+      console.groupEnd()
     }
   },  
   async mounted() {
@@ -178,6 +192,21 @@ export default {
 
     this.auxiliaryDataReady = false
 
+    // Basic data for viewing assessments
+    const mitResponse = await this.getMitigationDetails()
+    if (mitResponse !== true) {
+      throw new Error(mitResponse)
+    }
+    const catResponse = await this.getCategoryDetails()
+    if (catResponse !== true) {
+      throw new Error(catResponse)
+    }    
+    const configResponse = await this.getConfigQuestionDetails()
+    if (configResponse !== true) {
+      throw new Error(configResponse)
+    }
+
+    // Dashboard data
     const response = await this.progressReport()
     if (response.status >= 400) {
       throw new Error(response.message)

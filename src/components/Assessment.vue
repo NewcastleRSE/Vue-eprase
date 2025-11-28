@@ -214,11 +214,7 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')    
-    if (this.isReporter()) {
-      // Reporter users can't complete assessments
-      this.$router.push('/assessment-dashboard')
-    }
+    console.group('Assessment top-level mounted() hook')       
     console.groupEnd()
   },
   errorCaptured(...args) {

@@ -55,6 +55,11 @@ export const rootStore = defineStore('root', {
       const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
       return response
     },
+    // Get institution details
+    async getInstitutionDetails(id) {
+      const response = await this.apiCall(`institutions/${id}`, 'GET')
+      return response
+    },
     // Get list of ePrescribing system names
     async getEpSystems() {
       const response = await this.apiCall('ep-services?fields[0]=name&sort[0]=name:asc', 'GET')
