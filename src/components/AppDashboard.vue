@@ -95,7 +95,7 @@
                   </thead>
                   <tbody>
                     <tr v-for="pa in dashboardData.paediatricAssessments">
-                      <td :title="pa.institution.name">{{ pa.institution.institution_code }}</td>
+                      <td :title="pa.institution.institution_code">{{ pa.institution.name }}</td>
                       <td>{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</td>
                       <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
                         <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
