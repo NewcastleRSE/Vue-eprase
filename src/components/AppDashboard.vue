@@ -63,7 +63,7 @@
                   <tbody>
                     
                     <tr v-for="aa in dashboardData.adultAssessments">
-                      <td :title="aa.institution.name">{{ aa.institution.institution_code }}</td>
+                      <td :title="aa.institution.institution_code">{{ aa.institution.name }}</td>
                       <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</td>
                       <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
                         <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
