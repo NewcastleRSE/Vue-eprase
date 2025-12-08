@@ -126,7 +126,8 @@ export const assessmentStore = defineStore('assessment', {
     mitigations: [],
     categories: [],
     dataReady: false,
-    loggingOut: false
+    loggingOut: false,
+    duplicateAssessmentAttempt: false
   }),
   persist: true, 
   actions: {
@@ -139,7 +140,12 @@ export const assessmentStore = defineStore('assessment', {
       this.$patch((state) => {
         state.loggingOut = logoutStatus
       })
-    },    
+    }, 
+    setDuplicateAssessment(isDuplicate) {
+      this.$patch((state) => {
+        state.duplicateAssessmentAttempt = isDuplicate
+      })
+    },   
     assessmentStateIndex() {
       return ASSESSMENT_STATES[this.assessmentData.assessmentState]
     },    
@@ -344,7 +350,23 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return currentState >= requiredState
-    },  
+    },
+    // Only here because it proves nigh impossible to create the right $and query in Strapi, so done by manual filtering
+    exactAssessmentPresent(orgCode, epService, patientType) {
+      console.group('exactAssessmentPresent()')
+      console.debug(orgCode, epService, patientType)
+      let present = false
+      for (const ca of this.allPossibleAssessments) {
+        console.debug(ca)
+        if (ca.patient_type == patientType && (ca.institution && ca.institution.institution_code == orgCode) && (ca.ep_service  && ca.ep_service.name == epService)) {
+          present = true
+          break
+        }
+      }
+      console.debug('Returning', present)
+      console.groupEnd()
+      return present
+    },
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
     async selectAssessment(assessmentId = null) {
@@ -356,31 +378,47 @@ export const assessmentStore = defineStore('assessment', {
       let action = 'select_assessment'
       this.setDataReady(false)
 
+      this.setDuplicateAssessment(false)
+
       if (assessmentId == null) {
         // New assessment
         console.debug('New assessment => save data')
-        const response = await rootStore().apiCall('assessments', 'POST', {
-          data: {
-            state: this.assessmentData.assessmentState,
-            patient_type: this.assessmentData.selection.patientType,
-            hospital: authenticationStore().hospital,
-            institution: { connect: [authenticationStore().orgDocId] },
-            ep_service: { connect: [this.assessmentData.selection.epService.value] },
-            other_ep_service: this.assessmentData.selection.otherEpService,
-            share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
-            share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut
-          }
-        })
-        if (response.status < 400) {
-          console.debug('Save assessment response is', response)
-          this.$patch((state) => { 
-            state.assessmentData.selection.assessmentId = response.data.data.documentId
-            state.assessmentData.hospital = authenticationStore().hospital,
-            state.assessmentData.institution = authenticationStore().orgDocId
-          })
+        // Check for existing assessment which may have been created by another user in the same trust for the same patient type
+        const orgCode = authenticationStore().orgCode
+        const epSystem = this.assessmentData.selection.epService.label
+        const patientType = this.assessmentData.selection.patientType
+        const exAssessmentResponse = await this.getAssessmentsForInstitution()
+        if (exAssessmentResponse !== true) {
+          ret = exAssessmentResponse
+        } else if (this.exactAssessmentPresent(orgCode, epSystem, patientType)) {
+          // An assessment already in progress for current trust / eP system / patient type - may have been saved while current user logged in
+          ret = 'An existing assessment for this ePrescribing system and patient type is already in progress in your trust'
+          this.setDuplicateAssessment(true)
         } else {
-          ret = response.message
-        }
+          // No existing assessment, so save submitted data          
+          const response = await rootStore().apiCall('assessments', 'POST', {
+            data: {
+              state: this.assessmentData.assessmentState,
+              patient_type: this.assessmentData.selection.patientType,
+              hospital: authenticationStore().hospital,
+              institution: { connect: [authenticationStore().orgDocId] },
+              ep_service: { connect: [this.assessmentData.selection.epService.value] },
+              other_ep_service: this.assessmentData.selection.otherEpService,
+              share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
+              share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut
+            }
+          })
+          if (response.status < 400) {
+            console.debug('Save assessment response is', response)
+            this.$patch((state) => { 
+              state.assessmentData.selection.assessmentId = response.data.data.documentId
+              state.assessmentData.hospital = authenticationStore().hospital,
+              state.assessmentData.institution = authenticationStore().orgDocId
+            })
+          } else {
+            ret = response.message
+          }
+        }        
       } else {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')

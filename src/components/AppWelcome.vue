@@ -7,6 +7,10 @@
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
+        <div class="alert alert-danger fw-bold" v-if="isDevelopmentSite">
+          This is a test version of the site, NOT the live ePRaSE tool. Please DO NOT use this site, but instead go to the 
+          <a href="https://eprase.nhs.uk/" title="Live ePRaSE tool" target="_blank" style="text-decoration:underline">live version of the tool</a>
+        </div>
         <div class="row w-50 mx-auto">
           <Vueform>          
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
@@ -16,10 +20,10 @@
                 @click="onLoginClick">
                 <i class="bi bi-person-circle me-2"></i>Log in
               </ButtonElement>            
-              <ButtonElement name="register" full 
+              <ButtonElement name="register" full
                 :columns="6" 
                 :add-class="'mx-2'" 
-                :disabled="$route.query.action === 'registered'" 
+                :disabled="isDevelopmentSite || $route.query.action === 'registered'" 
                 @click="onRegisterClick">
                 <i class="bi bi-person-fill-add me-2"></i>Register
               </ButtonElement>
@@ -64,7 +68,10 @@ export default {
     AppLogo
   },
   computed: {
-    ...mapState(appSettingsStore, ['version', 'year'])
+    ...mapState(appSettingsStore, ['version', 'year']),
+    isDevelopmentSite() {
+      return process.env.NODE_ENV === 'development'
+    }
   },
   methods: {
     onLoginClick() {
