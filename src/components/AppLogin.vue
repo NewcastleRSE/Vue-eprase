@@ -51,7 +51,7 @@
             <ButtonElement name="register" full 
               :columns="3" 
               :add-class="'mx-2'" 
-              :disabled="$route.query.action === 'registered'" 
+              :disabled="isDevelopmentSite || $route.query.action === 'registered'" 
               @click="onRegisterClick">
               <i class="bi bi-person-fill-add me-2"></i>Register
             </ButtonElement>
@@ -89,7 +89,10 @@ export default {
   computed: {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
     ...mapState(rootStore, ['audit']),
-    ...mapState(assessmentStore, ['reset'])
+    ...mapState(assessmentStore, ['reset']),
+    isDevelopmentSite() {
+      return process.env.NODE_ENV === 'development'
+    }
   },
   data() {
     return {

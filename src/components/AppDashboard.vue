@@ -49,8 +49,8 @@
                       <th class="align-content-center" colspan="9">Completed stage</th>
                     </tr>
                     <tr>
-                      <th scope="col" class="vertical-header col-1"><span>Code</span></th>
-                      <th scope="col" class="vertical-header col-2"><span>EP service</span></th>
+                      <th scope="col" class="vertical-header col-2"><span>Institution</span></th>
+                      <th scope="col" class="vertical-header col-1"><span>EP service</span></th>
                       <th scope="col" class="vertical-header col-1"><span>No assessment</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Not started</span></th>
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
@@ -82,8 +82,8 @@
                       <th class="align-content-center" colspan="9">Completed stage</th>
                     </tr>
                     <tr>
-                      <th scope="col" class="vertical-header col-1"><span>Code</span></th>
-                      <th scope="col" class="vertical-header col-2"><span>EP service</span></th>
+                      <th scope="col" class="vertical-header col-2"><span>Institution</span></th>
+                      <th scope="col" class="vertical-header col-1"><span>EP service</span></th>
                       <th scope="col" class="vertical-header col-1"><span>No assessment</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Not started</span></th>
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>

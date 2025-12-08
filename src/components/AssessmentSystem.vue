@@ -7,7 +7,13 @@
         </div>
       </div>
     </StaticElement>
-    <GroupElement name="systemGroupLoaded" v-if="dataLoaded">
+    <StaticElement name="duplicateAssessmentAttempted" v-if="duplication">
+      <div class="alert alert-danger">
+        Another user from your trust has already created an assessment for ePrescribing system {{ epSystemName }} and patient type {{ selectionData.patientType }}.  They may be editing it at the present time, so  
+        you are advised to log out and come back later.
+      </div>
+    </StaticElement>
+    <GroupElement name="systemGroupLoaded" v-if="dataLoaded && !duplication">
       <StaticElement name="epSystemHeading">
         <h2><span class="fst-italic">{{ epSystemName }}</span> ePrescribing System information</h2>
         <h3>Please answer the following questions about your ePrescribing System:</h3>
@@ -171,7 +177,7 @@ export default {
   name: 'AssessmentSystem',      
   computed: {
     ...mapState(rootStore, ['getClinicalAreas', 'getHighRiskMeds']),
-    ...mapState(assessmentStore, ['assessmentData', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
+    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'setDuplicateAssessment', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
     confirmCancelEditModal() {
       return this.$refs.confirmCancelEditModal
     },  
@@ -199,6 +205,9 @@ export default {
     },
     dataLoaded() {
       return this.dataReady
+    },
+    duplication() {
+      return this.duplicateAssessmentAttempt
     }
   },
   components: {
@@ -261,13 +270,17 @@ export default {
   async beforeUnmount() {    
     console.group('AssessmentSystem beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentSystem beforeUnmount() hook - dataReady flag is false') 
-    // Note: DO NOT assume system data is complete if we log out in the middle of entering it!
-    // Also, it is very difficult to validate a form at this late stage as everything is in the process
-    // of being reset - compromise is to assume that if system data is NOT submitted then it is incomplete 
-    const sysResponse = await this.saveSystemData(!this.loggingOut)        
-    if (sysResponse !== true) {
-      throw new Error(sysResponse)
-    } 
+    if (this.duplication) {
+      this.setDuplicateAssessment(false)
+    } else {
+      // Note: DO NOT assume system data is complete if we log out in the middle of entering it!
+      // Also, it is very difficult to validate a form at this late stage as everything is in the process
+      // of being reset - compromise is to assume that if system data is NOT submitted then it is incomplete 
+      const sysResponse = await this.saveSystemData(!this.loggingOut)        
+      if (sysResponse !== true) {
+        throw new Error(sysResponse)
+      } 
+    }        
     console.groupEnd()
   }
 }

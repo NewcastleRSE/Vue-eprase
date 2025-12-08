@@ -22,7 +22,7 @@
               :labels="{ next: 'Continue to System Information' }" />
             <FormStep name="systemInfoStep" label="ePrescribing System<br>Information"               
               :elements="['systemInfoEl']" 
-              :buttons="{ previous: false }"
+              :buttons="{ previous: this.duplicateAssessmentAttempt, next: !this.duplicateAssessmentAttempt }"
               :labels="{ 
                 next: 'Continue to Patient Build'
               }" />
@@ -102,7 +102,7 @@ export default {
   computed: {
     ...mapState(authenticationStore, ['isReporter']),
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'assessmentStateIndex']),
+    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },   
