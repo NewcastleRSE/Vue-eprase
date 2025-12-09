@@ -70,7 +70,8 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
     isDevelopmentSite() {
-      return process.env.NODE_ENV === 'development'
+      // return process.env.NODE_ENV === 'development'
+      return process.env.BASE_URL == 'https://eprase.ncldata.dev'
     }
   },
   methods: {
