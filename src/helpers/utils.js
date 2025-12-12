@@ -50,3 +50,9 @@ export function shuffle(a) {
   }
   console.debug('List after shuffle', a)
 }
+
+export function isStagingSite() {
+  // Detects staging server via process.env.BASE_URL
+  console.debug('Detecting whether we are on staging', process.env.BASE_URL)
+  return process.env.BASE_URL.includes('ncldata.dev')
+}
