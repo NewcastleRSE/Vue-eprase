@@ -51,7 +51,7 @@
             <ButtonElement name="register" full 
               :columns="3" 
               :add-class="'mx-2'" 
-              :disabled="isDevelopmentSite || $route.query.action === 'registered'" 
+              :disabled="onStaging || $route.query.action === 'registered'" 
               @click="onRegisterClick">
               <i class="bi bi-person-fill-add me-2"></i>Register
             </ButtonElement>
@@ -74,7 +74,7 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { usernameFromEmail } from '../helpers/utils'
+import { usernameFromEmail, isStagingSite } from '../helpers/utils'
 import ForgotPasswordModal from './ForgotPasswordModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
@@ -90,8 +90,8 @@ export default {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
     ...mapState(rootStore, ['audit']),
     ...mapState(assessmentStore, ['reset']),
-    isDevelopmentSite() {
-      return process.env.NODE_ENV === 'development'
+    onStaging() {
+      return isStagingSite()
     }
   },
   data() {

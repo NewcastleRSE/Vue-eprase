@@ -7,7 +7,7 @@
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
-        <div class="alert alert-danger fw-bold" v-if="isDevelopmentSite">
+        <div class="alert alert-danger fw-bold" v-if="onStaging">
           This is a test version of the site, NOT the live ePRaSE tool. Please DO NOT use this site, but instead go to the 
           <a href="https://eprase.nhs.uk/" title="Live ePRaSE tool" target="_blank" style="text-decoration:underline">live version of the tool</a>
         </div>
@@ -23,7 +23,7 @@
               <ButtonElement name="register" full
                 :columns="6" 
                 :add-class="'mx-2'" 
-                :disabled="isDevelopmentSite || $route.query.action === 'registered'" 
+                :disabled="onStaging || $route.query.action === 'registered'" 
                 @click="onRegisterClick">
                 <i class="bi bi-person-fill-add me-2"></i>Register
               </ButtonElement>
@@ -59,7 +59,8 @@
 <script>
 
 import { mapState } from 'pinia'
-import AppLogo from "./AppLogo"
+import AppLogo from './AppLogo'
+import { isStagingSite } from '../helpers/utils'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
@@ -69,8 +70,8 @@ export default {
   },
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
-    isDevelopmentSite() {
-      return process.env.NODE_ENV === 'development'
+    onStaging() {
+      return isStagingSite()
     }
   },
   methods: {
