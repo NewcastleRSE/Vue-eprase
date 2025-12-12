@@ -3,7 +3,11 @@
     <AppLogo cls="banner" />
     <div class="pb-3">
       <h1>Welcome to ePRaSE {{ year }}</h1>
-      <p class="service-description mx-auto">
+      <div class="alert alert-danger" v-if="!toolIsOpen">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed to users.  Access possible for admins only.
+      </div>
+      <div v-if="toolIsOpen">
+        <p class="service-description mx-auto">
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
         and deliver improved patient outcomes.</p>
@@ -39,6 +43,7 @@
             </GroupElement>
           </Vueform>  
         </div>
+      </div>      
     </div>
     <div class="row w-75 mx-auto">
       <div class="col p-1">
@@ -62,16 +67,23 @@ import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
 import { isStagingSite } from '../helpers/utils'
 import { appSettingsStore } from '../stores/appSettings'
+import { rootStore } from '../stores/root';
 
 export default {
-  name: "AppWelcome",
+  name: 'AppWelcome',
   components: {
     AppLogo
   },
   computed: {
     ...mapState(appSettingsStore, ['version', 'year']),
+    ...mapState(rootStore, ['toolOpen']),
     onStaging() {
       return isStagingSite()
+    }
+  },
+  data() {
+    return {
+      toolIsOpen: false
     }
   },
   methods: {
@@ -84,6 +96,9 @@ export default {
     onForgotPasswordClick() {
       this.$router.push('/forgotpassword')
     }
+  },
+  async mounted() {
+    this.toolIsOpen = await this.toolOpen()
   }
 }
 </script>

@@ -155,7 +155,7 @@ export default {
         this.institutions = response.data.data.map(inst => { return { value: inst.id, label: inst.name, hospitals: inst.hospitals } })
         this.institutions.unshift({value: '', label: 'Please select...', disabled: true})        
       } else {
-        this.serverError = [response.message]
+        this.serverError = response.message
       }
     },
     getHospitals(instId) { 

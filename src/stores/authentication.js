@@ -148,7 +148,7 @@ export const authenticationStore = defineStore('authentication', {
       if (err.response) {
         console.debug('err.response set')
         console.debug(err.response)
-        payload = { status: err.response.status, message: err.response.data.error.message || err.response.data }
+        payload = { status: err.response.status, message: err.response.data.error || err.response.data.error.message || err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
         console.debug(err.request)
