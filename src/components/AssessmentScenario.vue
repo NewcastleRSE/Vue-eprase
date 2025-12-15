@@ -167,14 +167,17 @@
                               <tbody>
                                 <tr v-for="(mc, mcIdx) in matrixCategories">
                                   <td>{{  mc.label }}</td>
-                                  <td><CheckboxElement :name="'alert' + mc.value" /></td>
-                                  <td><CheckboxElement :name="'advisory' + mc.value" /></td>
+                                  <td><CheckboxElement :name="'alert' + mc.value" @change="recordDsCategorySelection" /></td>
+                                  <td><CheckboxElement :name="'advisory' + mc.value" @change="recordDsCategorySelection" /></td>
                                   <td>
                                     <span v-show="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
                                       :data-bs-title="mc.tip.replace('Tip: ', '')">
                                       <i class="bi bi-info-circle-fill"></i>
                                     </span>
                                   </td>
+                                </tr>
+                                <tr v-if="tooManyCategories == true">
+                                  <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
                                 </tr>
                               </tbody>
                             </table>
@@ -226,7 +229,7 @@
                       </div>
                       <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
-                          :disabled="!allowCurrentScenarioSave"
+                          :disabled="!allowCurrentScenarioSave || tooManyCategories"
                           :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
@@ -324,6 +327,9 @@ export default {
     completedScenariosHidden() {
       console.log('Hidden element is', this.$refs.completedScenariosHidden)
       return this.$refs.completedScenariosHidden
+    },
+    tooManyCategories() {
+      return Object.keys(this.dsCategoriesSelected).length > 2
     }
   },
   data() {
@@ -339,6 +345,7 @@ export default {
       numCompletedScenarios: 0,
       scenarioPatientLink: {},
       savedResponseData: true,
+      dsCategoriesSelected: {}, // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
       allScenariosCompleted
     }
   },
@@ -358,26 +365,53 @@ export default {
       
       console.group('saveScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
-     
-      //TODO - need to validate this data and flag any problems (at moment 03/10/2025 it just stays on the scenario and doesn't inform the user)
+
       this.savedResponseData = false
-      const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-      if (saveResponse !== true) {
-        throw new Error(saveResponse)
+     
+      // Validate the number of categories chosen in a system/user intervention scenario <= 2
+      const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
+      if (formPayload.interventionType == 'MT1' && Object.keys(this.dsCategoriesSelected).length > 2) {
+        // Output error, do not save the data and remain here for correction
+        console.debug('Too many categories', this.tooManyCategories)
       } else {
-        this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
-        this.numCompletedScenarios++
-        this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
-        this.completedScenariosHidden.validate()
-      }
-      setTimeout(() => {
-        this.savedResponseData = true
-      }, 200)
-      
+        // All good to go
+        const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
+        if (saveResponse !== true) {
+          throw new Error(saveResponse)
+        } else {
+          this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
+          this.numCompletedScenarios++
+          this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
+          this.completedScenariosHidden.validate()
+        }
+        setTimeout(() => {
+          this.savedResponseData = true
+        }, 200)
+      }                  
       console.groupEnd()
     },
     hasInterventionSelections(patientCode, scenarioCode) {
       return this.interventionSelections[patientCode + '.' + scenarioCode + '.interventionType'] === true
+    },
+    recordDsCategorySelection(newVal, oldVal, el$) {
+      console.debug('recordDsCategorySelection() called with', newVal, oldVal, el$)
+      const chkName = el$.name
+      const catCodePos = chkName.indexOf('CAT')
+      const intType = chkName.substring(0, catCodePos)
+      const catCode = chkName.substring(catCodePos)
+      if (newVal === true) {
+        if (!( catCode in this.dsCategoriesSelected)) {
+          this.dsCategoriesSelected[catCode] = []
+        } 
+        this.dsCategoriesSelected[catCode].push(intType)
+      } else {
+        const typePos = this.dsCategoriesSelected[catCode].indexOf(intType)
+        this.dsCategoriesSelected[catCode].splice(typePos, 1)
+        if (this.dsCategoriesSelected[catCode].length == 0) {
+          delete this.dsCategoriesSelected[catCode]
+        }
+      }      
+      console.debug('Selection record', this.dsCategoriesSelected)
     },
     formatRecordedInterventions(scenarioCode) {
       let intObj = {}
@@ -418,6 +452,7 @@ export default {
 
       console.group('openNextUnenteredScenario()')
 
+      this.dsCategoriesSelected = {}
       const doneScenarios = Object.keys(this.scenarioResponses)
       this.completedScenariosHidden.update(doneScenarios.join(','))
 
