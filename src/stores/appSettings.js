@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const appSettingsStore = defineStore('appSettings', {
   state: () => {
     return {
-      version: '3.1.2',
+      version: '3.1.3',
       debugMode: false,
       year: new Date().getFullYear(),     
       passwordMinLength: 6,
