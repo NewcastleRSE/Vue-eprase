@@ -242,7 +242,7 @@ export default {
     getHeading() {
       return `
         <h2>Assessment Report ${this.epSystemYear}</h2>
-        <h3>Trust: ${this.institutionName()}</h3>
+        <h3>Trust: ${this.institutionName}</h3>
         <h4>EP System: ${this.epSystemName}</h4>
         <h4>Type of assessment: ${this.assessmentData.selection.patientType} inpatient</h4>
       `
