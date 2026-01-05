@@ -42,15 +42,15 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane fade active show mt-2" id="patient-type-adult-content" role="tabpanel" tabindex="0">
-                <div v-if="dashboardData.adultAssessments.length == 0" class="mt-2">No assessments created so far</div>
+                <div v-if="dashboardData.adultAssessments.length == 0" class="mt-2">No assessments created so far</div>                
                 <table v-if="dashboardData.adultAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
                     <tr>
                       <th class="align-content-center" colspan="9">Completed stage</th>
                     </tr>
                     <tr>
-                      <th scope="col" class="vertical-header col-2"><span>Institution</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>EP service</span></th>
+                      <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
+                      <th scope="col" class="vertical-header col-auto"><span>EP service</span></th>
                       <th scope="col" class="vertical-header col-1"><span>No assessment</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Not started</span></th>
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
@@ -60,16 +60,14 @@
                       <th scope="col" class="vertical-header col-1"><span>Finished</span></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    
+                  <tbody>                    
                     <tr v-for="aa in dashboardData.adultAssessments">
-                      <td :title="aa.institution.institution_code">{{ aa.institution.name }}</td>
-                      <td>{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</td>
+                      <td :title="aa.institution.institution_code"><span class="nowrap">{{ aa.institution.name }}</span></td>
+                      <td><span class="nowrap">{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
                         <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
                       </td>
-                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell">
-                      </td>
+                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -82,8 +80,8 @@
                       <th class="align-content-center" colspan="9">Completed stage</th>
                     </tr>
                     <tr>
-                      <th scope="col" class="vertical-header col-2"><span>Institution</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>EP service</span></th>
+                      <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
+                      <th scope="col" class="vertical-header col-auto"><span>EP service</span></th>
                       <th scope="col" class="vertical-header col-1"><span>No assessment</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Not started</span></th>
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
@@ -95,8 +93,8 @@
                   </thead>
                   <tbody>
                     <tr v-for="pa in dashboardData.paediatricAssessments">
-                      <td :title="pa.institution.institution_code">{{ pa.institution.name }}</td>
-                      <td>{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</td>
+                      <td :title="pa.institution.institution_code"><span class="nowrap">{{ pa.institution.name }}</span></td>
+                      <td><span class="nowrap">{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
                         <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
                       </td>
@@ -131,6 +129,7 @@ import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
 import { assessmentStore } from '../stores/assessment'
+import { nextTick } from 'vue'
 
 export default {
   name: 'AssessmentDashboard',  
@@ -161,7 +160,7 @@ export default {
     },
     progressBarClass(idx) {
       return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 6 ? 'in-progress' : 'complete'))
-    },    
+    },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
       saveAs(response.data, 'scenario_data.csv')
@@ -214,7 +213,7 @@ export default {
     this.dashboardData = response.data
 
     this.auxiliaryDataReady = true
-    
+
     console.groupEnd()
   },
   beforeUnmount() {
@@ -229,7 +228,7 @@ export default {
     // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
     const activeElement = document.activeElement
     if (activeElement) {
-      activeElement.blur();
+      activeElement.blur()
     }
     this.errorAlertModal.show(args[0].message)
 
@@ -249,7 +248,11 @@ export default {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   text-align: left;
-  /* max-height: 150px; */
+}
+
+span.nowrap {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 </style>
