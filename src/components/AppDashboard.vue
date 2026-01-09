@@ -65,7 +65,7 @@
                       <td :title="aa.institution.institution_code"><span class="nowrap">{{ aa.institution.name }}</span></td>
                       <td><span class="nowrap">{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
+                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
                       </td>
                       <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
                     </tr>
@@ -96,7 +96,7 @@
                       <td :title="pa.institution.institution_code"><span class="nowrap">{{ pa.institution.name }}</span></td>
                       <td><span class="nowrap">{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
+                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
                       </td>
                       <td v-for="n in range(pa.stateIndex + 1, 6)" class="padding-cell"></td>
                     </tr>
@@ -104,9 +104,11 @@
                 </table>
               </div>
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
-                <a class="btn btn-primary col-3 me-2" @click="scenarioData()" role="button">Scenario data</a>
-                <a class="btn btn-primary col-3 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
-                <a class="btn btn-primary col-3" @click="configQuestionData()" role="button">Config Questions</a>
+                <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
+                <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
+                <a class="btn btn-primary col-2 me-2" @click="configQuestionData()" role="button">Config Questions</a>
+                <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
+                <a class="btn btn-primary col-2" @click="systemData()" role="button">System data</a>
               </div>
             </div>
           </div>                  
@@ -158,20 +160,31 @@ export default {
     range(start, end) {
       return Array(end - start + 1).fill().map((_, i) => start + i);
     },
+    formatDate() {
+      return new Date().toISOString().slice(0, 10)
+    },
     progressBarClass(idx) {
       return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 6 ? 'in-progress' : 'complete'))
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
-      saveAs(response.data, 'scenario_data.csv')
+      saveAs(response.data, `scenario_data_${this.formatDate()}.csv`)
     },
     async mitigationPercentages() {
       const response = await this.apiCall('assessment-mitigation-percentages', 'GET', null, 'blob')
-      saveAs(response.data, 'mitigation_percentages.csv')
+      saveAs(response.data, `mitigation_percentages_${this.formatDate()}.csv`)
     },
     async configQuestionData() {
       const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
-      saveAs(response.data, 'config_question_data.csv')
+      saveAs(response.data, `config_error_data_${this.formatDate()}.csv`)
+    },
+    async assessmentSummary() {
+      const response = await this.apiCall('assessment-summary-data', 'GET', null, 'blob')
+      saveAs(response.data, `assessments_summary_${this.formatDate()}.csv`)
+    },
+    async systemData() {
+      const response = await this.apiCall('assessment-system-data', 'GET', null, 'blob')
+      saveAs(response.data, `system_data_${this.formatDate()}.csv`)
     },
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
@@ -253,6 +266,10 @@ export default {
 span.nowrap {
   display: inline-block;
   white-space: nowrap;
+}
+
+.btn-nopad {
+  padding: 0px;
 }
 
 </style>
