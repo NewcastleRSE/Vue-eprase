@@ -198,13 +198,8 @@ export default {
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
       const selectResponse = await this.loadCompletedAssessment(assessmentId)        
-      if (selectResponse !== true) {
-        throw new Error('Failed to load assessment data')
-      } else {
-        window.open(this.$router.resolve({
-        path: '/assessment-report'
-      }).href, '_blank')
-      } 
+      errorResponder(selectResponse)
+      window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
       console.groupEnd()
     }
   },  
@@ -215,23 +210,15 @@ export default {
 
     // Basic data for viewing assessments
     const mitResponse = await this.getMitigationDetails()
-    if (mitResponse !== true) {
-      throw new Error(mitResponse)
-    }
+    errorResponder(mitResponse)    
     const catResponse = await this.getCategoryDetails()
-    if (catResponse !== true) {
-      throw new Error(catResponse)
-    }    
+    errorResponder(catResponse)
     const configResponse = await this.getConfigQuestionDetails()
-    if (configResponse !== true) {
-      throw new Error(configResponse)
-    }
+    errorResponder(configResponse)
 
     // Dashboard data
     const response = await this.progressReport()
-    if (response.status >= 400) {
-      throw new Error(response.message)
-    }
+    errorResponder(response)
     this.dashboardData = response.data
 
     this.auxiliaryDataReady = true

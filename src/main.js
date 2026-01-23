@@ -28,6 +28,9 @@ const pinia = createPinia()
 pinia.use(createPersistedState({ 
   storage: localStorage 
 }))
+pinia.use(({ store }) => {
+  store.router = router // This makes 'router' available as 'this.router' in stores
+})
 
 axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
@@ -40,12 +43,27 @@ app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
 app.config.devtools = true
 
-app.config.globalProperties.embolden = function(str, required=false) {
-  let markup = `<span class="fw-bold">${str}</span>`
-  if (required) {
-    markup += `<sup class="ms-1" title="Field is required"><i class="bi bi-asterisk text-danger"></i></sup>`
+app.config.globalProperties = {
+  embolden: function(str, required=false) {
+    let markup = `<span class="fw-bold">${str}</span>`
+    if (required) {
+      markup += `<sup class="ms-1" title="Field is required"><i class="bi bi-asterisk text-danger"></i></sup>`
+    }
+    return markup
+  },
+  // Check an API or other async service response and forward error only if response status not 401|403|440
+  // Otherwise just return and allow triageError() in authentication.js to route user to login page
+  errorResponder: function(response) {
+    const isObject = Object.prototype.toString.call(response) === '[object Object]'
+    if (isObject) {
+      const status = response.status || 200
+      const message = response.message || 'An unspecified error occurred'
+      const unauthHttp = [401, 403, 440]
+      if (status >= 400 && !unauthHttp.includes(status)) {
+        throw new Error(message)
+      }
+    }
   }
-  return markup
 }
 
 app.mount('#app')

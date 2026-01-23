@@ -125,7 +125,7 @@ export default {
               this.$router.push('/assessment-dashboard')
             } else {
               await this.audit('login:' + this.user.email, '/login')
-              this.$router.push('/')
+              this.$router.push('/assessment')
             }             
           } else {
             this.serverError = 'An error occured during signin:' + signinResponse.message

@@ -68,15 +68,11 @@ export default {
       const cqResults = this.assessmentData.config.configQuestionResults || []
       return cqResults.filter(cqr => cqr.config_error_code == cqCode).length > 0
     },
-    async saveConfigQuestionResponses() {
-      
+    async saveConfigQuestionResponses() {      
       console.group('saveConfigQuestionResponses()')
-      console.debug('Form part-object', this.$refs['configObject'])
-     
+      console.debug('Form part-object', this.$refs['configObject'])     
       const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
-      if (saveResponse !== true) {
-        throw new Error(saveResponse)
-      }
+      errorResponder(saveResponse)
       console.groupEnd()
     }
   },
@@ -84,9 +80,7 @@ export default {
     console.group('AssessmentConfigQuestion mounted()')
     this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, false) } })
     const loadCqDataResponse = await this.getConfigQuestionData(true)
-    if (loadCqDataResponse !== true) {
-      throw new Error(loadCqDataResponse)
-    }    
+    errorResponder(loadCqDataResponse)
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -94,9 +88,7 @@ export default {
     console.assert(this.dataLoaded, 'AssessmentConfigQuestion beforeUnmount() hook - dataReady flag is false')
     await this.saveConfigQuestionResponses()   
     const updateResponse = await this.updateAssessmentStatus('Config errors complete', true)
-    if (updateResponse !== true) {
-      throw new Error(updateResponse)
-    }
+    errorResponder(updateResponse)
     console.groupEnd()
   }
 }

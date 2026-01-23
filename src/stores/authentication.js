@@ -159,6 +159,10 @@ export const authenticationStore = defineStore('authentication', {
         payload =  { status: err.status, message: err.message }
       }
 
+      if (payload.status == 401 || payload.status == 403 || payload.status == 440) {
+        this.router.push('/login')
+      }
+
       console.debug('Payload', payload)
       console.groupEnd()
 

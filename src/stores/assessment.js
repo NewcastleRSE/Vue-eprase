@@ -392,7 +392,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = exAssessmentResponse
         } else if (this.exactAssessmentPresent(orgCode, epSystem, patientType)) {
           // An assessment already in progress for current trust / eP system / patient type - may have been saved while current user logged in
-          ret = 'An existing assessment for this ePrescribing system and patient type is already in progress in your trust'
+          ret = {status: 403, message: 'An existing assessment for this ePrescribing system and patient type is already in progress in your trust'}
           this.setDuplicateAssessment(true)
         } else {
           // No existing assessment, so save submitted data          
@@ -416,7 +416,7 @@ export const assessmentStore = defineStore('assessment', {
               state.assessmentData.institution = authenticationStore().orgDocId
             })
           } else {
-            ret = response.message
+            ret = response
           }
         }        
       } else {
@@ -508,15 +508,16 @@ export const assessmentStore = defineStore('assessment', {
             })
             const scenarioResponse = await this.getPatientScenarioData()
             if (scenarioResponse !== true) {
-              throw new Error('Failed to retrieve patient scenario data')
-            }
-            ret = true
+              ret = scenarioResponse
+            } else {
+              ret = true
+            }            
           } else {
-            throw new Error('Assessment is not complete')
+            ret = {status: 400, message: 'Assessment is not complete'}
           }
         }
       } else {
-        throw new Error('You are not authorised access to this data')
+        ret = {status: 401, message: 'You are not authorised access to this data'}
       }
       return ret
     },
@@ -544,7 +545,7 @@ export const assessmentStore = defineStore('assessment', {
           state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
         })          
       } else if (systemResponse.data.data.system != null) {   // Null here means a logout before visiting the system page
-        ret = `Failed to retrieve system data for assessment, error ${systemResponse}`
+        ret = systemResponse
       }
       
       if (recordLoading) {
@@ -966,7 +967,7 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
           })
         } else {
-          ret = `Failed to retrieve config question responses for assessment, error ${confQuestionResponse}`
+          ret = confQuestionResponse
         }
       }
       
@@ -1004,7 +1005,7 @@ export const assessmentStore = defineStore('assessment', {
         }        
         const savedCfgResponse = await rootStore().apiCall('config-error-data', 'POST', { data: dataOut })
         if (savedCfgResponse.status >= 400)  {
-          throw new Error(`Failed to save config question response - message was ${savedCfgResponse.message}`)
+          ret = savedCfgResponse
         } else {
           newConfResponseDocIds.push(savedCfgResponse.data.data.documentId)
         }
@@ -1014,7 +1015,7 @@ export const assessmentStore = defineStore('assessment', {
         config_error_data: { connect: newConfResponseDocIds }
       }})
       if (updatedAssessmentResponse.status >= 400) {
-        throw new Error(`Failed to update assessment with config question response - message was ${updatedAssessmentResponse.message}`)
+        ret = updatedAssessmentResponse
       }
 
       // Update store with new complete records
@@ -1087,7 +1088,7 @@ export const assessmentStore = defineStore('assessment', {
               const patientPool = poolRet
               if (patientPool.length < appSettingsStore().assessmentNumPatients) {
                 console.warn(`Not enough patients of patient type : ${this.assessmentData.selection.patientType} in database`)
-                ret = `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.selection.patientType}`
+                ret = {status: 400, message: `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.selection.patientType}`}
               } else {
                 // Get those whose scenarios include a required one
                 const requiredPatientCodes = await this.getRequiredScenarioPatientCodes()
@@ -1109,11 +1110,11 @@ export const assessmentStore = defineStore('assessment', {
                   })
                   console.debug('Generated new patient list', this.assessmentData.patients)                                                  
                 } else {
-                  ret = 'Failed to retrieve required patient list'
+                  ret = {status: 400, message: 'Failed to retrieve required patient list'}
                 }                
               }              
             } else {          
-              ret = `Failed to retrieve pool of suitable patients`
+              ret = {status: 400, message: 'Failed to retrieve pool of suitable patients'}
             }        
           } else {
             this.$patch((state) => {
@@ -1121,7 +1122,7 @@ export const assessmentStore = defineStore('assessment', {
             })
           }
         } else {
-          ret = `Error ${patientResponse.message} while retrieving patients for assessment`
+          ret = patientResponse
         }
       } else {
         console.debug('Patient list already retrieved')
@@ -1148,7 +1149,7 @@ export const assessmentStore = defineStore('assessment', {
             }
           })
           if (response.status >= 400) {
-            ret = `Failed to save patient list for assesssment : error was ${response.message}`
+            ret = response
           } 
         }
       }

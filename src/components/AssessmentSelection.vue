@@ -180,15 +180,12 @@ export default {
 
       // Select an existing assessment
       this.continuingExistingAssessment = true
-      const selectResponse = await this.selectAssessment(assessmentId)        
-      if (selectResponse !== true) {
-        throw new Error(selectResponse)
-      } else {
-        console.groupEnd()
-        if (this.dataLoaded) {
-          console.debug('Data loaded')
-          this.$emit('jumpToStep', assessmentId)
-        }
+      const selectResponse = await this.selectAssessment(assessmentId)   
+      errorResponder(selectResponse)           
+      console.groupEnd()
+      if (this.dataLoaded) {
+        console.debug('Data loaded')
+        this.$emit('jumpToStep', assessmentId)
       } 
     },
     async getEpSystemNames() {
@@ -210,7 +207,7 @@ export default {
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})
       } else {
-        throw new Error(response.message)
+        errorResponder(response)
       }
       return epSystems
     },
@@ -230,7 +227,7 @@ export default {
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()
       if (!this.duplicateAssessmentAttempt && selectResponse !== true) {
-        throw new Error(selectResponse)
+        errorResponder(selectResponse)
       } 
     }    
     console.groupEnd()

@@ -229,7 +229,7 @@ export default {
         cas.push({value: 'Other', label: 'Other (please specify)'})
         return cas
       } else {
-        throw new Error(response.message)
+        errorResponder(response)
       }
     },
     async cbgHighRiskMeds() {
@@ -237,7 +237,7 @@ export default {
       if (response.status < 400) {
         return response.data.data
       } else {
-        throw new Error(response.message)
+        errorResponder(response)
       }
     },
     async onResetClick() {      
@@ -276,10 +276,8 @@ export default {
       // Note: DO NOT assume system data is complete if we log out in the middle of entering it!
       // Also, it is very difficult to validate a form at this late stage as everything is in the process
       // of being reset - compromise is to assume that if system data is NOT submitted then it is incomplete 
-      const sysResponse = await this.saveSystemData(!this.loggingOut)        
-      if (sysResponse !== true) {
-        throw new Error(sysResponse)
-      } 
+      const sysResponse = await this.saveSystemData(!this.loggingOut)     
+      errorResponder(sysResponse)        
     }        
     console.groupEnd()
   }
