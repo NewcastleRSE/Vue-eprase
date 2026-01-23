@@ -25,7 +25,9 @@ console.dir(process.env)
 
 const app = createApp(App)
 const pinia = createPinia()
-pinia.use(createPersistedState({storage: localStorage}))
+pinia.use(createPersistedState({ 
+  storage: localStorage 
+}))
 
 axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'

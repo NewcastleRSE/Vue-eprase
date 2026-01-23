@@ -104,11 +104,16 @@
                 </table>
               </div>
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
-                <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
-                <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
-                <a class="btn btn-primary col-2 me-2" @click="configQuestionData()" role="button">Config Questions</a>
-                <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
-                <a class="btn btn-primary col-2" @click="systemData()" role="button">System data</a>
+                <div class="row col-12">
+                  <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
+                  <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a>
+                </div>
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
+                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>
+                  <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a>
+                </div>                
               </div>
             </div>
           </div>                  
@@ -185,6 +190,10 @@ export default {
     async systemData() {
       const response = await this.apiCall('assessment-system-data', 'GET', null, 'blob')
       saveAs(response.data, `system_data_${this.formatDate()}.csv`)
+    },
+    async optOutData() {
+      const response = await this.apiCall('assessment-opt-outs-data', 'GET', null, 'blob')
+      saveAs(response.data, `opt_outs_${this.formatDate()}.csv`)
     },
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')

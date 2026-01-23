@@ -229,7 +229,7 @@ export default {
       // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()
-      if (!this.duplicateAssessmentAttempt && selectResponse !== true)        {
+      if (!this.duplicateAssessmentAttempt && selectResponse !== true) {
         throw new Error(selectResponse)
       } 
     }    
