@@ -160,7 +160,7 @@ export const authenticationStore = defineStore('authentication', {
       }
 
       if (payload.status == 401 || payload.status == 403 || payload.status == 440) {
-        this.router.push('/login')
+        this.router.push('/login?action=sessionExpired')
       }
 
       console.debug('Payload', payload)

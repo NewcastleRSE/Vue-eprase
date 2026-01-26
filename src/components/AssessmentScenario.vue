@@ -376,17 +376,15 @@ export default {
       } else {
         // All good to go
         const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-        if (saveResponse !== true) {
-          throw new Error(saveResponse)
-        } else {
+        if (!this.errorResponder(saveResponse)) {
           this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
           this.numCompletedScenarios++
           this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
           this.completedScenariosHidden.validate()
-        }
-        setTimeout(() => {
-          this.savedResponseData = true
-        }, 200)
+          setTimeout(() => {
+            this.savedResponseData = true
+          }, 200)
+        }        
       }                  
       console.groupEnd()
     },
@@ -415,7 +413,7 @@ export default {
     },
     formatRecordedInterventions(scenarioCode) {
       let intObj = {}
-      const interventions = this.scenarioResponse(scenarioCode)['other_category']
+      const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
       if (interventions != null && interventions.length > 0) {
         // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
         interventions.split('|').forEach(intn => {
@@ -529,23 +527,20 @@ export default {
       })      
     }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    if (storedResultsResponse !== true) {
-      throw new Error(storedResultsResponse)
-    } else {
+    if (!this.errorResponder(storedResultsResponse)) {
       // Package the responses by scenario code for convenience - data is of form:
       // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
       this.assessmentData.storedScenarioResponses.forEach(asr => {
         this.storedResponsesByCode[asr.scenario.scenario_code] = asr
       })
       this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
-    }
-    
-    // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-    this.completedScenariosHidden.validate()
+      
+      // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
+      this.completedScenariosHidden.validate()
 
-    this.auxiliaryDataReady = true
-    this.openNextUnenteredScenario()
-    
+      this.auxiliaryDataReady = true
+      this.openNextUnenteredScenario()    
+    }    
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -554,9 +549,7 @@ export default {
     if (this.numCompletedScenarios == this.scenarioCount) {
       // We have done all the data entry now          
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
-      if (updateResponse !== true) {
-        throw new Error(updateResponse)
-      }
+      this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }

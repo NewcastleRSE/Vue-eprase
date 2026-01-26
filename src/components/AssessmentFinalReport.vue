@@ -353,28 +353,29 @@ export default {
 
     this.auxiliaryDataReady = false
 
+    let wasError = false
     const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
-    if (updateResponse !== true) {
-      throw new Error(updateResponse)
+    wasError = this.errorResponder(updateResponse)
+    if (!wasError) {
+      const storedResultsResponse = await this.getPatientScenarioResponses(true)
+      wasError = this.errorResponder(storedResultsResponse)  
     }
-    const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    if (storedResultsResponse !== true) {
-      throw new Error(storedResultsResponse)
+    if (!wasError) {
+      const storedConfigResponse = await this.getConfigQuestionData(true)
+      wasError = this.errorResponder(storedConfigResponse)  
     } 
-    const storedConfigResponse = await this.getConfigQuestionData(true)
-    if (storedConfigResponse !== true) {
-      throw new Error(storedConfigResponse)
-    }
-    await this.getInstitutionName()
+    if (!wasError) {
+      await this.getInstitutionName()
 
-    // Create hash object to count mitigation types
-    this.mitigationSummaries = this.mitigationSummary()
+      // Create hash object to count mitigation types
+      this.mitigationSummaries = this.mitigationSummary()
 
-    this.auxiliaryDataReady = true
-    this.$nextTick(() => {
-      this.renderPieChart()
-      this.renderCdsBarChart()
-    })
+      this.auxiliaryDataReady = true
+      this.$nextTick(() => {
+        this.renderPieChart()
+        this.renderCdsBarChart()
+      })
+    }     
     console.groupEnd()
   },
   beforeUnmount() {

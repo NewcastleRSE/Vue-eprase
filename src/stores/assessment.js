@@ -305,7 +305,7 @@ export const assessmentStore = defineStore('assessment', {
         console.debug('Response data from fetch assessments', response.data.data)
         this.$patch((state) => { state.allPossibleAssessments = response.data.data })
       } else {
-        ret = response.message
+        ret = response
       }
       this.setDataReady(true)
       console.groupEnd()
@@ -457,7 +457,7 @@ export const assessmentStore = defineStore('assessment', {
             ret = await this.getConfigQuestionData()
           }
         } else {
-          ret = `Assessment with id ${assessmentId} not found in list of assessments for this institution`
+          ret = {status: 400, message: `Assessment with id ${assessmentId} not found in list of assessments for this institution`}
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
@@ -575,7 +575,7 @@ export const assessmentStore = defineStore('assessment', {
         delete updatedSystem.system_id  // Not a valid key for the database (systemId == Strapi's documentId)
         const response = await rootStore().apiCall(`systems/${this.assessmentData.system.systemId}`, 'PUT', { data: updatedSystem })
         if (response.status >= 400) {         
-          ret = `Failed to update system data, error ${response.message}`
+          ret = {status: response.status, message: `Failed to update system data, error ${response.message}`}
         }
       } else {
         // Save new system data
@@ -590,7 +590,7 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.system.systemId = response.data.data.documentId
           })                      
         } else {
-          ret = `Failed to save system data, error ${response.message}`
+          ret = {status: response.status, message: `Failed to save system data, error ${response.message}`}
         }
       }
                     
@@ -627,7 +627,7 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.assessmentState = newStatus
           })
         } else {
-          ret = `Failed to update assessment state to ${newStatus}`
+          ret = {status: updateStatusResponse.status, message: `Failed to update assessment state to ${newStatus}`}
         }        
       }     
       if (recordLoading) {
@@ -815,7 +815,7 @@ export const assessmentStore = defineStore('assessment', {
             patientScenariosByCode[patientCode] = sppResponse.data.data
             nScenarios += patientScenariosByCode[patientCode].length
           } else {
-            ret = `Failed to retrieve scenario data for patient code ${patientCode}`
+            ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
           }
         }
         if (ret === true) {
@@ -853,7 +853,7 @@ export const assessmentStore = defineStore('assessment', {
           state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data.scenario_data
         })
       } else {
-        ret = 'Failed to retrieve saved scenario responses'
+        ret = {status: allScenariosResponse.status, message: 'Failed to retrieve saved scenario responses'}
       }
 
       if (recordLoading) {
@@ -932,11 +932,11 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
           }) 
         } else {
-          ret = `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`
+          ret = {status: updateAssessmentResponse.status, message: `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`}
         }
                               
       } else {
-        ret = `Failed to save scenario response, error ${saveScenarioDataResponse.message}`
+        ret = {status: saveScenarioDataResponse.status, message: `Failed to save scenario response, error ${saveScenarioDataResponse.message}`}
       }
 
       if (recordLoading) {
@@ -1049,7 +1049,7 @@ export const assessmentStore = defineStore('assessment', {
             state.assessmentData.numCompletedPatients = enteredCodes.length
           })
         } else {
-          ret = `Failed to update completed patients list by adding ${patientCode}`
+          ret = {status: enteredResponse.status, message: `Failed to update completed patients list by adding ${patientCode}`}
         }
 
         if (recordLoading) {

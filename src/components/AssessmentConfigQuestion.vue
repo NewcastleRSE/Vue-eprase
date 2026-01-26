@@ -72,7 +72,7 @@ export default {
       console.group('saveConfigQuestionResponses()')
       console.debug('Form part-object', this.$refs['configObject'])     
       const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
-      errorResponder(saveResponse)
+      this.errorResponder(saveResponse)
       console.groupEnd()
     }
   },
@@ -80,7 +80,7 @@ export default {
     console.group('AssessmentConfigQuestion mounted()')
     this.questionRows = this.configQuestionData.map(cqr => { return { value: cqr.config_error_code, label: this.embolden(cqr.description, false) } })
     const loadCqDataResponse = await this.getConfigQuestionData(true)
-    errorResponder(loadCqDataResponse)
+    this.errorResponder(loadCqDataResponse)
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -88,7 +88,7 @@ export default {
     console.assert(this.dataLoaded, 'AssessmentConfigQuestion beforeUnmount() hook - dataReady flag is false')
     await this.saveConfigQuestionResponses()   
     const updateResponse = await this.updateAssessmentStatus('Config errors complete', true)
-    errorResponder(updateResponse)
+    this.errorResponder(updateResponse)
     console.groupEnd()
   }
 }

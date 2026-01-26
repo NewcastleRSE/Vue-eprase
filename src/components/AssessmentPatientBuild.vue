@@ -352,13 +352,12 @@ export default {
     },
     async setPatientDataEntered(patientCode) {
       const spdeResponse = await this.setPatientEntryComplete(patientCode)
-      if (spdeResponse !== true) {
-        throw new Error(spdeResponse)
-      }
-      // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
-      setTimeout(() => {
-        this.openNextUnenteredPatient()
-      }, 1000)      
+      if (this.errorResponder(spdeResponse)) {
+        // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+        setTimeout(() => {
+          this.openNextUnenteredPatient()
+        }, 1000)   
+      }         
     }
   },
   async mounted() {
@@ -366,11 +365,10 @@ export default {
     // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
-    if (loadPatientsResponse !== true) {
-      throw new Error(loadPatientsResponse)
-    }       
-    // Get the details for the first (unentered) patient
-    this.$nextTick(() => { this.openNextUnenteredPatient() })      
+    if (this.errorResponder(loadPatientsResponse)) {
+      // Get the details for the first (unentered) patient
+      this.$nextTick(() => { this.openNextUnenteredPatient() })
+    }          
     console.groupEnd()
   }, 
   async beforeUnmount() {
@@ -379,9 +377,7 @@ export default {
     if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
-      if (updateResponse !== true) {
-        throw new Error(updateResponse)
-      }
+      this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }
