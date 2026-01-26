@@ -5,6 +5,11 @@
 
       <AppLogo cls="banner" />
 
+      <div class="alert alert-danger" v-if="!toolIsOpen">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed to users.  Access possible for admins only.
+      </div>
+
+      <div v-if="toolIsOpen">
         <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
 
         <h1 class="mt-4">Register</h1>
@@ -82,8 +87,8 @@
             </GroupElement>
           </Vueform>
         </div>
-
       </div>
+    </div>
   </main>
 </template>
 
@@ -103,7 +108,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['signup']),
-    ...mapState(rootStore, ['getInstitutions', 'audit']),
+    ...mapState(rootStore, ['getInstitutions', 'audit', 'toolOpen']),
     ...mapState(appSettingsStore, ['passwordMinLength', 'passwordMaxLength'])
   },
   data() {
@@ -119,7 +124,8 @@ export default {
       institutions: [],
       serverError: false,
       showPassword: false,
-      showPasswordConfirm: false
+      showPasswordConfirm: false,
+      toolIsOpen: false
     }
   },
   methods: {    
@@ -170,8 +176,9 @@ export default {
       }      
     }
   },
-  mounted() {
+  async mounted() {
     this.getInstitutionCodesNames()
+    this.toolIsOpen = await this.toolOpen()
   }
 }
 

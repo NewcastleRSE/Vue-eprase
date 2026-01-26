@@ -162,7 +162,7 @@
                             </div>
                             <table class="table table-striped vf-col-6">
                               <thead>
-                                <tr><th>Category</th><th>Alert</th><th>Advisory</th><th></th></tr>
+                                <tr><th v-html="embolden('Category', true)"></th><th>Alert</th><th>Advisory</th><th></th></tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(mc, mcIdx) in matrixCategories">
@@ -178,6 +178,9 @@
                                 </tr>
                                 <tr v-if="tooManyCategories == true">
                                   <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
+                                </tr>
+                                <tr v-if="tooFewCategories == true">
+                                  <td colspan="4"><span class="text-danger">Please select at least one category</span></td>
                                 </tr>
                               </tbody>
                             </table>                            
@@ -229,7 +232,7 @@
                       </div>
                       <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
-                          :disabled="!allowCurrentScenarioSave || tooManyCategories"
+                          :disabled="!allowCurrentScenarioSave || tooManyCategories || tooFewCategories"
                           :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
@@ -330,6 +333,9 @@ export default {
     },
     tooManyCategories() {
       return Object.keys(this.dsCategoriesSelected).length > 2
+    },
+    tooFewCategories() {
+      return Object.keys(this.dsCategoriesSelected).length == 0
     }
   },
   data() {
@@ -370,9 +376,12 @@ export default {
      
       // Validate the number of categories chosen in a system/user intervention scenario <= 2
       const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      if (formPayload.interventionType == 'MT1' && Object.keys(this.dsCategoriesSelected).length > 2) {
+      if (formPayload.interventionType == 'MT1' && this.tooManyCategories) {
         // Output error, do not save the data and remain here for correction
-        console.debug('Too many categories', this.tooManyCategories)
+        console.debug('Too many categories selected', this.tooManyCategories)
+      } else if (formPayload.interventionType == 'MT1' && this.tooFewCategories) {
+        // Output error, do not save the data and remain here for correction
+        console.debug('Too few categories selected', this.tooFewCategories) 
       } else {
         // All good to go
         const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
