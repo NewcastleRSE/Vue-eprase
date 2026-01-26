@@ -180,12 +180,12 @@
                                   <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
                                 </tr>
                               </tbody>
-                            </table>
-                            <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
-                              :attrs="{ maxlength: 500 }" 
-                              :label="embolden('Please tell us about the system response', false)" 
-                            />
+                            </table>                            
                           </div>
+                          <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
+                            :attrs="{ maxlength: 500 }" 
+                            :label="embolden('Additional comments', false)" 
+                          />
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
@@ -205,7 +205,7 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
+                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
                               <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
@@ -216,7 +216,7 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
+                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
                               <th>Category/intervention type</th>
                               <td>None</td>
                             </tr>                                                   
