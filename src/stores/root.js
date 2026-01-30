@@ -52,7 +52,7 @@ export const rootStore = defineStore('root', {
     },   
     // Check tool open by doing a bare-bones API call and seeing if we get a 403 response
     async toolOpen() {
-      const response = await this.apiCall('institutions?limit=1', 'GET')
+      const response = await this.apiCall('institutions?pagination[limit]=1', 'GET')
       return response.status != 403
     },
     // Get list of institutions

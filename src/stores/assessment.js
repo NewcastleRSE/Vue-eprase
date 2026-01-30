@@ -460,7 +460,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = {status: 400, message: `Assessment with id ${assessmentId} not found in list of assessments for this institution`}
         }
       } 
-      await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+      await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
 
       this.setDataReady(true)
 

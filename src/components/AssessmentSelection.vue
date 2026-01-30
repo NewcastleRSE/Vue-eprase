@@ -7,7 +7,12 @@
         </div>
       </div>
     </StaticElement>
-    <GroupElement name="assessmentGroupLoaded" v-if="dataLoaded">
+    <StaticElement name="assessmentGroupDuplicateAssessment" v-if="duplication">
+      <div class="alert alert-danger">
+        Another user from your trust is already editing this assessment at the present time, so you are advised to log out and come back later.
+      </div>
+    </StaticElement>
+    <GroupElement name="assessmentGroupLoaded" v-if="dataLoaded && !duplication">
       <StaticElement name="selectionHeading">
         <h2>Assessment Selection</h2>
       </StaticElement>
@@ -160,6 +165,9 @@ export default {
     }, 
     dataLoaded() {
       return this.dataReady
+    },
+    duplication() {
+      return this.duplicateAssessmentAttempt
     }
   },
   data() {
@@ -228,7 +236,7 @@ export default {
       // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()
-      if (!this.duplicateAssessmentAttempt && selectResponse !== true) {
+      if (!this.duplicateAssessmentAttempt) {
         this.errorResponder(selectResponse)
       } 
     }    
