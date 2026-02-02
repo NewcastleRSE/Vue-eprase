@@ -135,7 +135,8 @@ export default {
               this.$router.push('/assessment')
             }             
           } else {
-            this.serverError = 'An error occured during signin:' + signinResponse.message
+            console.debug(signinResponse)
+            this.serverError = 'An error occured during signin: ' + signinResponse.message
             await this.audit('loginfail:' + this.user.email, '/login')
             this.clear()
           }

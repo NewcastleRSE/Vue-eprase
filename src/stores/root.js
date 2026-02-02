@@ -9,7 +9,9 @@ export const rootStore = defineStore('root', {
   state: () => ({    
     printableReportData: null
   }),
-  persist: true, 
+  persist: {
+    storage: localStorage
+  }, 
   actions: {
   
     async apiCall(url, method = 'POST', body = null, responseType = 'json') {
@@ -23,8 +25,11 @@ export const rootStore = defineStore('root', {
       }
 
       let response = null, ret = {}
+      const config = { responseType: responseType }
       const auth = authenticationStore()
-      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: responseType } : {}
+      // if (Object.keys(auth.authTokenHeader).length > 0) {
+      //   config.headers = auth.authTokenHeader
+      // }
 
       try {
         if (method == 'GET') {

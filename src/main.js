@@ -25,9 +25,7 @@ console.dir(process.env)
 
 const app = createApp(App)
 const pinia = createPinia()
-pinia.use(createPersistedState({ 
-  storage: localStorage 
-}))
+pinia.use(createPersistedState())
 pinia.use(({ store }) => {
   store.router = router // This makes 'router' available as 'this.router' in stores
 })
@@ -35,6 +33,7 @@ pinia.use(({ store }) => {
 axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
+axios.defaults.withCredentials = true
 
 app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig)
 

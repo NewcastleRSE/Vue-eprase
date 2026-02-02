@@ -129,7 +129,9 @@ export const assessmentStore = defineStore('assessment', {
     loggingOut: false,
     duplicateAssessmentAttempt: false
   }),
-  persist: true, 
+  persist: {
+    storage: localStorage
+  }, 
   actions: {
     setDataReady(readyStatus) {
       this.$patch((state) => {

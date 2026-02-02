@@ -15,15 +15,15 @@ export const authenticationStore = defineStore('authentication', {
     orgDocId: null,
     orgCode: null,
     orgName: null,
-    trust: null,
-    token: null
+    trust: null
+    //token: null
   }),
   getters: {
-    authTokenHeader() {
-      return { 'Authorization': `Bearer ${this.token}` }
+    authTokenHeader(state) {
+      return state.token ? { 'Authorization': `Bearer ${state.token}` } : {}
     }
   },
-  persist: true, 
+  persist: true,
   actions: {
     isReporter() {
       return this.role == 'Reporter'
@@ -42,10 +42,11 @@ export const authenticationStore = defineStore('authentication', {
         const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
-        this.$patch({token: signinRes.data.jwt})  // Store the JWT
+        //this.$patch({ token: userDetails.jwt })  // Store the JWT
+        //console.debug(this.token, 'ATH', this.authTokenHeader)
 
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`) //, { headers: this.authTokenHeader }) 
         
         this.$patch({
           user: userDetails.user.username,
@@ -142,20 +143,18 @@ export const authenticationStore = defineStore('authentication', {
     triageError(err) {
 
       console.group('triageError()')
+      console.debug('Received error response', err)
 
       let payload = {}
 
       if (err.response) {
         console.debug('err.response set')
-        console.debug(err.response)
-        payload = { status: err.response.status, message: err.response.data.error || err.response.data.error.message || err.response.data }
+        payload = { status: err.response.status, message: err.response.data.error ? err.response.data.error.message : err.response.data }
       } else if (err.request) {
         console.debug('err.request set')
-        console.debug(err.request)
         payload = { status: err.request.status, message: err.request.statusText }
       } else {
         console.debug('Catch-all')
-        console.error(err)
         payload =  { status: err.status, message: err.message }
       }
 
