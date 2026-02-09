@@ -6,7 +6,7 @@ import '../node_modules/flatpickr/dist/plugins/monthSelect/style.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createPersistedState } from 'pinia-plugin-persistedstate'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
@@ -25,7 +25,7 @@ console.dir(process.env)
 
 const app = createApp(App)
 const pinia = createPinia()
-pinia.use(createPersistedState())
+pinia.use(piniaPluginPersistedstate)
 pinia.use(({ store }) => {
   store.router = router // This makes 'router' available as 'this.router' in stores
 })

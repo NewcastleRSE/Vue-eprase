@@ -28,14 +28,17 @@ export default {
     }
   },
   watch: {
-    dataReady(newVal) {
-      console.group('dataReady() watcher entered with new value', newVal)
-      if (newVal === true) {
-        // We can now log out safely as the store saving process has finished (so user JWT no longer required)
-        this.logOutUser()
-      }
-      console.groupEnd()
-    }, immediate: true
+    dataReady: {
+      handler: function(newVal) {
+        console.group('dataReady() watcher entered with new value', newVal)
+        if (newVal === true) {
+          // We can now log out safely as the store saving process has finished (so user JWT no longer required)
+          this.logOutUser()
+        }
+        console.groupEnd()
+      },
+      immediate: true
+    }
   },
   methods: {
     logOutUser() {

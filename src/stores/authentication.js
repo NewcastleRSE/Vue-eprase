@@ -6,24 +6,35 @@ const API = process.env.BASE_URL
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
-    user: null,
-    userId: null,
-    role: null,
-    email: null, 
-    institutionId: null,
-    hospital: null,
-    orgDocId: null,
-    orgCode: null,
-    orgName: null,
-    trust: null
-    //token: null
-  }),
+    user: '',
+    userId: 0,
+    role: '',
+    email: '', 
+    institutionId: 0,
+    hospital: '',
+    orgDocId: '',
+    orgCode: '',
+    orgName: '',
+    trust: '',
+    token: ''
+  }),  
+  persist: [
+    {
+      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust'],
+      storage: localStorage,
+      debug: process.env.NODE_ENV !== 'production'
+    }, 
+    {
+      pick: ['token'],
+      storage: sessionStorage,     
+      debug: process.env.NODE_ENV !== 'production'
+    }
+  ],
   getters: {
     authTokenHeader(state) {
-      return { 'Authorization': `Bearer ${this.token}` }
+      return { 'Authorization': `Bearer ${state.token}` }
     }
   },
-  persist: true,
   actions: {
     isReporter() {
       return this.role == 'Reporter'
@@ -46,7 +57,7 @@ export const authenticationStore = defineStore('authentication', {
 
         console.debug('Determining user institution...')
         const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
-        
+                
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
@@ -73,6 +84,7 @@ export const authenticationStore = defineStore('authentication', {
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
+      sessionStorage.clear()
     },
     logout() {
       console.group('logout()')

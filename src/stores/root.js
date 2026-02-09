@@ -7,7 +7,11 @@ const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({    
-    printableReportData: null
+    printableReportData: {
+      heading: '',
+      buttonCaption: '',
+      content: ''
+    }
   }),
   persist: {
     storage: localStorage
