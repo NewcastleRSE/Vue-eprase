@@ -25,12 +25,9 @@ export const rootStore = defineStore('root', {
       }
 
       let response = null, ret = {}
-      const config = { responseType: responseType }
       const auth = authenticationStore()
-      // if (Object.keys(auth.authTokenHeader).length > 0) {
-      //   config.headers = auth.authTokenHeader
-      // }
-
+      const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: responseType } : {}
+      
       try {
         if (method == 'GET') {
           console.debug('GET url', API + url, 'config', config)

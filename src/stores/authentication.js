@@ -20,7 +20,7 @@ export const authenticationStore = defineStore('authentication', {
   }),
   getters: {
     authTokenHeader(state) {
-      return state.token ? { 'Authorization': `Bearer ${state.token}` } : {}
+      return { 'Authorization': `Bearer ${this.token}` }
     }
   },
   persist: true,
@@ -42,11 +42,10 @@ export const authenticationStore = defineStore('authentication', {
         const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
-        //this.$patch({ token: userDetails.jwt })  // Store the JWT
-        //console.debug(this.token, 'ATH', this.authTokenHeader)
+        this.$patch({ token: userDetails.jwt })  // Store the JWT
 
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`) //, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
         
         this.$patch({
           user: userDetails.user.username,
