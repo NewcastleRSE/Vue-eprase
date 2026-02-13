@@ -171,7 +171,7 @@ import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
-import bsColors from '../assets/scss/variables.scss'
+import bsColors from '../assets/scss/_variables.scss'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {

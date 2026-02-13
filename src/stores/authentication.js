@@ -25,8 +25,7 @@ export const authenticationStore = defineStore('authentication', {
       debug: process.env.NODE_ENV !== 'production'
     }, 
     {
-      pick: ['token'],
-      storage: sessionStorage,     
+      omit: ['token'],
       debug: process.env.NODE_ENV !== 'production'
     }
   ],

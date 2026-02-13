@@ -332,10 +332,10 @@ export default {
       return this.$refs.completedScenariosHidden
     },
     tooManyCategories() {
-      return Object.keys(this.dsCategoriesSelected).length > 2
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
     },
     tooFewCategories() {
-      return Object.keys(this.dsCategoriesSelected).length == 0
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length == 0
     }
   },
   data() {
@@ -519,6 +519,8 @@ export default {
         this.interventionSelections[identifier] = isIntervention
         this.currentScenarioInterventionSelected = true
       }
+      console.debug('Identifier', identifier, 'current patient', this.currentPatient, 'current scenario', this.currentScenario)
+      console.debug('Intervention selections', this.interventionSelections, 'currentScenarioInterventionSelected', this.currentScenarioInterventionSelected)
       console.groupEnd()
     }
   },

@@ -75,7 +75,9 @@ module.exports = {
             }
           },
           // Option here necessary to suppress spurious warnings in bootstrap files after swapping node-sass for Dart sass - David 05/08/2024
-          { loader: "sass-loader", options: { sassOptions: { quietDeps: true } } }
+          // https://github.com/twbs/bootstrap/issues/36304 Roadmap for @import -> @use in Bootstrap scss files, scheduled for Bootstrap v6 10/26
+          // Until then, suppress deprecation warnings using the 'silenceDeprecations' option below - David 13/02/2026
+          { loader: "sass-loader", options: { sassOptions: { quietDeps: true, silenceDeprecations: ['color-functions', 'global-builtin', 'import'] } } }
         ],
       },
       {

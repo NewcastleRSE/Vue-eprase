@@ -1,6 +1,6 @@
-@use "./variables.scss";
-@use "~bootstrap/scss/bootstrap";
-@use "@vueform/vueform/themes/bootstrap/scss/index.scss";
+@use "./_variables.scss" as *;
+@import "~bootstrap/scss/bootstrap";
+@import "@vueform/vueform/themes/bootstrap/scss/index.scss";
 
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
