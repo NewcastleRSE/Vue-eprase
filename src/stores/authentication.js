@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { assessmentStore } from './assessment'
+import VueCookies from 'vue-cookies'
 
 const API = process.env.BASE_URL
 
@@ -25,7 +26,15 @@ export const authenticationStore = defineStore('authentication', {
       debug: process.env.NODE_ENV !== 'production'
     }, 
     {
-      omit: ['token'],
+      pick: ['token'],
+      storage: {
+        getItem: (key) => {
+          return VueCookies.get(key)
+        },
+        setItem: (key, value) => {
+          VueCookies.set(key, value)
+        }
+      },
       debug: process.env.NODE_ENV !== 'production'
     }
   ],
