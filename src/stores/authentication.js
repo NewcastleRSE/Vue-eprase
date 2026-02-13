@@ -93,6 +93,7 @@ export const authenticationStore = defineStore('authentication', {
       assessmentStore().reset()
       localStorage.clear()
       sessionStorage.clear()
+      VueCookies.remove('token')
     },
     logout() {
       console.group('logout()')
