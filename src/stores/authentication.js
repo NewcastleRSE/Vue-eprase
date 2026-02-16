@@ -163,18 +163,18 @@ export const authenticationStore = defineStore('authentication', {
     triageError(err) {
 
       console.group('triageError()')
-      console.debug('Received error response', err)
+      console.warn('Received error response', err)
 
       let payload = {}
 
       if (err.response) {
-        console.debug('err.response set')
+        console.warn('err.response set')
         payload = { status: err.response.status, message: err.response.data.error ? err.response.data.error.message : err.response.data }
       } else if (err.request) {
-        console.debug('err.request set')
+        console.warn('err.request set')
         payload = { status: err.request.status, message: err.request.statusText }
       } else {
-        console.debug('Catch-all')
+        console.warn('Catch-all')
         payload =  { status: err.status, message: err.message }
       }
 
@@ -184,7 +184,7 @@ export const authenticationStore = defineStore('authentication', {
         this.router.push('/login?action=adminsOnly')
       }
 
-      console.debug('Payload', payload)
+      console.warn('Payload', payload)
       console.groupEnd()
 
       return payload
