@@ -114,6 +114,15 @@
                   <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>
                   <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a>
                 </div>                
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
+                </div>
+                <div class="row col-12 mt-4"><h3>Experimental reports</h3></div>
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="categoryRiskReport()" role="button">Category risk</a>
+                  <a class="btn btn-primary col-2 me-2" @click="scenarioRiskReport()" role="button">Scenario risk</a>
+                </div>
               </div>
             </div>
           </div>                  
@@ -178,6 +187,22 @@ export default {
     async mitigationPercentages() {
       const response = await this.apiCall('assessment-mitigation-percentages', 'GET', null, 'blob')
       saveAs(response.data, `mitigation_percentages_${this.formatDate()}.csv`)
+    },
+    async mitigationByCategory() {
+      const response = await this.apiCall('assessment-mitigation-by-category', 'GET', null, 'blob')
+      saveAs(response.data, `mitigations_by_category_${this.formatDate()}.csv`)
+    },
+    async mitigationByScenario() {
+      const response = await this.apiCall('assessment-mitigation-by-scenario', 'GET', null, 'blob')
+      saveAs(response.data, `mitigations_by_scenario_${this.formatDate()}.csv`)
+    },
+    async categoryRiskReport() {
+      const response = await this.apiCall('assessment-category-risk-report', 'GET', null, 'blob')
+      saveAs(response.data, `category_risk_report_${this.formatDate()}.csv`)
+    },
+    async scenarioRiskReport() {
+      const response = await this.apiCall('assessment-scenario-risk-report', 'GET', null, 'blob')
+      saveAs(response.data, `scenario_risk_report_${this.formatDate()}.csv`)
     },
     async configQuestionData() {
       const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')

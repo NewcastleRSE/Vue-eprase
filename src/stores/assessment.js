@@ -850,9 +850,20 @@ export const assessmentStore = defineStore('assessment', {
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
       const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')      
-      if (allScenariosResponse.status < 400) {        
+      if (allScenariosResponse.status < 400) {  
+        // Postprocess to weed out duplicates
+        // NOTE: 16/02/2026 We are not clear how duplicate identical records have got into the database - possibly via accidental double-clicks on buttons, or 
+        // network unresponsiveness causing users to click again (many such duplicates have been created seconds or at most a minute apart).  We need to prevent
+        // re-saving of data at the scenario save stage - this postprocess restores sanity to data already stored
+        const sanitisedScenarioResponses = {}
+        allScenariosResponse.data.data.scenario_data.forEach(scd => {
+          const scenarioCode = scd.scenario.scenario_code
+          if (!( scenarioCode in sanitisedScenarioResponses )) {
+            sanitisedScenarioResponses[scenarioCode] = scd
+          }
+        })
         this.$patch((state) => {
-          state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data.scenario_data
+          state.assessmentData.storedScenarioResponses = Object.values(sanitisedScenarioResponses)
         })
       } else {
         ret = {status: allScenariosResponse.status, message: 'Failed to retrieve saved scenario responses'}
