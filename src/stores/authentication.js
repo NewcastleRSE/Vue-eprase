@@ -146,20 +146,20 @@ export const authenticationStore = defineStore('authentication', {
       let payload = {}
 
       if (err.response) {
-        console.debug('err.response set')
-        console.debug(err.response)
+        console.warn('err.response set')
+        console.warn(err.response)
         payload = { status: err.response.status, message: err.response.data.error ? err.response.data.error.message : err.response.data }
       } else if (err.request) {
-        console.debug('err.request set')
-        console.debug(err.request)
+        console.warn('err.request set')
+        console.warn(err.request)
         payload = { status: err.request.status, message: err.request.statusText }
       } else {
-        console.debug('Catch-all')
+        console.warn('Catch-all')
         console.error(err)
-        payload =  { status: err.status, message: err.message }
+        payload = { status: err.status, message: err.message }
       }
 
-      console.debug('Payload', payload)
+      console.warn('Payload', payload)
       console.groupEnd()
 
       return payload
