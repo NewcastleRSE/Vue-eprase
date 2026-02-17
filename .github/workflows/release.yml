@@ -9,7 +9,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@2.20
+        uses: elgohr/Publish-Docker-Github-Action@5
         env:
           TARGET: production
         with:
