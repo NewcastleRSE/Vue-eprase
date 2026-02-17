@@ -850,7 +850,7 @@ export const assessmentStore = defineStore('assessment', {
       }      
       // This will be executed always, regardless of what is stored currently in assessmentData.storedScenarioResponses
       const allScenariosResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[scenario_data][populate][0]=scenario`, 'GET')      
-      if (allScenariosResponse.status < 400) {  
+      if (allScenariosResponse.status < 400) {
         // Postprocess to weed out duplicates
         // NOTE: 16/02/2026 We are not clear how duplicate identical records have got into the database - possibly via accidental double-clicks on buttons, or 
         // network unresponsiveness causing users to click again (many such duplicates have been created seconds or at most a minute apart).  We need to prevent
@@ -861,7 +861,7 @@ export const assessmentStore = defineStore('assessment', {
           if (!( scenarioCode in sanitisedScenarioResponses )) {
             sanitisedScenarioResponses[scenarioCode] = scd
           }
-        })
+        })        
         this.$patch((state) => {
           state.assessmentData.storedScenarioResponses = Object.values(sanitisedScenarioResponses)
         })

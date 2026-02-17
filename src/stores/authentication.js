@@ -169,19 +169,16 @@ export const authenticationStore = defineStore('authentication', {
 
       if (err.response) {
         console.warn('err.response set')
+        console.warn(err.response)
         payload = { status: err.response.status, message: err.response.data.error ? err.response.data.error.message : err.response.data }
       } else if (err.request) {
         console.warn('err.request set')
+        console.warn(err.request)
         payload = { status: err.request.status, message: err.request.statusText }
       } else {
         console.warn('Catch-all')
-        payload =  { status: err.status, message: err.message }
-      }
-
-      if (payload.status == 401 || payload.status == 440) {
-        this.router.push('/login?action=sessionExpired')
-      } else if (payload.status == 403) {
-        this.router.push('/login?action=adminsOnly')
+        console.error(err)
+        payload = { status: err.status, message: err.message }
       }
 
       console.warn('Payload', payload)
