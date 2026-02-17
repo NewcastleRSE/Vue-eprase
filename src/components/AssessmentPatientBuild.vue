@@ -80,7 +80,7 @@
                           <tbody>
                             <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
                             <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
-                            <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
+                            <tr><th>DOB</th><td>{{ patient.dob ? new Date(patient.dob).toLocaleDateString('en-GB') : 'Not specified' }}</td></tr>
                             <tr v-if="patient.age_years == 0 && patient.age_days == 0 && patient.gestational_age == 0"><th>Age</th><td>Unspecified</td></tr>
                             <tr v-if="patient.age_years != null && patient.age_years != 0"><th>Age</th><td>{{ patient.age_years }} years</td></tr>
                             <tr v-if="patient.age_days != null && patient.age_days != 0"><th>Age</th><td>{{ patient.age_days }} days</td></tr>
@@ -222,8 +222,6 @@
 
 <script>
 
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { Validator } from '@vueform/vueform'
@@ -290,18 +288,7 @@ export default {
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
-    },      
-    // Patient DOB is random date within last 12 months, adjusted by their stored age (modified to account for the 3 possible age fields)
-    formatDOB(patient) {
-      dayjs.extend(customParseFormat)
-      if (patient.age_years >0) {
-        return dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age_years, 'year').format('DD/MM/YYYY')
-      } else if (patient.age_days > 0) {
-        return dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
-      } else if (patient.gestational_age > 0) {
-        return dayjs().subtract(patient.gestational_age, 'week').format('DD/MM/YYYY')
-      }      
-    },    
+    },              
     docIdFromTabBtnId(tabId) {
       return tabId.replace(/^accordion-btn-([a-z0-9]+)$/, '\$1')
     },
@@ -352,13 +339,12 @@ export default {
     },
     async setPatientDataEntered(patientCode) {
       const spdeResponse = await this.setPatientEntryComplete(patientCode)
-      if (spdeResponse !== true) {
-        throw new Error(spdeResponse)
-      }
-      // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
-      setTimeout(() => {
-        this.openNextUnenteredPatient()
-      }, 1000)      
+      if (this.errorResponder(spdeResponse)) {
+        // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+        setTimeout(() => {
+          this.openNextUnenteredPatient()
+        }, 1000)   
+      }         
     }
   },
   async mounted() {
@@ -366,11 +352,10 @@ export default {
     // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
-    if (loadPatientsResponse !== true) {
-      throw new Error(loadPatientsResponse)
-    }       
-    // Get the details for the first (unentered) patient
-    this.$nextTick(() => { this.openNextUnenteredPatient() })      
+    if (this.errorResponder(loadPatientsResponse)) {
+      // Get the details for the first (unentered) patient
+      this.$nextTick(() => { this.openNextUnenteredPatient() })
+    }          
     console.groupEnd()
   }, 
   async beforeUnmount() {
@@ -379,9 +364,7 @@ export default {
     if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
-      if (updateResponse !== true) {
-        throw new Error(updateResponse)
-      }
+      this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }

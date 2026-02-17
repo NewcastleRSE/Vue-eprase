@@ -64,22 +64,21 @@ export default {
     console.group('AssessmentIntro mounted hook')
     this.reset()
     // Get mitigation and category base data
+    let wasError = false
     const mitResponse = await this.getMitigationDetails()
-    if (mitResponse !== true) {
-      throw new Error(mitResponse)
+    wasError = this.errorResponder(mitResponse)
+    if (!wasError) {
+      const catResponse = await this.getCategoryDetails()
+      wasError = this.errorResponder(catResponse)
     }
-    const catResponse = await this.getCategoryDetails()
-    if (catResponse !== true) {
-      throw new Error(catResponse)
+    if (!wasError) {
+      const configResponse = await this.getConfigQuestionDetails()
+      wasError = this.errorResponder(configResponse) 
+    }
+    if (!wasError) {
+      const instResponse = await this.getAssessmentsForInstitution()
+      wasError = this.errorResponder(instResponse)
     }    
-    const configResponse = await this.getConfigQuestionDetails()
-    if (configResponse !== true) {
-      throw new Error(configResponse)
-    }
-    const instResponse = await this.getAssessmentsForInstitution()
-    if (instResponse !== true) {      
-      throw new Error(instResponse)
-    }
     console.groupEnd()
   }
 }

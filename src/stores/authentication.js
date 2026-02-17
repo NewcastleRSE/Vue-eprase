@@ -1,29 +1,48 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { assessmentStore } from './assessment'
+import VueCookies from 'vue-cookies'
 
 const API = process.env.BASE_URL
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
-    user: null,
-    userId: null,
-    role: null,
-    email: null, 
-    institutionId: null,
-    hospital: null,
-    orgDocId: null,
-    orgCode: null,
-    orgName: null,
-    trust: null,
-    token: null
-  }),
+    user: '',
+    userId: 0,
+    role: '',
+    email: '', 
+    institutionId: 0,
+    hospital: '',
+    orgDocId: '',
+    orgCode: '',
+    orgName: '',
+    trust: '',
+    token: ''
+  }),  
+  persist: [
+    {
+      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust'],
+      storage: localStorage,
+      debug: process.env.NODE_ENV !== 'production'
+    }, 
+    {
+      pick: ['token'],
+      storage: {
+        getItem: (key) => {
+          return VueCookies.get(key)
+        },
+        setItem: (key, value) => {
+          VueCookies.set(key, value)
+        }
+      },
+      debug: process.env.NODE_ENV !== 'production'
+    }
+  ],
   getters: {
-    authTokenHeader() {
-      return { 'Authorization': `Bearer ${this.token}` }
+    authTokenHeader(state) {
+      return { 'Authorization': `Bearer ${state.token}` }
     }
   },
-  persist: true, 
   actions: {
     isReporter() {
       return this.role == 'Reporter'
@@ -42,11 +61,11 @@ export const authenticationStore = defineStore('authentication', {
         const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
-        this.$patch({token: signinRes.data.jwt})  // Store the JWT
+        this.$patch({ token: userDetails.jwt })  // Store the JWT
 
         console.debug('Determining user institution...')
         const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
-        
+                
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
@@ -73,6 +92,8 @@ export const authenticationStore = defineStore('authentication', {
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
+      sessionStorage.clear()
+      VueCookies.remove('token')
     },
     logout() {
       console.group('logout()')
@@ -142,6 +163,7 @@ export const authenticationStore = defineStore('authentication', {
     triageError(err) {
 
       console.group('triageError()')
+      console.warn('Received error response', err)
 
       let payload = {}
 

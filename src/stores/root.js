@@ -7,9 +7,15 @@ const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
 
 export const rootStore = defineStore('root', {
   state: () => ({    
-    printableReportData: null
+    printableReportData: {
+      heading: '',
+      buttonCaption: '',
+      content: ''
+    }
   }),
-  persist: true, 
+  persist: {
+    storage: localStorage
+  }, 
   actions: {
   
     async apiCall(url, method = 'POST', body = null, responseType = 'json') {
@@ -25,7 +31,7 @@ export const rootStore = defineStore('root', {
       let response = null, ret = {}
       const auth = authenticationStore()
       const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: responseType } : {}
-
+      
       try {
         if (method == 'GET') {
           console.debug('GET url', API + url, 'config', config)
@@ -52,7 +58,7 @@ export const rootStore = defineStore('root', {
     },   
     // Check tool open by doing a bare-bones API call and seeing if we get a 403 response
     async toolOpen() {
-      const response = await this.apiCall('ep-services?limit=1', 'GET')
+      const response = await this.apiCall('institutions?pagination[limit]=1', 'GET')
       return response.status != 403
     },
     // Get list of institutions

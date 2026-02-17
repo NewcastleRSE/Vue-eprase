@@ -162,7 +162,7 @@
                             </div>
                             <table class="table table-striped vf-col-6">
                               <thead>
-                                <tr><th>Category</th><th>Alert</th><th>Advisory</th><th></th></tr>
+                                <tr><th v-html="embolden('Category', true)"></th><th>Alert</th><th>Advisory</th><th></th></tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(mc, mcIdx) in matrixCategories">
@@ -179,13 +179,16 @@
                                 <tr v-if="tooManyCategories == true">
                                   <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
                                 </tr>
+                                <tr v-if="tooFewCategories == true">
+                                  <td colspan="4"><span class="text-danger">Please select at least one category</span></td>
+                                </tr>
                               </tbody>
-                            </table>
-                            <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
-                              :attrs="{ maxlength: 500 }" 
-                              :label="embolden('Please tell us about the system response', false)" 
-                            />
+                            </table>                            
                           </div>
+                          <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
+                            :attrs="{ maxlength: 500 }" 
+                            :label="embolden('Additional comments', false)" 
+                          />
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
@@ -205,7 +208,7 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
+                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
                               <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
@@ -216,7 +219,7 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-show="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
+                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
                               <th>Category/intervention type</th>
                               <td>None</td>
                             </tr>                                                   
@@ -229,7 +232,7 @@
                       </div>
                       <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
-                          :disabled="!allowCurrentScenarioSave || tooManyCategories"
+                          :disabled="!allowCurrentScenarioSave || tooManyCategories || tooFewCategories"
                           :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
@@ -329,7 +332,10 @@ export default {
       return this.$refs.completedScenariosHidden
     },
     tooManyCategories() {
-      return Object.keys(this.dsCategoriesSelected).length > 2
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
+    },
+    tooFewCategories() {
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length == 0
     }
   },
   data() {
@@ -370,23 +376,24 @@ export default {
      
       // Validate the number of categories chosen in a system/user intervention scenario <= 2
       const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      if (formPayload.interventionType == 'MT1' && Object.keys(this.dsCategoriesSelected).length > 2) {
+      if (formPayload.interventionType == 'MT1' && this.tooManyCategories) {
         // Output error, do not save the data and remain here for correction
-        console.debug('Too many categories', this.tooManyCategories)
+        console.debug('Too many categories selected', this.tooManyCategories)
+      } else if (formPayload.interventionType == 'MT1' && this.tooFewCategories) {
+        // Output error, do not save the data and remain here for correction
+        console.debug('Too few categories selected', this.tooFewCategories) 
       } else {
         // All good to go
         const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-        if (saveResponse !== true) {
-          throw new Error(saveResponse)
-        } else {
+        if (!this.errorResponder(saveResponse)) {
           this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
           this.numCompletedScenarios++
           this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
           this.completedScenariosHidden.validate()
-        }
-        setTimeout(() => {
-          this.savedResponseData = true
-        }, 200)
+          setTimeout(() => {
+            this.savedResponseData = true
+          }, 200)
+        }        
       }                  
       console.groupEnd()
     },
@@ -415,7 +422,7 @@ export default {
     },
     formatRecordedInterventions(scenarioCode) {
       let intObj = {}
-      const interventions = this.scenarioResponse(scenarioCode)['other_category']
+      const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
       if (interventions != null && interventions.length > 0) {
         // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
         interventions.split('|').forEach(intn => {
@@ -512,6 +519,8 @@ export default {
         this.interventionSelections[identifier] = isIntervention
         this.currentScenarioInterventionSelected = true
       }
+      console.debug('Identifier', identifier, 'current patient', this.currentPatient, 'current scenario', this.currentScenario)
+      console.debug('Intervention selections', this.interventionSelections, 'currentScenarioInterventionSelected', this.currentScenarioInterventionSelected)
       console.groupEnd()
     }
   },
@@ -529,23 +538,20 @@ export default {
       })      
     }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    if (storedResultsResponse !== true) {
-      throw new Error(storedResultsResponse)
-    } else {
+    if (!this.errorResponder(storedResultsResponse)) {
       // Package the responses by scenario code for convenience - data is of form:
       // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
       this.assessmentData.storedScenarioResponses.forEach(asr => {
         this.storedResponsesByCode[asr.scenario.scenario_code] = asr
       })
       this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
-    }
-    
-    // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-    this.completedScenariosHidden.validate()
+      
+      // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
+      this.completedScenariosHidden.validate()
 
-    this.auxiliaryDataReady = true
-    this.openNextUnenteredScenario()
-    
+      this.auxiliaryDataReady = true
+      this.openNextUnenteredScenario()    
+    }    
     console.groupEnd()
   },
   async beforeUnmount() {
@@ -554,9 +560,7 @@ export default {
     if (this.numCompletedScenarios == this.scenarioCount) {
       // We have done all the data entry now          
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
-      if (updateResponse !== true) {
-        throw new Error(updateResponse)
-      }
+      this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }

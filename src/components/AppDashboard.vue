@@ -104,11 +104,25 @@
                 </table>
               </div>
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
-                <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
-                <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
-                <a class="btn btn-primary col-2 me-2" @click="configQuestionData()" role="button">Config Questions</a>
-                <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
-                <a class="btn btn-primary col-2" @click="systemData()" role="button">System data</a>
+                <div class="row col-12">
+                  <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
+                  <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a>
+                </div>
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
+                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>
+                  <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a>
+                </div>                
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
+                </div>
+                <div class="row col-12 mt-4"><h3>Experimental reports</h3></div>
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="categoryRiskReport()" role="button">Category risk</a>
+                  <a class="btn btn-primary col-2 me-2" @click="scenarioRiskReport()" role="button">Scenario risk</a>
+                </div>
               </div>
             </div>
           </div>                  
@@ -174,6 +188,22 @@ export default {
       const response = await this.apiCall('assessment-mitigation-percentages', 'GET', null, 'blob')
       saveAs(response.data, `mitigation_percentages_${this.formatDate()}.csv`)
     },
+    async mitigationByCategory() {
+      const response = await this.apiCall('assessment-mitigation-by-category', 'GET', null, 'blob')
+      saveAs(response.data, `mitigations_by_category_${this.formatDate()}.csv`)
+    },
+    async mitigationByScenario() {
+      const response = await this.apiCall('assessment-mitigation-by-scenario', 'GET', null, 'blob')
+      saveAs(response.data, `mitigations_by_scenario_${this.formatDate()}.csv`)
+    },
+    async categoryRiskReport() {
+      const response = await this.apiCall('assessment-category-risk-report', 'GET', null, 'blob')
+      saveAs(response.data, `category_risk_report_${this.formatDate()}.csv`)
+    },
+    async scenarioRiskReport() {
+      const response = await this.apiCall('assessment-scenario-risk-report', 'GET', null, 'blob')
+      saveAs(response.data, `scenario_risk_report_${this.formatDate()}.csv`)
+    },
     async configQuestionData() {
       const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
       saveAs(response.data, `config_error_data_${this.formatDate()}.csv`)
@@ -186,16 +216,15 @@ export default {
       const response = await this.apiCall('assessment-system-data', 'GET', null, 'blob')
       saveAs(response.data, `system_data_${this.formatDate()}.csv`)
     },
+    async optOutData() {
+      const response = await this.apiCall('assessment-opt-outs-data', 'GET', null, 'blob')
+      saveAs(response.data, `opt_outs_${this.formatDate()}.csv`)
+    },
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
       const selectResponse = await this.loadCompletedAssessment(assessmentId)        
-      if (selectResponse !== true) {
-        throw new Error('Failed to load assessment data')
-      } else {
-        window.open(this.$router.resolve({
-        path: '/assessment-report'
-      }).href, '_blank')
-      } 
+      this.errorResponder(selectResponse)
+      window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
       console.groupEnd()
     }
   },  
@@ -205,26 +234,24 @@ export default {
     this.auxiliaryDataReady = false
 
     // Basic data for viewing assessments
+    let wasError = false
     const mitResponse = await this.getMitigationDetails()
-    if (mitResponse !== true) {
-      throw new Error(mitResponse)
+    wasError = this.errorResponder(mitResponse)    
+    if (!wasError) {
+      const catResponse = await this.getCategoryDetails()
+      wasError = this.errorResponder(catResponse)
     }
-    const catResponse = await this.getCategoryDetails()
-    if (catResponse !== true) {
-      throw new Error(catResponse)
+    if (!wasError) {
+      const configResponse = await this.getConfigQuestionDetails()
+      wasError = this.errorResponder(configResponse)
+    }
+    if (!wasError) {
+      // Dashboard data
+      const response = await this.progressReport()
+      if (!this.errorResponder(response)) {
+        this.dashboardData = response.data
+      }      
     }    
-    const configResponse = await this.getConfigQuestionDetails()
-    if (configResponse !== true) {
-      throw new Error(configResponse)
-    }
-
-    // Dashboard data
-    const response = await this.progressReport()
-    if (response.status >= 400) {
-      throw new Error(response.message)
-    }
-    this.dashboardData = response.data
-
     this.auxiliaryDataReady = true
 
     console.groupEnd()

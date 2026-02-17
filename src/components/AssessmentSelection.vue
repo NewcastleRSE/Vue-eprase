@@ -7,7 +7,12 @@
         </div>
       </div>
     </StaticElement>
-    <GroupElement name="assessmentGroupLoaded" v-if="dataLoaded">
+    <StaticElement name="assessmentGroupDuplicateAssessment" v-if="duplication">
+      <div class="alert alert-danger">
+        Another user from your trust is already editing this assessment at the present time, so you are advised to log out and come back later.
+      </div>
+    </StaticElement>
+    <GroupElement name="assessmentGroupLoaded" v-if="dataLoaded && !duplication">
       <StaticElement name="selectionHeading">
         <h2>Assessment Selection</h2>
       </StaticElement>
@@ -160,6 +165,9 @@ export default {
     }, 
     dataLoaded() {
       return this.dataReady
+    },
+    duplication() {
+      return this.duplicateAssessmentAttempt
     }
   },
   data() {
@@ -180,16 +188,15 @@ export default {
 
       // Select an existing assessment
       this.continuingExistingAssessment = true
-      const selectResponse = await this.selectAssessment(assessmentId)        
-      if (selectResponse !== true) {
-        throw new Error(selectResponse)
-      } else {
-        console.groupEnd()
+      const selectResponse = await this.selectAssessment(assessmentId)
+      if (!this.errorResponder(selectResponse)) {
         if (this.dataLoaded) {
           console.debug('Data loaded')
+          console.groupEnd()
           this.$emit('jumpToStep', assessmentId)
-        }
-      } 
+        } 
+      }          
+      console.groupEnd()      
     },
     async getEpSystemNames() {
       let epSystems = []
@@ -210,7 +217,7 @@ export default {
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})
       } else {
-        throw new Error(response.message)
+        this.errorResponder(response)
       }
       return epSystems
     },
@@ -229,8 +236,8 @@ export default {
       // Create a new assessment (continuation / reporting will be handled by 'continueAssessment()' above)
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()
-      if (!this.duplicateAssessmentAttempt && selectResponse !== true)        {
-        throw new Error(selectResponse)
+      if (!this.duplicateAssessmentAttempt) {
+        this.errorResponder(selectResponse)
       } 
     }    
     console.groupEnd()

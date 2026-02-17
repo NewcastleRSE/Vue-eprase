@@ -4,70 +4,76 @@
 
       <AppLogo cls="banner" />
 
-      <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
-      <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
-      <h3 v-if="$route.query.action === 'changedPassword'" class="text-success">Successfully changed your password, please sign in again</h3>
-      <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
-
-      <h1 class="mt-4">Log-in to ePRaSE</h1>
-
-      <p class="pb-2">
-        Please enter your login details below, or click 'Register' to create a new user account.<br>You will need a valid
-        <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
-      </p>
-
-      <div class="mb-4">
-        <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
-          <TextElement name="email" placeholder="Valid NHS email address"
-            :label="embolden('Email address', true)" 
-            :debounce="200" 
-            :messages="{required: 'Email is required'}" 
-            :rules="['required', $vueform.rules.nhsEmail]" />
-          <TextElement name="password" autocomplete="on"
-            :label="embolden('Password', true)"
-            :input-type="showPassword ? 'text' : 'password'"            
-            :debounce="200" 
-            :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
-            :rules="['required', 'between:6,50']">
-            <template #addon-after="scope">
-              <i style="cursor:pointer" @click="togglePasswordVisibility"
-                :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
-                :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
-            </template>
-          </TextElement>
-          <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
-            <ButtonElement name="submit" full
-              :columns="3" 
-              :add-class="'me-2'" 
-              :submits="true">
-              <i class="bi bi-person-circle me-2"></i>Log in
-            </ButtonElement>
-            <ButtonElement name="reset" full 
-              :columns="3" 
-              :add-class="'mx-2'" 
-              :resets="true">
-              <i class="bi bi-x-circle-fill me-2"></i>Clear form
-            </ButtonElement>
-            <ButtonElement name="register" full 
-              :columns="3" 
-              :add-class="'mx-2'" 
-              :disabled="onStaging || $route.query.action === 'registered'" 
-              @click="onRegisterClick">
-              <i class="bi bi-person-fill-add me-2"></i>Register
-            </ButtonElement>
-            <ButtonElement name="forgotpassword" full 
-              data-bs-toggle="modal" data-bs-target="#forgotPasswordModal"
-              :columns="3" 
-              :add-class="'ms-2'"               
-              :disabled="$route.query.action === 'registered'"> 
-              <i class="bi bi-key-fill me-2"></i>Forgot password?
-            </ButtonElement>
-            <ForgotPasswordModal ref="forgotPasswordModal" />
-          </GroupElement>
-        </Vueform>
+      <div class="alert alert-danger" v-if="!toolIsOpen">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed to users.  Access possible for admins only.
       </div>
-    </div>
-    
+
+      <div v-if="toolIsOpen">
+        <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
+        <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
+        <h3 v-if="$route.query.action === 'changedPassword'" class="text-success">Successfully changed your password, please sign in again</h3>
+        <h3 v-if="$route.query.action === 'sessionExpired'" class="text-danger">Your session has expired, please sign in again</h3>
+        <h3 v-if="serverError" class="text-danger">{{ serverError }}</h3>
+
+        <h1 class="mt-4">Log-in to ePRaSE</h1>
+
+        <p class="pb-2">
+          Please enter your login details below, or click 'Register' to create a new user account.<br>You will need a valid
+          <span class="fw-bold">'nhs.uk'</span> or <span class="fw-bold">'nhs.net'</span> email account to register with ePRaSE successfully.
+        </p>
+
+        <div class="mb-4">
+          <Vueform ref="loginForm" :endpoint="false" @submit="onLoginClick" v-model="user" sync>
+            <TextElement name="email" placeholder="Valid NHS email address"
+              :label="embolden('Email address', true)" 
+              :debounce="200" 
+              :messages="{required: 'Email is required'}" 
+              :rules="['required', $vueform.rules.nhsEmail]" />
+            <TextElement name="password" autocomplete="on"
+              :label="embolden('Password', true)"
+              :input-type="showPassword ? 'text' : 'password'"            
+              :debounce="200" 
+              :messages="{required: 'Password is required', between: 'Password must be between 6 and 50 characters long'}" 
+              :rules="['required', 'between:6,50']">
+              <template #addon-after="scope">
+                <i style="cursor:pointer" @click="togglePasswordVisibility"
+                  :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
+                  :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
+              </template>
+            </TextElement>
+            <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+              <ButtonElement name="submit" full
+                :columns="3" 
+                :add-class="'me-2'" 
+                :submits="true">
+                <i class="bi bi-person-circle me-2"></i>Log in
+              </ButtonElement>
+              <ButtonElement name="reset" full 
+                :columns="3" 
+                :add-class="'mx-2'" 
+                :resets="true">
+                <i class="bi bi-x-circle-fill me-2"></i>Clear form
+              </ButtonElement>
+              <ButtonElement name="register" full 
+                :columns="3" 
+                :add-class="'mx-2'" 
+                :disabled="onStaging || $route.query.action === 'registered'" 
+                @click="onRegisterClick">
+                <i class="bi bi-person-fill-add me-2"></i>Register
+              </ButtonElement>
+              <ButtonElement name="forgotpassword" full 
+                data-bs-toggle="modal" data-bs-target="#forgotPasswordModal"
+                :columns="3" 
+                :add-class="'ms-2'"               
+                :disabled="$route.query.action === 'registered'"> 
+                <i class="bi bi-key-fill me-2"></i>Forgot password?
+              </ButtonElement>
+              <ForgotPasswordModal ref="forgotPasswordModal" />
+            </GroupElement>
+          </Vueform>
+        </div>
+      </div>      
+    </div>    
   </main>
 </template>
 
@@ -88,7 +94,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
-    ...mapState(rootStore, ['audit']),
+    ...mapState(rootStore, ['audit', 'toolOpen']),
     ...mapState(assessmentStore, ['reset']),
     onStaging() {
       return isStagingSite()
@@ -102,7 +108,8 @@ export default {
         password: '',
       },
       showPassword: false,
-      serverError: false
+      serverError: false,
+      toolIsOpen: false
     }
   },
   methods: {
@@ -125,10 +132,11 @@ export default {
               this.$router.push('/assessment-dashboard')
             } else {
               await this.audit('login:' + this.user.email, '/login')
-              this.$router.push('/')
+              this.$router.push('/assessment')
             }             
           } else {
-            this.serverError = 'An error occured during signin:' + signinResponse.message
+            console.debug(signinResponse)
+            this.serverError = 'An error occured during signin: ' + signinResponse.message
             await this.audit('loginfail:' + this.user.email, '/login')
             this.clear()
           }
@@ -143,9 +151,10 @@ export default {
       this.showPassword = !this.showPassword
     }
   },
-  mounted() {
+  async mounted() {
     // Clear any assessment data that may be around
     this.reset()
+    this.toolIsOpen = await this.toolOpen()
   }
 }
 </script>

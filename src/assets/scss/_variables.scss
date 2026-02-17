@@ -27,6 +27,10 @@ $nav-tabs-link-active-color: white;
 $nav-link-font-weight: "bold";
 /* Better padding for dropdown items */
 $dropdown-item-padding-x: 0.5rem;
+/* Reduce flicker when modals appear/disappear */
+$modal-fade-transform: none;
+$modal-transition: none;
+$modal-scale-transform: none;
 
 /* Webpack magic - see https://github.com/alexanderweigelt/ExportSassVarsToJS */
 :export {

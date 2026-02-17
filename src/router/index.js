@@ -75,12 +75,15 @@ router.beforeEach(async (to, from, next) => {
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
-  const loggedInRes = await authenticationStore().isLoggedIn()
-  if (loggedInRes === false) {
-    // Clear all local storage, e.g. wipe sessions with expired JWTs
-    authenticationStore().clear()
+  let loggedInRes = false
+  if (authRequired) {
+    loggedInRes = await authenticationStore().isLoggedIn()
+    if (loggedInRes === false) {
+      // Clear all local storage, e.g. wipe sessions with expired JWTs
+      authenticationStore().clear()
+    }
+    console.debug('Logged in user', loggedInRes)
   }
-  console.debug('Logged in user', loggedInRes)
 
   if (authRequired && loggedInRes === false) {
 
