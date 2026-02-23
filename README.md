@@ -8,7 +8,7 @@ The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluat
 
 The application has been in development since 2019 and has multiple repos, some of which are archived. The current application consists of a Vue3 SPA client and a Strapi back-end configured to work with Postgres.
 
-Please visit the Vue-Eprase wiki page for in-depth documention.
+Please visit the Vue-Eprase [Wiki](https://github.com/NewcastleRSE/Vue-eprase/wiki) page for in-depth documention.
 
 ### Project Team
 
