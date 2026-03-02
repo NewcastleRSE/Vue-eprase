@@ -382,7 +382,7 @@ export default {
       } else if (formPayload.interventionType == 'MT1' && this.tooFewCategories) {
         // Output error, do not save the data and remain here for correction
         console.debug('Too few categories selected', this.tooFewCategories) 
-      } else {
+      } else if ( !( scenario.scenario_code in this.storedResponsesByCode ) ) {
         // All good to go
         const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
         if (!this.errorResponder(saveResponse)) {

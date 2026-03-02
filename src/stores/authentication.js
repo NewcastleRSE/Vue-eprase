@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { assessmentStore } from './assessment'
-import VueCookies from 'vue-cookies'
+import Cookies from 'js-cookie'
 
 const API = process.env.BASE_URL
 
@@ -29,10 +29,10 @@ export const authenticationStore = defineStore('authentication', {
       pick: ['token'],
       storage: {
         getItem: (key) => {
-          return VueCookies.get(key)
+          return Cookies.get(key)
         },
         setItem: (key, value) => {
-          VueCookies.set(key, value)
+          Cookies.set(key, value)
         }
       },
       debug: process.env.NODE_ENV !== 'production'
@@ -61,7 +61,7 @@ export const authenticationStore = defineStore('authentication', {
         const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
-        this.$patch({ token: userDetails.jwt })  // Store the JWT
+        this.$patch({token: userDetails.jwt})
 
         console.debug('Determining user institution...')
         const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
@@ -92,8 +92,7 @@ export const authenticationStore = defineStore('authentication', {
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
-      sessionStorage.clear()
-      VueCookies.remove('token')
+      Cookies.remove('authentication')
     },
     logout() {
       console.group('logout()')
@@ -179,6 +178,12 @@ export const authenticationStore = defineStore('authentication', {
         console.warn('Catch-all')
         console.error(err)
         payload = { status: err.status, message: err.message }
+      }
+
+      if (payload.status == 401 || payload.status == 440) {
+        this.router.push('/login?action=sessionExpired')
+      } else if (payload.status == 403) {
+        this.router.push('/login?action=adminsOnly')
       }
 
       console.warn('Payload', payload)

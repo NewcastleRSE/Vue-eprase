@@ -115,7 +115,7 @@ const EMPTY_DATA = {
   numCompletedPatients: 0,
   patientScenarios: {},       // The details of the scenarios
   numScenarios: 0,
-  storedScenarioResponses: {} // Stored responses  
+  storedScenarioResponses: [] // Stored responses  
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -865,6 +865,9 @@ export const assessmentStore = defineStore('assessment', {
         this.$patch((state) => {
           state.assessmentData.storedScenarioResponses = Object.values(sanitisedScenarioResponses)
         })
+        // this.$patch((state) => {
+        //   state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data.scenario_data
+        // })
       } else {
         ret = {status: allScenariosResponse.status, message: 'Failed to retrieve saved scenario responses'}
       }
@@ -886,14 +889,6 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-
-      // Fix 16/02/2026 Daid - Ensure we don't save the data again e.g. because of double click on a button or network lag 
-      // leading to a duplicate submission and hence duplication of database records
-      if (this.storedScenarioResponses[scenario.scenario_code]) {
-        console.warn('Preventing save of duplicate record', patient, scenario)
-        console.groupEnd()
-        return { status: 400, message: 'Attempt to save duplicate scenario response record' }
-      }
 
       // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
       // Massage it into db form:

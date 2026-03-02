@@ -12,7 +12,6 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import Vueform from '@vueform/vueform'
 import vueformConfig from '../vueform.config'
-import VueCookies from 'vue-cookies'
 import { router } from './router'
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
@@ -36,7 +35,7 @@ axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 axios.defaults.withCredentials = true
 
-app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig).use(VueCookies)
+app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig)
 
 // hides default console message
 app.config.productionTip = false
