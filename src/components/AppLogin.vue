@@ -8,7 +8,11 @@
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed to users.  Access possible for admins only.
       </div>
 
-      <div v-if="toolIsOpen">
+      <div v-if="toolIsOpen && multipleSessions">
+        <!-- TODO -->
+      </div>
+
+      <div v-if="toolIsOpen && !multipleSessions">
         <h3 v-if="$route.query.action === 'loggedOut'" class="text-success">You have successfully logged out</h3>
         <h3 v-if="$route.query.action === 'registered'" class="text-success">Registration successful, please sign in</h3>
         <h3 v-if="$route.query.action === 'changedPassword'" class="text-success">Successfully changed your password, please sign in again</h3>
@@ -93,7 +97,7 @@ export default {
     ForgotPasswordModal
   },
   computed: {
-    ...mapState(authenticationStore, ['login', 'clear', 'isReporter']),
+    ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions']),
     ...mapState(rootStore, ['audit', 'toolOpen']),
     ...mapState(assessmentStore, ['reset']),
     onStaging() {
@@ -109,7 +113,8 @@ export default {
       },
       showPassword: false,
       serverError: false,
-      toolIsOpen: false
+      toolIsOpen: false,
+      multipleSessions: false
     }
   },
   methods: {
@@ -131,8 +136,16 @@ export default {
               await this.audit('reporter-login:' + this.user.email, '/login')
               this.$router.push('/assessment-dashboard')
             } else {
-              await this.audit('login:' + this.user.email, '/login')
-              this.$router.push('/assessment')
+              await this.audit('login:' + this.user.email, '/login')              
+              this.sessions = await this.getAllSessions()
+              if (this.sessions === false) {
+                throw new Error('Logged in, but no sessions found')
+              } else if (this.sessions.length > 1) {
+                // Disambiguate the case of multiple sessions
+                this.multipleSessions = true
+              } else {
+                this.$router.push('/assessment')
+              }              
             }             
           } else {
             console.debug(signinResponse)

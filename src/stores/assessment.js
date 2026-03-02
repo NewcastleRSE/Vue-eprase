@@ -417,6 +417,8 @@ export const assessmentStore = defineStore('assessment', {
               state.assessmentData.hospital = authenticationStore().hospital,
               state.assessmentData.institution = authenticationStore().orgDocId
             })
+            // David 02/03-2026 - Auditing will now record the assessment documentId on creation as well as update
+            uri = `${uri}/${response.data.data.documentId}`
           } else {
             ret = response
           }

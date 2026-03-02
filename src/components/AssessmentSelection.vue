@@ -34,9 +34,10 @@
               <th>ePrescribing System</th>
               <th>Patient Type</th>
               <th>Assessment Status</th>
-              <th>Created on</th>
+              <th>Created On</th>
+              <th>By User</th>
               <th>Last Update</th>
-              <th>User</th>
+              <th>By User</th>
               <th>&nbsp;</th>
             </tr>
           </thead>
@@ -46,8 +47,9 @@
               <td>{{ assessment.patient_type }}</td>
               <td>{{ assessment.state == 'System complete' ? 'System information completed' : assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_creator_email || 'Not recorded' }}</td>
+              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+              <td>{{ assessment.eprase_updater_email || 'Not recorded' }}</td>
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
@@ -67,8 +69,9 @@
               <th>Patient Type</th>
               <th>Assessment Status</th>
               <th>Created on</th>
+              <th>By User</th>
               <th>Last Update</th>
-              <th>User</th>
+              <th>By User</th>
               <th>&nbsp;</th>
             </tr>
           </thead>
@@ -78,8 +81,9 @@
               <td>{{ assessment.patient_type }}</td>
               <td>{{ assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_creator_email || 'Not recorded' }}</td>
+              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+              <td>{{ assessment.eprase_updater_email || 'Not recorded' }}</td>
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select

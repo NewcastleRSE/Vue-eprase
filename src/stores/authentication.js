@@ -118,6 +118,24 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
+    async getAllSessions() {
+
+      let ret = false
+
+      console.group('getAllSessions()')
+
+      try {
+        const res = await axios.get(`${API}magic-sessionmanager/my-sessions`, { headers: this.authTokenHeader })
+        ret = res.data.data
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
     async signup(username, institution, hospital, email, password) {
 
       let ret = {}
