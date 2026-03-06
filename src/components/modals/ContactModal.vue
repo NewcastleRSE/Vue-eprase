@@ -15,7 +15,7 @@
 
 import GenericModal from './GenericModal'
 import { mapState } from 'pinia'
-import { rootStore } from '../stores/root'
+import { rootStore } from '../../stores/root'
 
 export default {
   name: "ContactModal",

@@ -88,14 +88,17 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
-    clear() {
+    clear() {       
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
-      Cookies.remove('authentication')
+      Cookies.remove('authentication')         
     },
-    logout() {
+    async logout() {
       console.group('logout()')
+      if (this.token) {
+        await axios.post(`${API}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })
+      }  
       this.clear()
       console.groupEnd()
     },    
@@ -127,6 +130,26 @@ export const authenticationStore = defineStore('authentication', {
       try {
         const res = await axios.get(`${API}magic-sessionmanager/my-sessions`, { headers: this.authTokenHeader })
         ret = res.data.data
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async terminateSession(sessionId) {
+
+      let ret = false
+
+      console.group('terminateSession()')
+      console.debug('Terminating active session', sessionId)
+
+      try {
+        const res = await axios.delete(`${API}magic-sessionmanager/my-sessions/${sessionId}`, { headers: this.authTokenHeader })
+        console.debug(res)
+        ret = res.data.success
       } catch (err) {
         console.error(err)
       }

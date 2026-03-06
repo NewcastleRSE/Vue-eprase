@@ -30,7 +30,7 @@ import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
-import ExitModal from './ExitModal'
+import ExitModal from './modals/ExitModal'
 
 export default {
   name: 'LoginInfo',

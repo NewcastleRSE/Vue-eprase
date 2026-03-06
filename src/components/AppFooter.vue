@@ -31,9 +31,9 @@
 
 <script>
 
-import InstructionsModal from './InstructionsModal'
-import AboutModal from './AboutModal'
-import ContactModal from './ContactModal'
+import InstructionsModal from './modals/InstructionsModal'
+import AboutModal from './modals/AboutModal'
+import ContactModal from './modals/ContactModal'
 
 export default {
   name: "AppFooter", 

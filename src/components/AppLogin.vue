@@ -9,7 +9,51 @@
       </div>
 
       <div v-if="toolIsOpen && multipleSessions">
-        <!-- TODO -->
+        <table class="table table-striped vf-col-12">
+          <thead>
+            <tr>
+              <th class="align-content-center" colspan="9">You have ePRaSE sessions open on other devices - please choose what to do</th>
+            </tr>
+            <tr>
+              <th>Login time</th>
+              <th>Mins since active</th>
+              <th>Device type</th>
+              <th>Browser</th>
+              <th>OS name</th>
+              <th>Status</th>              
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="s in nonCurrentSessions">
+              <td>{{ convertDate(s.loginTime) }}</td>
+              <td>{{ s.minutesSinceActive }}</td>
+              <td>{{ s.deviceType }}</td>
+              <td>{{ s.browserName }}</td>
+              <td>{{ s.osName }}</td>
+              <td><span class="fw-bold"><i class="fw-bold" :class="s.logoutTime == null ? 'bi bi-x-lg text-danger' : 'bi bi-check-lg text-success'"></i></span></td>
+            </tr>                            
+          </tbody>
+        </table>
+        <Vueform ref="loginDisambiguateForm" :endpoint="false">
+          <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
+            <ButtonElement name="submit" full
+              :columns="6" 
+              :add-class="'me-2'" 
+              data-bs-toggle="modal" data-bs-target="#logoutCurrentSessionModal"
+            >
+              <i class="bi bi-box-arrow-right me-2"></i>Log out this session 
+            </ButtonElement>
+            <ButtonElement name="reset" full 
+              :columns="6" 
+              :add-class="'ms-2'" 
+              data-bs-toggle="modal" data-bs-target="#logoutOtherSessionsModal"
+            >
+              <i class="bi bi-box-arrow-right me-2"></i>Log out other sessions
+            </ButtonElement>           
+          </GroupElement>
+        </Vueform>  
+        <LogoutCurrentSessionModal ref="logoutCurrentSessionModal" :showActionBtn="true" @modal-actioned="logoutCurrentSession()" />
+        <LogoutOtherSessionsModal ref="logoutOtherSessionsModal" :showActionBtn="true" @modal-actioned="logoutOtherSessions()" />
       </div>
 
       <div v-if="toolIsOpen && !multipleSessions">
@@ -84,24 +128,31 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { usernameFromEmail, isStagingSite } from '../helpers/utils'
-import ForgotPasswordModal from './ForgotPasswordModal'
+import { usernameFromEmail, isStagingSite, isoToUkDate } from '../helpers/utils'
+import ForgotPasswordModal from './modals/ForgotPasswordModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
+import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal.vue'
+import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal.vue'
 
 export default {
   name: 'AppLogin',
   components: {
     AppLogo,
-    ForgotPasswordModal
+    ForgotPasswordModal,
+    LogoutCurrentSessionModal,
+    LogoutOtherSessionsModal
   },
   computed: {
-    ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions']),
+    ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions', 'terminateSession']),
     ...mapState(rootStore, ['audit', 'toolOpen']),
-    ...mapState(assessmentStore, ['reset']),
+    ...mapState(assessmentStore, ['reset', 'setLoggingOut']),
     onStaging() {
       return isStagingSite()
+    },
+    nonCurrentSessions() {
+      return this.sessions.filter(sess => (sess.isCurrentSession === false && sess.logoutTime == null && sess.minutesSinceActive < 120))
     }
   },
   data() {
@@ -114,10 +165,27 @@ export default {
       showPassword: false,
       serverError: false,
       toolIsOpen: false,
+      sessions: [],
       multipleSessions: false
     }
   },
   methods: {
+    convertDate(d, useTime) {
+      return isoToUkDate(d, useTime)
+    },
+    logoutCurrentSession() {
+      this.setLoggingOut(true)
+      this.$router.push('/logout')
+    },
+    async logoutOtherSessions() {
+      this.nonCurrentSessions.forEach(async ncs => {
+        console.debug('Terminate session', ncs)
+        let result = await this.terminateSession(ncs.documentId)
+        if (!result) {
+          console.warn('Failed to delete session with id', ncs.sessionId)
+        }
+      })
+    },
     onLoginClick(form$) {
 
       console.group('onLoginClick()')
@@ -138,9 +206,10 @@ export default {
             } else {
               await this.audit('login:' + this.user.email, '/login')              
               this.sessions = await this.getAllSessions()
+              console.debug('Number of active sessions in addition to current', this.nonCurrentSessions.length)
               if (this.sessions === false) {
-                throw new Error('Logged in, but no sessions found')
-              } else if (this.sessions.length > 1) {
+                throw new Error('Logged in, but no sessions found - not sure what happened here!')
+              } else if (this.nonCurrentSessions.length > 1) {
                 // Disambiguate the case of multiple sessions
                 this.multipleSessions = true
               } else {
@@ -166,7 +235,7 @@ export default {
   },
   async mounted() {
     // Clear any assessment data that may be around
-    this.reset()
+    this.clear()
     this.toolIsOpen = await this.toolOpen()
   }
 }

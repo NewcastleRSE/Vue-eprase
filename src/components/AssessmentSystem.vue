@@ -169,7 +169,7 @@
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
-import ConfirmCancelEditModal from "./ConfirmCancelEditModal"
+import ConfirmCancelEditModal from "./modals/ConfirmCancelEditModal"
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
 

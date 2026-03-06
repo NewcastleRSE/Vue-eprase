@@ -20,7 +20,7 @@
 
 import GenericModal from './GenericModal'
 import { mapStores } from 'pinia'
-import { rootStore } from '../stores/root'
+import { rootStore } from '../../stores/root'
 
 export default {
   name: "InstructionsModal",

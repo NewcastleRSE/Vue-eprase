@@ -7,13 +7,13 @@
         assessment for any additional adult EP systems or start a paediatric assessment from the Assessment Selection page. Please select using the buttons below.
       </div>
       <GroupElement name="exitButtonBar">
-        <ButtonElement name="about" title="About" full
+        <ButtonElement name="surveyAndExit" title="Exit Tool" full
           data-bs-toggle="modal" data-bs-target="#surveyLinkModal"
           :columns="3" 
           :add-class="'me-2'">
           <i class="bi bi-box-arrow-right me-lg-2"></i><span class="d-lg-block d-none">Exit tool</span>
         </ButtonElement>
-        <ButtonElement name="about" title="About" full
+        <ButtonElement name="startNewAssessment" title="Start New Assessment" full
           @click="startNewAssessment"
           :columns="6" 
           :add-class="'ms-2'">
@@ -30,7 +30,7 @@
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { rootStore } from '../stores/root'
-import SurveyLinkModal from './SurveyLinkModal'
+import SurveyLinkModal from './modals/SurveyLinkModal'
 
 export default {
   name: 'AssessmentConfigQuestion',  

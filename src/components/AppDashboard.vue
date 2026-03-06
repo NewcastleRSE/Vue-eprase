@@ -140,7 +140,7 @@
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { appSettingsStore } from '../stores/appSettings'
-import ErrorAlertModal from './ErrorAlertModal'
+import ErrorAlertModal from './modals/ErrorAlertModal'
 import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'

@@ -29,11 +29,11 @@ export default {
   },
   watch: {
     dataReady: {
-      handler: function(newVal) {
+      handler: async function(newVal) {
         console.group('dataReady() watcher entered with new value', newVal)
         if (newVal === true) {
           // We can now log out safely as the store saving process has finished (so user JWT no longer required)
-          this.logOutUser()
+          await this.logOutUser()
         }
         console.groupEnd()
       },
@@ -41,18 +41,15 @@ export default {
     }
   },
   methods: {
-    logOutUser() {
+    async logOutUser() {
       console.debug('Logging out user...')
       this.setLoggingOut(false)
-      this.logout()
+      await this.logout()
       this.$router.push('/login?action=loggedOut')
     }
   },
   mounted() {
-    if (this.dataLoaded) {
-      this.logOutUser()
-    }
-  },
+  }
 }
 </script>
 

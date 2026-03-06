@@ -94,7 +94,7 @@ import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
-import ErrorAlertModal from './ErrorAlertModal'
+import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
 
 export default {
