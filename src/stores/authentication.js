@@ -139,15 +139,15 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
-    async terminateSession(sessionId) {
+    async terminateSession(sessionDocumentId) {
 
       let ret = false
 
       console.group('terminateSession()')
-      console.debug('Terminating active session', sessionId)
+      console.debug('Terminating active session', sessionDocumentId)
 
       try {
-        const res = await axios.delete(`${API}magic-sessionmanager/my-sessions/${sessionId}`, { headers: this.authTokenHeader })
+        const res = await axios.delete(`${API}magic-sessionmanager/my-sessions/${sessionDocumentId}`, { headers: this.authTokenHeader })
         console.debug(res)
         ret = res.data.success
       } catch (err) {
@@ -221,10 +221,8 @@ export const authenticationStore = defineStore('authentication', {
         payload = { status: err.status, message: err.message }
       }
 
-      if (payload.status == 401 || payload.status == 440) {
+      if (payload.status == 401 || payload.status == 440 || payload.status == 403) {
         this.router.push('/login?action=sessionExpired')
-      } else if (payload.status == 403) {
-        this.router.push('/login?action=adminsOnly')
       }
 
       console.warn('Payload', payload)

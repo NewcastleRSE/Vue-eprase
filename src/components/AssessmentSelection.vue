@@ -183,7 +183,7 @@ export default {
     }
   },
   emits: ['jumpToStep'],
-  methods: {      
+  methods: {       
     async continueAssessment(assessmentId) {
 
       console.group('continueAssessment()')

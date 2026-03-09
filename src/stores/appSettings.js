@@ -5,7 +5,8 @@ export const appSettingsStore = defineStore('appSettings', {
     return {
       version: '3.1.7',
       debugMode: false,
-      year: new Date().getFullYear(),     
+      year: new Date().getFullYear(),
+      sessionTimeout: 7200,     
       passwordMinLength: 6,
       passwordMaxLength: 50,
       assessmentNumPatients: 15 
