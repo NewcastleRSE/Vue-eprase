@@ -51,8 +51,11 @@
               <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_updater_email || 'Not recorded' }}</td>
               <td>
-                <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
+                <ButtonElement v-if="!assessment.isLocked" :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
+                </ButtonElement>
+                <ButtonElement v-if="assessment.isLocked" :name="'select-' + assessment.documentId" :disabled="true" title="This assessment is currently being edited by another user - please try again later" danger>
+                  <i class="bi bi-person-lock"></i>Locked
                 </ButtonElement>
               </td>
             </tr>
@@ -87,7 +90,7 @@
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
-                </ButtonElement>
+                </ButtonElement>                
               </td>
             </tr>
           </tbody>

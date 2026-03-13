@@ -305,7 +305,17 @@ export const assessmentStore = defineStore('assessment', {
       const response = await rootStore().apiCall(`assessments?populate[institution][fields][0]=institution_code&filters[institution][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
-        this.$patch((state) => { state.allPossibleAssessments = response.data.data })
+        const assessmentData = response.data.data
+        // Examine locking metadata to decide whether each assessment can be edited
+        const lockInfo = response.data.lockInfo
+        assessmentData.forEach(ad => {
+          if (lockInfo[ad.documentId]) {
+            ad.updatedAt = lockInfo[ad.documentId]['last_active']
+            ad.eprase_updater_email = lockInfo[ad.documentId]['lockingUser']
+            ad.isLocked = true
+          }
+        })
+        this.$patch((state) => { state.allPossibleAssessments = assessmentData })
       } else {
         ret = response
       }
