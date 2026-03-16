@@ -109,9 +109,8 @@ export const authenticationStore = defineStore('authentication', {
       console.group('isLoggedIn()')
 
       try {
-        const res = await axios.get(`${API}users/me?populate=*`, { headers: this.authTokenHeader })
-        this.$patch({ role: res.data.role.name })
-        ret = true
+        const res = await axios.get(`${API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })        
+        ret = res.data?.data?.isTrulyActive === true 
       } catch (err) {
         console.error(err)
       }

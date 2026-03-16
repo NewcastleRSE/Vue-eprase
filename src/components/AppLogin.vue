@@ -38,11 +38,11 @@
           <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
             <ButtonElement name="submit" full :columns="6" :add-class="'me-2'" data-bs-toggle="modal"
               data-bs-target="#logoutCurrentSessionModal">
-              <i class="bi bi-box-arrow-right me-2"></i>Log out this session
+              <i class="bi bi-box-arrow-right me-2"></i>Log out my current session
             </ButtonElement>
             <ButtonElement name="reset" full :columns="6" :add-class="'ms-2'" data-bs-toggle="modal"
               data-bs-target="#logoutOtherSessionsModal">
-              <i class="bi bi-box-arrow-right me-2"></i>Log out other sessions
+              <i class="bi bi-box-arrow-right me-2"></i>Log out all sessions in above list
             </ButtonElement>
           </GroupElement>
         </Vueform>
