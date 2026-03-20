@@ -223,7 +223,7 @@ export default {
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
       const selectResponse = await this.loadCompletedAssessment(assessmentId)        
-      this.errorResponder(selectResponse)
+      await this.errorResponder(selectResponse)
       window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
       console.groupEnd()
     }
@@ -236,19 +236,20 @@ export default {
     // Basic data for viewing assessments
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
-    wasError = this.errorResponder(mitResponse)    
+    wasError = await this.errorResponder(mitResponse)    
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
-      wasError = this.errorResponder(catResponse)
+      wasError = await this.errorResponder(catResponse)
     }
     if (!wasError) {
       const configResponse = await this.getConfigQuestionDetails()
-      wasError = this.errorResponder(configResponse)
+      wasError = await this.errorResponder(configResponse)
     }
     if (!wasError) {
       // Dashboard data
       const response = await this.progressReport()
-      if (!this.errorResponder(response)) {
+      const wasError = await this.errorResponder(response)
+      if (!wasError) {
         this.dashboardData = response.data
       }      
     }    

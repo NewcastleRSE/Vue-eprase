@@ -355,14 +355,14 @@ export default {
 
     let wasError = false
     const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
-    wasError = this.errorResponder(updateResponse)
+    wasError = await this.errorResponder(updateResponse)
     if (!wasError) {
       const storedResultsResponse = await this.getPatientScenarioResponses(true)
-      wasError = this.errorResponder(storedResultsResponse)  
+      wasError = await this.errorResponder(storedResultsResponse)  
     }
     if (!wasError) {
       const storedConfigResponse = await this.getConfigQuestionData(true)
-      wasError = this.errorResponder(storedConfigResponse)  
+      wasError = await this.errorResponder(storedConfigResponse)  
     } 
     if (!wasError) {
       await this.getInstitutionName()

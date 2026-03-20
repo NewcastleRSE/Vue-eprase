@@ -215,7 +215,7 @@ export default {
             }
           } else {
             console.debug(signinResponse)
-            this.serverError = 'An error occured during signin: ' + signinResponse.message
+            this.serverError = 'Unable to sign you in with these credentials'
             await this.audit('loginfail:' + this.user.email, '/login')
             this.clear()
           }

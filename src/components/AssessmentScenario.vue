@@ -47,15 +47,8 @@
                   @click="openPatientScenarios(patient.patient_code)"
                 >
                   <span class="fw-bold">
-                    <img class="img-thumbnail" style="width: 50px; height: 50px" v-show="patient.gender === 'Male'"
-                      src="../assets/images/anon-male.png" alt="male patient" />
-                    <img class="img-thumbnail" style="width: 50px; height: 50px" v-show="patient.gender === 'Female'"
-                      src="../assets/images/anon-female.png" alt="female-patient" />
-                    Patient: {{ patient.full_name }},
-                    <span v-show="patient.age_years == 0 && patient.age_days == 0 && patient.gestational_age == 0"> age: unspecified</span> 
-                    <span v-show="patient.age_years != null && patient.age_years != 0"> age: {{ patient.age_years }} years</span>
-                    <span v-show="patient.age_days != null && patient.age_days != 0"> age: {{ patient.age_days }} days</span>
-                    <span v-show="patient.gestational_age != null && patient.gestational_age != 0"> gestational age: {{ patient.gestational_age }} weeks</span>
+                    <img class="img-thumbnail" style="width: 50px; height: 50px" :src="patientImage(patient)" :alt="patientImageAlt(patient)" />                    
+                    Patient: {{ patient.full_name }}, {{ patientAgeCaption(patient) }}: {{ patientAgeString(patient) }}
                   </span>
                 </button>
               </h2>
@@ -356,6 +349,46 @@ export default {
     }
   },
   methods: {
+    patientImage(patient) {
+      let image = ''
+      if (patient.is_adult === true) {
+        image = patient.gender === 'Male' ? 'anon-male' : 'anon-female'
+      } else {
+        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
+          image = 'baby'
+        } else {
+          image = patient.gender === 'Male' ? 'anon-child-boy' : 'anon-child-girl'
+        }
+      }
+      return '/images/' + image + '.png'
+    },
+    patientImageAlt(patient) {
+      let imageAlt = ''
+      if (patient.is_adult === true) {
+        imageAlt = patient.gender === 'Male' ? 'Male adult patient' : 'Female adult patient'
+      } else {
+        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
+          imageAlt = 'Baby patient'
+        } else {
+          imageAlt = patient.gender === 'Male' ? 'Male paediatric patient' : 'Female paediatric patient'
+        }
+      }
+      return imageAlt
+    }, 
+    patientAgeString(patient) {
+      let ageString = 'Unspecified'
+      if (patient.age_years != null && patient.age_years != 0) {
+        ageString = patient.age_years + ' years'
+      } else if (patient.age_days != null && patient.age_days != 0) {
+        ageString = patient.age_days + ' days'
+      } else if (patient.gestational_age != null && patient.gestational_age != 0) {
+        ageString = patient.gestational_age + ' weeks'
+      }
+      return ageString
+    },
+    patientAgeCaption(patient) {
+      return (patient.gestational_age != null && patient.gestational_age != 0) ? 'gestational age' : 'age'
+    },
     mitigationDescription(scenarioCode) {
       let description = ''
       if (this.scenarioResponse(scenarioCode)) {
@@ -385,7 +418,8 @@ export default {
       } else if ( !( scenario.scenario_code in this.storedResponsesByCode ) ) {
         // All good to go
         const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-        if (!this.errorResponder(saveResponse)) {
+        const wasError = await this.errorResponder(saveResponse)
+        if (!wasError) {
           this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
           this.numCompletedScenarios++
           this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
@@ -475,11 +509,13 @@ export default {
           this.showUniqueScenario()       
           const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
           if (patientElement != null) {
-            patientElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'nearest'
-            })
+            this.$nextTick(() => { 
+                patientElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+              })
+            })            
           }
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
@@ -538,7 +574,8 @@ export default {
       })      
     }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    if (!this.errorResponder(storedResultsResponse)) {
+    const wasError = await this.errorResponder(storedResultsResponse)
+    if (!wasError) {
       // Package the responses by scenario code for convenience - data is of form:
       // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
       this.assessmentData.storedScenarioResponses.forEach(asr => {
@@ -560,7 +597,7 @@ export default {
     if (this.numCompletedScenarios == this.scenarioCount) {
       // We have done all the data entry now          
       const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
-      this.errorResponder(updateResponse)
+      await this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }

@@ -66,18 +66,18 @@ export default {
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
-    wasError = this.errorResponder(mitResponse)
+    wasError = await this.errorResponder(mitResponse)
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
-      wasError = this.errorResponder(catResponse)
+      wasError = await this.errorResponder(catResponse)
     }
     if (!wasError) {
       const configResponse = await this.getConfigQuestionDetails()
-      wasError = this.errorResponder(configResponse) 
+      wasError = await this.errorResponder(configResponse) 
     }
     if (!wasError) {
       const instResponse = await this.getAssessmentsForInstitution()
-      wasError = this.errorResponder(instResponse)
+      wasError = await this.errorResponder(instResponse)
     }    
     console.groupEnd()
   }
