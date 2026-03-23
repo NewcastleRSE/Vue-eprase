@@ -96,13 +96,20 @@ import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
 import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
+import { rootStore } from '../stores/root'
+import sessionTimeout from '@travishorn/session-timeout'
+
+const TIMEOUT_AFTER = 5 * 60 * 1000   // Sessions time out after this number of milliseconds
+const TIMEOUT_WARN = 4 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
+const TIMEOUT_IN_MINS = (TIMEOUT_AFTER - TIMEOUT_WARN)/60000
 
 export default {
   name: 'Assessment',
   computed: {
-    ...mapState(authenticationStore, ['isReporter']),
+    ...mapState(rootStore, ['audit']),
+    ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn']),
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex']),
+    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },   
@@ -216,7 +223,30 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')    
+    console.group('Assessment top-level mounted() hook')   
+    sessionTimeout({
+      continueText: "Continue Session",
+      logoutText: 'Log Out',
+      message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
+      onContinue: async () => {
+        // Keep-alive request
+        await this.isLoggedIn()
+      },
+      onLogout: async () => {
+        // Ensure user's work is properly saved
+        this.setLoggingOut(true)
+        await this.audit('logout:' + this.user, '/logout')
+        this.$router.push('/logout')
+      },
+      onTimeout: async () => {
+        // Called when session times out (defaults to redirecting to /timed-out)
+        this.setLoggingOut(true)
+        await this.audit('timeout:' + this.user, '/logout')
+        this.$router.push('/logout?action=timeout')
+      },
+      timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
+      warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
+    })
     console.groupEnd()
   },
   errorCaptured(...args) {

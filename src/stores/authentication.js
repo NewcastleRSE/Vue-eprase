@@ -17,7 +17,8 @@ export const authenticationStore = defineStore('authentication', {
     orgCode: '',
     orgName: '',
     trust: '',
-    token: ''
+    token: '',
+    session: ''
   }),  
   persist: [
     {
@@ -26,7 +27,7 @@ export const authenticationStore = defineStore('authentication', {
       debug: process.env.NODE_ENV !== 'production'
     }, 
     {
-      pick: ['token'],
+      pick: ['token', 'session'],
       storage: {
         getItem: (key) => {
           return Cookies.get(key)
@@ -63,6 +64,11 @@ export const authenticationStore = defineStore('authentication', {
         console.debug('User details from signin', userDetails)
         this.$patch({token: userDetails.jwt})
 
+        // Get current session document ID
+        const sessRes = await axios.get(`${API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })
+        this.$patch({session: sessRes.data.data.documentId})
+
+        // Get details of user trust and institution
         console.debug('Determining user institution...')
         const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
                 

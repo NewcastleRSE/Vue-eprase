@@ -21,7 +21,7 @@ export const router = createRouter({
       component: AppLogin,
     },
     {
-      path: "/logout",
+      path: "/logout/:action?",
       component: AppLogout
     },
     {

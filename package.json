@@ -10,6 +10,7 @@
     "build": "NODE_ENV=production webpack --progress"
   },
   "dependencies": {
+    "@travishorn/session-timeout": "^3.1.0",
     "@vueform/vueform": "^1.13.8",
     "axios": "^1.13.5",
     "bootstrap": "^5.3.8",

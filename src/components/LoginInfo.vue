@@ -13,7 +13,7 @@
               <a class="dropdown-item" @click="changePassword">Change my password</a>
             </li>
             <li>
-              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress &amp; log out' : 'Log in ' }}</a>
+              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn() ? 'Save progress &amp; log out' : 'Log in ' }}</a>
             </li>
           </ul>          
         </div>
@@ -60,7 +60,7 @@ export default {
       this.loginInfoDd.toggle()
     },
     saveProgress() {
-      if (this.isLoggedIn) {
+      if (this.isLoggedIn()) {
         this.exitModal.show()
       } else {
         this.$router.push('/login')

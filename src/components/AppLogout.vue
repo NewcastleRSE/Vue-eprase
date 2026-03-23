@@ -45,7 +45,7 @@ export default {
       console.debug('Logging out user...')
       this.setLoggingOut(false)
       await this.logout()
-      this.$router.push('/login?action=loggedOut')
+      this.$router.push('/login?action=' + (this.$route.query.action == 'timeout' ? 'sessionExpired' : 'loggedOut'))
     }
   },
   mounted() {
