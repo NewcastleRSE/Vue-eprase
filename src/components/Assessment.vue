@@ -94,15 +94,22 @@ import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
-import ErrorAlertModal from './ErrorAlertModal'
+import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
+import { rootStore } from '../stores/root'
+import sessionTimeout from '@travishorn/session-timeout'
+
+const TIMEOUT_AFTER = 5 * 60 * 1000   // Sessions time out after this number of milliseconds
+const TIMEOUT_WARN = 4 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
+const TIMEOUT_IN_MINS = (TIMEOUT_AFTER - TIMEOUT_WARN)/60000
 
 export default {
   name: 'Assessment',
   computed: {
-    ...mapState(authenticationStore, ['isReporter']),
+    ...mapState(rootStore, ['audit']),
+    ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
     ...mapState(appSettingsStore, ['version', 'year']),
-    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex']),
+    ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
     },   
@@ -146,7 +153,10 @@ export default {
       allAssessments: [],
       activeStep: 0,
       nextClicked: false,
-      previousClicked: false
+      previousClicked: false,
+      fetchedSessions: false,
+      allMySessions: [],
+      timeoutDialogObserver: null
     }
   },  
   methods: {
@@ -214,8 +224,71 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')       
+
+    console.group('Assessment top-level mounted() hook')  
+    
+    // Set up observer to detect addition of session timeout dialog so Bootstrap classes can be added
+    // This avoids making copies of BS styles to manually style 3rd party elements
+
+    this.timeoutDialogObserver = new MutationObserver((mutationList, observer) => {
+      for (const mutation of mutationList) {
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0 && mutation.addedNodes[0].className == 'session-timeout-dialog') {
+          // Create Bootstrap toast element from overall dialog
+          const stDialog = mutation.addedNodes[0]
+          stDialog.classList.add('toast')
+          stDialog.setAttribute('role', 'alert') 
+          stDialog.classList.add('show')  
+          // Get message and create new container   
+          const msg = stDialog.querySelector('p')
+          const msgHead = document.createElement('h5')
+          msgHead.textContent = msg.innerText
+          stDialog.removeChild(msg)
+          // Get button container
+          const btns = stDialog.querySelector('div.buttons')
+          btns.classList.add(...['mt-2', 'pt-2', 'border-top'])
+          btns.querySelector('button[data-action="continue"]').className = 'btn btn-primary me-2'
+          btns.querySelector('button[data-action="logout"]').className = 'btn btn-danger ms-2'
+          btns.querySelector('button[data-action="logout"]').style.color = 'white'  // Not sure why adding the class dynamically doesn't add this...
+          // Create new toast-body element in the hierarchy
+          const tb = document.createElement('div')
+          tb.className = 'toast-body'
+          // Relink
+          tb.appendChild(msgHead)
+          tb.appendChild(btns)
+          stDialog.appendChild(tb)          
+        }          
+      }
+    })
+    this.timeoutDialogObserver.observe(document.body, { childList: true })
+
+    this.setSessionTimer(sessionTimeout({
+      continueText: "Continue Session",
+      logoutText: 'Log Out',
+      message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
+      onContinue: async () => {
+        // Keep-alive request
+        await this.isLoggedIn()
+      },
+      onLogout: async () => {
+        // Ensure user's work is properly saved
+        this.setLoggingOut(true)
+        await this.audit('logout:' + this.user, '/logout')
+        this.$router.push('/logout')
+      },
+      onTimeout: async () => {
+        // Called when session times out (defaults to redirecting to /timed-out)
+        this.setLoggingOut(true)
+        await this.audit('timeout:' + this.user, '/logout')
+        this.$router.push('/logout?action=timeout')//TODO - doesn't work correctly
+      },
+      timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
+      warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
+    }))
+
     console.groupEnd()
+  },
+  unmounted() {
+    this.timeoutDialogObserver?.disconnect()
   },
   errorCaptured(...args) {
 

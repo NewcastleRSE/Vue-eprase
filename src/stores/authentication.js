@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { assessmentStore } from './assessment'
-import VueCookies from 'vue-cookies'
+import Cookies from 'js-cookie'
 
 const API = process.env.BASE_URL
 
@@ -17,22 +17,24 @@ export const authenticationStore = defineStore('authentication', {
     orgCode: '',
     orgName: '',
     trust: '',
-    token: ''
+    token: '',
+    session: '',
+    sessionTimeoutTimer: null
   }),  
   persist: [
     {
-      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust'],
+      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust', 'sessionTimeoutTimer'],
       storage: localStorage,
       debug: process.env.NODE_ENV !== 'production'
     }, 
     {
-      pick: ['token'],
+      pick: ['token', 'session'],
       storage: {
         getItem: (key) => {
-          return VueCookies.get(key)
+          return Cookies.get(key)
         },
         setItem: (key, value) => {
-          VueCookies.set(key, value)
+          Cookies.set(key, value)
         }
       },
       debug: process.env.NODE_ENV !== 'production'
@@ -46,6 +48,9 @@ export const authenticationStore = defineStore('authentication', {
   actions: {
     isReporter() {
       return this.role == 'Reporter'
+    },
+    setSessionTimer(timer) {
+      this.$patch({sessionTimeoutTimer: timer})
     },
     async login(identifier, password) {
 
@@ -61,8 +66,13 @@ export const authenticationStore = defineStore('authentication', {
         const signinRes = await axios.post(`${API}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
-        this.$patch({ token: userDetails.jwt })  // Store the JWT
+        this.$patch({token: userDetails.jwt})
 
+        // Get current session document ID
+        const sessRes = await axios.get(`${API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })
+        this.$patch({session: sessRes.data.data.documentId})
+
+        // Get details of user trust and institution
         console.debug('Determining user institution...')
         const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
                 
@@ -88,15 +98,18 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
-    clear() {
+    clear() {  
+      this.sessionTimeoutTimer?.destroy()     
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
-      sessionStorage.clear()
-      VueCookies.remove('token')
+      Cookies.remove('authentication')         
     },
-    logout() {
+    async logout() {
       console.group('logout()')
+      if (this.token) {
+        await axios.post(`${API}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })
+      }  
       this.clear()
       console.groupEnd()
     },    
@@ -107,9 +120,46 @@ export const authenticationStore = defineStore('authentication', {
       console.group('isLoggedIn()')
 
       try {
-        const res = await axios.get(`${API}users/me?populate=*`, { headers: this.authTokenHeader })
-        this.$patch({ role: res.data.role.name })
-        ret = true
+        const res = await axios.get(`${API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })        
+        ret = res.data?.data?.isTrulyActive === true 
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async getAllSessions() {
+
+      let ret = false
+
+      console.group('getAllSessions()')
+
+      try {
+        const res = await axios.get(`${API}magic-sessionmanager/my-sessions`, { headers: this.authTokenHeader })
+        ret = res.data.data
+      } catch (err) {
+        console.error(err)
+      }
+      
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async terminateSession(sessionDocumentId) {
+
+      let ret = false
+
+      console.group('terminateSession()')
+      console.debug('Terminating active session', sessionDocumentId)
+
+      try {
+        const res = await axios.delete(`${API}magic-sessionmanager/my-sessions/${sessionDocumentId}`, { headers: this.authTokenHeader })
+        console.debug(res)
+        ret = res.data.success
       } catch (err) {
         console.error(err)
       }
@@ -179,6 +229,10 @@ export const authenticationStore = defineStore('authentication', {
         console.warn('Catch-all')
         console.error(err)
         payload = { status: err.status, message: err.message }
+      }
+
+      if (payload.status == 401 || payload.status == 440 || payload.status == 403) {
+        this.router.push('/login?action=sessionExpired')
       }
 
       console.warn('Payload', payload)

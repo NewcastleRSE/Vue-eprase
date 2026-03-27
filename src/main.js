@@ -12,8 +12,8 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import Vueform from '@vueform/vueform'
 import vueformConfig from '../vueform.config'
-import VueCookies from 'vue-cookies'
 import { router } from './router'
+import { authenticationStore } from './stores/authentication.js'
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
 if (process.env.NODE_ENV === 'production') {
@@ -36,12 +36,12 @@ axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 axios.defaults.withCredentials = true
 
-app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig).use(VueCookies)
+app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig)
 
 // hides default console message
 app.config.productionTip = false
 // control inspection of code using vue devtools - set to false for production
-app.config.devtools = true
+app.config.devtools = process.env.NODE_ENV !== 'production'
 
 app.config.globalProperties.embolden = function(str, required=false) {
   let markup = `<span class="fw-bold">${str}</span>`
@@ -52,7 +52,7 @@ app.config.globalProperties.embolden = function(str, required=false) {
 }
 // Check an API or other async service response and forward error only if response status not 401|403|440
 // Otherwise just return and allow triageError() in authentication.js to route user to login page
-app.config.globalProperties.errorResponder = function(response) {
+app.config.globalProperties.errorResponder = async function(response) {
   let wasError = false
   const isObject = Object.prototype.toString.call(response) === '[object Object]'
   if (isObject) {
@@ -62,7 +62,14 @@ app.config.globalProperties.errorResponder = function(response) {
     const unauthHttp = [401, 403, 440]
     if (status >= 400) {
       wasError = true
-      if (!unauthHttp.includes(status)) {
+      let sessionValid = true
+      if (status == 500) {
+        // Server error - could be thrown by a manually terminated session, so check session validity first
+        sessionValid = await authenticationStore().isLoggedIn()
+      }
+      if (!sessionValid) {
+        authenticationStore().triageError({ status: 403, message: 'Your session is no longer valid, possibly terminated on another device' })
+      } else if (!unauthHttp.includes(status)) {
         throw new Error(message)
       } 
     }

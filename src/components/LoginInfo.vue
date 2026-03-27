@@ -13,7 +13,7 @@
               <a class="dropdown-item" @click="changePassword">Change my password</a>
             </li>
             <li>
-              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn ? 'Save progress &amp; log out' : 'Log in ' }}</a>
+              <a class="dropdown-item" @click="saveProgress">{{ isLoggedIn() ? 'Save progress &amp; log out' : 'Log in ' }}</a>
             </li>
           </ul>          
         </div>
@@ -30,7 +30,7 @@ import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
-import ExitModal from './ExitModal'
+import ExitModal from './modals/ExitModal'
 
 export default {
   name: 'LoginInfo',
@@ -60,7 +60,7 @@ export default {
       this.loginInfoDd.toggle()
     },
     saveProgress() {
-      if (this.isLoggedIn) {
+      if (this.isLoggedIn()) {
         this.exitModal.show()
       } else {
         this.$router.push('/login')

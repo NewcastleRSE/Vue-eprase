@@ -43,7 +43,7 @@
 <script>
 
 import { mapState } from 'pinia'
-import { rootStore } from '../stores/root'
+import { rootStore } from '../../stores/root'
 import GenericModal from './GenericModal'
 
 export default {

@@ -18,6 +18,21 @@ export const rootStore = defineStore('root', {
   }, 
   actions: {
   
+    async publicApiGet(url) {
+
+      console.group('publicApiGet()')
+      let response = null, ret = {}
+      try {
+        response = await axios.get(API + url, { responseType: 'json' })        
+        ret = { status: response.status, data: response.data}
+      } catch(err) {
+        ret = authenticationStore().triageError(err)
+      }
+      console.debug('API call response is', ret)
+      console.groupEnd()
+
+      return ret
+    },
     async apiCall(url, method = 'POST', body = null, responseType = 'json') {
 
       console.group('apiCall()')
@@ -58,12 +73,12 @@ export const rootStore = defineStore('root', {
     },   
     // Check tool open by doing a bare-bones API call and seeing if we get a 403 response
     async toolOpen() {
-      const response = await this.apiCall('institutions?pagination[limit]=1', 'GET')
+      const response = await this.publicApiGet('institutions?pagination[limit]=1')
       return response.status != 403
     },
     // Get list of institutions
     async getInstitutions() {
-      const response = await this.apiCall('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc', 'GET')
+      const response = await this.publicApiGet('institutions?fields[0]=institution_code&fields[1]=name&fields[2]=hospitals&pagination[pageSize]=500&sort[0]=name:asc')
       return response
     },
     // Get institution details

@@ -115,7 +115,7 @@ const EMPTY_DATA = {
   numCompletedPatients: 0,
   patientScenarios: {},       // The details of the scenarios
   numScenarios: 0,
-  storedScenarioResponses: {} // Stored responses  
+  storedScenarioResponses: [] // Stored responses  
 }
 
 export const assessmentStore = defineStore('assessment', {
@@ -305,7 +305,17 @@ export const assessmentStore = defineStore('assessment', {
       const response = await rootStore().apiCall(`assessments?populate[institution][fields][0]=institution_code&filters[institution][institution_code][$eq]=${instCode}&populate=ep_service`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
-        this.$patch((state) => { state.allPossibleAssessments = response.data.data })
+        const assessmentData = response.data.data
+        // Examine locking metadata to decide whether each assessment can be edited
+        const lockInfo = response.data.lockInfo
+        assessmentData.forEach(ad => {
+          if (lockInfo[ad.documentId]) {
+            ad.updatedAt = lockInfo[ad.documentId]['last_active']
+            ad.eprase_updater_email = lockInfo[ad.documentId]['lockingUser']
+            ad.isLocked = true
+          }
+        })
+        this.$patch((state) => { state.allPossibleAssessments = assessmentData })
       } else {
         ret = response
       }
@@ -369,6 +379,9 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return present
     },
+    assessmentIsLocked(assessmentId) {
+      
+    },
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
     async selectAssessment(assessmentId = null) {
@@ -417,6 +430,8 @@ export const assessmentStore = defineStore('assessment', {
               state.assessmentData.hospital = authenticationStore().hospital,
               state.assessmentData.institution = authenticationStore().orgDocId
             })
+            // David 02/03-2026 - Auditing will now record the assessment documentId on creation as well as update
+            uri = `${uri}/${response.data.data.documentId}`
           } else {
             ret = response
           }
@@ -546,8 +561,8 @@ export const assessmentStore = defineStore('assessment', {
         this.$patch((state) => {
           state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
         })          
-      } else if (systemResponse.data.data.system != null) {   // Null here means a logout before visiting the system page
-        ret = systemResponse
+      } else {        
+        ret = {status: response.status, message: `Failed to update system data, error ${response.message}`}
       }
       
       if (recordLoading) {
@@ -865,6 +880,9 @@ export const assessmentStore = defineStore('assessment', {
         this.$patch((state) => {
           state.assessmentData.storedScenarioResponses = Object.values(sanitisedScenarioResponses)
         })
+        // this.$patch((state) => {
+        //   state.assessmentData.storedScenarioResponses = allScenariosResponse.data.data.scenario_data
+        // })
       } else {
         ret = {status: allScenariosResponse.status, message: 'Failed to retrieve saved scenario responses'}
       }
@@ -886,14 +904,6 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-
-      // Fix 16/02/2026 Daid - Ensure we don't save the data again e.g. because of double click on a button or network lag 
-      // leading to a duplicate submission and hence duplication of database records
-      if (this.storedScenarioResponses[scenario.scenario_code]) {
-        console.warn('Preventing save of duplicate record', patient, scenario)
-        console.groupEnd()
-        return { status: 400, message: 'Attempt to save duplicate scenario response record' }
-      }
 
       // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
       // Massage it into db form:

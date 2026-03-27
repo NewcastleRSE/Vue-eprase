@@ -6,7 +6,7 @@
 
 <script>
 
-import { setVisible } from '../helpers/modal'
+import { setVisible } from '../../helpers/modal'
 import GenericModal from './GenericModal'
 
 export default {

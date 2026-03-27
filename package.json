@@ -10,6 +10,7 @@
     "build": "NODE_ENV=production webpack --progress"
   },
   "dependencies": {
+    "@travishorn/session-timeout": "^3.1.0",
     "@vueform/vueform": "^1.13.8",
     "axios": "^1.13.5",
     "bootstrap": "^5.3.8",
@@ -17,6 +18,7 @@
     "dayjs": "^1.11.19",
     "file-saver-es": "^2.0.5",
     "flatpickr": "^4.6.13",
+    "js-cookie": "^3.0.5",
     "jstat": "^1.9.6",
     "lodash": "^4.17.23",
     "lodash-humps": "^3.1.6",
@@ -30,7 +32,6 @@
     "terser-webpack-plugin": "^5.3.16",
     "vue": "^3.5.28",
     "vue-axios": "^3.5.2",
-    "vue-cookies": "^1.8.6",
     "vue-flatpickr-component": "^12.0.0",
     "vue-router": "^5.0.2"
   },

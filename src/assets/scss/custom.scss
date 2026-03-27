@@ -195,3 +195,10 @@ td.assessment-complete {
 td.assessment-padding-cell {
   background-color: $light;
 }
+
+.session-timeout-dialog.toast {
+  background-color: white !important; 
+  opacity: 1 !important;
+  max-width: none;
+  width: fit-content;
+}

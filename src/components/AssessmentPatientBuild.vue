@@ -72,8 +72,7 @@
                   <div v-if="dataLoaded">
                     <div class="d-flex">
                       <div class="p-2">
-                        <img style="width: 150px; height: 150px" v-if="patient.gender === 'Male'" src="../assets/images/anon-male.png" alt="male patient" />
-                        <img style="width: 150px; height: 150px" v-if="patient.gender === 'Female'" src="../assets/images/anon-female.png" alt="female-patient" />                          
+                        <img style="width: 150px; height: 150px" :src="patientImage(patient)" :alt="patientImageAlt(patient)" />                                               
                       </div>
                       <div class="p-2 flex-grow-1">
                         <table class="table table-striped">
@@ -81,10 +80,7 @@
                             <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
                             <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
                             <tr><th>DOB</th><td>{{ patient.dob ? new Date(patient.dob).toLocaleDateString('en-GB') : 'Not specified' }}</td></tr>
-                            <tr v-if="patient.age_years == 0 && patient.age_days == 0 && patient.gestational_age == 0"><th>Age</th><td>Unspecified</td></tr>
-                            <tr v-if="patient.age_years != null && patient.age_years != 0"><th>Age</th><td>{{ patient.age_years }} years</td></tr>
-                            <tr v-if="patient.age_days != null && patient.age_days != 0"><th>Age</th><td>{{ patient.age_days }} days</td></tr>
-                            <tr v-if="patient.gestational_age != null && patient.gestational_age != 0"><th>Gestational age</th><td>{{ patient.gestational_age }} weeks</td></tr>
+                            <tr><th>{{ patientAgeCaption(patient) }}</th><td>{{ patientAgeString(patient) }}</td></tr>                            
                             <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
                             <tr><th>Height (cm)</th><td>{{ patient.height }}</td></tr>
                             <tr><th>Weight (kg)</th><td>{{ patient.weight }}</td></tr>
@@ -284,7 +280,47 @@ export default {
       allPatientsCompleted
     }    
   },
-  methods: {    
+  methods: { 
+    patientImage(patient) {
+      let image = ''
+      if (patient.is_adult === true) {
+        image = patient.gender === 'Male' ? 'anon-male' : 'anon-female'
+      } else {
+        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
+          image = 'baby'
+        } else {
+          image = patient.gender === 'Male' ? 'anon-child-boy' : 'anon-child-girl'
+        }
+      }
+      return '/images/' + image + '.png'
+    },
+    patientImageAlt(patient) {
+      let imageAlt = ''
+      if (patient.is_adult === true) {
+        imageAlt = patient.gender === 'Male' ? 'Male adult patient' : 'Female adult patient'
+      } else {
+        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
+          imageAlt = 'Baby patient'
+        } else {
+          imageAlt = patient.gender === 'Male' ? 'Male paediatric patient' : 'Female paediatric patient'
+        }
+      }
+      return imageAlt
+    }, 
+    patientAgeString(patient) {
+      let ageString = 'Unspecified'
+      if (patient.age_years != null && patient.age_years != 0) {
+        ageString = patient.age_years + ' years'
+      } else if (patient.age_days != null && patient.age_days != 0) {
+        ageString = patient.age_days + ' days'
+      } else if (patient.gestational_age != null && patient.gestational_age != 0) {
+        ageString = patient.gestational_age + ' weeks'
+      }
+      return ageString
+    },
+    patientAgeCaption(patient) {
+      return (patient.gestational_age != null && patient.gestational_age != 0) ? 'Gestational age' : 'Age'
+    },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
@@ -325,12 +361,14 @@ export default {
         this.patientRelations(docId)  
         const patientElement = document.getElementById('patient-' + nextCode)
         if (patientElement != null) {
-            console.debug('Scroll patient', nextCode, 'into view')
-            document.getElementById('patient-' + nextCode).scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
-          })
+          this.$nextTick(() => { 
+              console.debug('Scroll patient', nextCode, 'into view')
+              document.getElementById('patient-' + nextCode).scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest'
+            })
+          })            
         }            
       } else {
         console.debug('No unentered patients left')
@@ -338,13 +376,19 @@ export default {
       console.groupEnd()
     },
     async setPatientDataEntered(patientCode) {
+      console.group('setPatientDataEntered()')
+      console.debug('Patient code', patientCode)
       const spdeResponse = await this.setPatientEntryComplete(patientCode)
-      if (this.errorResponder(spdeResponse)) {
+      console.debug('Response', spdeResponse)
+      const wasError = await this.errorResponder(spdeResponse)
+      if (!wasError) {
         // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+        console.debug('Opening next unentered patient...')
         setTimeout(() => {
           this.openNextUnenteredPatient()
         }, 1000)   
-      }         
+      }  
+      console.groupEnd()       
     }
   },
   async mounted() {
@@ -352,7 +396,8 @@ export default {
     // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
-    if (this.errorResponder(loadPatientsResponse)) {
+    const wasError = await this.errorResponder(loadPatientsResponse)
+    if (!wasError) {
       // Get the details for the first (unentered) patient
       this.$nextTick(() => { this.openNextUnenteredPatient() })
     }          
@@ -364,7 +409,7 @@ export default {
     if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
-      this.errorResponder(updateResponse)
+      await this.errorResponder(updateResponse)
     }    
     console.groupEnd()
   }

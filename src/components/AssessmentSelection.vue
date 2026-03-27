@@ -34,9 +34,10 @@
               <th>ePrescribing System</th>
               <th>Patient Type</th>
               <th>Assessment Status</th>
-              <th>Created on</th>
+              <th>Created On</th>
+              <th>By User</th>
               <th>Last Update</th>
-              <th>User</th>
+              <th>By User</th>
               <th>&nbsp;</th>
             </tr>
           </thead>
@@ -46,11 +47,15 @@
               <td>{{ assessment.patient_type }}</td>
               <td>{{ assessment.state == 'System complete' ? 'System information completed' : assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_creator_email || 'Not recorded' }}</td>
+              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+              <td>{{ assessment.eprase_updater_email || 'Not recorded' }}</td>
               <td>
-                <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
+                <ButtonElement v-if="!assessment.isLocked" :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
+                </ButtonElement>
+                <ButtonElement v-if="assessment.isLocked" :name="'select-' + assessment.documentId" :disabled="true" title="This assessment is currently being edited by another user - please try again later" danger>
+                  <i class="bi bi-person-lock"></i>Locked
                 </ButtonElement>
               </td>
             </tr>
@@ -67,8 +72,9 @@
               <th>Patient Type</th>
               <th>Assessment Status</th>
               <th>Created on</th>
+              <th>By User</th>
               <th>Last Update</th>
-              <th>User</th>
+              <th>By User</th>
               <th>&nbsp;</th>
             </tr>
           </thead>
@@ -78,12 +84,13 @@
               <td>{{ assessment.patient_type }}</td>
               <td>{{ assessment.state }}</td>
               <td>{{ convertDate(assessment.createdAt, false) }}</td>
-              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
               <td>{{ assessment.eprase_creator_email || 'Not recorded' }}</td>
+              <td>{{ convertDate(assessment.updatedAt, true) }}</td>
+              <td>{{ assessment.eprase_updater_email || 'Not recorded' }}</td>
               <td>
                 <ButtonElement :name="'select-' + assessment.documentId" title="Continue with this assessment" @click="continueAssessment(assessment.documentId)">
                   <i class="bi bi-play-fill me-2"></i>Select
-                </ButtonElement>
+                </ButtonElement>                
               </td>
             </tr>
           </tbody>
@@ -179,7 +186,7 @@ export default {
     }
   },
   emits: ['jumpToStep'],
-  methods: {      
+  methods: {       
     async continueAssessment(assessmentId) {
 
       console.group('continueAssessment()')
@@ -189,7 +196,8 @@ export default {
       // Select an existing assessment
       this.continuingExistingAssessment = true
       const selectResponse = await this.selectAssessment(assessmentId)
-      if (!this.errorResponder(selectResponse)) {
+      const wasError = await this.errorResponder(selectResponse)
+      if (!wasError) {
         if (this.dataLoaded) {
           console.debug('Data loaded')
           console.groupEnd()
@@ -217,7 +225,7 @@ export default {
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})
       } else {
-        this.errorResponder(response)
+        await this.errorResponder(response)
       }
       return epSystems
     },
@@ -237,7 +245,7 @@ export default {
       console.assert(this.dataLoaded, 'AssessmentSelection beforeUnmount() hook - dataReady flag is false')
       const selectResponse = await this.selectAssessment()
       if (!this.duplicateAssessmentAttempt) {
-        this.errorResponder(selectResponse)
+        await this.errorResponder(selectResponse)
       } 
     }    
     console.groupEnd()
