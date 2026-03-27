@@ -18,11 +18,12 @@ export const authenticationStore = defineStore('authentication', {
     orgName: '',
     trust: '',
     token: '',
-    session: ''
+    session: '',
+    sessionTimeoutTimer: null
   }),  
   persist: [
     {
-      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust'],
+      pick: ['user', 'userId', 'role', 'email', 'institutionId', 'hospital', 'orgDocId', 'orgCode', 'orgName', 'trust', 'sessionTimeoutTimer'],
       storage: localStorage,
       debug: process.env.NODE_ENV !== 'production'
     }, 
@@ -47,6 +48,9 @@ export const authenticationStore = defineStore('authentication', {
   actions: {
     isReporter() {
       return this.role == 'Reporter'
+    },
+    setSessionTimer(timer) {
+      this.$patch({sessionTimeoutTimer: timer})
     },
     async login(identifier, password) {
 
@@ -94,7 +98,8 @@ export const authenticationStore = defineStore('authentication', {
 
       return ret
     },
-    clear() {       
+    clear() {  
+      this.sessionTimeoutTimer?.destroy()     
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()

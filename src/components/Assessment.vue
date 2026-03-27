@@ -107,7 +107,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(rootStore, ['audit']),
-    ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn']),
+    ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
     ...mapState(appSettingsStore, ['version', 'year']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {
@@ -155,7 +155,8 @@ export default {
       nextClicked: false,
       previousClicked: false,
       fetchedSessions: false,
-      allMySessions: []
+      allMySessions: [],
+      timeoutDialogObserver: null
     }
   },  
   methods: {
@@ -223,8 +224,44 @@ export default {
     }
   },
   async mounted() {
-    console.group('Assessment top-level mounted() hook')   
-    sessionTimeout({
+
+    console.group('Assessment top-level mounted() hook')  
+    
+    // Set up observer to detect addition of session timeout dialog so Bootstrap classes can be added
+    // This avoids making copies of BS styles to manually style 3rd party elements
+
+    this.timeoutDialogObserver = new MutationObserver((mutationList, observer) => {
+      for (const mutation of mutationList) {
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0 && mutation.addedNodes[0].className == 'session-timeout-dialog') {
+          // Create Bootstrap toast element from overall dialog
+          const stDialog = mutation.addedNodes[0]
+          stDialog.classList.add('toast')
+          stDialog.setAttribute('role', 'alert') 
+          stDialog.classList.add('show')  
+          // Get message and create new container   
+          const msg = stDialog.querySelector('p')
+          const msgHead = document.createElement('h5')
+          msgHead.textContent = msg.innerText
+          stDialog.removeChild(msg)
+          // Get button container
+          const btns = stDialog.querySelector('div.buttons')
+          btns.classList.add(...['mt-2', 'pt-2', 'border-top'])
+          btns.querySelector('button[data-action="continue"]').className = 'btn btn-primary me-2'
+          btns.querySelector('button[data-action="logout"]').className = 'btn btn-danger ms-2'
+          btns.querySelector('button[data-action="logout"]').style.color = 'white'  // Not sure why adding the class dynamically doesn't add this...
+          // Create new toast-body element in the hierarchy
+          const tb = document.createElement('div')
+          tb.className = 'toast-body'
+          // Relink
+          tb.appendChild(msgHead)
+          tb.appendChild(btns)
+          stDialog.appendChild(tb)          
+        }          
+      }
+    })
+    this.timeoutDialogObserver.observe(document.body, { childList: true })
+
+    this.setSessionTimer(sessionTimeout({
       continueText: "Continue Session",
       logoutText: 'Log Out',
       message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
@@ -242,12 +279,16 @@ export default {
         // Called when session times out (defaults to redirecting to /timed-out)
         this.setLoggingOut(true)
         await this.audit('timeout:' + this.user, '/logout')
-        this.$router.push('/logout?action=timeout')
+        this.$router.push('/logout?action=timeout')//TODO - doesn't work correctly
       },
       timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
       warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
-    })
+    }))
+
     console.groupEnd()
+  },
+  unmounted() {
+    this.timeoutDialogObserver?.disconnect()
   },
   errorCaptured(...args) {
 
