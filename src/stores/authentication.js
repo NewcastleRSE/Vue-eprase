@@ -74,7 +74,7 @@ export const authenticationStore = defineStore('authentication', {
 
         // Get details of user trust and institution
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${API}users/me?populate[role][fields][0]=name&populate=institution`, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${API}users/me?populate[institution][fields][]=*&populate[role][fields][0]=name`, { headers: this.authTokenHeader }) 
                 
         this.$patch({
           user: userDetails.user.username,
