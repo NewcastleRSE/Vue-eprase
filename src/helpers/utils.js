@@ -14,22 +14,6 @@ export function calcNum(num, total) {
   return 0;
 }
 
-export function stringTrueFalseToBoolean(s) {
-  return s.toLowerCase() != "false" 
-}
-
-export function prependZero(month) {
-  try {
-    return parseInt(month) < 10 ? `0${month}` : month + ''
-  } catch(e) {
-    return '00'
-  }  
-}
-
-export function getFormattedDate(time) {
-  return new Date(time * 1000).toLocaleDateString("en-GB")
-}
-
 export function isoToUkDate(iso, includeTime = false) {
   dayjs.extend(utc);
   dayjs.extend(timezone);

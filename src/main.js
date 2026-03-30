@@ -14,9 +14,11 @@ import Vueform from '@vueform/vueform'
 import vueformConfig from '../vueform.config'
 import { router } from './router'
 import { authenticationStore } from './stores/authentication.js'
+import { isStagingSite } from './helpers/utils.js'
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
-if (process.env.NODE_ENV === 'production') {
+// 30/03/2026 David - leave debugging trace information in for staging site, only strip out on actual production server
+if (process.env.NODE_ENV === 'production' && !isStagingSite()) {
   console.log = function() {}
   console.debug = function() {}
   console.group = function() {}

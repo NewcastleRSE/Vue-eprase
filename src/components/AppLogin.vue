@@ -134,7 +134,7 @@ export default {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions', 'terminateSession']),
     ...mapState(rootStore, ['audit', 'toolOpen']),
     ...mapState(assessmentStore, ['reset', 'setLoggingOut']),
-    ...mapState(appSettingsStore, ['sessionTimeout']),
+    ...mapState(appSettingsStore, ['sessionTimeoutAfter']),
     onStaging() {
       return isStagingSite()
     },
@@ -143,7 +143,7 @@ export default {
         sess.isCurrentSession === false &&
         sess.isTrulyActive === true &&
         sess.logoutTime == null &&
-        sess.minutesSinceActive < parseInt(this.sessionTimeout / 60)
+        sess.minutesSinceActive < parseInt(this.sessionTimeoutAfter / 60)
       )) : []
     }
   },
