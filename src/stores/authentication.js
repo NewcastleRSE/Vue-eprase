@@ -99,7 +99,9 @@ export const authenticationStore = defineStore('authentication', {
       return ret
     },
     clear() {  
-      this.sessionTimeoutTimer?.destroy()     
+      if (typeof this.sessionTimeoutTimer?.destroy === 'function') {
+        this.sessionTimeoutTimer.destroy()
+      }
       this.$reset()
       assessmentStore().reset()
       localStorage.clear()
