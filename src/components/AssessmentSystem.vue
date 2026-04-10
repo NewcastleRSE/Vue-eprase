@@ -99,10 +99,11 @@
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
-          <ToggleElement name="penicillinResults"
+          <TriStateInputElement name="penicillinResults" :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?', true)" />
+          <!-- <ToggleElement name="penicillinResults"
             :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"
             :labels="{ on: 'Yes', off: 'No' }"
-          />
+          /> -->
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />
@@ -172,6 +173,7 @@ import { assessmentStore } from '../stores/assessment'
 import ConfirmCancelEditModal from "./modals/ConfirmCancelEditModal"
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
+import TriStateInputElement from './TriStateInputElement.vue'
 
 export default {
   name: 'AssessmentSystem',      

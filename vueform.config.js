@@ -6,6 +6,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import en from '@vueform/vueform/locales/en'
 import bootstrap from '@vueform/vueform/dist/bootstrap'
 import { defineConfig, Validator } from '@vueform/vueform'
+import TriStateInputElement from './src/components/TriStateInputElement'
 
 // https://www.30secondsofcode.org/js/s/get-nested-object-value/ - uses nullish coalescing (??) and optional chaining (?.) operators
 const deepGet = (obj, keys) => keys.reduce((xs, x) => xs?.[x] ?? null, obj)
@@ -112,5 +113,8 @@ export default defineConfig({
   floatPlaceholders: false,
   rules: {
     nhsEmail, nonEmptyObject, dateIsSameOrAfter, fieldIsOther
-  }
+  },
+  elements: [
+    TriStateInputElement
+  ]
 })
