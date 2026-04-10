@@ -99,7 +99,10 @@
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
-          <TriStateInputElement name="penicillinResults" :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?', true)" />
+          <TriStateInputElement name="penicillinResults" 
+            :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?', true)"
+            :rules="['required', 'tristateSet']" 
+          />
           <!-- <ToggleElement name="penicillinResults"
             :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"
             :labels="{ on: 'Yes', off: 'No' }"

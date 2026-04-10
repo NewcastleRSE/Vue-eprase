@@ -279,7 +279,7 @@ export default {
         // Called when session times out (defaults to redirecting to /timed-out)
         this.setLoggingOut(true)
         await this.audit('timeout:' + this.user, '/logout')
-        this.$router.push('/logout?action=timeout')//TODO - doesn't work correctly
+        this.$router.push('/logout?action=timeout')
       },
       timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
       warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         

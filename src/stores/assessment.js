@@ -378,10 +378,7 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', present)
       console.groupEnd()
       return present
-    },
-    assessmentIsLocked(assessmentId) {
-      
-    },
+    },    
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
     async selectAssessment(assessmentId = null) {
@@ -562,7 +559,7 @@ export const assessmentStore = defineStore('assessment', {
           state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
         })          
       } else {        
-        ret = {status: response.status, message: `Failed to update system data, error ${response.message}`}
+        ret = {status: systemResponse.status, message: `Failed to update system data, error ${systemResponse.message}`}
       }
       
       if (recordLoading) {

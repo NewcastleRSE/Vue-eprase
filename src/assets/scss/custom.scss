@@ -212,7 +212,6 @@ td.assessment-padding-cell {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  //padding: 5px;
   max-width: max-content;
 }
 
@@ -240,14 +239,6 @@ td.assessment-padding-cell {
   font-size: 1.5rem;
 }
 
-.tristate-radio-group input[type="radio"]:first-of-type:is(:checked) + label {
-  color: $success;
-}
-
-.tristate-radio-group input[type="radio"]:nth-of-type(2):is(:checked) + label {
-  color: $light;
-}
-
-.tristate-radio-group input[type="radio"]:last-of-type:is(:checked) + label {
-  color: $danger;
+.tristate-radio-group input[type="radio"]:is(:checked) + label {
+  color: $primary;
 }
