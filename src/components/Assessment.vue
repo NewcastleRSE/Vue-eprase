@@ -156,6 +156,7 @@ export default {
       previousClicked: false,
       fetchedSessions: false,
       allMySessions: [],
+      sessionTimeout: null,
       timeoutDialogObserver: null
     }
   },  
@@ -261,7 +262,7 @@ export default {
     })
     this.timeoutDialogObserver.observe(document.body, { childList: true })
 
-    this.setSessionTimer(sessionTimeout({
+    this.sessionTimeout = sessionTimeout({
       continueText: "Continue Session",
       logoutText: 'Log Out',
       message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
@@ -283,7 +284,8 @@ export default {
       },
       timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
       warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
-    }))
+    })
+    this.setSessionTimer(this.sessionTimeout)
 
     console.groupEnd()
   },
@@ -301,6 +303,7 @@ export default {
       activeElement.blur();
     }
     this.errorAlertModal.show(args[0].message)
+    this.sessionTimeout.destroy()
 
     console.groupEnd()
     return false

@@ -78,5 +78,13 @@ app.config.globalProperties.errorResponder = async function(response) {
   }
   return wasError
 }
+// yes|no => true|false
+app.config.yesNoToBoolean = function(value) {
+
+}
+// true|false => yes/no
+app.config.booleanToYesNo = function(value) {
+
+}
 
 app.mount('#app')

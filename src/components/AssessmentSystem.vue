@@ -101,7 +101,7 @@
             :debounce="200" />
           <TriStateInputElement name="penicillinResults" 
             :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?', true)"
-            :rules="['required', 'tristateSet']" 
+            :rules="[$vueform.rules.tristateSet]"
           />
           <!-- <ToggleElement name="penicillinResults"
             :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"

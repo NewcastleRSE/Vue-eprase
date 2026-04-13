@@ -16,8 +16,8 @@ const tristateSet = class extends Validator {
     return 'Must answer yes or no'
   }
   check(value) {
-    console.debug('Validate tristate', value)
-    const isValid = value === 'yes' || value === 'no'
+    console.debug('Validate tristate value', value)
+    const isValid = value == 'yes' || value == 'no'
     console.debug('Return', isValid)
     return isValid
   }
