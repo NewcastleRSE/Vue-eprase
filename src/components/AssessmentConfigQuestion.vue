@@ -46,7 +46,7 @@ import { rootStore } from '../stores/root'
 export default {
   name: 'AssessmentConfigQuestion',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData']),
+    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData', 'loggingOut']),
     ...mapState(rootStore, ['getConfigQuestions']),
     dataLoaded() {
       return this.dataReady
@@ -76,7 +76,7 @@ export default {
     async saveConfigQuestionResponses() {      
       console.group('saveConfigQuestionResponses()')
       console.debug('Form part-object', this.$refs['configObject'])     
-      const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true)
+      const saveResponse = await this.saveConfigQuestionData(this.$refs['configObject'].data, true, !this.loggingOut)
       await this.errorResponder(saveResponse)
       console.groupEnd()
     }
@@ -91,9 +91,7 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentConfigQuestion beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentConfigQuestion beforeUnmount() hook - dataReady flag is false')
-    await this.saveConfigQuestionResponses()   
-    const updateResponse = await this.updateAssessmentStatus('Config errors complete', true)
-    await this.errorResponder(updateResponse)
+    await this.saveConfigQuestionResponses()      
     console.groupEnd()
   }
 }

@@ -1007,7 +1007,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Save new config error responses
-    async saveConfigQuestionData(cqData, recordLoading = false) {
+    async saveConfigQuestionData(cqData, recordLoading = false, configComplete = true) {
 
       let ret = true
 
@@ -1018,6 +1018,7 @@ export const assessmentStore = defineStore('assessment', {
       console.group('saveConfigQuestionData()')
       console.debug('Responses to config questions are', cqData.config)
       console.debug('Config questions', this.assessmentData.config.configQuestions)
+      console.debug('Config question data complete (i.e. not logging out before submitting data)', configComplete)
 
       // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }   
       let newConfResponseDocIds = []   
@@ -1048,6 +1049,10 @@ export const assessmentStore = defineStore('assessment', {
 
       // Update store with new complete records
       this.getConfigQuestionData()
+
+      if (ret === true && configComplete) {
+        ret = await this.updateAssessmentStatus('Config errors complete', true)
+      }
 
       if (recordLoading) {
         this.setDataReady(true)

@@ -40,7 +40,6 @@ export default defineElement ({
     setActiveRadio() {
       console.debug('setActiveRadio()', this.labels, this.value, typeof this.value)
       this.labels.forEach(lbl => {
-        console.debug('Looking for label class containing', this.value == true ? 'yes' : (this.value == false ? 'no' : 'unset'))
         lbl.classList.toggle('active', lbl.className.includes(this.value == true ? 'yes' : (this.value == false ? 'no' : 'unset')))
       })
     },
@@ -57,7 +56,6 @@ export default defineElement ({
       this.container = document.querySelector(`#${this.name}-tristate-wrapper`)
       this.labels = this.container.querySelectorAll('label')
       this.value = this.toBoolean(this.value)
-      console.debug('Value on mount is', this.value)
       this.setActiveRadio()
     })    
   }
