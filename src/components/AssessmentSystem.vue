@@ -99,14 +99,10 @@
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
             :debounce="200" />
-          <TriStateInputElement name="penicillinResults" 
+          <TriStateInputElement name="penicillinResults"
             :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?', true)"
             :rules="[$vueform.rules.tristateSet]"
-          />
-          <!-- <ToggleElement name="penicillinResults"
-            :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"
-            :labels="{ on: 'Yes', off: 'No' }"
-          /> -->
+          />          
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />

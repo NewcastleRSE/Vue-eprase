@@ -3,11 +3,11 @@
     <template #element>
       <div class="tristate-radio-group" :id="name + '-tristate-wrapper'">        
         <label :for="name + '-yes'" class="yes-lbl">Y</label>
-        <input type="radio" value="yes" :name="name" :id="name + '-yes'" title="Yes" @change="onValueChange">
+        <input type="radio" value="true" :name="name" :id="name + '-yes'" title="Yes" v-model="value" @change="onValueChange" />
         <label :for="name + '-unset'" class="unset-lbl">-</label>
-        <input type="radio" value="unset" :name="name" :id="name + '-unset'" title="Not answered yet" @change="onValueChange">
+        <input type="radio" value="null" :name="name" :id="name + '-unset'" title="Not answered yet" v-model="value" @change="onValueChange" />
         <label :for="name + '-no'" class="no-lbl">N</label>
-        <input type="radio" value="no" :name="name" :id="name + '-no'" title="No" @change="onValueChange">        
+        <input type="radio" value="false" :name="name" :id="name + '-no'" title="No" v-model="value" @change="onValueChange" />        
         <div class="toggle"></div>
       </div>
     </template>    
@@ -28,24 +28,37 @@ export default defineElement ({
   },
   data() {
     return {
-      wrapperDiv: null,
-      value: 'unset'
+      container: null,
+      labels: null,
+      value: null
     }
   },
   methods: {
+    toBoolean(v) {
+      try { return JSON.parse(v) } catch(e) { return null }
+    },
+    setActiveRadio() {
+      console.debug('setActiveRadio()', this.labels, this.value, typeof this.value)
+      this.labels.forEach(lbl => {
+        console.debug('Looking for label class containing', this.value == true ? 'yes' : (this.value == false ? 'no' : 'unset'))
+        lbl.classList.toggle('active', lbl.className.includes(this.value == true ? 'yes' : (this.value == false ? 'no' : 'unset')))
+      })
+    },
     onValueChange(evt) {
       console.group('onValueChange()')
       console.debug('Tristate radio change event', evt)
-      this.value = evt.target.value
-      this.wrapperDiv.querySelectorAll('label').forEach(lbl => {
-        lbl.classList.toggle('active', lbl.className.includes(this.value))
-      })
+      this.value = this.toBoolean(evt.target.value)
+      this.setActiveRadio()
       console.groupEnd()
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.wrapperDiv = document.querySelector(`#${this.name}-tristate-wrapper`)
+      this.container = document.querySelector(`#${this.name}-tristate-wrapper`)
+      this.labels = this.container.querySelectorAll('label')
+      this.value = this.toBoolean(this.value)
+      console.debug('Value on mount is', this.value)
+      this.setActiveRadio()
     })    
   }
 })
@@ -150,27 +163,25 @@ $colors: $primary, #adb5bd, $primary;
   }
 }
 
-input[type="radio"][value="yes"]:checked {
-  background: $success;  
+input[type="radio"][value="true"]:checked {
   ~ .toggle {
     @include borderColor(1);
     left: calc(($h - $tw) / 2);
   }
 }
 
-input[type="radio"][value="no"]:checked {
-  background: $danger;  
+input[type="radio"][value="false"]:checked {
   ~ .toggle {
     @include borderColor(3);
     left: calc($w * 2 / 3 - ($tw - $h) / 2);
   }
 }
 
-input[type="radio"][value="unset"], .unset-lbl {
+input[type="radio"][value="null"], .unset-lbl {
   left: 33%;
 }
 
-input[type="radio"][value="no"], .no-lbl {
+input[type="radio"][value="false"], .no-lbl {
   left: 66%;
 }
 

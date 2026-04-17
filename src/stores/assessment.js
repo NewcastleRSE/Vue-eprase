@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
-import { shuffle, calcPercentage } from '../helpers/utils'
+import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
 import bsColors from '../assets/scss/_variables.scss'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
@@ -345,7 +345,7 @@ export const assessmentStore = defineStore('assessment', {
       const fieldsToConvert = toArray ? ARRAY_FIELDS_HUMPS : ARRAY_FIELDS_SNAKES
       fieldsToConvert.forEach(ftc => {
         if (ftc in obj) {
-          obj[ftc] = toArray ? obj[ftc].split(',') : obj[ftc].toString()
+          obj[ftc] = toArray ? obj[ftc].split(',') : removeLeadingComma(obj[ftc].toString())
         }
       })
       return obj

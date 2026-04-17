@@ -17,7 +17,7 @@ const tristateSet = class extends Validator {
   }
   check(value) {
     console.debug('Validate tristate value', value)
-    const isValid = value == 'yes' || value == 'no'
+    const isValid = value === true || value === false
     console.debug('Return', isValid)
     return isValid
   }
@@ -115,7 +115,7 @@ const dateIsSameOrAfter = class extends Validator {
 }
 
 export default defineConfig({
-  env: 'development',
+  env: process.env.NODE_ENV,
   theme: bootstrap,
   locales: { en },
   locale: 'en',
