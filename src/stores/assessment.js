@@ -73,7 +73,7 @@ const EMPTY_SYSTEM = {
   diagnosisResults: false,
   penicillinDescription: [],
   penicillinDescriptionOther: '',
-  penicillinResults: false,
+  penicillinResults: 'null',
   penicillinComment: '',
   antiMicReviewTime: false,
   antiMicInterpretResults: false,

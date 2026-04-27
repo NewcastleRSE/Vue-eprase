@@ -17,16 +17,11 @@
           <tbody>
             <tr v-for="qr in matrixQuestionRows">
               <td v-if="!hasExistingResponse(qr.value)">                            
-                <!-- <ToggleElement 
+                <ToggleElement 
                   :name="qr.value"
                   :label="qr.label"
                   :labels="{ on: 'Yes', off: 'No' }"
-                /> -->
-                <TriStateInputElement 
-                  :name="qr.value"
-                  :label="embolden(qr.label, true)"
-                  :rules="[$vueform.rules.tristateSet]"
-                /> 
+                />                
               </td>
               <td v-if="hasExistingResponse(qr.value)" v-html="qr.label + '  ' + getExistingResponse(qr.value)" />             
             </tr>                            

@@ -35,15 +35,15 @@
             <FormStep name="scenarioStep" label="Scenarios" 
               :elements="['scenarioEl']" 
               :labels="{ 
-                next: 'Continue to Configuration Questions',
+                next: 'Continue to Reports',
                 previous: 'Back to Patient Build'
               }" />
-            <FormStep name="configQuestionStep" label="Configuration Questions" 
+            <!-- <FormStep name="configQuestionStep" label="Configuration Questions" 
               :elements="['configQuestionEl']" 
               :labels="{ 
                 next: 'Continue to Reports',
                 previous: 'Back to Scenarios'
-              }" />
+              }" /> -->
             <FormStep name="finalReportStep" label="Final Report" 
               :elements="['finalReportEl']" 
               :buttons="{ previous: false }"
@@ -61,9 +61,9 @@
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
-            <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
-            <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
-            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" @jump-to-step="goToStep" />
+            <!-- <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" /> -->
+            <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 5" />
+            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 6" @jump-to-step="goToStep" />
           </FormElements>
           <FormStepsControls ref="assessmentStepsControl" /> 
         </template>
@@ -99,16 +99,12 @@ import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
 
-const TIMEOUT_AFTER = 5 * 60 * 1000   // Sessions time out after this number of milliseconds
-const TIMEOUT_WARN = 4 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
-const TIMEOUT_IN_MINS = (TIMEOUT_AFTER - TIMEOUT_WARN)/60000
-
 export default {
   name: 'Assessment',
   computed: {
     ...mapState(rootStore, ['audit']),
     ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
-    ...mapState(appSettingsStore, ['version', 'year']),
+    ...mapState(appSettingsStore, ['version', 'year', 'sessionInactivityTimeout', 'sessionInactivityWarningAt']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
@@ -262,10 +258,12 @@ export default {
     })
     this.timeoutDialogObserver.observe(document.body, { childList: true })
 
+    const timeoutInMins = (this.sessionInactivityTimeout - this.sessionInactivityWarningAt)/60000
+
     this.sessionTimeout = sessionTimeout({
       continueText: "Continue Session",
       logoutText: 'Log Out',
-      message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
+      message: `Your session will expire in ${timeoutInMins} minute${timeoutInMins > 1 ? 's' : ''}`,
       onContinue: async () => {
         // Keep-alive request
         await this.isLoggedIn()
@@ -282,8 +280,8 @@ export default {
         await this.audit('timeout:' + this.user, '/logout')
         this.$router.push('/logout?action=timeout')
       },
-      timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
-      warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
+      timeoutAt: this.sessionInactivityTimeout, // Call onTimeout after 5 minutes
+      warnAt: this.sessionInactivityWarningAt,     // Show warning after 4 minutes)         
     })
     this.setSessionTimer(this.sessionTimeout)
 
