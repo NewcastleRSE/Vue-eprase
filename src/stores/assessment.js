@@ -614,7 +614,7 @@ export const assessmentStore = defineStore('assessment', {
         ret = await this.updateAssessmentStatus('System complete')          
       }
 
-      await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+      await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
 
       this.setDataReady(true)
       console.debug('Returning', ret)
@@ -643,7 +643,10 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = {status: updateStatusResponse.status, message: `Failed to update assessment state to ${newStatus}`}
         }        
-      }     
+      }
+
+      await rootStore().audit('update_assessment_status', '/status', ret === true ? 'ok' : ret.message)
+
       if (recordLoading) {
         this.setDataReady(true)
       }    
@@ -966,6 +969,8 @@ export const assessmentStore = defineStore('assessment', {
       } else {
         ret = {status: saveScenarioDataResponse.status, message: `Failed to save scenario response, error ${saveScenarioDataResponse.message}`}
       }
+            
+      await rootStore().audit('save_scenario_response', '/scenario', ret === true ? `${scenario.scenario_code} response saved ok` : `error ${ret.message} saving response to ${scenario.scenario_code}`)
 
       if (recordLoading) {
         this.setDataReady(true)
