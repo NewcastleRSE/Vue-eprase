@@ -99,8 +99,8 @@ import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
 
-const TIMEOUT_AFTER = 5 * 60 * 1000   // Sessions time out after this number of milliseconds
-const TIMEOUT_WARN = 4 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
+const TIMEOUT_AFTER = 120 * 60 * 1000   // Sessions time out after this number of milliseconds
+const TIMEOUT_WARN = 119 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
 const TIMEOUT_IN_MINS = (TIMEOUT_AFTER - TIMEOUT_WARN)/60000
 
 export default {
