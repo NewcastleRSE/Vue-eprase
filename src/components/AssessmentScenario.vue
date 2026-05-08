@@ -47,11 +47,11 @@
                   @click="openPatientScenarios(patient.patient_code)"
                 >
                   <span class="fw-bold">
-                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="/images/anon-male.png" alt="Adult male patient" />
-                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="/images/anon-female.png" alt="Adult female patient" />
-                    <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="/images/baby.png" alt="Baby patient" />
-                    <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="/images/anon-child-boy.png" alt="Male paediatric patient" />
-                    <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="/images/anon-child-girl.png" alt="Female paediatric patient" />                          
+                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" :src="'/images/anon-male.png'" alt="Adult male patient" />
+                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" :src="'/images/anon-female.png'" alt="Adult female patient" />
+                    <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" :src="'/images/baby.png'" alt="Baby patient" />
+                    <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" :src="'/images/anon-child-boy.png'" alt="Male paediatric patient" />
+                    <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" :src="'/images/anon-child-girl.png'" alt="Female paediatric patient" />                         
                     Patient: {{ patient.full_name }}, {{ patientAgeCaption(patient) }}: {{ patientAgeString(patient) }}
                   </span>
                 </button>
