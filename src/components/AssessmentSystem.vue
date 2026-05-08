@@ -92,17 +92,13 @@
             ]"
             :messages="{filled: 'Please check all that apply'}" 
             :rules="['filled']"        
-          />   
+          />         
           <TextElement name="penicillinDescriptionOther"
             :label="embolden('Your description', true)"
             v-if="systemData.penicillinDescription.includes('other')"
             :messages="{required: 'Additional description is required'}" 
             :rules="['required', 'fieldIsOther:system.penicillinDescription']"
-            :debounce="200" />
-          <ToggleElement name="penicillinResults"
-            :label="embolden('When you enter &quot;Penicill&quot; in your allergy recording function, is Penicillamine visible as an option to select?')"
-            :labels="{ on: 'Yes', off: 'No' }"
-          />
+            :debounce="200" />          
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
             :debounce="200" />

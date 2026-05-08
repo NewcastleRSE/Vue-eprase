@@ -35,12 +35,12 @@
             Prescribe a series of medication to each test patient and provide details about ePrescribing system responses.
           </div>
         </li>
-        <li class="list-group-item d-flex justify-content-between align-items-start">
+        <!-- <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
             <div class="fw-bold">Configuration Questions</div>
             Answer additional questions about your ePrescribing system.
           </div>
-        </li>
+        </li> -->
       </ol>    
       <div class="alert alert-warning mt-4" role="alert">
         <span class="fw-bold">Disclaimer:</span> These patients have been designed to support the test

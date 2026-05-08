@@ -102,7 +102,7 @@ const dateIsSameOrAfter = class extends Validator {
 }
 
 export default defineConfig({
-  env: 'development',
+  env: process.env.NODE_ENV,
   theme: bootstrap,
   locales: { en },
   locale: 'en',

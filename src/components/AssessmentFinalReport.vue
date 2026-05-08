@@ -101,7 +101,7 @@
           </table>
         </div>
         
-        <div class="report-page">
+        <!-- <div class="report-page">
           <h3>Configuration test results</h3>
           <p>
             In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
@@ -128,7 +128,7 @@
               <tr class="border-white text-center"><td colspan="3">Table 3. Configuration tests results</td></tr>
             </tfoot>
           </table>
-        </div>
+        </div> -->
         
         <div class="report-page">
           <h3>Clinical Decision Support Category Results</h3>

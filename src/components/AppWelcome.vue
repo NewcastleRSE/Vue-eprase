@@ -13,7 +13,7 @@
         and deliver improved patient outcomes.</p>
         <div class="alert alert-danger fw-bold" v-if="onStaging">
           This is a test version of the site, NOT the live ePRaSE tool. Please DO NOT use this site, but instead go to the 
-          <a href="https://eprase.nhs.uk/" title="Live ePRaSE tool" target="_blank" style="text-decoration:underline">live version of the tool</a>
+          <a href="https://eprase.nuth.nhs.uk/" title="Live ePRaSE tool" target="_blank" style="text-decoration:underline">live version of the tool</a>
         </div>
         <div class="row w-50 mx-auto">
           <Vueform>          

@@ -12,48 +12,35 @@
       <Vueform ref="assessmentStepsForm" validate-on="change|step" v-model="allFormData" sync>
         <template #empty>
           <FormSteps ref="assessmentSteps" @next="nextStep" @previous="previousStep" @select="selectStep">
-            <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" 
-              :elements="['epraseIntroEl']"
-              :buttons="{ previous: false }"
-              :labels="{ next: 'Continue to Assessment Selection' }" />
-            <FormStep name="selectAssessmentStep" label="Start Or Continue<br>Assessment" 
-              :elements="['selectAssessmentEl']" 
-              :buttons="{ previous: false }"
+            <FormStep name="epraseIntroStep" label="Introduction to ePRaSE" :elements="['epraseIntroEl']"
+              :buttons="{ previous: false }" :labels="{ next: 'Continue to Assessment Selection' }" />
+            <FormStep name="selectAssessmentStep" label="Start Or Continue<br>Assessment"
+              :elements="['selectAssessmentEl']" :buttons="{ previous: false }"
               :labels="{ next: 'Continue to System Information' }" />
-            <FormStep name="systemInfoStep" label="ePrescribing System<br>Information"               
-              :elements="['systemInfoEl']" 
-              :buttons="{ previous: this.duplicateAssessmentAttempt, next: !this.duplicateAssessmentAttempt }"
-              :labels="{ 
+            <FormStep name="systemInfoStep" label="ePrescribing System<br>Information" :elements="['systemInfoEl']"
+              :buttons="{ previous: this.duplicateAssessmentAttempt, next: !this.duplicateAssessmentAttempt }" :labels="{
                 next: 'Continue to Patient Build'
               }" />
-            <FormStep name="patientBuildStep" label="Patient Build" 
-              :elements="['patientBuildEl']" 
-              :labels="{ 
-                next: 'Continue to Scenarios',
-                previous: 'Back to ePrescribing System Information'
-              }" />
-            <FormStep name="scenarioStep" label="Scenarios" 
-              :elements="['scenarioEl']" 
-              :labels="{ 
-                next: 'Continue to Configuration Questions',
-                previous: 'Back to Patient Build'
-              }" />
-            <FormStep name="configQuestionStep" label="Configuration Questions" 
+            <FormStep name="patientBuildStep" label="Patient Build" :elements="['patientBuildEl']" :labels="{
+              next: 'Continue to Scenarios',
+              previous: 'Back to ePrescribing System Information'
+            }" />
+            <FormStep name="scenarioStep" label="Scenarios" :elements="['scenarioEl']" :labels="{
+              next: 'Continue to Reports',
+              previous: 'Back to Patient Build'
+            }" />
+            <!-- <FormStep name="configQuestionStep" label="Configuration Questions" 
               :elements="['configQuestionEl']" 
               :labels="{ 
                 next: 'Continue to Reports',
                 previous: 'Back to Scenarios'
-              }" />
-            <FormStep name="finalReportStep" label="Final Report" 
-              :elements="['finalReportEl']" 
-              :buttons="{ previous: false }"
-              :labels="{ 
+              }" /> -->
+            <FormStep name="finalReportStep" label="Final Report" :elements="['finalReportEl']"
+              :buttons="{ previous: false }" :labels="{
                 next: 'Assessment complete'
               }" />
-            <FormStep name="toolExitStep" label="Exit" 
-              :elements="['toolExitEl']" 
-              :buttons="{ previous: false, next: false, finish: false }"
-            />
+            <FormStep name="toolExitStep" label="Exit" :elements="['toolExitEl']"
+              :buttons="{ previous: false, next: false, finish: false }" />
           </FormSteps>
           <FormElements>
             <AssessmentIntro name="epraseIntroEl" v-if="activeStep == 0" />
@@ -61,11 +48,11 @@
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
-            <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" />
-            <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 6" />
-            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 7" @jump-to-step="goToStep" />
+            <!-- <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" /> -->
+            <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 5" />
+            <AssessmentToolExit name="toolExitEl" v-if="activeStep == 6" @jump-to-step="goToStep" />
           </FormElements>
-          <FormStepsControls ref="assessmentStepsControl" /> 
+          <FormStepsControls ref="assessmentStepsControl" />
         </template>
       </Vueform>
 
@@ -99,27 +86,23 @@ import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
 
-const TIMEOUT_AFTER = 120 * 60 * 1000   // Sessions time out after this number of milliseconds
-const TIMEOUT_WARN = 119 * 60 * 1000    // Warn the user of session expiry after this number of milliseconds
-const TIMEOUT_IN_MINS = (TIMEOUT_AFTER - TIMEOUT_WARN)/60000
-
 export default {
   name: 'Assessment',
   computed: {
     ...mapState(rootStore, ['audit']),
     ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
-    ...mapState(appSettingsStore, ['version', 'year']),
+    ...mapState(appSettingsStore, ['version', 'year', 'sessionInactivityTimeout', 'sessionInactivityWarningAt']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {
       return this.assessmentData.selection.assessmentId
-    },   
+    },
     assessmentState() {
       return this.assessmentData.assessmentState
     },
     allFormData: {
-      get() {        
+      get() {
         return this.assessmentData
-      }, 
+      },
       set(newdata) {
       }
     },
@@ -148,17 +131,18 @@ export default {
     ErrorAlertModal
   },
   data() {
-    return {   
-      assessmentComplete: false,  
+    return {
+      assessmentComplete: false,
       allAssessments: [],
       activeStep: 0,
       nextClicked: false,
       previousClicked: false,
       fetchedSessions: false,
       allMySessions: [],
+      sessionTimeout: null,
       timeoutDialogObserver: null
     }
-  },  
+  },
   methods: {
     goToStep(assessmentId) {
       console.group('goToStep()')
@@ -169,23 +153,23 @@ export default {
         console.debug('Assessment state is', this.assessmentState)
         let toStep = null
         let enableAll = true
-        switch (this.assessmentState) {      
-          case 'System complete': 
-            toStep ='patientBuildStep'           
+        switch (this.assessmentState) {
+          case 'System complete':
+            toStep = 'patientBuildStep'
             break
-          case 'Patient build complete': 
+          case 'Patient build complete':
             toStep = 'scenarioStep'
-            break 
-          case 'Scenarios complete': 
+            break
+          case 'Scenarios complete':
             toStep = 'configQuestionStep'
             break
-          case 'Config errors complete': 
-            toStep = 'finalReportStep'            
+          case 'Config errors complete':
+            toStep = 'finalReportStep'
             break
           case 'Assessment complete':
             toStep = 'finalReportStep'
             break
-          default: 
+          default:
             console.assert(this.assessmentState == 'Not started')
             enableAll = false
             toStep = this.assessmentId == null ? 'epraseIntroStep' : 'systemInfoStep'
@@ -198,35 +182,35 @@ export default {
         this.formSteps.goTo('epraseIntroStep', false)
       }
       console.groupEnd()
-    },     
+    },
     nextStep(toStep) {
       console.group('nextStep()')
       console.debug('Next step', toStep.index, 'steps by key', this.formSteps.steps$, 'steps by array', this.formSteps.steps$Array)
-      this.nextClicked = true            
+      this.nextClicked = true
       console.debug('Form data', this.allFormData)
       console.groupEnd()
-    }, 
+    },
     previousStep(toStep) {
       console.group('previousStep()')
       console.debug('Previous step', toStep.index)
-      this.previousClicked = true      
+      this.previousClicked = true
       console.groupEnd()
-    }, 
+    },
     selectStep(active, previous) {
       console.group('selectStep()')
       console.debug('Active step', active.index, 'previous', previous.index)
       console.debug('Active', active)
       console.debug('Previous', previous)
-      this.activeStep = active.index 
+      this.activeStep = active.index
       this.nextClicked = false
-      this.previousClicked = false      
+      this.previousClicked = false
       console.groupEnd()
     }
   },
   async mounted() {
 
-    console.group('Assessment top-level mounted() hook')  
-    
+    console.group('Assessment top-level mounted() hook')
+
     // Set up observer to detect addition of session timeout dialog so Bootstrap classes can be added
     // This avoids making copies of BS styles to manually style 3rd party elements
 
@@ -236,8 +220,8 @@ export default {
           // Create Bootstrap toast element from overall dialog
           const stDialog = mutation.addedNodes[0]
           stDialog.classList.add('toast')
-          stDialog.setAttribute('role', 'alert') 
-          stDialog.classList.add('show')  
+          stDialog.setAttribute('role', 'alert')
+          stDialog.classList.add('show')
           // Get message and create new container   
           const msg = stDialog.querySelector('p')
           const msgHead = document.createElement('h5')
@@ -255,16 +239,18 @@ export default {
           // Relink
           tb.appendChild(msgHead)
           tb.appendChild(btns)
-          stDialog.appendChild(tb)          
-        }          
+          stDialog.appendChild(tb)
+        }
       }
     })
     this.timeoutDialogObserver.observe(document.body, { childList: true })
 
-    this.setSessionTimer(sessionTimeout({
+    const timeoutInMins = (this.sessionInactivityTimeout - this.sessionInactivityWarningAt) / 60000
+
+    this.sessionTimeout = sessionTimeout({
       continueText: "Continue Session",
       logoutText: 'Log Out',
-      message: `Your session will expire in ${TIMEOUT_IN_MINS} minute${TIMEOUT_IN_MINS > 1 ? 's' : ''}`,
+      message: `Your session will expire in ${timeoutInMins} minute${timeoutInMins > 1 ? 's' : ''}`,
       onContinue: async () => {
         // Keep-alive request
         await this.isLoggedIn()
@@ -279,11 +265,12 @@ export default {
         // Called when session times out (defaults to redirecting to /timed-out)
         this.setLoggingOut(true)
         await this.audit('timeout:' + this.user, '/logout')
-        this.$router.push('/logout?action=timeout')//TODO - doesn't work correctly
+        this.$router.push('/logout?action=timeout')
       },
-      timeoutAt: TIMEOUT_AFTER, // Call onTimeout after 5 minutes
-      warnAt: TIMEOUT_WARN,     // Show warning after 4 minutes)         
-    }))
+      timeoutAt: this.sessionInactivityTimeout,
+      warnAt: this.sessionInactivityWarningAt,
+    })
+    this.setSessionTimer(this.sessionTimeout)
 
     console.groupEnd()
   },
@@ -298,9 +285,10 @@ export default {
     // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
     const activeElement = document.activeElement
     if (activeElement) {
-      activeElement.blur();
+      activeElement.blur()
     }
     this.errorAlertModal.show(args[0].message)
+    this.sessionTimeout.destroy()
 
     console.groupEnd()
     return false
@@ -309,9 +297,7 @@ export default {
 </script>
 
 <style scoped>
-
 .assessment-head {
-   text-align: center;
+  text-align: center;
 }
-
 </style>

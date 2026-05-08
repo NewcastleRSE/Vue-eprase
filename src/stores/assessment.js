@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
-import { shuffle, calcPercentage } from '../helpers/utils'
+import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
 import bsColors from '../assets/scss/_variables.scss'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
@@ -73,7 +73,8 @@ const EMPTY_SYSTEM = {
   diagnosisResults: false,
   penicillinDescription: [],
   penicillinDescriptionOther: '',
-  penicillinResults: false,
+  // Set to true always - field removed from system page 08/05/2026 - avoid database table field modification
+  penicillinResults: true,
   penicillinComment: '',
   antiMicReviewTime: false,
   antiMicInterpretResults: false,
@@ -302,7 +303,7 @@ export const assessmentStore = defineStore('assessment', {
       // assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service&populate=system&populate=patients
       // If anyone can enlighten me on the "Invalid Key Error 2" this reliably gives unless one of the 'populate' or 'filter' terms is removed I (David) would be interested
       // Does not seems to matter which term goes, so it may be a Strapi bug or a query that's just too complex...
-      const response = await rootStore().apiCall(`assessments?populate[institution][fields][0]=institution_code&filters[institution][institution_code][$eq]=${instCode}&populate=ep_service[fields][]=*`, 'GET')
+      const response = await rootStore().apiCall(`assessments?populate=institution&populate=ep_service&filters[institution][institution_code][$eq]=${instCode}`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
         const assessmentData = response.data.data
@@ -345,7 +346,7 @@ export const assessmentStore = defineStore('assessment', {
       const fieldsToConvert = toArray ? ARRAY_FIELDS_HUMPS : ARRAY_FIELDS_SNAKES
       fieldsToConvert.forEach(ftc => {
         if (ftc in obj) {
-          obj[ftc] = toArray ? obj[ftc].split(',') : obj[ftc].toString()
+          obj[ftc] = toArray ? obj[ftc].split(',') : removeLeadingComma(obj[ftc].toString())
         }
       })
       return obj
@@ -378,10 +379,7 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', present)
       console.groupEnd()
       return present
-    },
-    assessmentIsLocked(assessmentId) {
-      
-    },
+    },    
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
     async selectAssessment(assessmentId = null) {
@@ -562,7 +560,7 @@ export const assessmentStore = defineStore('assessment', {
           state.assessmentData.system = this.convertArrayFields(humps(newSystem), true)
         })          
       } else {        
-        ret = {status: response.status, message: `Failed to update system data, error ${response.message}`}
+        ret = {status: systemResponse.status, message: `Failed to update system data, error ${systemResponse.message}`}
       }
       
       if (recordLoading) {
@@ -617,7 +615,7 @@ export const assessmentStore = defineStore('assessment', {
         ret = await this.updateAssessmentStatus('System complete')          
       }
 
-      await rootStore().audit(action, uri, ret === true ? 'ok' : ret)
+      await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
 
       this.setDataReady(true)
       console.debug('Returning', ret)
@@ -646,7 +644,10 @@ export const assessmentStore = defineStore('assessment', {
         } else {
           ret = {status: updateStatusResponse.status, message: `Failed to update assessment state to ${newStatus}`}
         }        
-      }     
+      }
+
+      await rootStore().audit('update_assessment_status', '/status', ret === true ? 'ok' : ret.message)
+
       if (recordLoading) {
         this.setDataReady(true)
       }    
@@ -969,6 +970,8 @@ export const assessmentStore = defineStore('assessment', {
       } else {
         ret = {status: saveScenarioDataResponse.status, message: `Failed to save scenario response, error ${saveScenarioDataResponse.message}`}
       }
+            
+      await rootStore().audit('save_scenario_response', '/scenario', ret === true ? `${scenario.scenario_code} response saved ok` : `error ${ret.message} saving response to ${scenario.scenario_code}`)
 
       if (recordLoading) {
         this.setDataReady(true)
@@ -1010,7 +1013,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Save new config error responses
-    async saveConfigQuestionData(cqData, recordLoading = false) {
+    async saveConfigQuestionData(cqData, recordLoading = false, configComplete = true) {
 
       let ret = true
 
@@ -1021,6 +1024,7 @@ export const assessmentStore = defineStore('assessment', {
       console.group('saveConfigQuestionData()')
       console.debug('Responses to config questions are', cqData.config)
       console.debug('Config questions', this.assessmentData.config.configQuestions)
+      console.debug('Config question data complete (i.e. not logging out before submitting data)', configComplete)
 
       // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }   
       let newConfResponseDocIds = []   
@@ -1051,6 +1055,10 @@ export const assessmentStore = defineStore('assessment', {
 
       // Update store with new complete records
       this.getConfigQuestionData()
+
+      if (ret === true && configComplete) {
+        ret = await this.updateAssessmentStatus('Config errors complete', true)
+      }
 
       if (recordLoading) {
         this.setDataReady(true)

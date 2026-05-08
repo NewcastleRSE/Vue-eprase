@@ -14,6 +14,10 @@ export function calcNum(num, total) {
   return 0;
 }
 
+export function removeLeadingComma(s) {
+  return s.substring(0, 1) == ',' ? s.substring(1) : s
+}
+
 export function isoToUkDate(iso, includeTime = false) {
   dayjs.extend(utc);
   dayjs.extend(timezone);
