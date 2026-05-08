@@ -92,7 +92,7 @@
             ]"
             :messages="{filled: 'Please check all that apply'}" 
             :rules="['filled']"        
-          />   
+          />         
           <TextElement name="penicillinDescriptionOther"
             :label="embolden('Your description', true)"
             v-if="systemData.penicillinDescription.includes('other')"

@@ -73,7 +73,8 @@ const EMPTY_SYSTEM = {
   diagnosisResults: false,
   penicillinDescription: [],
   penicillinDescriptionOther: '',
-  penicillinResults: 'null',
+  // Set to true always - field removed from system page 08/05/2026 - avoid database table field modification
+  penicillinResults: true,
   penicillinComment: '',
   antiMicReviewTime: false,
   antiMicInterpretResults: false,
@@ -302,7 +303,7 @@ export const assessmentStore = defineStore('assessment', {
       // assessments?filters[hospital][$eq]=${hospital}&populate[institution][filters][institution_code][$eq]=${instCode}&populate=ep_service&populate=system&populate=patients
       // If anyone can enlighten me on the "Invalid Key Error 2" this reliably gives unless one of the 'populate' or 'filter' terms is removed I (David) would be interested
       // Does not seems to matter which term goes, so it may be a Strapi bug or a query that's just too complex...
-      const response = await rootStore().apiCall(`assessments?populate[institution][fields][0]=institution_code&filters[institution][institution_code][$eq]=${instCode}&populate[ep_service][fields][]=*`, 'GET')
+      const response = await rootStore().apiCall(`assessments?populate=institution&populate=ep_service&filters[institution][institution_code][$eq]=${instCode}`, 'GET')
       if (response.status < 400) {
         console.debug('Response data from fetch assessments', response.data.data)
         const assessmentData = response.data.data
