@@ -72,11 +72,11 @@
                   <div v-if="dataLoaded">
                     <div class="d-flex">
                       <div class="p-2">
-                        <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" :src="'/images/anon-male.png'" alt="Adult male patient" />
-                        <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" :src="'/images/anon-female.png'" alt="Adult female patient" />
-                        <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 150px; height: 150px" :src="'/images/baby.png'" alt="Baby patient" />
-                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" :src="'/images/anon-child-boy.png'" alt="Male paediatric patient" />
-                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" :src="'/images/anon-child-girl.png'" alt="Female paediatric patient" />                                               
+                        <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-male.png" alt="Adult male patient" />
+                        <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-female.png" alt="Adult female patient" />
+                        <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/baby.png" alt="Baby patient" />
+                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
+                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                                               
                       </div>
                       <div class="p-2 flex-grow-1">
                         <table class="table table-striped">
