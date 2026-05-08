@@ -72,7 +72,11 @@
                   <div v-if="dataLoaded">
                     <div class="d-flex">
                       <div class="p-2">
-                        <img style="width: 150px; height: 150px" :src="patientImage(patient)" :alt="patientImageAlt(patient)" />                                               
+                        <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="/images/anon-male.png" alt="Adult male patient" />
+                        <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="/images/anon-female.png" alt="Adult female patient" />
+                        <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 150px; height: 150px" src="/images/baby.png" alt="Baby patient" />
+                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="/images/anon-child-boy.png" alt="Male paediatric patient" />
+                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="/images/anon-child-girl.png" alt="Female paediatric patient" />                                               
                       </div>
                       <div class="p-2 flex-grow-1">
                         <table class="table table-striped">
@@ -281,32 +285,9 @@ export default {
     }    
   },
   methods: { 
-    patientImage(patient) {
-      let image = ''
-      if (patient.is_adult === true) {
-        image = patient.gender === 'Male' ? 'anon-male' : 'anon-female'
-      } else {
-        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
-          image = 'baby'
-        } else {
-          image = patient.gender === 'Male' ? 'anon-child-boy' : 'anon-child-girl'
-        }
-      }
-      return '/images/' + image + '.png'
-    },
-    patientImageAlt(patient) {
-      let imageAlt = ''
-      if (patient.is_adult === true) {
-        imageAlt = patient.gender === 'Male' ? 'Male adult patient' : 'Female adult patient'
-      } else {
-        if ((patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)) {
-          imageAlt = 'Baby patient'
-        } else {
-          imageAlt = patient.gender === 'Male' ? 'Male paediatric patient' : 'Female paediatric patient'
-        }
-      }
-      return imageAlt
-    }, 
+    patientIsBaby(patient) {
+      return patient.is_adult === false && (patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)
+    },    
     patientAgeString(patient) {
       let ageString = 'Unspecified'
       if (patient.age_years != null && patient.age_years != 0) {
