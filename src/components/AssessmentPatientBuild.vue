@@ -55,148 +55,19 @@
                     class="nav-link" data-bs-toggle="tab" type="button" role="tab"
                     :class="index == 0 ? 'active' : ''"                      
                     :id="'patient-' + patient.patient_code + '-' + key + '-tab'" 
-                    :data-bs-target="'#patient-' + patient.patient_code + '-' + key">{{ value }}
+                    :data-bs-target="'#patient-' + patient.patient_code + '-' + key">{{ value }}                    
                   </button>
                 </li>                  
               </ul>
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <!-- Profile tab -->
-                <div class="tab-pane fade active show mt-2" :id="'patient-' + patient.patient_code + '-profile'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Profile...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <div class="d-flex">
-                      <div class="p-2">
-                        <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-male.png" alt="Adult male patient" />
-                        <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-female.png" alt="Adult female patient" />
-                        <img v-show="patientIsBaby(patient)" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/baby.png" alt="Baby patient" />
-                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
-                        <img v-show="!patientIsBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 150px; height: 150px" src="../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                                               
-                      </div>
-                      <div class="p-2 flex-grow-1">
-                        <table class="table table-striped">
-                          <tbody>
-                            <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
-                            <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
-                            <tr><th>DOB</th><td>{{ patient.dob ? new Date(patient.dob).toLocaleDateString('en-GB') : 'Not specified' }}</td></tr>
-                            <tr><th>{{ patientAgeCaption(patient) }}</th><td>{{ patientAgeString(patient) }}</td></tr>                            
-                            <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
-                            <tr><th>Height (cm)</th><td>{{ patient.height }}</td></tr>
-                            <tr><th>Weight (kg)</th><td>{{ patient.weight }}</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>                    
-                </div>
-                <!-- Allergy tab -->
-                <div class="tab-pane fade mt-2 " :id="'patient-' + patient.patient_code + '-allergy'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Allergies...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <p v-if="patientAllergies.length == 0">No allergies</p>
-                    <table class="table table-striped" v-if="patientAllergies.length != 0">
-                      <tbody>
-                        <tr v-for="allergy in patientAllergies">
-                          <td>{{  allergy.allergy }}</td>
-                        </tr>                         
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- Comorbidity tab -->
-                <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-comorbidity'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Comorbidities...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <p v-if="patientComorbidities.length == 0">No comorbidities</p>
-                    <table class="table table-striped" v-if="patientComorbidities.length != 0">
-                      <tbody>
-                        <tr v-for="comorbidity in patientComorbidities">
-                          <td>{{  comorbidity.comorbidity }}</td>
-                        </tr>  
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- Presenting complaints tab -->
-                <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-diagnosis'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Presenting Complaints...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <p v-if="patientPresentingComplaints.length == 0">No presenting complaints</p>
-                    <table class="table table-striped" v-if="patientPresentingComplaints.length != 0">
-                      <tbody>
-                        <tr v-for="complaint in patientPresentingComplaints">
-                          <td>{{ complaint.diagnosis }}</td>
-                        </tr>  
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- Current medication tab -->
-                <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-prescription'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Current Medication...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <p v-if="patientMedicationHistory.length == 0">No current medication</p>
-                    <table class="table table-striped" v-if="patientMedicationHistory.length != 0">
-                      <tbody>
-                        <tr>
-                          <th>Name</th>
-                          <th>Dose</th>
-                          <th>Route</th>
-                          <th>Frequency</th>
-                          <th>Duration</th>
-                          <th>Indication</th>
-                        </tr>
-                        <tr v-for="prescription in patientMedicationHistory">
-                          <td>{{ prescription.name }}</td>
-                          <td>{{ prescription.dose }}</td>
-                          <td>{{ prescription.route }}</td>
-                          <td>{{ prescription.frequency }}</td>
-                          <td>{{ prescription.duration }}</td>
-                          <td>{{ prescription.justification }}</td>
-                        </tr>  
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- Clinical data tab -->
-                <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-clinical_data'" role="tabpanel" tabindex="0">
-                  <div v-if="!dataLoaded" class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                      <span class="visually-hidden">Loading Clinical Data...</span>
-                    </div>
-                  </div>
-                  <div v-if="dataLoaded">
-                    <p v-if="patientClinicalData.length == 0">No clinical data</p>
-                    <table class="table table-striped" v-if="patientClinicalData.length != 0">
-                      <tbody>                         
-                        <tr v-for="clinicalData in patientClinicalData">
-                          <td>{{ clinicalData.clinical_datum }}</td>
-                        </tr>  
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <PatientProfile :patient="patient" :dataLoaded="dataLoaded" />
+                <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
+                <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
+                <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
+                <PatientCurrentMedication :patient="patient" :patientCurrentMedication="patientMedicationHistory" :dataLoaded="dataLoaded" />
+                <PatientClinicalData :patient="patient" :patientClinicalData="patientClinicalData" :dataLoaded="dataLoaded" />                
                 <ButtonElement 
                   :name="'done-patient-' + patient.patient_code" 
                   :columns="6" 
@@ -226,6 +97,12 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { Validator } from '@vueform/vueform'
 import { appSettingsStore } from '../stores/appSettings'
+import PatientProfile from './patientTabs/PatientProfile'
+import PatientAllergies from './patientTabs/PatientAllergies'
+import PatientComorbidities from './patientTabs/PatientComorbidities'
+import PatientPresentingComplaints from './patientTabs/PatientPresentingComplaints'
+import PatientCurrentMedication from './patientTabs/PatientCurrentMedication'
+import PatientClinicalData from './patientTabs/PatientClinicalData'
 
 const allPatientsCompleted = class extends Validator {
   get msg() {
@@ -239,6 +116,14 @@ const allPatientsCompleted = class extends Validator {
 
 export default {
   name: 'AssessmentPatientBuild',
+  components: {
+    PatientProfile,
+    PatientAllergies,
+    PatientComorbidities,
+    PatientPresentingComplaints,
+    PatientCurrentMedication,
+    PatientClinicalData
+  },
   computed: {
     ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
     dataLoaded() {
@@ -284,24 +169,7 @@ export default {
       allPatientsCompleted
     }    
   },
-  methods: { 
-    patientIsBaby(patient) {
-      return patient.is_adult === false && (patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)
-    },    
-    patientAgeString(patient) {
-      let ageString = 'Unspecified'
-      if (patient.age_years != null && patient.age_years != 0) {
-        ageString = patient.age_years + ' years'
-      } else if (patient.age_days != null && patient.age_days != 0) {
-        ageString = patient.age_days + ' days'
-      } else if (patient.gestational_age != null && patient.gestational_age != 0) {
-        ageString = patient.gestational_age + ' weeks'
-      }
-      return ageString
-    },
-    patientAgeCaption(patient) {
-      return (patient.gestational_age != null && patient.gestational_age != 0) ? 'Gestational age' : 'Age'
-    },
+  methods: {     
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
@@ -343,8 +211,8 @@ export default {
         const patientElement = document.getElementById('patient-' + nextCode)
         if (patientElement != null) {
           this.$nextTick(() => { 
-              console.debug('Scroll patient', nextCode, 'into view')
-              document.getElementById('patient-' + nextCode).scrollIntoView({
+            console.debug('Scroll patient', nextCode, 'into view')
+            document.getElementById('patient-' + nextCode).scrollIntoView({
               behavior: 'smooth',
               block: 'center',
               inline: 'nearest'

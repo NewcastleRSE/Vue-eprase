@@ -56,7 +56,7 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: "AssessmentIntro", 
+  name: 'AssessmentIntro', 
   computed: {
     ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
   }, 

@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: "AppLogo",
+  name: 'AppLogo',
   props: {
     cls: 'banner' // banner|bottomright
   }
