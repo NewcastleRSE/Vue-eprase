@@ -255,7 +255,7 @@
         </div>
       </ObjectElement>
       <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
-        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Configuration Questions' below to answer further questions about your system.</div>
+        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Reports' below to see your final report.</div>
       </StaticElement>
     </GroupElement>
   </GroupElement>
