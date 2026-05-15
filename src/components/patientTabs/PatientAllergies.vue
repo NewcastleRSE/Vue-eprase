@@ -36,11 +36,6 @@ export default {
       type: Boolean,
       default: false
     }
-  },
-  updated() {
-    console.group('PatientAllergies updated hook')
-    console.debug(this.patient)
-    console.groupEnd()
   }
 }
 </script>

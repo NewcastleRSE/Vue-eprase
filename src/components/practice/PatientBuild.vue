@@ -14,13 +14,12 @@
         you can navigate back and forth between all patients within the patient build section.
       </div>
     </StaticElement>
-    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
     <StaticElement name="patientBuildProgress" class="mb-4">
       <div class="alert alert-info fw-bold" role="alert">
-        {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
+        {{ `You have entered ${numCompletedPatients} of ${patientData.length} patients` }}
       </div>
-      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" :style="'width: ' + ((completedPatientsArray().length / patientData.length) * 100) + '%'"></div>
+      <div v-show="numCompletedPatients != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" :style="'width: ' + ((numCompletedPatients / patientData.length) * 100) + '%'"></div>
       </div>
     </StaticElement>
     <StaticElement name="patientBuildBody">
@@ -82,41 +81,31 @@
           </div>
         </div>
       </div>
-    </StaticElement>
-    <StaticElement v-show="this.completedPatientsArray().length == patientData.length" name="patientListEntryComplete">
-      <div class="alert alert-info" role="alert">
-        You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios
-      </div>
-    </StaticElement>    
+    </StaticElement>        
   </GroupElement>  
 </template>
 
 <script>
 
 import { mapState } from 'pinia'
-import { assessmentStore } from '../stores/assessment'
-import { patientDataTabValues } from '../helpers/common'
-import { Validator } from '@vueform/vueform'
-import { appSettingsStore } from '../stores/appSettings'
-import PatientProfile from './patientTabs/PatientProfile'
-import PatientAllergies from './patientTabs/PatientAllergies'
-import PatientComorbidities from './patientTabs/PatientComorbidities'
-import PatientPresentingComplaints from './patientTabs/PatientPresentingComplaints'
-import PatientCurrentMedication from './patientTabs/PatientCurrentMedication'
-import PatientClinicalData from './patientTabs/PatientClinicalData'
-
-const allPatientsCompleted = class extends Validator {
-  get msg() {
-    return 'Please enter all patients into your system'
-  }
-  check(value) {
-    console.debug('allPatientsCompleted() validator entered with', value)
-    return value && value.split(',').length == appSettingsStore().assessmentNumPatients
-  }
-}
+import { patientDataTabValues } from '../../helpers/common'
+import { practiceStore } from '../../stores/practice'
+import PatientProfile from '../patientTabs/PatientProfile'
+import PatientAllergies from '../patientTabs/PatientAllergies'
+import PatientComorbidities from '../patientTabs/PatientComorbidities'
+import PatientPresentingComplaints from '../patientTabs/PatientPresentingComplaints'
+import PatientCurrentMedication from '../patientTabs/PatientCurrentMedication'
+import PatientClinicalData from '../patientTabs/PatientClinicalData'
 
 export default {
-  name: 'AssessmentPatientBuild',
+  name: 'PatientBuild',
+  props: {
+    noPatients: {
+      type: Number,
+      required: true,
+      default: 1
+    }
+  },
   components: {
     PatientProfile,
     PatientAllergies,
@@ -126,12 +115,12 @@ export default {
     PatientClinicalData
   },
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
+    ...mapState(practiceStore, ['dataReady', 'patients', 'getPatientDetails', 'patientListBuild']),
     dataLoaded() {
       return this.dataReady
     },
     patientData() {
-      return this.assessmentData.patients
+      return this.patients
     },    
     patientAllergies() {
       return this.patientAuxiliaryData('allergies')
@@ -151,26 +140,23 @@ export default {
     patientDataTabs() {
       return patientDataTabValues
     },
-    completedPatientsHidden() {
-      console.log('Hidden element is', this.$refs.patientBuildGroup)
-      return this.$refs.patientBuildGroup
+    numCompletedPatients() {
+      return this.completedPatients.length
     }
   },  
   data() {
     return {
       allPatientData: {},
       currentPatient: null,
-      allPatientsCompleted
+      completedPatients: []
     }    
   },
+  emits: ['allPatientsEntered'],
   methods: {     
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
-    },                 
-    completedPatientsArray() {
-      return !this.assessmentData.completedPatients ? [] : this.assessmentData.completedPatients.split(',')
-    },
+    },                     
     async patientRelations(docId) {
       this.currentPatient = docId
       if ( !(docId in this.allPatientData)) {      
@@ -184,14 +170,14 @@ export default {
       return this.allPatientData[docId]
     },
     patientDataEntered(code) {
-      return this.completedPatientsArray().includes(code)
+      return this.completedPatients.includes(code)
     },
     openNextUnenteredPatient() {
 
       console.group('openNextUnenteredPatient()')
 
       const allCodes = this.patientData.map(p => p.patient_code)
-      const doneCodes = this.completedPatientsArray()
+      const doneCodes = this.completedPatients
 
       if (allCodes.length > doneCodes.length) {
         // Still some to do
@@ -212,54 +198,34 @@ export default {
         }            
       } else {
         console.debug('No unentered patients left')
+        this.$emit('allPatientsEntered')
       }
       console.groupEnd()
     },
     async setPatientDataEntered(patientCode) {
       console.group('setPatientDataEntered()')
       console.debug('Patient code', patientCode)
-      const spdeResponse = await this.setPatientEntryComplete(patientCode)
-      console.debug('Response', spdeResponse)
-      const wasError = await this.errorResponder(spdeResponse)
-      if (!wasError) {
-        // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
-        console.debug('Opening next unentered patient...')
-        setTimeout(() => {
-          this.openNextUnenteredPatient()
-        }, 1000)   
-      }  
+      this.completedPatients.push(patientCode)      
+      // Time delay of 1s to allow user to see the 'Data entry complete' message on the button before moving to the next one...
+      console.debug('Opening next unentered patient...')
+      setTimeout(() => {
+        this.openNextUnenteredPatient()
+      }, 1000)   
       console.groupEnd()       
     }
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')  
-    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
-    this.completedPatientsHidden.validate()
-    const loadPatientsResponse = await this.patientListBuild(true)
+    console.group('PatientBuild mounted()')      
+    // NOTE: choice of patient type and number of patients could be chosen by the user via a preliminary form
+    const loadPatientsResponse = await this.patientListBuild(this.noPatients, [], 'Adult', true)
     const wasError = await this.errorResponder(loadPatientsResponse)
     if (!wasError) {
       // Get the details for the first (unentered) patient
       this.$nextTick(() => { this.openNextUnenteredPatient() })
     }          
     console.groupEnd()
-  }, 
-  async beforeUnmount() {
-    console.group('AssessmentPatientBuild beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
-    if (this.completedPatientsArray().length == this.patientData.length) {
-      // We have done all the data entry now
-      const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)
-      await this.errorResponder(updateResponse)
-    }    
-    console.groupEnd()
   }
 }
 </script>
 
-<style scoped>
-
-div#patientAccordion {
-  margin-bottom: 4rem;
-}
-
-</style>
+<style scoped></style>

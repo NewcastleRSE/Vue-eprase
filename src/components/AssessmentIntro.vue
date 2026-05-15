@@ -58,7 +58,7 @@ import { assessmentStore } from '../stores/assessment'
 export default {
   name: 'AssessmentIntro', 
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails'])
   }, 
   async mounted() {
     console.group('AssessmentIntro mounted hook')

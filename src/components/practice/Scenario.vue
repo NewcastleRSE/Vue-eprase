@@ -1,11 +1,10 @@
 <template>
   <GroupElement name="scenarioGroup" :class="'mb-4'">
-    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />    
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
-          <p>There are 45 test scenarios to complete. This should be carried out in <span
+          <p>There are {{ scenarioCount }} test scenarios to complete. This should be carried out in <span
               class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
           <p>
             Please select the first patient's name from those set up in the patient build phase and prescribe the
@@ -19,8 +18,7 @@
           </p>
           <p>
             You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should
-            complete the same process.
-            On completion of the three scenario tests you will be prompted to move onto the next patient.
+            complete the same process. On completion of the three scenario tests you will be prompted to move onto the next patient.
           </p>
           <p>Please work through all of the patients until all test scenarios are complete</p>
         </div>
@@ -47,11 +45,11 @@
                   @click="openPatientScenarios(patient.patient_code)"
                 >
                   <span class="fw-bold">
-                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-male.png" alt="Adult male patient" />
-                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-female.png" alt="Adult female patient" />
-                    <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/baby.png" alt="Baby patient" />
-                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
-                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
+                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-male.png" alt="Adult male patient" />
+                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-female.png" alt="Adult female patient" />
+                    <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/baby.png" alt="Baby patient" />
+                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
+                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
                     Patient: {{ patient.full_name }}, {{ formatAgeCaption(patient) }}: {{ formatAge(patient) }}
                   </span>
                 </button>
@@ -264,35 +262,21 @@
 <script>
 
 import { mapState } from 'pinia'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../helpers/common'
-import { assessmentStore } from '../stores/assessment'
-import { Validator } from '@vueform/vueform'
-
-const allScenariosCompleted = class extends Validator {
-  get msg() {
-    return 'Please complete all scenario questions'
-  }
-  check(value) {
-    console.debug('allScenariosCompleted() validator entered with', value)
-    return value && value.split(',').length == assessmentStore().assessmentData.numScenarios
-  }
-}
+import { practiceStore } from '../../stores/practice'
+import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
 
 export default {
-  name: 'AssessmentScenario',
+  name: 'Scenario',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
+    ...mapState(practiceStore, ['dataReady', 'patients', 'patientScenarios', 'scenarioUserResponses', 'savePatientScenarioResponse', 'numScenarios', 'getCategoryDetails', 'getMitigationDetails', 'categories', 'mitigations']),
     dataLoaded() {
-      return this.auxiliaryDataReady && this.dataReady
+      return this.dataReady
     },        
     patientData() {
-      return this.assessmentData.patients
-    },
-    patientScenarios() {
-      return this.assessmentData.patientScenarios
-    },
+      return this.patients
+    },    
     scenarioCount() {
-      return this.assessmentData.numScenarios
+      return this.numScenarios
     },    
     scenarioResponses() {
       return this.storedResponsesByCode
@@ -312,10 +296,6 @@ export default {
     categoryTips() {
       return this.categories.map(c => { c.tip })
     },
-    completedScenariosHidden() {
-      console.log('Hidden element is', this.$refs.completedScenariosHidden)
-      return this.$refs.completedScenariosHidden
-    },
     tooManyCategories() {
       return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
     },
@@ -325,7 +305,6 @@ export default {
   },
   data() {
     return {
-      auxiliaryDataReady: false,
       displayCategories: [],
       interventionSelections: {},
       currentPatient: null,
@@ -337,9 +316,10 @@ export default {
       scenarioPatientLink: {},
       savedResponseData: true,
       dsCategoriesSelected: {}, // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
-      allScenariosCompleted
+      allScenariosCompleted: false
     }
   },
+  emits: ['allScenariosCompleted'],
   methods: {
     isBaby(patient) {
       return patientIsBaby(patient)
@@ -378,17 +358,12 @@ export default {
         console.debug('Too few categories selected', this.tooFewCategories) 
       } else if ( !( scenario.scenario_code in this.storedResponsesByCode ) ) {
         // All good to go
-        const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-        const wasError = await this.errorResponder(saveResponse)
-        if (!wasError) {
-          this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
-          this.numCompletedScenarios++
-          this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
-          this.completedScenariosHidden.validate()
-          setTimeout(() => {
-            this.savedResponseData = true
-          }, 200)
-        }        
+        this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code])
+        this.storedResponsesByCode[scenario.scenario_code] = this.scenarioUserResponses[scenario.scenario_code]        
+        this.numCompletedScenarios++          
+        setTimeout(() => {
+          this.savedResponseData = true
+        }, 200)
       }                  
       console.groupEnd()
     },
@@ -456,8 +431,7 @@ export default {
 
       this.dsCategoriesSelected = {}
       const doneScenarios = Object.keys(this.scenarioResponses)
-      this.completedScenariosHidden.update(doneScenarios.join(','))
-
+      console.debug('Done scenarios', doneScenarios, 'responses', this.scenarioResponses)
       if (doneScenarios.length < this.scenarioCount) {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
@@ -480,6 +454,9 @@ export default {
           }
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
+      } else {
+        console.debug('All scenarios completed')
+        this.$emit('allScenariosCompleted')
       }
       console.groupEnd()
     },
@@ -522,44 +499,27 @@ export default {
     }
   },
   async mounted() {
-
-    console.group('AssessmentScenario mounted()')
-
-    this.auxiliaryDataReady = false
-
-    // Massage the category list for better use in Vueform components      
-    this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })        
-    for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
-      scenarios.forEach(s => {
-        this.scenarioPatientLink[s.scenario_code] = patientCode
-      })      
-    }
-    const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    const wasError = await this.errorResponder(storedResultsResponse)
+    console.group('Scenario mounted()')
+    // Get mitigation and category base data
+    let wasError = false
+    const mitResponse = await this.getMitigationDetails()
+    wasError = await this.errorResponder(mitResponse)
     if (!wasError) {
-      // Package the responses by scenario code for convenience - data is of form:
-      // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
-      this.assessmentData.storedScenarioResponses.forEach(asr => {
-        this.storedResponsesByCode[asr.scenario.scenario_code] = asr
-      })
-      this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
-      
-      // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-      this.completedScenariosHidden.validate()
-
-      this.auxiliaryDataReady = true
-      this.openNextUnenteredScenario()    
-    }    
-    console.groupEnd()
-  },
-  async beforeUnmount() {
-    console.group('AssessmentScenario beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
-    if (this.numCompletedScenarios == this.scenarioCount) {
-      // We have done all the data entry now          
-      const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
-      await this.errorResponder(updateResponse)
-    }    
+      const catResponse = await this.getCategoryDetails()
+      wasError = await this.errorResponder(catResponse)
+    } if (!wasError) {
+      // Massage the category list for better use in Vueform components      
+      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } }) 
+      //TODO - this code needs to be subsumed into practiceStore when the scenario data is first retrieved       
+      for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
+        scenarios.forEach(s => {
+          this.scenarioPatientLink[s.scenario_code] = patientCode
+        })      
+      }
+      // END of what goes into store...
+      //TODO - this needs to be invoked when the component is whon, not mounted!
+      this.$nextTick(() => { this.openNextUnenteredScenario() })
+    }       
     console.groupEnd()
   }
 }

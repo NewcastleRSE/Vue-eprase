@@ -5,6 +5,7 @@ import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
+import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
 import bsColors from '../assets/scss/_variables.scss'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
@@ -17,42 +18,6 @@ const ASSESSMENT_STATES = {
   'Scenarios complete': 4,
   'Config errors complete': 5,
   'Assessment complete': 6
-}
-
-// Done as <recorded_response> : { <expected_response1>: <mitigation_result1>, ... }
-// Transcription of document posted on Slack eprase2 channel by Becky 18/08/2025
-const GOOD_MITIGATION = 'Good mitigation'
-const SOME_MITIGATION = 'Some mitigation'
-const OVER_MITIGATION = 'Over mitigation'
-const NO_MITIGATION = 'No mitigation'
-const INVALID_TEST = 'Invalid test'
-const MITIGATION_DESCRIPTIONS = [NO_MITIGATION, GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, INVALID_TEST]
-const MITIGATION_MATRIX = {
-  'MT2': { // Recorded response : You were able to complete the prescription without any additional user or system input
-    'MT2': GOOD_MITIGATION,     // Expected response : No intervention
-    'MT1': NO_MITIGATION,       // Expected response : User/system intervention
-    'MT3': NO_MITIGATION        // Expected response : Prescribing prevented
-  },
-  'MT4': { // Recorded response : You were able to complete the prescription, but had to override components of the order sentence
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
-    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT1': { // Recorded response : You were able to complete the prescription, with system/user intervention
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': GOOD_MITIGATION,     // Expected response : User/system intervention
-    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT3': { // Recorded response : Prevented from prescribing
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': OVER_MITIGATION,     // Expected response : User/system intervention
-    'MT3': GOOD_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT99': { // Recorded response : Medicine or formulary alternative not available in the system
-    'MT2': INVALID_TEST,        // Expected response : No intervention
-    'MT1': INVALID_TEST,        // Expected response : User/system intervention
-    'MT3': INVALID_TEST         // Expected response : Prescribing prevented
-  }
 }
 
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
