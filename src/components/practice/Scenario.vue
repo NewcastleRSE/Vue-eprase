@@ -1,29 +1,13 @@
 <template>
-  <GroupElement name="scenarioGroup" :class="'mb-4'">
+  <GroupElement name="scenarioGroup" class="my-4">
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
-        <div class="alert alert-info mt-2" role="alert">
-          <p>There are {{ scenarioCount }} test scenarios to complete. This should be carried out in <span
-              class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
-          <p>
-            Please select the first patient's name from those set up in the patient build phase and prescribe the
-            medication exactly as detailed in the scenario 1 tab presented.
-            Record any relevant advice or information received while completing the test as prompted. Check all
-            responses and then click <span class="fw-bold">Save</span>.
-          </p>
-          <p>
-            Please note once you have clicked <span class="fw-bold">Save</span> you will <span
-              class="fw-bold">not</span> be able to return to this page again to change your response.
-          </p>
-          <p>
-            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should
-            complete the same process. On completion of the three scenario tests you will be prompted to move onto the next patient.
-          </p>
-          <p>Please work through all of the patients until all test scenarios are complete</p>
+        <div class="alert alert-info mt-4" role="alert">
+          <p>There are {{ scenarioCount }} test scenarios to complete. TODO - need wording here...</p>
         </div>
       </StaticElement>       
-      <StaticElement name="scenariosProgress" class="mb-4">
+      <StaticElement name="scenariosProgress">
         <div class="alert alert-info fw-bold" role="alert">
           {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
         </div>
@@ -62,7 +46,9 @@
                     <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
                       <button class="nav-link scenario" data-bs-toggle="tab" type="button" role="tab"
-                        :class="currentScenario == pscd.scenario_code ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        :class="currentScenario == pscd.scenario_code ? 'active' : ''" 
+                        :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        @click="currentScenario = pscd.scenario_code"
                         :data-bs-target="'#scenario-' + pscd.scenario_code">{{ 'Scenario ' + (index + 1) }}
                       </button>
                     </li>
@@ -223,9 +209,9 @@
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
                             </tr>                                                    
                           </tbody>
-                        </table>
+                        </table>                        
                       </div>
-                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
+                      <GroupElement name="scenario-response-button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
                           :disabled="!allowCurrentScenarioSave || tooManyCategories || tooFewCategories"
                           :columns="4"
@@ -251,10 +237,7 @@
             </ObjectElement>
           </div>
         </div>
-      </ObjectElement>
-      <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
-        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Reports' below to see your final report.</div>
-      </StaticElement>
+      </ObjectElement>      
     </GroupElement>
   </GroupElement>
 </template>
@@ -268,7 +251,11 @@ import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patie
 export default {
   name: 'Scenario',  
   computed: {
-    ...mapState(practiceStore, ['dataReady', 'patients', 'patientScenarios', 'scenarioUserResponses', 'savePatientScenarioResponse', 'numScenarios', 'getCategoryDetails', 'getMitigationDetails', 'categories', 'mitigations']),
+    ...mapState(practiceStore, [
+      'dataReady', 'patients', 'patientScenarios', 'scenarioPatientLink', 
+      'scenarioUserResponses', 'savePatientScenarioResponse', 'numScenarios', 
+      'getCategoryDetails', 'getMitigationDetails', 'categories', 'mitigations'
+    ]),
     dataLoaded() {
       return this.dataReady
     },        
@@ -290,12 +277,6 @@ export default {
     matrixCategories() {
       return this.displayCategories
     },
-    categoryCount() {
-      return this.categories.length
-    },
-    categoryTips() {
-      return this.categories.map(c => { c.tip })
-    },
     tooManyCategories() {
       return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
     },
@@ -313,7 +294,6 @@ export default {
       allowCurrentScenarioSave: false,
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
-      scenarioPatientLink: {},
       savedResponseData: true,
       dsCategoriesSelected: {}, // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
       allScenariosCompleted: false
@@ -363,6 +343,9 @@ export default {
         this.numCompletedScenarios++          
         setTimeout(() => {
           this.savedResponseData = true
+          if (this.numCompletedScenarios == this.scenarioCount) {
+            this.$emit('allScenariosCompleted')
+          }
         }, 200)
       }                  
       console.groupEnd()
@@ -475,7 +458,10 @@ export default {
       })  
       
       console.groupEnd()
-    },  
+    },
+    patientScenarioIndex(patientCode, scenarioCode) {
+
+    },
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode]
     },
@@ -509,15 +495,7 @@ export default {
       wasError = await this.errorResponder(catResponse)
     } if (!wasError) {
       // Massage the category list for better use in Vueform components      
-      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } }) 
-      //TODO - this code needs to be subsumed into practiceStore when the scenario data is first retrieved       
-      for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
-        scenarios.forEach(s => {
-          this.scenarioPatientLink[s.scenario_code] = patientCode
-        })      
-      }
-      // END of what goes into store...
-      //TODO - this needs to be invoked when the component is whon, not mounted!
+      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })      
       this.$nextTick(() => { this.openNextUnenteredScenario() })
     }       
     console.groupEnd()

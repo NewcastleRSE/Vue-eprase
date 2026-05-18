@@ -47,7 +47,7 @@
         tool and may not necessarily resemble real life. <span class="fw-bold fst-italic">Please enter all information exactly as presented.</span>
       </div>
     </StaticElement>
-  </GroupElement>  
+  </GroupElement>    
 </template>
 
 <script>
@@ -56,9 +56,9 @@ import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 
 export default {
-  name: 'AssessmentIntro', 
+  name: 'AssessmentIntro',   
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails'])
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),    
   }, 
   async mounted() {
     console.group('AssessmentIntro mounted hook')

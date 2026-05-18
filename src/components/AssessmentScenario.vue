@@ -64,7 +64,9 @@
                     <li v-for="(pscd, index) in patientScenarios[patient.patient_code]" class="nav-item"
                       role="presentation">
                       <button class="nav-link scenario" data-bs-toggle="tab" type="button" role="tab"
-                        :class="currentScenario == pscd.scenario_code ? 'active' : ''" :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        :class="currentScenario == pscd.scenario_code ? 'active' : ''" 
+                        :id="'scenario-' + pscd.scenario_code + '-tab'"
+                        @click="currentScenario = pscd.scenario_code"
                         :data-bs-target="'#scenario-' + pscd.scenario_code">{{ 'Scenario ' + (index + 1) }}
                       </button>
                     </li>
@@ -227,7 +229,7 @@
                           </tbody>
                         </table>
                       </div>
-                      <GroupElement name="scenario-response=button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
+                      <GroupElement name="scenario-response-button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
                           :disabled="!allowCurrentScenarioSave || tooManyCategories || tooFewCategories"
                           :columns="4"
@@ -305,13 +307,7 @@ export default {
     },
     matrixCategories() {
       return this.displayCategories
-    },
-    categoryCount() {
-      return this.categories.length
-    },
-    categoryTips() {
-      return this.categories.map(c => { c.tip })
-    },
+    },        
     completedScenariosHidden() {
       console.log('Hidden element is', this.$refs.completedScenariosHidden)
       return this.$refs.completedScenariosHidden

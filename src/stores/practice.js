@@ -9,6 +9,7 @@ export const practiceStore = defineStore('practice', {
     dataReady: false,
     patients: [],               // List of patients   
     patientScenarios: {},       // Details of patient scenarios
+    scenarioPatientLink: {},    // Hash of scenarios per patient
     scenarioUserResponses: {},  // User responses to the scenarios
     numScenarios: 0,
     categories: [],
@@ -70,8 +71,16 @@ export const practiceStore = defineStore('practice', {
 
       // Ensure scenario details present for each patient
       if (ret === true && Object.keys(this.patientScenarios).length == 0) {
-        ret = await this.getPatientScenarioData(recordLoading)        
-      }
+        ret = await this.getPatientScenarioData(recordLoading)       
+        if (ret === true) {
+          // Do linkage of scenarios with patients
+          const linkTable = {}
+          for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
+            scenarios.forEach(s => { linkTable[s.scenario_code] = patientCode })      
+          }
+          this.$patch((state) => { state.scenarioPatientLink = linkTable })
+        }
+      }      
 
       if (recordLoading) {
         this.setDataReady(true)

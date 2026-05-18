@@ -1,6 +1,6 @@
 <template>
   <!-- Allergies tab -->
-  <div class="tab-pane fade mt-2 " :id="'patient-' + patient.patient_code + '-allergy'" role="tabpanel" tabindex="0">
+  <div class="tab-pane fade mt-2" :id="'patient-' + patient.patient_code + '-allergy'" role="tabpanel" tabindex="0">
     <div v-if="!dataLoaded" class="d-flex justify-content-center">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading Allergies...</span>

@@ -62,11 +62,13 @@
     </div>
     <AppLogo cls="bottomright" />
     <ErrorAlertModal ref="errorAlertModal" />
+    <PracticeModal ref="practiceModal" />
   </main>
 </template>
 
 <script>
 
+import Cookies from 'js-cookie'
 import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { assessmentStore } from '../stores/assessment'
@@ -81,6 +83,7 @@ import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
 import AppFooter from './AppFooter'
 import AppLogo from './AppLogo'
+import PracticeModal from './modals/PracticeModal'
 import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
@@ -109,6 +112,9 @@ export default {
     errorAlertModal() {
       return this.$refs.errorAlertModal
     },
+    practiceModal() {
+      return this.$refs.practiceModal
+    },
     formSteps() {
       return this.$refs.assessmentSteps
     },
@@ -128,6 +134,7 @@ export default {
     LoginInfo,
     AppFooter,
     AppLogo,
+    PracticeModal,
     ErrorAlertModal
   },
   data() {
@@ -271,6 +278,16 @@ export default {
       warnAt: this.sessionInactivityWarningAt,
     })
     this.setSessionTimer(this.sessionTimeout)
+
+    await this.$nextTick(() => {
+      // Show practice modal if required
+      const hidePracticeModal = Cookies.get('hidePracticeModal')
+      console.debug('Hide practice modal', hidePracticeModal)
+      if (hidePracticeModal != 'yes') {
+        console.debug('Showing practice modal')
+        this.practiceModal.show()
+      }
+    }) 
 
     console.groupEnd()
   },

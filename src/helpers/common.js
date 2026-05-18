@@ -10,6 +10,13 @@ export const patientDataTabValues = {
   'clinical_data': 'Clinical Data'
 }
 
+// Tab name/title values for practice mode
+export const practiceTabValues = {
+  'intro': 'Introduction',
+  'patients': 'Patient entry',
+  'scenarios': 'Scenarios'
+}
+
 // Response text for the different mitigation codes
 // NOTE: this undesirably hard-codes the mitigation codes in order to associate them with labels - perhaps label text better stored in the database?
 export const systemMitigationResponses = [
