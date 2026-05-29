@@ -14,7 +14,8 @@ export const patientDataTabValues = {
 export const practiceTabValues = {
   'intro': 'Introduction',
   'patients': 'Patient entry',
-  'scenarios': 'Scenarios'
+  'scenarios': 'Scenarios',
+  'report': 'Reporting'
 }
 
 // Response text for the different mitigation codes

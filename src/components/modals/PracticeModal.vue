@@ -1,9 +1,9 @@
 <template>
-  <GenericModal :modalName="'PracticeModal'" :modalId="'practiceModal'" :title="'Practice answering scenario questions?'"
+  <GenericModal :modalName="'PracticeModal'" :modalId="'practiceModal'" :title="'Practise answering scenario questions?'"
     :showActionBtn="true" :actionBtnText="'Yes please'" :closeBtnText="'No thanks'" @modalClosed="showInFuture" @modalActioned="doPractice">
     <div>
-      For those new with ePRaSE, there is a guided opportunity to get familiar with the way the scenario questions work,
-      and to understand more about how your responses are evaluated by the ePRaSE tool.  
+      For those new to ePRaSE, there is now a guided opportunity to familiarise yourself with the way scenario questions work,
+      and to understand more about how responses are evaluated by the ePRaSE tool.  Would you like to try the practice mode?
       <div class="form-check mt-2">
         <input ref="cbDontShowAgain" class="form-check-input" type="checkbox" value="" :id="'practiceModal-dont-show-again'">
         <label class="form-check-label" :for="'practiceModal-dont-show-again'">Don't show this again</label>
