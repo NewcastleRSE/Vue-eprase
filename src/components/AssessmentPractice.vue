@@ -64,6 +64,7 @@
       </div>    
     </div>
     <AppLogo cls="bottomright" />
+    <ErrorAlertModal ref="errorAlertModal" />
   </main>  
 </template>
 
@@ -87,7 +88,10 @@ export default {
     ...mapState(appSettingsStore, ['year']),
     practiceTabs() {
       return practiceTabValues
-    }
+    },
+    errorAlertModal() {
+      return this.$refs.errorAlertModal
+    },
   }, 
   components: {
     LoginInfo,
@@ -105,9 +109,10 @@ export default {
     } 
   },
   methods: {
-    selectTab(name) {
+    async selectTab(name) {
       const triggerEl = document.querySelector(`#practice-stage-tabs button[data-bs-target="#practice-tab-${name}"]`)      
       Tab.getInstance(triggerEl).show()
+      await this.audit('practice', '/practice', name)
     },
     doAssessment() {
       this.$router.push('/assessment')
@@ -119,7 +124,23 @@ export default {
     triggerTabList.forEach(triggerEl => {
       const tabTrigger = new Tab(triggerEl)      
     })
+    await this.audit('practice', '/practice', 'intro')
     console.groupEnd()
+  },
+  errorCaptured(...args) {
+
+    console.group('errorCaptured()')
+    console.debug(args)
+
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+    const activeElement = document.activeElement
+    if (activeElement) {
+      activeElement.blur()
+    }
+    this.errorAlertModal.show(args[0].message)
+    console.groupEnd()
+
+    return false
   }
 }
 </script>
