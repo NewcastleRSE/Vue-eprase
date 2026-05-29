@@ -54,6 +54,19 @@
           :rules="['required', 'fieldIsOther:system.specialisation,specific']"
           :debounce="200" /> -->
         <!-- End of change for https://github.com/NewcastleRSE/Vue-eprase/issues/389 -->
+
+        <!-- Added 29/05/2026 David - https://github.com/NewcastleRSE/Vue-eprase/issues/383 -->
+        <!-- NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
+        <RadiogroupElement name="usingLiveEpSystem"
+          :label="embolden('Tell us where you are building the tests patients and completing this assessment', true)"
+          :items="[
+            { value: 'yes', label: 'In the live EP System' },
+            { value: 'no', label: 'In a test environment that closely mimics the live EP system' }
+          ]" 
+          :rules="['required']"
+          :messages="{required: 'ePrescribing environment is required'}"
+        />-->
+
         <!-- Values changed 29/05/2026 according to https://github.com/NewcastleRSE/Vue-eprase/issues/385 --> 
         <SelectElement name="epUsage"
           :label="embolden('Across what proportion of settings and services in your organisation are medications electronically prescribed?', true)"

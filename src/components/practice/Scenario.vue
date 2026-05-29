@@ -127,7 +127,8 @@
                           Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
                           Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
                           -->
-                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
+
+                          <!-- <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
                             <div class="alert alert-warning mt-2" role="alert">
                               If the system were to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
                               <ul class="list-group mt-4">
@@ -145,7 +146,7 @@
                               <thead>
                                 <tr><th v-html="embolden('Category', true)"></th><th>Alert</th><th>Advisory</th><th></th></tr>
                               </thead>
-                              <tbody>
+                              <tbody>                                
                                 <tr v-for="(mc, mcIdx) in matrixCategories">
                                   <td>{{  mc.label }}</td>
                                   <td><CheckboxElement :name="'alert' + mc.value" @change="recordDsCategorySelection" /></td>
@@ -165,12 +166,26 @@
                                 </tr>
                               </tbody>
                             </table>                            
+                          </div> -->
+
+                          <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
+                            <div class="alert alert-warning mt-2" role="alert">
+                              If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:                              
+                            </div>
+                            <TagsElement name="dsCategory"
+                              placeholder="Select at most two categories"
+                              :items="matrixCategories"
+                              @mounted="initCategoryTooltips"
+                              @change="updateCategoryTooltips"
+                            />
                           </div>
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->                          
                           <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                             :attrs="{ maxlength: 500 }" 
                             :label="embolden('Additional comments', false)" 
                           />
-                          <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
+                          <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-4" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
@@ -245,6 +260,7 @@
 <script>
 
 import { mapState } from 'pinia'
+import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
 import { practiceStore } from '../../stores/practice'
 import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
 
@@ -287,6 +303,7 @@ export default {
   data() {
     return {
       displayCategories: [],
+      categoryTooltips: {},
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
@@ -320,6 +337,18 @@ export default {
         }
       }                  
       return description
+    },
+    initCategoryTooltips(tagsEl) {
+      const containerDiv = document.getElementById(tagsEl.fieldId)
+      containerDiv.querySelectorAll('li').forEach(optEl => {
+        const catCode = optEl.id.match(/(CAT\d+)/)
+        optEl.setAttribute('data-bs-toggle', 'tooltip')
+        optEl.setAttribute('data-bs-title', this.categoryTooltips[catCode[1]])
+      })
+    },
+    updateCategoryTooltips(newVal, oldVal, tagsEl) {
+      console.debug(newVal, oldVal, tagsEl)
+      //TODO
     },
     async saveScenarioResponse(patient, scenario) {
       
@@ -458,10 +487,7 @@ export default {
       })  
       
       console.groupEnd()
-    },
-    patientScenarioIndex(patientCode, scenarioCode) {
-
-    },
+    },    
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode]
     },
@@ -486,6 +512,9 @@ export default {
   },
   async mounted() {
     console.group('Scenario mounted()')
+    new Tooltip(document.body, {
+      selector: '[data-bs-toggle="tooltip"]'
+    })
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
@@ -495,7 +524,9 @@ export default {
       wasError = await this.errorResponder(catResponse)
     } if (!wasError) {
       // Massage the category list for better use in Vueform components      
-      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })      
+      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })
+      this.categoryTooltips = {}
+      this.categories.forEach(c => this.categoryTooltips[c.category_code] = c.description)      
       this.$nextTick(() => { this.openNextUnenteredScenario() })
     }       
     console.groupEnd()
