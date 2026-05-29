@@ -35,19 +35,41 @@
           :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
           :debounce="200" 
           :messages="{required: 'Number of WTE is required', numeric: 'Must be a number between 0 and 20', min: 'Must be >= 0', max: 'Must be < 20' }" 
-          :rules="['required', 'numeric', 'min:0.0', 'max:20']" /> 
+          :rules="['required', 'numeric', 'min:0.0', 'max:20']" />
+        <!-- Added 29/05/2026 David - https://github.com/NewcastleRSE/Vue-eprase/issues/389 -->
+        <!-- NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
+        <RadiogroupElement name="specialisation"
+          :label="embolden('Does the ePrescribing system support prescribing across all clinical areas, or is it a bespoke / limited system (e.g., designed exclusively for use within ICU settings)? Please provide details', true)"
+          :items="[
+            { value: 'general', label: 'System is designed to support prescribing across most clinical areas' },
+            { value: 'specific', label: 'System is a bespoke or specialised EP system designed to support prescribing in a specific setting only e.g. ICU' }
+          ]" 
+          :rules="['required']"
+          :messages="{required: 'System prescribing scope is required'}"
+        />
+        <TextElement name="specialisationDescription"
+          :label="embolden('Please give details of the setting the system is used in', true)"
+          v-if="systemData.specialisation == 'specific'"
+          :messages="{required: 'Additional description is required'}" 
+          :rules="['required', 'fieldIsOther:system.specialisation,specific']"
+          :debounce="200" /> -->
+        <!-- End of change for https://github.com/NewcastleRSE/Vue-eprase/issues/389 -->
+        <!-- Values changed 29/05/2026 according to https://github.com/NewcastleRSE/Vue-eprase/issues/385 --> 
         <SelectElement name="epUsage"
-          :label="embolden('Approximately what percentage of inpatient prescription orders are prescribed through the eP system across your organisation?', true)"
+          :label="embolden('Across what proportion of settings and services in your organisation are medications electronically prescribed?', true)"
           :native="false"
           :track-by="['label', 'value']"
           :items="[
             { value: '', label: 'Select percentage...', disabled: true },
-            { value: '76-100', label: '76-100%' },
-            { value: '51-75', label: '51-75%' },
-            { value: '26-50', label: '26-50%' },
-            { value: '0-25', label: '0-25%' }
+            { value: '0', label: '0%' },
+            { value: '1-20', label: '1-20%' },
+            { value: '21-40', label: '21-40%' },
+            { value: '41-60', label: '41-60%' },
+            { value: '61-80', label: '61-80%' },
+            { value: '81-99', label: '81-99%' },
+            { value: '100', label: '100%' }
           ]"
-          :messages="{required: 'Percentage is required'}" 
+          :messages="{required: 'ePrescribing percentage is required'}" 
           :rules="['required']"
         />   
         <TextElement name="otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 

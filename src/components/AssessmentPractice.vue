@@ -81,11 +81,14 @@ import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import PracticeIntro from './practice/PracticeIntro'
 import PracticeReport from './practice/PracticeReport'
+import ErrorAlertModal from './modals/ErrorAlertModal'
+import { rootStore } from '../stores/root'
 
 export default {
   name: 'AssessmentPractice', 
   computed: {
     ...mapState(appSettingsStore, ['year']),
+    ...mapState(rootStore, ['audit']),
     practiceTabs() {
       return practiceTabValues
     },
@@ -100,7 +103,8 @@ export default {
     PracticeIntro,
     PatientBuild,
     Scenario,
-    PracticeReport
+    PracticeReport,
+    ErrorAlertModal
   },
   data() {
     return {

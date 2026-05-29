@@ -51,6 +51,10 @@ const fieldIsOther = class extends Validator {
     return this.attributes[0]
   }
 
+  get otherFieldValue() {
+    return this.attributes[1] || 'other'
+  }
+
   check(value) {
     console.debug(this.otherField, this.form$.data)
     this.watch(this.otherField)
@@ -62,7 +66,8 @@ const fieldIsOther = class extends Validator {
         otherVal = otherVal.label
       }
       const otherArr = Array.isArray(otherVal) ? otherVal : [otherVal]
-      return otherArr.includes('Other') || otherVal.includes('other')
+      const testValue = this.otherFieldValue()
+      return otherArr.includes(testValue.substring(0, 1).toUpperCase() + testValue.substring(1)) || otherVal.includes(testValue)
     }
     return true
   }
