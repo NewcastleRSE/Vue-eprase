@@ -169,15 +169,15 @@
                           </div> -->
 
                           <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
-                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
-                            <div class="alert alert-warning mt-2" role="alert">
-                              If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:                              
-                            </div>
-                            <TagsElement name="dsCategory"
-                              placeholder="Select at most two categories"
+                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-12">                            
+                            <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
+                              :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
                               :items="matrixCategories"
+                              :break-tags="true"
+                              :rules="['required']"                              
+                              :messages="{'required': 'Please enter categories, maximum of two'}"
                               @mounted="initCategoryTooltips"
-                              @change="updateCategoryTooltips"
+                              @change="updateCategorySelector"
                             />
                           </div>
                           <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->                          
@@ -204,21 +204,10 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
+                            <tr>
                               <th>Category/intervention type</th>
-                              <td>
-                                <ul class="list-group">
-                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(prompts, catDesc) in formatRecordedInterventions(pscd.scenario_code)">
-                                    {{  catDesc }}
-                                    <span class="badge text-bg-primary rounded-pill">{{ prompts }}</span>
-                                  </li>                                                         
-                                </ul>
-                              </td>
-                            </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
-                              <th>Category/intervention type</th>
-                              <td>None</td>
-                            </tr>                                                   
+                              <td>{{ scenarioResponse(pscd.scenario_code)['other_category'] || 'None' }}</td>
+                            </tr>                                                                        
                             <tr>
                               <th>Your notes</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
@@ -261,12 +250,14 @@
 
 import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
+import { appSettingsStore } from '../../stores/appSettings';
 import { practiceStore } from '../../stores/practice'
 import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
 
 export default {
   name: 'Scenario',  
   computed: {
+    ...mapState(appSettingsStore, ['maxSelectableDsCategories']),
     ...mapState(practiceStore, [
       'dataReady', 'patients', 'patientScenarios', 'scenarioPatientLink', 
       'scenarioUserResponses', 'savePatientScenarioResponse', 'numScenarios', 
@@ -294,10 +285,10 @@ export default {
       return this.displayCategories
     },
     tooManyCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && this.dsCategoriesSelected.length > this.maxSelectableDsCategories
     },
     tooFewCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length == 0
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && this.dsCategoriesSelected.length == 0
     }
   },
   data() {
@@ -312,7 +303,7 @@ export default {
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
       savedResponseData: true,
-      dsCategoriesSelected: {}, // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
+      dsCategoriesSelected: [], // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
       allScenariosCompleted: false
     }
   },
@@ -338,17 +329,46 @@ export default {
       }                  
       return description
     },
-    initCategoryTooltips(tagsEl) {
+    initCategoryTooltips(tagsEl, firstTime = true) {
       const containerDiv = document.getElementById(tagsEl.fieldId)
-      containerDiv.querySelectorAll('li').forEach(optEl => {
-        const catCode = optEl.id.match(/(CAT\d+)/)
-        optEl.setAttribute('data-bs-toggle', 'tooltip')
-        optEl.setAttribute('data-bs-title', this.categoryTooltips[catCode[1]])
-      })
+      this.$nextTick(() => { 
+        // Rejig tooltips on remaining entries in multiselect list
+        containerDiv.querySelectorAll('li').forEach(optEl => {
+          const catCode = optEl.id.match(/(CAT\d+)/)
+          const catTip = this.categoryTooltips[catCode[1]]
+          console.debug('Setting', catCode, 'tip to', catTip)
+          if (firstTime) {
+            optEl.setAttribute('data-bs-toggle', 'tooltip')
+            optEl.setAttribute('data-bs-title', catTip)
+          } else {
+            const tooltip = Tooltip.getOrCreateInstance(optEl)
+            tooltip.setContent({ '.tooltip-inner': catTip })
+          }                           
+        })
+        // Add tooltips to selected entries
+        containerDiv.querySelectorAll('span.vf-multiselect-tag-wrapper').forEach(selTag => {
+          // The content of the tag wrapper is the category label
+          const catLabel = selTag.innerText
+          const catArr = this.displayCategories.filter(c => c.label == catLabel)
+          console.debug(selTag, catArr)
+          if (catArr.length > 0) {
+            selTag.setAttribute('data-bs-toggle', 'tooltip')
+            selTag.setAttribute('data-bs-title', this.categoryTooltips[catArr[0].value])      
+          }
+        })
+      })       
     },
-    updateCategoryTooltips(newVal, oldVal, tagsEl) {
+    updateCategorySelector(newVal, oldVal, tagsEl) {
+
+      console.group()
       console.debug(newVal, oldVal, tagsEl)
-      //TODO
+
+      // Update the tooltips on list entries and selected tags
+      this.initCategoryTooltips(tagsEl, false)
+
+      this.dsCategoriesSelected = tagsEl.value
+
+      console.groupEnd()
     },
     async saveScenarioResponse(patient, scenario) {
       
@@ -359,13 +379,13 @@ export default {
      
       // Validate the number of categories chosen in a system/user intervention scenario <= 2
       const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      if (formPayload.interventionType == 'MT1' && this.tooManyCategories) {
-        // Output error, do not save the data and remain here for correction
-        console.debug('Too many categories selected', this.tooManyCategories)
-      } else if (formPayload.interventionType == 'MT1' && this.tooFewCategories) {
-        // Output error, do not save the data and remain here for correction
-        console.debug('Too few categories selected', this.tooFewCategories) 
-      } else if ( !( scenario.scenario_code in this.storedResponsesByCode ) ) {
+      //TODO - sort this out.
+      if (formPayload.interventionType == 'MT1') {
+        console.debug(this.$refs['dsCategory'])
+        await this.$refs['dsCategory'][0].validate()
+        console.debug('Validated', validated)
+      }
+      if ( validated && !( scenario.scenario_code in this.storedResponsesByCode ) ) {
         // All good to go
         this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code])
         this.storedResponsesByCode[scenario.scenario_code] = this.scenarioUserResponses[scenario.scenario_code]        
@@ -382,42 +402,43 @@ export default {
     hasInterventionSelections(patientCode, scenarioCode) {
       return this.interventionSelections[patientCode + '.' + scenarioCode + '.interventionType'] === true
     },
-    recordDsCategorySelection(newVal, oldVal, el$) {
-      console.debug('recordDsCategorySelection() called with', newVal, oldVal, el$)
-      const chkName = el$.name
-      const catCodePos = chkName.indexOf('CAT')
-      const intType = chkName.substring(0, catCodePos)
-      const catCode = chkName.substring(catCodePos)
-      if (newVal === true) {
-        if (!( catCode in this.dsCategoriesSelected)) {
-          this.dsCategoriesSelected[catCode] = []
-        } 
-        this.dsCategoriesSelected[catCode].push(intType)
-      } else {
-        const typePos = this.dsCategoriesSelected[catCode].indexOf(intType)
-        this.dsCategoriesSelected[catCode].splice(typePos, 1)
-        if (this.dsCategoriesSelected[catCode].length == 0) {
-          delete this.dsCategoriesSelected[catCode]
-        }
-      }      
-      console.debug('Selection record', this.dsCategoriesSelected)
-    },
-    formatRecordedInterventions(scenarioCode) {
-      let intObj = {}
-      const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
-      if (interventions != null && interventions.length > 0) {
-        // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
-        interventions.split('|').forEach(intn => {
-          const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
-          const prompts = intn.split(':').pop().split(',')
-          intObj[catDesc] = prompts.join(' + ')
-        })
-      }
-      return intObj
-    },
+    // recordDsCategorySelection(newVal, oldVal, el$) {
+    //   console.debug('recordDsCategorySelection() called with', newVal, oldVal, el$)
+    //   const chkName = el$.name
+    //   const catCodePos = chkName.indexOf('CAT')
+    //   const intType = chkName.substring(0, catCodePos)
+    //   const catCode = chkName.substring(catCodePos)
+    //   if (newVal === true) {
+    //     if (!( catCode in this.dsCategoriesSelected)) {
+    //       this.dsCategoriesSelected[catCode] = []
+    //     } 
+    //     this.dsCategoriesSelected[catCode].push(intType)
+    //   } else {
+    //     const typePos = this.dsCategoriesSelected[catCode].indexOf(intType)
+    //     this.dsCategoriesSelected[catCode].splice(typePos, 1)
+    //     if (this.dsCategoriesSelected[catCode].length == 0) {
+    //       delete this.dsCategoriesSelected[catCode]
+    //     }
+    //   }      
+    //   console.debug('Selection record', this.dsCategoriesSelected)
+    // },
+    // formatRecordedInterventions(scenarioCode) {
+    //   let intObj = {}
+    //   const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
+    //   if (interventions != null && interventions.length > 0) {
+    //     // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
+    //     interventions.split('|').forEach(intn => {
+    //       const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
+    //       const prompts = intn.split(':').pop().split(',')
+    //       intObj[catDesc] = prompts.join(' + ')
+    //     })
+    //   }
+    //   return intObj
+    // },
     showUniqueScenario() {
       // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
       // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
+      // Probably not needed in this context, but left in just in case - David 01/06/2026
       console.group('showUniqueScenario() - HACK')
       const scenarioTabs = document.getElementById('scenario-patient-' + this.currentPatient + '-scenario-tabs')
       if (scenarioTabs) {
@@ -473,6 +494,7 @@ export default {
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
+    // Note needed if practice session limited to one patient, but left here in case...
     async openPatientScenarios(patientCode) {
 
       console.group('openPatientScenarios()')

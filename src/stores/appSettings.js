@@ -15,7 +15,8 @@ export const appSettingsStore = defineStore('appSettings', {
       sessionInactivityWarningAt: 119 * 60 * 1000,  // Warn the user of session expiry after this number of milliseconds 
       passwordMinLength: 6,
       passwordMaxLength: 50,
-      assessmentNumPatients: 15 
+      assessmentNumPatients: 15,
+      maxSelectableDsCategories: 2                  // How many selectable categories for scenario with user intervention 
     }
   }
 })

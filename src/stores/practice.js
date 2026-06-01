@@ -3,6 +3,7 @@ import { sampleSize } from 'lodash'
 import { MITIGATION_MATRIX } from '../helpers/common'
 import { assessmentStore } from './assessment'
 import { rootStore } from './root'
+import { appSettingsStore } from './appSettings'
 
 export const practiceStore = defineStore('practice', {
   state: () => ({
@@ -205,43 +206,16 @@ export const practiceStore = defineStore('practice', {
       console.group('savePatientScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form data', formData)
 
-      // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
+      // Form data will be of form { interventionType: MT<code>, dsCategory: [<catcode1>,<catcode2>...], qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
       // Massage it into db form:
-      // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
+      // { intervention_type: MT<code>, result: <calculated>, other_category: '<category_code1>,<category_code2>...', qualitative_data: <text> }
       const dataOut = {
         intervention_type: formData.interventionType,
         result: '',
-        other_category: '',
+        other_category: Array.isArray(formData.dsCategory) ? formData.dsCategory.join(',') : '',
         qualitative_data: formData.qualitativeData
       }
-
-      if (formData.interventionType == 'MT1') {
-        // System intervention, so look at alerts and advisories
-        console.debug('System or user intervention - process alerts and advisories')
-        const interventionsByCategoryCode = {}
-        for (const [formKey, formValue] of Object.entries(formData)) {
-          if (formValue === true && formKey != 'haveDiscontinuedPrescription') {            
-            let isAlert = formKey.startsWith('alert')
-            let catCode = formKey.replace(isAlert ? 'alert' : 'advisory', '')
-            if (!( catCode in interventionsByCategoryCode )) {
-              interventionsByCategoryCode[catCode] = []
-            }
-            interventionsByCategoryCode[catCode].push(isAlert ? 'alert' : 'advisory')
-          }          
-        }
-        // Only two categories are allowed - any further ticked ones are ignored completely...
-        const recordedCategories = Object.keys(interventionsByCategoryCode)
-        console.assert(recordedCategories.length > 0, 'Should have at least 1 category alert / advisory boxes ticked')
-        let prompts = []
-        for (let i = 0; i < Math.min(recordedCategories.length, 2); i++) {
-          prompts.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
-        }          
-        dataOut['other_category'] = prompts.join('|') 
-        // Scream about this before Postgres does... 
-        console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!') 
-        console.debug('Alert / advisory record by category', interventionsByCategoryCode)       
-      }
-
+      
       // Next, calculate mitigation (field 'result')
       const expectedResponse = scenario.mitigations.mitigation_code
       dataOut['result'] = MITIGATION_MATRIX[formData.interventionType][expectedResponse]
