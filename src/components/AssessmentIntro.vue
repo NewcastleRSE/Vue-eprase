@@ -8,7 +8,7 @@
         The following annual assessment evaluates ePrescribing system performance against a range of indicators.
         You will be asked to admit a series of test patients to your hospital's admissions system, and then 
         prescribe a series of medications to those patients. You will then be asked to record any feedback about 
-        how your EP system responds to the prescription, for example, you were able to complete the prescription 
+        how your ePrescribing system responds to the prescription, for example, you were able to complete the prescription 
         without any additional user or system input or you were able to complete the prescription with system/user 
         intervention.
       </p>

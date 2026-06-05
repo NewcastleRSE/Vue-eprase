@@ -42,7 +42,7 @@
           :label="embolden('Does the ePrescribing system support prescribing across all clinical areas, or is it a bespoke / limited system (e.g., designed exclusively for use within ICU settings)? Please provide details', true)"
           :items="[
             { value: 'general', label: 'System is designed to support prescribing across most clinical areas' },
-            { value: 'specific', label: 'System is a bespoke or specialised EP system designed to support prescribing in a specific setting only e.g. ICU' }
+            { value: 'specific', label: 'System is a bespoke or specialised ePrescribing system designed to support prescribing in a specific setting only e.g. ICU' }
           ]" 
           :rules="['required']"
           :messages="{required: 'System prescribing scope is required'}"
@@ -60,8 +60,8 @@
         <RadiogroupElement name="usingLiveEpSystem"
           :label="embolden('Tell us where you are building the tests patients and completing this assessment', true)"
           :items="[
-            { value: 'yes', label: 'In the live EP System' },
-            { value: 'no', label: 'In a test environment that closely mimics the live EP system' }
+            { value: 'yes', label: 'In the live ePrescribing system' },
+            { value: 'no', label: 'In a test environment that closely mimics the live ePrescribing system' }
           ]" 
           :rules="['required']"
           :messages="{required: 'ePrescribing environment is required'}"

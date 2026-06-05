@@ -21,11 +21,11 @@ export const practiceTabValues = {
 // Response text for the different mitigation codes
 // NOTE: this undesirably hard-codes the mitigation codes in order to associate them with labels - perhaps label text better stored in the database?
 export const systemMitigationResponses = [
-  { value: 'MT2', label: 'You were able to complete the prescription (includes followed order sentence) <span class="fw-bold">without any additional user or system input</span>' },
-  { value: 'MT4', label: 'You were able to complete the prescription, <span class="fw-bold">but had to override components of the order sentence</span>' },
-  { value: 'MT1', label: 'You were able to complete the prescription, <span class="fw-bold">with system/user intervention</span>' },
-  { value: 'MT3', label: 'Prevented from prescribing' },
-  { value: 'MT99', label: 'Medicine or formulary alternative not available in the system' },
+  { value: 'MT2', label: 'Prescribing completed with <span class="fw-bold">no</span> system/user intervention' },
+  { value: 'MT4', label: 'Prescribing completed but had to overide components of the order sentence' },
+  { value: 'MT1', label: 'Prescribing completed <span class="fw-bold">with</span> system/user intervention' },
+  { value: 'MT3', label: 'Prescribing prevented' },
+  { value: 'MT99', label: 'Unable to perform test' },
 ]
 
 // Tooltips explaining the possible system responses
@@ -33,7 +33,7 @@ export const systemResponseTooltips = [
   'You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system',
   'You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it',
   'You prescribed the medicine and received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, monitoring, contraindication or something else, which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, to mitigate risk without outright prevention.',
-  'These are prescribing actions that should never occur, where it is clear cut with no additional prescriber decision point. The EP system blocks completion of the prescriptions entirely.',
+  'These are prescribing actions that should never occur, where it is clear cut with no additional prescriber decision point. The ePrescribing system blocks completion of the prescriptions entirely.',
   'Where the medicine presented in the test is not available in your system, the question will be passed over. This will be classed as an invalid test. It will not affect the overall mitigation results, which are calculated on the valid tests taken.'
 ]
 

@@ -369,7 +369,7 @@ export const assessmentStore = defineStore('assessment', {
         if (exAssessmentResponse !== true) {
           ret = exAssessmentResponse
         } else if (this.exactAssessmentPresent(orgCode, epSystem, patientType)) {
-          // An assessment already in progress for current trust / eP system / patient type - may have been saved while current user logged in
+          // An assessment already in progress for current trust / ePrescribing system / patient type - may have been saved while current user logged in
           ret = {status: 403, message: 'An existing assessment for this ePrescribing system and patient type is already in progress in your trust'}
           this.setDuplicateAssessment(true)
         } else {

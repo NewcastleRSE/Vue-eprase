@@ -20,7 +20,7 @@
         <p>
           It is now possible to test more than one type of ePrescribing System deployed 
           in your trust. Users can also do both an adult and a separate paediatric assessment 
-          for an individual EP system. If both adult and paediatric prescribing are undertaken, 
+          for an individual ePrescribing system. If both adult and paediatric prescribing are undertaken, 
           <strong>both assessments should be completed</strong>. Please work through each 
           assessment one at a time i.e., complete one assessment fully before starting the next.
         </p>
@@ -113,10 +113,10 @@
             :messages="{required: 'Name of ePrescribing system is required'}"           
             :rules="['required', $vueform.rules.nonEmptyObject]"
           />
-          <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
+          <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your ePrescribing system"
             :label="embolden('Name of ePrescribing system', true)"
             :debounce="200" 
-            :messages="{required: 'Other eP system name is required'}" 
+            :messages="{required: 'Other ePrescribing system name is required'}" 
             :rules="['required', 'fieldIsOther:selection.epService']" />
           <RadiogroupElement name="patientType"
             :label="embolden('For patient type', true)"      
@@ -128,10 +128,10 @@
           />          
           <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
             <CheckboxElement name="shareTrustsOptOut">
-              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
+              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>          
             <CheckboxElement name="shareSuppliersOptOut">
-              <span v-html="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
+              <span v-html="embolden('Good mitigation results may be shared with <i>ePrescribing system suppliers</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>   
           </GroupElement> 
         </ObjectElement>              
@@ -217,7 +217,7 @@ export default {
           accumulator[value] = ++accumulator[value] || 1
           return accumulator
         }, {})
-        // Don't offer EP system codes which already have 2 assessments         
+        // Don't offer ePrescribing system codes which already have 2 assessments         
         const validEpSystems = response.data.data.filter(ep => !Object.keys(frequencyCounts).includes(ep.documentId) || frequencyCounts[ep.documentId] < 2)       
         epSystems = validEpSystems.map(ep => { return { value: ep.documentId, label: ep.name } })
         // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)

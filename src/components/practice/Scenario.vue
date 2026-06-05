@@ -124,17 +124,16 @@
                             </div>
                           </StaticElement>
                           <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
-                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-12">                            
-                            <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
-                              :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
-                              :items="matrixCategories"
-                              :break-tags="true"
-                              :rules="['min:1', 'max:2']"                              
-                              :messages="{'min': 'Please enter at least one category', 'max': 'Please enter a maximum of two categories'}"
-                              @mounted="initCategoryTooltips"
-                              @change="updateCategorySelector"
-                            />
-                          </div>
+                          <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
+                            v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)"
+                            :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
+                            :items="matrixCategories"
+                            :break-tags="true"
+                            :rules="['min:1', 'max:2']"                              
+                            :messages="{'min': 'Please enter at least one category', 'max': 'Please enter a maximum of two categories'}"
+                            @mounted="initCategoryTooltips"
+                            @change="updateCategorySelector"
+                          />
                           <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->                          
                           <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                             :attrs="{ maxlength: 500 }" 
@@ -161,7 +160,7 @@
                             </tr>
                             <tr>
                               <th>Category/intervention type</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['other_category'] || 'None' }}</td>
+                              <td>{{ humanFriendlyCategories(scenarioResponse(pscd.scenario_code)['other_category']) }}</td>
                             </tr>                                                                        
                             <tr>
                               <th>Your notes</th>
@@ -445,6 +444,16 @@ export default {
     },
     scenarioCompleted(scenarioCode) {
       return scenarioCode in this.scenarioResponses
+    },
+    humanFriendlyCategories(categories) {
+      // Expects category codes CAT001,CAT002...
+      console.debug('Received category codes', categories)
+      if (categories) {
+        let catLabels = categories.split(',').map(c => this.displayCategories.filter(dc => c == dc.value)[0].label).join(', ')
+        return catLabels.substring(0, 1).toUpperCase() + catLabels.substring(1).toLowerCase()
+      } else {
+        return 'None'
+      }
     },
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')

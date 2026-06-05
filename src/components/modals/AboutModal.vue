@@ -30,7 +30,7 @@
         safety team undertake a regular review of all reported patient safety incidents 
         that are categorised as death or severe harm. Through this process the national 
         patient safety team were able to support the ePRaSE team to identify several 
-        prescribing errors that could be mitigated against by a trust's EP system. These 
+        prescribing errors that could be mitigated against by a trust's ePrescribing system. These 
         included errors that are currently categorised as Never Events by NHS England.</p>
 
       <p>The technical development of the tool is led by Rebecca Osselton, Senior Research 
