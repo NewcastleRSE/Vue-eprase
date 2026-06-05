@@ -123,59 +123,14 @@
                               <div class="spinner-border ms-auto" aria-hidden="true"></div>
                             </div>
                           </StaticElement>
-                          <!-- 
-                          Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
-                          Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
-                          -->
-
-                          <!-- <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
-                            <div class="alert alert-warning mt-2" role="alert">
-                              If the system were to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
-                              <ul class="list-group mt-4">
-                                <li class="list-group-item">
-                                  <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action e.g. pop-up boxes or requiring password entry
-                                </li>
-                                <li class="list-group-item">
-                                  <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. a passive dialogue, maybe a banner message on the bottom of the screen
-                                </li>
-                              </ul>
-                              <br/>
-                              <p>Please select <strong>up to two</strong> clinical decision support categories from the list below:</p>
-                            </div>
-                            <table class="table table-striped vf-col-6">
-                              <thead>
-                                <tr><th v-html="embolden('Category', true)"></th><th>Alert</th><th>Advisory</th><th></th></tr>
-                              </thead>
-                              <tbody>                                
-                                <tr v-for="(mc, mcIdx) in matrixCategories">
-                                  <td>{{  mc.label }}</td>
-                                  <td><CheckboxElement :name="'alert' + mc.value" @change="recordDsCategorySelection" /></td>
-                                  <td><CheckboxElement :name="'advisory' + mc.value" @change="recordDsCategorySelection" /></td>
-                                  <td>
-                                    <span v-show="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
-                                      :data-bs-title="mc.tip.replace('Tip: ', '')">
-                                      <i class="bi bi-info-circle-fill"></i>
-                                    </span>
-                                  </td>
-                                </tr>
-                                <tr v-if="tooManyCategories == true">
-                                  <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
-                                </tr>
-                                <tr v-if="tooFewCategories == true">
-                                  <td colspan="4"><span class="text-danger">Please select at least one category</span></td>
-                                </tr>
-                              </tbody>
-                            </table>                            
-                          </div> -->
-
                           <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
                           <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-12">                            
                             <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
                               :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
                               :items="matrixCategories"
                               :break-tags="true"
-                              :rules="['required']"                              
-                              :messages="{'required': 'Please enter categories, maximum of two'}"
+                              :rules="['min:1', 'max:2']"                              
+                              :messages="{'min': 'Please enter at least one category', 'max': 'Please enter a maximum of two categories'}"
                               @mounted="initCategoryTooltips"
                               @change="updateCategorySelector"
                             />
@@ -350,7 +305,6 @@ export default {
           // The content of the tag wrapper is the category label
           const catLabel = selTag.innerText
           const catArr = this.displayCategories.filter(c => c.label == catLabel)
-          console.debug(selTag, catArr)
           if (catArr.length > 0) {
             selTag.setAttribute('data-bs-toggle', 'tooltip')
             selTag.setAttribute('data-bs-title', this.categoryTooltips[catArr[0].value])      
@@ -361,7 +315,7 @@ export default {
     updateCategorySelector(newVal, oldVal, tagsEl) {
 
       console.group()
-      console.debug(newVal, oldVal, tagsEl)
+      console.debug('Category selector updated', newVal, oldVal, tagsEl)
 
       // Update the tooltips on list entries and selected tags
       this.initCategoryTooltips(tagsEl, false)
@@ -370,22 +324,8 @@ export default {
 
       console.groupEnd()
     },
-    async saveScenarioResponse(patient, scenario) {
-      
-      console.group('saveScenarioResponse()')
-      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
-
-      this.savedResponseData = false
-     
-      // Validate the number of categories chosen in a system/user intervention scenario <= 2
-      const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      //TODO - sort this out.
-      if (formPayload.interventionType == 'MT1') {
-        console.debug(this.$refs['dsCategory'])
-        await this.$refs['dsCategory'][0].validate()
-        console.debug('Validated', validated)
-      }
-      if ( validated && !( scenario.scenario_code in this.storedResponsesByCode ) ) {
+    storeResponse(patient, scenario) {
+      if (!( scenario.scenario_code in this.storedResponsesByCode )) {
         // All good to go
         this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code])
         this.storedResponsesByCode[scenario.scenario_code] = this.scenarioUserResponses[scenario.scenario_code]        
@@ -396,45 +336,34 @@ export default {
             this.$emit('allScenariosCompleted')
           }
         }, 200)
-      }                  
+      }   
+    },
+    async saveScenarioResponse(patient, scenario) {
+      
+      console.group('saveScenarioResponse()')
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
+
+      this.savedResponseData = false
+     
+      // Validate the number of categories chosen in a system/user intervention scenario <= 2
+      const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
+      if (formPayload.interventionType == 'MT1') {
+        const dsCategoryTags = this.$refs['dsCategory'][0]
+        console.debug(dsCategoryTags)
+        dsCategoryTags.validate().then(async () => {
+          if (!dsCategoryTags.hasErrors) {
+            this.storeResponse(patient, scenario)
+          }
+        })
+      } else {
+        this.storeResponse(patient, scenario)
+      }
+                     
       console.groupEnd()
     },
     hasInterventionSelections(patientCode, scenarioCode) {
       return this.interventionSelections[patientCode + '.' + scenarioCode + '.interventionType'] === true
-    },
-    // recordDsCategorySelection(newVal, oldVal, el$) {
-    //   console.debug('recordDsCategorySelection() called with', newVal, oldVal, el$)
-    //   const chkName = el$.name
-    //   const catCodePos = chkName.indexOf('CAT')
-    //   const intType = chkName.substring(0, catCodePos)
-    //   const catCode = chkName.substring(catCodePos)
-    //   if (newVal === true) {
-    //     if (!( catCode in this.dsCategoriesSelected)) {
-    //       this.dsCategoriesSelected[catCode] = []
-    //     } 
-    //     this.dsCategoriesSelected[catCode].push(intType)
-    //   } else {
-    //     const typePos = this.dsCategoriesSelected[catCode].indexOf(intType)
-    //     this.dsCategoriesSelected[catCode].splice(typePos, 1)
-    //     if (this.dsCategoriesSelected[catCode].length == 0) {
-    //       delete this.dsCategoriesSelected[catCode]
-    //     }
-    //   }      
-    //   console.debug('Selection record', this.dsCategoriesSelected)
-    // },
-    // formatRecordedInterventions(scenarioCode) {
-    //   let intObj = {}
-    //   const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
-    //   if (interventions != null && interventions.length > 0) {
-    //     // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
-    //     interventions.split('|').forEach(intn => {
-    //       const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
-    //       const prompts = intn.split(':').pop().split(',')
-    //       intObj[catDesc] = prompts.join(' + ')
-    //     })
-    //   }
-    //   return intObj
-    // },
+    },    
     showUniqueScenario() {
       // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
       // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
@@ -464,9 +393,10 @@ export default {
 
       this.dsCategoriesSelected = {}
       const doneScenarios = Object.keys(this.scenarioResponses)
-      console.debug('Done scenarios', doneScenarios, 'responses', this.scenarioResponses)
+      console.debug('Done', doneScenarios.length, 'of', this.scenarioCount, 'scenarios')
       if (doneScenarios.length < this.scenarioCount) {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
+        console.debug('Still scenarios to complete')
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         await this.$nextTick(() => { 

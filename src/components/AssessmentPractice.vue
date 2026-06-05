@@ -29,7 +29,7 @@
               </StaticElement>
             </div>
             <div class="tab-pane fade mt-2" :id="'practice-tab-patients'" role="tabpanel" tabindex="0">
-              <PatientBuild :noPatients="1" @all-patients-entered="completedPatientEntry = true" />
+              <PatientBuild v-if="currentTab == 'patients' ":noPatients="1" @all-patients-entered="completedPatientEntry = true" />
               <StaticElement name="patientListEntryComplete">
                 <div v-show="completedPatientEntry" class="alert alert-info" role="alert">
                   You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios.
@@ -41,7 +41,7 @@
               </StaticElement>
             </div>
             <div class="tab-pane fade mt-2" :id="'practice-tab-scenarios'" role="tabpanel" tabindex="0">
-              <Scenario @all-scenarios-completed="completedScenarios = true" />
+              <Scenario v-if="currentTab == 'scenarios'" @all-scenarios-completed="completedScenarios = true" />
               <StaticElement name="scenarioEntryDone">
                 <div v-show="completedScenarios" class="alert alert-info" role="alert">You have now completed all the scenarios.</div>
                 <GroupElement name="patientbuttonBar" :columns="6" :add-class="'mt-4'">
@@ -51,7 +51,7 @@
               </StaticElement>    
             </div>
             <div class="tab-pane fade mt-2" :id="'practice-tab-report'" role="tabpanel" tabindex="0">
-              <PracticeReport />
+              <PracticeReport v-if="currentTab == 'report'" />
               <StaticElement name="practiceReport">
                 <ButtonElement :disabled="!completedScenarios" name="continueToAssessment" :columns="4" @click="doAssessment">Do Assessment for real</ButtonElement>
               </StaticElement>    
@@ -108,6 +108,7 @@ export default {
   },
   data() {
     return {
+      currentTab: 'intro',
       completedPatientEntry: false,
       completedScenarios: false
     } 
@@ -116,6 +117,7 @@ export default {
     async selectTab(name) {
       const triggerEl = document.querySelector(`#practice-stage-tabs button[data-bs-target="#practice-tab-${name}"]`)      
       Tab.getInstance(triggerEl).show()
+      this.currentTab = name
       await this.audit('practice', '/practice', name)
     },
     doAssessment() {
@@ -123,7 +125,7 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentPractice mounted hook')
+    console.group('AssessmentPractice mounted hook')    
     const triggerTabList = document.querySelectorAll('#practice-stage-tabs button')
     triggerTabList.forEach(triggerEl => {
       const tabTrigger = new Tab(triggerEl)      

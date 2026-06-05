@@ -54,15 +54,18 @@
 
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
+import { practiceStore } from '../stores/practice';
 
 export default {
   name: 'AssessmentIntro',   
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),    
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']), 
+    ...mapState(practiceStore, ['resetPracticeData'])   
   }, 
   async mounted() {
     console.group('AssessmentIntro mounted hook')
     this.reset()
+    this.resetPracticeData()
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()

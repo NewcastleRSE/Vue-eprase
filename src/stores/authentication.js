@@ -105,7 +105,7 @@ export const authenticationStore = defineStore('authentication', {
       }
       this.$reset()
       assessmentStore().reset()
-      practiceStore().reset()
+      practiceStore().resetPracticeData()
       localStorage.clear()
       Cookies.remove('authentication')         
     },

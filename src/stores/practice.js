@@ -23,8 +23,8 @@ export const practiceStore = defineStore('practice', {
     setDataReady(readyStatus) {
       this.$patch((state) => { state.dataReady = readyStatus })
     },
-    reset() {
-      console.group('reset() on practice store')
+    resetPracticeData() {
+      console.group('resetPracticeData() on practice store')
       this.$patch((state) => {
         state.patients = []
         state.patientScenarios = {}
