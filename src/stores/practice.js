@@ -28,9 +28,12 @@ export const practiceStore = defineStore('practice', {
       this.$patch((state) => {
         state.patients = []
         state.patientScenarios = {}
-        state.scenarioResponses = {}
+        state.scenarioPatientLink = {}
+        state.scenarioUserResponses = {}
         state.numScenarios = 0
         state.dataReady = true
+        state.categories = []
+        state.mitigations = []
       })
       console.debug(this.assessmentData)
       console.groupEnd()

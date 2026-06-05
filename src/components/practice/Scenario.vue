@@ -125,7 +125,7 @@
                           </StaticElement>
                           <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
                           <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
-                            v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)"
+                            v-if="dataLoaded && prescribingHasIntervention"
                             :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
                             :items="matrixCategories"
                             :break-tags="true"
@@ -134,14 +134,37 @@
                             @mounted="initCategoryTooltips"
                             @change="updateCategorySelector"
                           />
-                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->                          
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                          <!-- Extra dropdown for identifying different cases where prescribing was not possible - https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->
+                          <SelectElement name="reasonImpossible"
+                            v-if="dataLoaded && prescribingImpossible"
+                            :label="embolden('Please enter the reason prescribing was not possible', true)"
+                            :native="false"
+                            :track-by="['label', 'value']"
+                            :items="[
+                              { value: '', label: 'Please select...', disabled: true },
+                              { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
+                              { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
+                              { value: 'other', label: 'Other - please specify' }
+                            ]"
+                            :messages="{required: 'Reason is required if prescribing was not possible'}" 
+                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.interventionType,MT99`]" 
+                          />
+                           <TextElement name="otherReasonImpossible" placeholder="Please give details"
+                            v-if="dataLoaded && prescribingImpossible && reasonImpossible == 'other'"
+                            :label="embolden('Describe why prescribing was not possible', true)" 
+                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.reasonImpossible,other`]"
+                            :messages="{required: 'Additional description is required'}" 
+                            :debounce="200" 
+                          />
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->                     
                           <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                             :attrs="{ maxlength: 500 }" 
                             :label="embolden('Additional comments', false)" 
                           />
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-4" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
-                            <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
+                            <CheckboxElement name="haveDiscontinuedPrescription"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
                               I have done this
@@ -238,11 +261,23 @@ export default {
     matrixCategories() {
       return this.displayCategories
     },
+    reasonImpossible() {
+      return this.scenarioForm.data[this.currentScenario].reasonImpossible
+    },
+    scenarioForm() {
+      return this.$refs[`${this.currentScenario}Snippet`][0]
+    },
+    prescribingHasIntervention() {
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === 'MT1'
+    },
+    prescribingImpossible() {
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === 'MT99'
+    },
     tooManyCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && this.dsCategoriesSelected.length > this.maxSelectableDsCategories
+      return this.prescribingHasIntervention && this.dsCategoriesSelected.length > this.maxSelectableDsCategories
     },
     tooFewCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && this.dsCategoriesSelected.length == 0
+      return this.prescribingHasIntervention && this.dsCategoriesSelected.length == 0
     }
   },
   data() {
@@ -252,7 +287,6 @@ export default {
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
-      currentScenarioInterventionSelected: false,
       allowCurrentScenarioSave: false,
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
@@ -326,7 +360,7 @@ export default {
     storeResponse(patient, scenario) {
       if (!( scenario.scenario_code in this.storedResponsesByCode )) {
         // All good to go
-        this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code])
+        this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
         this.storedResponsesByCode[scenario.scenario_code] = this.scenarioUserResponses[scenario.scenario_code]        
         this.numCompletedScenarios++          
         setTimeout(() => {
@@ -340,29 +374,19 @@ export default {
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
-      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)
 
       this.savedResponseData = false
      
-      // Validate the number of categories chosen in a system/user intervention scenario <= 2
-      const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      if (formPayload.interventionType == 'MT1') {
-        const dsCategoryTags = this.$refs['dsCategory'][0]
-        console.debug(dsCategoryTags)
-        dsCategoryTags.validate().then(async () => {
-          if (!dsCategoryTags.hasErrors) {
-            this.storeResponse(patient, scenario)
-          }
-        })
-      } else {
-        this.storeResponse(patient, scenario)
-      }
+      // Validate the patient/scenario form snippet
+      this.scenarioForm.validateChildren().then(async () => {
+        if (!this.scenarioForm.invalid) {
+          this.storeResponse(patient, scenario)
+        }
+      })
                      
       console.groupEnd()
-    },
-    hasInterventionSelections(patientCode, scenarioCode) {
-      return this.interventionSelections[patientCode + '.' + scenarioCode + '.interventionType'] === true
-    },    
+    },     
     showUniqueScenario() {
       // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
       // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
@@ -400,7 +424,6 @@ export default {
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         await this.$nextTick(() => { 
           this.allowCurrentScenarioSave = false
-          this.currentScenarioInterventionSelected = false
           this.currentScenario = incompleteScenarioCodes[0]
           this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
           this.showUniqueScenario()       
@@ -430,7 +453,6 @@ export default {
 
       await this.$nextTick(() => {
         this.allowCurrentScenarioSave = false
-        this.currentScenarioInterventionSelected = false
         this.currentPatient = patientCode
         this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
         this.showUniqueScenario()
@@ -440,14 +462,13 @@ export default {
       console.groupEnd()
     },    
     scenarioResponse(scenarioCode) {
-      return this.scenarioResponses[scenarioCode]
+      return this.scenarioResponses[scenarioCode] || {}
     },
     scenarioCompleted(scenarioCode) {
       return scenarioCode in this.scenarioResponses
     },
     humanFriendlyCategories(categories) {
       // Expects category codes CAT001,CAT002...
-      console.debug('Received category codes', categories)
       if (categories) {
         let catLabels = categories.split(',').map(c => this.displayCategories.filter(dc => c == dc.value)[0].label).join(', ')
         return catLabels.substring(0, 1).toUpperCase() + catLabels.substring(1).toLowerCase()
@@ -458,16 +479,14 @@ export default {
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
       const identifier = el$.dataPath.split('.').slice(1).join('.')
-      const isIntervention = newVal == 'MT1'
       // This sets the object key to <patient_code>.<scenario_code>.outcome
-      if (this.interventionSelections[identifier] != isIntervention) {
+      if (this.interventionSelections[identifier] != newVal) {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
-        this.interventionSelections[identifier] = isIntervention
-        this.currentScenarioInterventionSelected = true
-      }
+        this.interventionSelections[identifier] = newVal
+      } 
       console.debug('Identifier', identifier, 'current patient', this.currentPatient, 'current scenario', this.currentScenario)
-      console.debug('Intervention selections', this.interventionSelections, 'currentScenarioInterventionSelected', this.currentScenarioInterventionSelected)
+      console.debug('Intervention selections', this.interventionSelections)
       console.groupEnd()
     }
   },

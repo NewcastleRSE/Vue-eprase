@@ -9,7 +9,7 @@
 
       <h1 class="assessment-head p-4">ePRaSE {{ year }} - Practice Mode</h1>
 
-      <Vueform ref="assessmentPracticeForm">
+      <Vueform ref="assessmentPracticeForm" validate-on="change">
         <template #empty>
           <ul class="nav nav-tabs" :id="'practice-stage-tabs'" role="tablist">
             <li v-for="(value, key, index) in practiceTabs" class="nav-item" role="presentation">
@@ -88,7 +88,7 @@ export default {
   name: 'AssessmentPractice', 
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['audit']),
+    ...mapState(rootStore, ['audit']),   
     practiceTabs() {
       return practiceTabValues
     },
