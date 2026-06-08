@@ -374,13 +374,12 @@ export default {
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
-      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)
-
-      this.savedResponseData = false
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)      
      
       // Validate the patient/scenario form snippet
       this.scenarioForm.validateChildren().then(async () => {
         if (!this.scenarioForm.invalid) {
+          this.savedResponseData = false
           this.storeResponse(patient, scenario)
         }
       })
