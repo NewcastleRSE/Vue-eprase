@@ -3,7 +3,27 @@
     <StaticElement name="introHeading">
       <h2>Introduction</h2>
     </StaticElement>
-    <StaticElement name="introBody">
+    <GroupElement v-if="!allChecklistTicked" name="introChecklist">
+      <StaticElement name="checklistPreamble"><p>Before you start the assessment, please complete the checklist below to ensure:</p></StaticElement>
+      <CheckboxgroupElement
+        ref="checklist"
+        name="preparedChecklist"
+        :items="[
+          'You have allocated 4-6 hours for patient setup and scenario testing (split sessions)',
+          'You can register patients with specific demographics',
+          'You have good operational understanding of the ePrescribing system',
+          'You can prescribe without restrictions'
+        ]"
+        :messages="{required: 'Please tick all 4 boxes to confirm', 'size4': 'Please tick all 4 boxes to confirm'}"
+        :rules="['required', 'size:4']"
+      />
+      <ButtonElement name="confirmPrepared" class="mt-2" 
+        :columns="4" 
+        @click="allChecklistTicked = true"
+      >I confirm all the above are the case
+      </ButtonElement>
+    </GroupElement>
+    <StaticElement v-if="allChecklistTicked" name="introBody">
       <p>
         The following annual assessment evaluates ePrescribing system performance against a range of indicators.
         You will be asked to admit a series of test patients to your hospital's admissions system, and then 
@@ -60,8 +80,16 @@ export default {
   name: 'AssessmentIntro',   
   computed: {
     ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']), 
-    ...mapState(practiceStore, ['resetPracticeData'])   
+    ...mapState(practiceStore, ['resetPracticeData']),
+    checklistBoxes() {
+      return this.$refs['checklist']
+    }
   }, 
+  data() {
+    return {
+      allChecklistTicked: false
+    }
+  },
   async mounted() {
     console.group('AssessmentIntro mounted hook')
     this.reset()
@@ -82,6 +110,7 @@ export default {
       const instResponse = await this.getAssessmentsForInstitution()
       wasError = await this.errorResponder(instResponse)
     }    
+    console.debug(this.$refs['checklist'])
     console.groupEnd()
   }
 }

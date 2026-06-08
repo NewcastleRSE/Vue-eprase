@@ -19,8 +19,30 @@
         <h3>Please answer the following questions about your ePrescribing System:</h3>
       </StaticElement>
       <ObjectElement ref="systemObject" name="system">
+
+        <!-- Additional institution information required by https://github.com/NewcastleRSE/Vue-eprase/issues/384 (and 389) -->
+        NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
+        <SelectElement name="orgCareSetting"
+          :label="embolden('Select your organisation care setting', true)"
+          :track-by="['label', 'value']"
+          :items="[
+            { value: 'acute', label: 'Acute' },
+            { value: 'mental_health', label: 'Mental Health' },
+            { value: 'community', label: 'Community' },
+            { value: 'other', label: 'Highly Specialist (please specify)' }
+          ]" 
+          :messages="{required: 'Organisation care setting is required'}"               
+          :rules="['required']" />
+        <TextElement name="orgCareSettingDetail"
+          :label="embolden('Please state specialism', true)"
+          v-if="user.careSetting == 'other'"
+          :messages="{required: 'Additional description of specialism is required'}" 
+          :rules="['required', 'fieldIsOther:system.orgCareSetting']"
+          :debounce="200" />
+        <!-- End of change for https://github.com/NewcastleRSE/Vue-eprase/issues/384 -->
+
         <!-- Additions as per https://github.com/NewcastleRSE/Vue-eprase/issues/383 -->
-        <!-- <RadiogroupElement name="buildLocation"
+        <RadiogroupElement name="epSystemEnvironment"
           :label="embolden('Where are you building test patients and completing this assessment?', true)"      
           :items="[
             { value: 'live', label: 'Live ePrescribing System' },
@@ -28,12 +50,13 @@
           :messages="{required: 'Select an option'}"
           :rules="['required']"
         />
-        <ToggleElement name="accessToTestSystem"
+        <ToggleElement name="hasTestEnv"
           :label="embolden('Do you have access to a test system?')"
           :labels="{ on: 'Yes', off: 'No' }"
-          v-if="systemData.buildLocation == 'live'" 
-        /> -->
-        <!-- End of #383 additions -->                 
+          v-if="systemData.epSystemEnvironment == 'live'" 
+        />
+        <!-- End of #383 additions -->  
+
         <DateElement name="epServiceImplemented"
           :max="new Date()"
           :label="embolden('ePrescribing system implementation date', true)" 
@@ -46,8 +69,9 @@
           :extendOptions="{ plugins: [monthSelector] }"
           :messages="{required: 'Update date is required'}"  
           :rules="['required', 'dateIsSameOrAfter:system.epServiceImplemented,service implementation date']" />
+
         <!-- New fields as per https://github.com/NewcastleRSE/Vue-eprase/issues/420 -->
-        <!-- <SelectElement name="updateType"
+        <SelectElement name="epServiceUpdateType"
           :label="embolden('What type of update was applied to your ePrescribing System?', true)"
           :native="false"
           :track-by="['label', 'value']"
@@ -61,48 +85,42 @@
           :messages="{required: 'Type of update is required'}" 
           :rules="['required']"
         />
-        <TextElement name="updateDetails"
+        <TextElement name="epServiceUpdateTypeDetail"
           :label="embolden('Details of update', true)"
-          v-if="systemData.updateType.includes('other')"
+          v-if="systemData.updateType == 'other'"
           :messages="{required: 'Additional details are required'}" 
-          :rules="['required', 'fieldIsOther:system.updateType']"
-          :debounce="200" />   -->
+          :rules="['required', 'fieldIsOther:system.epServiceUpdateType']"
+          :debounce="200" />  
         <!-- End of #420 additions -->
+
         <TextElement name="numMaintainers"
           :label="embolden('How many WTE maintain the drug catalogue and prescribing decision support for this system?', true)"
           :debounce="200" 
           :messages="{required: 'Number of WTE is required', numeric: 'Must be a number between 0 and 20', min: 'Must be >= 0', max: 'Must be < 20' }" 
           :rules="['required', 'numeric', 'min:0.0', 'max:20']" />
-        <!-- Added 29/05/2026 David - https://github.com/NewcastleRSE/Vue-eprase/issues/389 -->
-        <!-- NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
-        <RadiogroupElement name="specialisation"
-          :label="embolden('Does the ePrescribing system support prescribing across all clinical areas, or is it a bespoke / limited system (e.g., designed exclusively for use within ICU settings)? Please provide details', true)"
-          :items="[
-            { value: 'general', label: 'System is designed to support prescribing across most clinical areas' },
-            { value: 'specific', label: 'System is a bespoke or specialised ePrescribing system designed to support prescribing in a specific setting only e.g. ICU' }
-          ]" 
-          :rules="['required']"
-          :messages="{required: 'System prescribing scope is required'}"
-        />
-        <TextElement name="specialisationDescription"
-          :label="embolden('Please give details of the setting the system is used in', true)"
-          v-if="systemData.specialisation == 'specific'"
-          :messages="{required: 'Additional description is required'}" 
-          :rules="['required', 'fieldIsOther:system.specialisation,specific']"
-          :debounce="200" /> -->
-        <!-- End of change for https://github.com/NewcastleRSE/Vue-eprase/issues/389 -->
 
-        <!-- Added 29/05/2026 David - https://github.com/NewcastleRSE/Vue-eprase/issues/383 -->
-        <!-- NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
-        <RadiogroupElement name="usingLiveEpSystem"
-          :label="embolden('Tell us where you are building the tests patients and completing this assessment', true)"
+        <!-- Added as per https://github.com/NewcastleRSE/Vue-eprase/issues/400 -->
+        <SelectElement name="drugCatalogSupplier"
+          :label="embolden('Who is your ePrescribing System drug catalogue supplier?', true)"
+          :native="false"
+          :track-by="['label', 'value']"
           :items="[
-            { value: 'yes', label: 'In the live ePrescribing system' },
-            { value: 'no', label: 'In a test environment that closely mimics the live ePrescribing system' }
-          ]" 
+            { value: '', label: 'Please select', disabled: true },
+            { value: 'First Databank (FDB)', label: 'First Databank (FDB)' },
+            { value: 'Multum', label: 'Multum' },
+            { value: 'ePrescribing System vendor', label: 'ePrescribing System vendor' },
+            { value: 'other', label: 'Other' }
+          ]"
+          :messages="{required: 'Type of update is required'}" 
           :rules="['required']"
-          :messages="{required: 'ePrescribing environment is required'}"
-        />-->
+        />
+        <TextElement name="drugCatalogSupplierDetail"
+          :label="embolden('Other drug catalogue supplier details', true)"
+          v-if="systemData.drugCatalogue == 'other'"
+          :messages="{required: 'Additional details are required'}" 
+          :rules="['required', 'fieldIsOther:system.drugCatalogSupplier']"
+          :debounce="200" />
+        <!-- End of https://github.com/NewcastleRSE/Vue-eprase/issues/400 addition -->
 
         <!-- Values changed 29/05/2026 according to https://github.com/NewcastleRSE/Vue-eprase/issues/385 --> 
         <SelectElement name="epUsage"
@@ -125,8 +143,9 @@
         <TextElement name="otherEpSystem" placeholder="Name(s) of other ePrescribing systems in use in your organisation" 
           :label="embolden('Other ePrescribing systems in use')" 
           :debounce="200" />
-        <!-- To be removed - https://github.com/NewcastleRSE/Vue-eprase/issues/387 -->
-        <GroupElement name="labResultsGroup" :class="'mt-2'">
+
+        <!-- Removed 08/06/2026 David - https://github.com/NewcastleRSE/Vue-eprase/issues/387 -->
+        <!-- <GroupElement name="labResultsGroup" :class="'mt-2'">
           <ToggleElement name="labResults"
             :label="embolden('Is your hospital laboratory results system fully integrated with your ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
@@ -147,29 +166,30 @@
             :labels="{ on: 'Yes', off: 'No' }"
             v-if="systemData.medHistory === true" 
           />
-        </GroupElement>
+        </GroupElement> -->
         <!-- End of #387 removed block -->
-        <!-- Replacement block - https://github.com/NewcastleRSE/Vue-eprase/issues/387 -->
-        <!-- 
+
+        <!-- Replacement block - https://github.com/NewcastleRSE/Vue-eprase/issues/387 -->        
         <GroupElement name="interoperabilityGroup" :class="'mt-2'">
-          <ToggleElement name="recordDiagnosisAndHistory"
+          <ToggleElement name="medHistoryRoutinelyRecorded"
             :label="embolden('Does your organisation routinely record diagnosis and medical history electronically within the ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
-          <ToggleElement name="manualEnterDiagnosis"
+          <!-- Unclear - document and issue constradict each other - looks like this should be removed -->
+          <!-- <ToggleElement name="manualEnterDiagnosis"
             :label="embolden('Are you able to manually enter diagnosis and medical history into your ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
-          />
-          <ToggleElement name="eInterfacePresent"
+          /> -->
+          <ToggleElement name="primaryCareIncorporated"
             :label="embolden('Is there an electronic interface between your primary care systems and your hospital ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
-          <ToggleElement name="usedForAllPatients"
-            v-if="systemData.eInterfacePresent === true"
+          <ToggleElement name="primaryCareRoutinelyUsed"
+            v-if="systemData.primaryCareIncorporated === true"
             :label="embolden('Is this interface used routinely for all patients?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
-        </GroupElement> -->
+        </GroupElement>
         <!-- End of #387 replacement block -->
         <GroupElement name="penicillinGroup" :class="'mb-4'">
           <StaticElement name="penicillinWarning">
