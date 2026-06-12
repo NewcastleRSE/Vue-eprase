@@ -3,27 +3,29 @@
     <StaticElement name="introHeading">
       <h2>Introduction</h2>
     </StaticElement>
-    <GroupElement v-if="!allChecklistTicked" name="introChecklist">
-      <StaticElement name="checklistPreamble"><p>Before you start the assessment, please complete the checklist below to ensure:</p></StaticElement>
+    <GroupElement v-if="!requirementsConfirmed" name="introChecklist" class="alert alert-warning">
+      <StaticElement name="checklistPreamble"><h3>Before you start the assessment, please complete the checklist below to ensure:</h3></StaticElement>
       <CheckboxgroupElement
         ref="checklist"
         name="preparedChecklist"
+        @change="updateTicklist"
         :items="[
           'You have allocated 4-6 hours for patient setup and scenario testing (split sessions)',
           'You can register patients with specific demographics',
           'You have good operational understanding of the ePrescribing system',
           'You can prescribe without restrictions'
         ]"
-        :messages="{required: 'Please tick all 4 boxes to confirm', 'size4': 'Please tick all 4 boxes to confirm'}"
+        :messages="{required: 'Please tick all 4 boxes to confirm', 'size': 'Please tick all 4 boxes to confirm'}"
         :rules="['required', 'size:4']"
       />
       <ButtonElement name="confirmPrepared" class="mt-2" 
         :columns="4" 
-        @click="allChecklistTicked = true"
+        :disabled="!itemsTicked || itemsTicked.length != 4"
+        @click="setConfirmation"
       >I confirm all the above are the case
       </ButtonElement>
     </GroupElement>
-    <StaticElement v-if="allChecklistTicked" name="introBody">
+    <StaticElement v-if="requirementsConfirmed" name="introBody">
       <p>
         The following annual assessment evaluates ePrescribing system performance against a range of indicators.
         You will be asked to admit a series of test patients to your hospital's admissions system, and then 
@@ -72,6 +74,7 @@
 
 <script>
 
+import Cookies from 'js-cookie'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { practiceStore } from '../stores/practice';
@@ -87,13 +90,27 @@ export default {
   }, 
   data() {
     return {
-      allChecklistTicked: false
+      itemsTicked: [],
+      requirementsConfirmed: false
+    }
+  },
+  methods: {
+    updateTicklist(newValue) {
+      this.itemsTicked = newValue
+    },
+    setConfirmation() {
+      this.requirementsConfirmed = true
+      Cookies.set('showCompetencyChecklist', 'yes', { expires: 90 })
     }
   },
   async mounted() {
     console.group('AssessmentIntro mounted hook')
     this.reset()
     this.resetPracticeData()
+
+    // See if user has already checked all the competency requirements
+    this.requirementsConfirmed = Cookies.get('showCompetencyChecklist') == 'yes'
+   
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
