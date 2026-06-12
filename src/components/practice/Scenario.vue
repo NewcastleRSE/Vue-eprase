@@ -181,10 +181,20 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr>
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
                               <th>Category/intervention type</th>
-                              <td>{{ humanFriendlyCategories(scenarioResponse(pscd.scenario_code)['other_category']) }}</td>
-                            </tr>                                                                        
+                              <td>
+                                <ul class="list-group">
+                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="catDesc in humanFriendlyCategories(scenarioResponse(pscd.scenario_code)['other_category'])">
+                                    <span class="badge text-bg-primary rounded-pill">{{ catDesc }}</span>
+                                  </li>                                                         
+                                </ul>
+                              </td>
+                            </tr>
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                              <th>Intervention details</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
+                            </tr>                                                                       
                             <tr>
                               <th>Your notes</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
@@ -291,8 +301,7 @@ export default {
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
       savedResponseData: true,
-      dsCategoriesSelected: [], // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
-      allScenariosCompleted: false
+      dsCategoriesSelected: [] // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
     }
   },
   emits: ['allScenariosCompleted'],
@@ -413,7 +422,7 @@ export default {
 
       console.group('openNextUnenteredScenario()')
 
-      this.dsCategoriesSelected = {}
+      this.dsCategoriesSelected = []
       const doneScenarios = Object.keys(this.scenarioResponses)
       console.debug('Done', doneScenarios.length, 'of', this.scenarioCount, 'scenarios')
       if (doneScenarios.length < this.scenarioCount) {
@@ -445,7 +454,7 @@ export default {
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
-    // Note needed if practice session limited to one patient, but left here in case...
+    // Not needed if practice session limited to one patient, but left here in case...
     async openPatientScenarios(patientCode) {
 
       console.group('openPatientScenarios()')
@@ -469,10 +478,10 @@ export default {
     humanFriendlyCategories(categories) {
       // Expects category codes CAT001,CAT002...
       if (categories) {
-        let catLabels = categories.split(',').map(c => this.displayCategories.filter(dc => c == dc.value)[0].label).join(', ')
-        return catLabels.substring(0, 1).toUpperCase() + catLabels.substring(1).toLowerCase()
+        let catLabels = categories.split(',').map(c => this.displayCategories.filter(dc => c == dc.value)[0].label)
+        return catLabels.map(cl => cl.substring(0, 1).toUpperCase() + cl.substring(1).toLowerCase())
       } else {
-        return 'None'
+        return []
       }
     },
     setIntervention(newVal, oldVal, el$) {

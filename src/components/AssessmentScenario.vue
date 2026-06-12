@@ -1,6 +1,6 @@
 <template>
   <GroupElement name="scenarioGroup" :class="'mb-4'">
-    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[allScenariosCompleted]" />    
+    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[scenarioCompletionValidator]" />    
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
@@ -141,56 +141,48 @@
                               <div class="spinner-border ms-auto" aria-hidden="true"></div>
                             </div>
                           </StaticElement>
-                          <!-- 
-                          Alert/advisory checkboxes (two categories maximum, mapped onto database fields 'result' and 'other_category')
-                          Values are stored as <category_code>:alert[,advisory] - minimum 1 box checked, maximum 4
-                          -->
-                          <div v-if="dataLoaded && hasInterventionSelections(patient.patient_code, pscd.scenario_code)" class="vf-col-6">
-                            <div class="alert alert-warning mt-2" role="alert">
-                              If the system were to respond to the challenge, please indicate what category of intervention (e.g. dose, frequency dialogue) and the type of response i.e:
-                              <ul class="list-group mt-4">
-                                <li class="list-group-item">
-                                  <span class="fw-bold">Alert</span> - information is provided which interrupts work flow and/or requires action e.g. pop-up boxes or requiring password entry
-                                </li>
-                                <li class="list-group-item">
-                                  <span class="fw-bold">Advisory</span> - information is provided which does not interrupt workflow or require action e.g. a passive dialogue, maybe a banner message on the bottom of the screen
-                                </li>
-                              </ul>
-                              <br/>
-                              <p>Please select <strong>up to two</strong> clinical decision support categories from the list below:</p>
-                            </div>
-                            <table class="table table-striped vf-col-6">
-                              <thead>
-                                <tr><th v-html="embolden('Category', true)"></th><th>Alert</th><th>Advisory</th><th></th></tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(mc, mcIdx) in matrixCategories">
-                                  <td>{{  mc.label }}</td>
-                                  <td><CheckboxElement :name="'alert' + mc.value" @change="recordDsCategorySelection" /></td>
-                                  <td><CheckboxElement :name="'advisory' + mc.value" @change="recordDsCategorySelection" /></td>
-                                  <td>
-                                    <span v-show="mc.tip != ''" data-bs-toggle="tooltip" data-bs-placement="right"
-                                      :data-bs-title="mc.tip.replace('Tip: ', '')">
-                                      <i class="bi bi-info-circle-fill"></i>
-                                    </span>
-                                  </td>
-                                </tr>
-                                <tr v-if="tooManyCategories == true">
-                                  <td colspan="4"><span class="text-danger">Please select a maximum of 2 categories</span></td>
-                                </tr>
-                                <tr v-if="tooFewCategories == true">
-                                  <td colspan="4"><span class="text-danger">Please select at least one category</span></td>
-                                </tr>
-                              </tbody>
-                            </table>                            
-                          </div>
+                          <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                          <TagsElement name="otherCategory" placeholder="Select at most two categories"
+                            v-if="dataLoaded && prescribingHasIntervention"
+                            :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
+                            :items="matrixCategories"
+                            :break-tags="true"
+                            :rules="['min:1', 'max:2']"                              
+                            :messages="{'min': 'Please enter at least one category', 'max': 'Please enter a maximum of two categories'}"
+                            @mounted="initCategoryTooltips"
+                            @change="updateCategorySelector"
+                          />
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                          <!-- Extra dropdown for identifying different cases where prescribing was not possible - https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->
+                          <SelectElement name="invalidTestDetail"
+                            v-if="dataLoaded && prescribingImpossible"
+                            :label="embolden('Please enter the reason prescribing was not possible', true)"
+                            :native="false"
+                            :track-by="['label', 'value']"
+                            :items="[
+                              { value: '', label: 'Please select...', disabled: true },
+                              { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
+                              { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
+                              { value: 'other', label: 'Other - please specify' }
+                            ]"
+                            :messages="{required: 'Reason is required if prescribing was not possible'}" 
+                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.interventionType,MT99`]" 
+                          />
+                           <TextElement name="invalidTestDetailOther" placeholder="Please give details"
+                            v-if="dataLoaded && prescribingImpossible && reasonImpossible == 'other'"
+                            :label="embolden('Describe why prescribing was not possible', true)" 
+                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.invalidTestDetail,other`]"
+                            :messages="{required: 'Additional description is required'}" 
+                            :debounce="200" 
+                          />
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->                           
                           <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                             :attrs="{ maxlength: 500 }" 
                             :label="embolden('Additional comments', false)" 
                           />
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
-                            <CheckboxElement name="haveDiscontinuedPrescription" :disabled="this.currentScenarioInterventionSelected === false"
+                            <CheckboxElement name="haveDiscontinuedPrescription"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
                               I have done this
@@ -207,27 +199,26 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length != 0">
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
                               <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
-                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(prompts, catDesc) in formatRecordedInterventions(pscd.scenario_code)">
-                                    {{  catDesc }}
-                                    <span class="badge text-bg-primary rounded-pill">{{ prompts }}</span>
+                                  <li class="list-group-item d-flex justify-content-between align-items-center" v-for="catDesc in humanFriendlyCategories(scenarioResponse(pscd.scenario_code)['other_category'])">
+                                    <span class="badge text-bg-primary rounded-pill">{{ catDesc }}</span>
                                   </li>                                                         
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="Object.keys(formatRecordedInterventions(pscd.scenario_code)).length == 0">
-                              <th>Category/intervention type</th>
-                              <td>None</td>
-                            </tr>                                                   
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                              <th>Intervention details</th>
+                              <td>{{ scenarioResponse(pscd.scenario_code)['invalid_test_detail_other'] || scenarioResponse(pscd.scenario_code)['invalid_test_detail'] }}</td>
+                            </tr>                                                                                                  
                             <tr>
                               <th>Your notes</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
                             </tr>                                                    
                           </tbody>
-                        </table>
+                        </table>                        
                       </div>
                       <GroupElement name="scenario-response-button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
@@ -266,16 +257,18 @@
 <script>
 
 import { mapState } from 'pinia'
+import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
 import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../helpers/common'
 import { assessmentStore } from '../stores/assessment'
+import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
 
-const allScenariosCompleted = class extends Validator {
+const scenarioCompletionValidator = class extends Validator {
   get msg() {
     return 'Please complete all scenario questions'
   }
   check(value) {
-    console.debug('allScenariosCompleted() validator entered with', value)
+    console.debug('scenarioCompletionValidator() validator entered with', value)
     return value && value.split(',').length == assessmentStore().assessmentData.numScenarios
   }
 }
@@ -284,6 +277,7 @@ export default {
   name: 'AssessmentScenario',
   computed: {
     ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
+    ...mapState(appSettingsStore, ['maxSelectableDsCategories']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
     },        
@@ -307,33 +301,45 @@ export default {
     },
     matrixCategories() {
       return this.displayCategories
-    },        
+    },     
+    reasonImpossible() {
+      return this.scenarioForm.data[this.currentScenario].invalidTestDetail
+    },
+    scenarioForm() {
+      return this.$refs[`${this.currentScenario}Snippet`][0]
+    },
+    prescribingHasIntervention() {
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === 'MT1'
+    },
+    prescribingImpossible() {
+      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === 'MT99'
+    },   
     completedScenariosHidden() {
       console.log('Hidden element is', this.$refs.completedScenariosHidden)
       return this.$refs.completedScenariosHidden
     },
     tooManyCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length > 2
+      return this.prescribingHasIntervention && this.dsCategoriesSelected.length > this.maxSelectableDsCategories
     },
     tooFewCategories() {
-      return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === true && Object.keys(this.dsCategoriesSelected).length == 0
+      return this.prescribingHasIntervention && this.dsCategoriesSelected.length == 0
     }
   },
   data() {
     return {
       auxiliaryDataReady: false,
       displayCategories: [],
+      categoryTooltips: {},
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
-      currentScenarioInterventionSelected: false,
       allowCurrentScenarioSave: false,
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
       scenarioPatientLink: {},
       savedResponseData: true,
-      dsCategoriesSelected: {}, // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
-      allScenariosCompleted
+      dsCategoriesSelected: [], // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
+      scenarioCompletionValidator
     }
   },
   methods: {
@@ -357,73 +363,73 @@ export default {
       }                  
       return description
     },
+    initCategoryTooltips(tagsEl, firstTime = true) {
+      const containerDiv = document.getElementById(tagsEl.fieldId)
+      this.$nextTick(() => { 
+        // Rejig tooltips on remaining entries in multiselect list
+        containerDiv.querySelectorAll('li').forEach(optEl => {
+          const catCode = optEl.id.match(/(CAT\d+)/)
+          const catTip = this.categoryTooltips[catCode[1]]
+          console.debug('Setting', catCode, 'tip to', catTip)
+          if (firstTime) {
+            optEl.setAttribute('data-bs-toggle', 'tooltip')
+            optEl.setAttribute('data-bs-title', catTip)
+          } else {
+            const tooltip = Tooltip.getOrCreateInstance(optEl)
+            tooltip.setContent({ '.tooltip-inner': catTip })
+          }                           
+        })
+        // Add tooltips to selected entries
+        containerDiv.querySelectorAll('span.vf-multiselect-tag-wrapper').forEach(selTag => {
+          // The content of the tag wrapper is the category label
+          const catLabel = selTag.innerText
+          const catArr = this.displayCategories.filter(c => c.label == catLabel)
+          if (catArr.length > 0) {
+            selTag.setAttribute('data-bs-toggle', 'tooltip')
+            selTag.setAttribute('data-bs-title', this.categoryTooltips[catArr[0].value])      
+          }
+        })
+      })       
+    },
+    updateCategorySelector(newVal, oldVal, tagsEl) {
+
+      console.group()
+      console.debug('Category selector updated', newVal, oldVal, tagsEl)
+
+      // Update the tooltips on list entries and selected tags
+      this.initCategoryTooltips(tagsEl, false)
+
+      this.dsCategoriesSelected = tagsEl.value
+
+      console.groupEnd()
+    },   
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
-      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.$refs[`${scenario.scenario_code}Snippet`][0])
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)
 
-      this.savedResponseData = false
-     
-      // Validate the number of categories chosen in a system/user intervention scenario <= 2
-      const formPayload = this.$refs[`${scenario.scenario_code}Snippet`][0].value
-      if (formPayload.interventionType == 'MT1' && this.tooManyCategories) {
-        // Output error, do not save the data and remain here for correction
-        console.debug('Too many categories selected', this.tooManyCategories)
-      } else if (formPayload.interventionType == 'MT1' && this.tooFewCategories) {
-        // Output error, do not save the data and remain here for correction
-        console.debug('Too few categories selected', this.tooFewCategories) 
-      } else if ( !( scenario.scenario_code in this.storedResponsesByCode ) ) {
-        // All good to go
-        const saveResponse = await this.savePatientScenarioResponse(patient, scenario, this.$refs[`${scenario.scenario_code}Snippet`][0].data[scenario.scenario_code], false)
-        const wasError = await this.errorResponder(saveResponse)
-        if (!wasError) {
-          this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
-          this.numCompletedScenarios++
-          this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
-          this.completedScenariosHidden.validate()
-          setTimeout(() => {
-            this.savedResponseData = true
-          }, 200)
-        }        
-      }                  
-      console.groupEnd()
-    },
-    hasInterventionSelections(patientCode, scenarioCode) {
-      return this.interventionSelections[patientCode + '.' + scenarioCode + '.interventionType'] === true
-    },
-    recordDsCategorySelection(newVal, oldVal, el$) {
-      console.debug('recordDsCategorySelection() called with', newVal, oldVal, el$)
-      const chkName = el$.name
-      const catCodePos = chkName.indexOf('CAT')
-      const intType = chkName.substring(0, catCodePos)
-      const catCode = chkName.substring(catCodePos)
-      if (newVal === true) {
-        if (!( catCode in this.dsCategoriesSelected)) {
-          this.dsCategoriesSelected[catCode] = []
-        } 
-        this.dsCategoriesSelected[catCode].push(intType)
-      } else {
-        const typePos = this.dsCategoriesSelected[catCode].indexOf(intType)
-        this.dsCategoriesSelected[catCode].splice(typePos, 1)
-        if (this.dsCategoriesSelected[catCode].length == 0) {
-          delete this.dsCategoriesSelected[catCode]
+      // Validate the patient/scenario form snippet
+      this.scenarioForm.validateChildren().then(async () => {
+        if (!this.scenarioForm.invalid) {
+          this.savedResponseData = false
+          if (!( scenario.scenario_code in this.storedResponsesByCode )) {
+            // All good to go
+            await this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
+            this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
+            this.numCompletedScenarios++     
+            this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
+            this.completedScenariosHidden.validate()     
+            setTimeout(() => {
+              this.savedResponseData = true
+              if (this.numCompletedScenarios == this.scenarioCount) {
+                this.$emit('allScenariosCompleted')
+              }
+            }, 200)
+          }
         }
-      }      
-      console.debug('Selection record', this.dsCategoriesSelected)
-    },
-    formatRecordedInterventions(scenarioCode) {
-      let intObj = {}
-      const interventions = this.scenarioResponse(scenarioCode) ? this.scenarioResponse(scenarioCode)['other_category'] : null
-      if (interventions != null && interventions.length > 0) {
-        // Data looks like { <category_code1>:alert[,advisory]|<category_code2:...}
-        interventions.split('|').forEach(intn => {
-          const catDesc = this.displayCategories.filter(c => c.value == intn.split(':').shift())[0].label
-          const prompts = intn.split(':').pop().split(',')
-          intObj[catDesc] = prompts.join(' + ')
-        })
-      }
-      return intObj
-    },
+      })     
+      console.groupEnd()
+    },      
     showUniqueScenario() {
       // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
       // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
@@ -450,7 +456,7 @@ export default {
 
       console.group('openNextUnenteredScenario()')
 
-      this.dsCategoriesSelected = {}
+      this.dsCategoriesSelected = []
       const doneScenarios = Object.keys(this.scenarioResponses)
       this.completedScenariosHidden.update(doneScenarios.join(','))
 
@@ -460,14 +466,13 @@ export default {
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         await this.$nextTick(() => { 
           this.allowCurrentScenarioSave = false
-          this.currentScenarioInterventionSelected = false
           this.currentScenario = incompleteScenarioCodes[0]
           this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
           this.showUniqueScenario()       
           const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
           if (patientElement != null) {
             this.$nextTick(() => { 
-                patientElement.scrollIntoView({
+              patientElement.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
                 inline: 'nearest'
@@ -476,6 +481,9 @@ export default {
           }
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
+      } else {
+        console.debug('All scenarios completed')
+        this.$emit('allScenariosCompleted')
       }
       console.groupEnd()
     },
@@ -486,7 +494,6 @@ export default {
 
       await this.$nextTick(() => {
         this.allowCurrentScenarioSave = false
-        this.currentScenarioInterventionSelected = false
         this.currentPatient = patientCode
         this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
         this.showUniqueScenario()
@@ -496,24 +503,31 @@ export default {
       console.groupEnd()
     },  
     scenarioResponse(scenarioCode) {
-      return this.scenarioResponses[scenarioCode]
+      return this.scenarioResponses[scenarioCode] || {}
     },
     scenarioCompleted(scenarioCode) {
       return scenarioCode in this.scenarioResponses
     },
+    humanFriendlyCategories(categories) {
+      // Expects category codes CAT001,CAT002...
+      if (categories) {
+        let catLabels = categories.split(',').map(c => this.displayCategories.filter(dc => c == dc.value)[0].label)
+        return catLabels.map(cl => cl.substring(0, 1).toUpperCase() + cl.substring(1).toLowerCase())
+      } else {
+        return []
+      }
+    },
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
       const identifier = el$.dataPath.split('.').slice(1).join('.')
-      const isIntervention = newVal == 'MT1'
       // This sets the object key to <patient_code>.<scenario_code>.outcome
-      if (this.interventionSelections[identifier] != isIntervention) {
+      if (this.interventionSelections[identifier] != newVal) {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
-        this.interventionSelections[identifier] = isIntervention
-        this.currentScenarioInterventionSelected = true
-      }
+        this.interventionSelections[identifier] = newVal
+      } 
       console.debug('Identifier', identifier, 'current patient', this.currentPatient, 'current scenario', this.currentScenario)
-      console.debug('Intervention selections', this.interventionSelections, 'currentScenarioInterventionSelected', this.currentScenarioInterventionSelected)
+      console.debug('Intervention selections', this.interventionSelections)
       console.groupEnd()
     }
   },
@@ -523,8 +537,15 @@ export default {
 
     this.auxiliaryDataReady = false
 
+    new Tooltip(document.body, {
+      selector: '[data-bs-toggle="tooltip"]'
+    })
+
     // Massage the category list for better use in Vueform components      
-    this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name, tip: c.description } })        
+    this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })  
+    this.categoryTooltips = {}
+    this.categories.forEach(c => this.categoryTooltips[c.category_code] = c.description)       
+
     for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
       scenarios.forEach(s => {
         this.scenarioPatientLink[s.scenario_code] = patientCode
@@ -534,7 +555,7 @@ export default {
     const wasError = await this.errorResponder(storedResultsResponse)
     if (!wasError) {
       // Package the responses by scenario code for convenience - data is of form:
-      // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>:alert[,advisory]|..., qualitative_data: <text> }
+      // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>,<category_code2>..., qualitative_data: <text> }
       this.assessmentData.storedScenarioResponses.forEach(asr => {
         this.storedResponsesByCode[asr.scenario.scenario_code] = asr
       })
@@ -544,7 +565,7 @@ export default {
       this.completedScenariosHidden.validate()
 
       this.auxiliaryDataReady = true
-      this.openNextUnenteredScenario()    
+      this.$nextTick(() => { this.openNextUnenteredScenario() })   
     }    
     console.groupEnd()
   },

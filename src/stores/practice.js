@@ -209,13 +209,30 @@ export const practiceStore = defineStore('practice', {
       console.group('savePatientScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form data', formData)
 
-      // Form data will be of form { interventionType: MT<code>, dsCategory: [<catcode1>,<catcode2>...], qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
+      // Form data will be of form 
+      // { 
+      //  interventionType: MT<code>, 
+      //  dsCategory: [<catcode1>,<catcode2>...], 
+      //  reasonImpossible: <text>, 
+      //  otherReasonImpossible: <text>, 
+      //  qualitativeData: <text>, 
+      //  haveDiscontinuedPrescription: <true|false> 
+      // }
       // Massage it into db form:
-      // { intervention_type: MT<code>, result: <calculated>, other_category: '<category_code1>,<category_code2>...', qualitative_data: <text> }
+      // { 
+      //  intervention_type: MT<code>, 
+      //  result: <calculated>, 
+      //  other_category: '<category_code1>,<category_code2>...',
+      //  invalid_test_detail: <text>,
+      //  invalid_test_detail_other: <text>,
+      //  qualitative_data: <text> 
+      // }
       const dataOut = {
         intervention_type: formData.interventionType,
         result: '',
         other_category: Array.isArray(formData.dsCategory) ? formData.dsCategory.join(',') : '',
+        invalid_test_detail: formData.invalidTestDetail,
+        invalid_test_detail_other: formData.invalidTestDetailOther,
         qualitative_data: formData.qualitativeData
       }
       
