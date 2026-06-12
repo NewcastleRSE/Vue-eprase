@@ -51,7 +51,7 @@ module.exports = {
               importLoaders: 2,
               url: false,
               modules: {
-                mode: "icss", // Enable ICSS (Interoperable CSS)
+                mode: "icss", // Enable ICSS (Interoperable CSS)                
               }
             }
           },

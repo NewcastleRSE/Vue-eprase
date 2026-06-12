@@ -31,16 +31,3 @@ $dropdown-item-padding-x: 0.5rem;
 $modal-fade-transform: none;
 $modal-transition: none;
 $modal-scale-transform: none;
-
-/* Webpack magic - see https://github.com/alexanderweigelt/ExportSassVarsToJS */
-:export {
-  primaryColor: $primary;
-  successColor: $success;
-  warningColor: $warning;
-  dangerColor: $danger;
-  infoColor: $info;
-  lightColor: $light;
-  darkColor: $dark;
-  invalidColor: $invalid;
-  primarySubtleColor: $primary-bg-subtle
-}

@@ -171,13 +171,12 @@ import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
-import bsColors from '../assets/scss/_variables.scss'
 import { appSettingsStore } from '../stores/appSettings'
 
 export default {
   name: 'AssessmentFinalReport',  
   computed: {
-    ...mapState(appSettingsStore, ['year']),
+    ...mapState(appSettingsStore, ['year', 'epraseTheme']),
     ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
@@ -299,7 +298,8 @@ export default {
       const plotDiv = this.$refs.barChartContainer
       const categoryNames = Object.keys(this.mitigationByCategoryAnalysis)
       const categorySubkeys = ['good', 'some', 'not', 'over', 'invalid']
-      const colorMapping = [bsColors.successColor, bsColors.warningColor, bsColors.dangerColor, bsColors.infoColor, bsColors.invalidColor]
+      const bsColors = this.epraseTheme
+      const colorMapping = [bsColors.success, bsColors.warning, bsColors.danger, bsColors.info, bsColors.invalid]
       const mitigationByCategoryData = []
       const legendText = { 'good': 'Good mitigation', 'some': 'Some mitigation', 'not': 'No mitigation', 'over': 'Over mitigation', 'invalid': 'Invalid test' }
 

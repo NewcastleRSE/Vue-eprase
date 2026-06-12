@@ -6,7 +6,6 @@ import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
 import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
-import bsColors from '../assets/scss/_variables.scss'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -134,13 +133,14 @@ export const assessmentStore = defineStore('assessment', {
       console.group('mitigationSummary()')
 
       const numCompletedScenarios = this.assessmentData.storedScenarioResponses.length
+      const bsColors = appSettingsStore().epraseTheme
 
       const summary = {
         mitigationFrequencyAnalysis: {
           mitigations: MITIGATION_DESCRIPTIONS,
           frequencies: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
           percentages: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
-          colors: [bsColors.dangerColor, bsColors.successColor, bsColors.warningColor, bsColors.infoColor, bsColors.invalidColor],
+          colors: [bsColors.danger, bsColors.success, bsColors.warning, bsColors.info, bsColors.invalid]
         },        
         goodMitigationByRiskAnalysis: { 
           'Extreme': { total: 0, good: 0 }, 
