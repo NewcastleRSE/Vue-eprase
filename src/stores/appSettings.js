@@ -17,8 +17,8 @@ export const appSettingsStore = defineStore('appSettings', {
       passwordMaxLength: 50,
       assessmentNumPatients: 15,
       maxSelectableDsCategories: 2,                 // How many selectable categories for scenario with user intervention
-      // Desperate stuff - have to hard code ePRaSE colours here as well as in _variables.module.css - the :export fails after Dart sass update
-      // Any updates here need to be mirrored exactly in assets/_variables.module.css, and vice-versa - David 12/06/2026
+      // Desperate stuff - have to hard code ePRaSE colours here as well as in _variables.css - the :export fails after Dart sass update
+      // Any updates here need to be mirrored exactly in assets/_variables.css, and vice-versa - David 12/06/2026
       epraseTheme: {
         'primary': '#07818e',
         'success': '#35d635',
