@@ -21,7 +21,6 @@
       <ObjectElement ref="systemObject" name="system">
 
         <!-- Additional institution information required by https://github.com/NewcastleRSE/Vue-eprase/issues/384 (and 389) -->
-        NOTE: will involve a Strapi database change to store the new information so commented out until all legacy imports are done on production system
         <SelectElement name="orgCareSetting"
           :label="embolden('Select your organisation care setting', true)"
           :track-by="['label', 'value']"
@@ -35,7 +34,7 @@
           :rules="['required']" />
         <TextElement name="orgCareSettingDetail"
           :label="embolden('Please state specialism', true)"
-          v-if="user.careSetting == 'other'"
+          v-if="systemData.orgCareSetting == 'other'"
           :messages="{required: 'Additional description of specialism is required'}" 
           :rules="['required', 'fieldIsOther:system.orgCareSetting']"
           :debounce="200" />
@@ -87,7 +86,7 @@
         />
         <TextElement name="epServiceUpdateTypeDetail"
           :label="embolden('Details of update', true)"
-          v-if="systemData.updateType == 'other'"
+          v-if="systemData.epServiceUpdateType == 'other'"
           :messages="{required: 'Additional details are required'}" 
           :rules="['required', 'fieldIsOther:system.epServiceUpdateType']"
           :debounce="200" />  
@@ -116,7 +115,7 @@
         />
         <TextElement name="drugCatalogSupplierDetail"
           :label="embolden('Other drug catalogue supplier details', true)"
-          v-if="systemData.drugCatalogue == 'other'"
+          v-if="systemData.drugCatalogSupplier == 'other'"
           :messages="{required: 'Additional details are required'}" 
           :rules="['required', 'fieldIsOther:system.drugCatalogSupplier']"
           :debounce="200" />
@@ -191,8 +190,10 @@
           />
         </GroupElement>
         <!-- End of #387 replacement block -->
+        
         <GroupElement name="penicillinGroup" :class="'mb-4'">
-          <StaticElement name="penicillinWarning">
+          <!-- Removed 12/06/2026 David - does not seem connected to an issue anywhere... -->
+          <!-- <StaticElement name="penicillinWarning">
             <div class="alert alert-warning mt-4" role="alert">
               Nationally there have been a number of patient safety incidents relating to mis-recording of Penicillin
               allergy as Penicillamine allergy in electronic prescribing systems, with the risk of allergy alert
@@ -219,7 +220,7 @@
             :debounce="200" />          
           <TextElement name="penicillinComment"
             :label="embolden('If there is anything you would like to tell us about penicillin prescribing in your organisation, please record it here')"
-            :debounce="200" />
+            :debounce="200" /> -->
           <StaticElement name="antimicrobialWarning">
             <div class="alert alert-warning mt-4" role="alert">
               We are hoping to learn about any build users may have within their electronic 
