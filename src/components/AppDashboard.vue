@@ -106,18 +106,16 @@
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
                 <div class="row col-12">
                   <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
-                  <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a>
-                </div>
-                <div class="row col-12 mt-4">
                   <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
-                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>
-                  <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a>
-                </div>                
-                <div class="row col-12 mt-4">
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
+                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>                  
+                  <!-- <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a> -->
                 </div>
+                <div class="row col-12 mt-4">
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
+                  <!-- <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a> -->
+                </div>                               
                 <div class="row col-12 mt-4"><h3>Experimental reports</h3></div>
                 <div class="row col-12 mt-4">
                   <a class="btn btn-primary col-2 me-2" @click="categoryRiskReport()" role="button">Category risk</a>
