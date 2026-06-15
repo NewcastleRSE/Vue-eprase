@@ -27,7 +27,7 @@
       <StaticElement name="checklistPostamble">
         <p>
           It is recommended that users new to the ePRaSE tool try the <a href="/practice" target="_blank" title="Try practice mode in a new tab">practice mode (opens in new tab)</a> 
-          and watch the <a href="Javascript:alert('Need URL for video here')" title="Watch video in a new tab">instruction video (opens in new tab)</a> before proceedoing further.
+          and watch the <a href="https://eprase.info/using/" target="_blank" title="Watch video in a new tab">instruction video (opens in new tab)</a> before proceeding further.
         </p>
       </StaticElement>
     </GroupElement>
