@@ -177,7 +177,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -357,8 +357,8 @@ export default {
     const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
     wasError = await this.errorResponder(updateResponse)
     if (!wasError) {
-      const patientScenarioResponse = await this.getPatientScenarioData(true)
-      wasError = await this.errorResponder(patientScenarioResponse)
+      const patientBuildResponse = await this.patientListBuild(true)
+      wasError = await this.errorResponder(patientBuildResponse)
     }
     if (!wasError) {
       const storedResultsResponse = await this.getPatientScenarioResponses(true)
