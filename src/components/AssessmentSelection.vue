@@ -139,6 +139,16 @@
             </CheckboxElement>   
           </GroupElement>  -->
           <!-- End of removed block -->
+          <!-- Added 15/06/2026 David as per https://github.com/NewcastleRSE/Vue-eprase/issues/381 -->
+          <StaticElement name="dataNoticeText" class="alert alert-info">
+            <h3>Data Use Notice (ePRaSE)</h3>
+            <p>Your data helps improve prescribing safety across the NHS. When you complete the ePRaSE assessment, your responses are combined with others to support national reporting and system improvement.</p>
+            <p>All data shared outside your organisation is anonymous. Your organisation will not be named or identified in any public reports or dashboards.</p>
+            <p>You will be able to see your own results and compare them with others, but you will not be able to identify any other organisation.</p>
+            <p>Your data is used by NHS England and the ePRaSE team to understand system performance, support learning, and work with suppliers to improve safety.</p>
+            <p>System suppliers only receive summary information that does not identify organisations.</p>
+            <p>If you have questions about data use or governance, please <a href="mailto:nuth.eprase@nhs.net" title="Email the ePRaSE team">contact the ePRaSE team</a></p>
+          </StaticElement>
         </ObjectElement>              
       </GroupElement>
          
