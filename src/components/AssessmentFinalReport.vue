@@ -57,16 +57,17 @@
               <tr><td>High risk</td><td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} were correctly mitigated.</td></tr>
               <tr><td>No risk (controls)</td><td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} were correctly mitigated.</td></tr>
               <tr>
-                <td>Alert / advisory intervention types</td>
+                <td>System interventions</td>
                 <td>
                   <p>
                     Out of {{ scenarioTotal - excludedTests() }} valid prescribing tests completed, {{ systemInterventionAnalysis.total }} were recorded as completed with system/user intervention. 
-                    {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
-                    {{ systemInterventionAnalysis.both }} reported as both.
+                    <!-- Removed 15/06/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                    <!-- {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
+                    {{ systemInterventionAnalysis.both }} reported as both. -->
                   </p>                
-                  <p>
+                  <!-- <p>
                     This would be considered as a {{ alertRelianceLevel() }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
-                  </p>
+                  </p> -->
                 </td>
               </tr>
             </tbody>
@@ -177,7 +178,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'getPatientScenarioData', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -357,8 +358,8 @@ export default {
     const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
     wasError = await this.errorResponder(updateResponse)
     if (!wasError) {
-      const patientScenarioResponse = await this.getPatientScenarioData(true)
-      wasError = await this.errorResponder(patientScenarioResponse)
+      const patientBuildResponse = await this.patientListBuild(true)
+      wasError = await this.errorResponder(patientBuildResponse)
     }
     if (!wasError) {
       const storedResultsResponse = await this.getPatientScenarioResponses(true)

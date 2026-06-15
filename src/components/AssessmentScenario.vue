@@ -199,7 +199,7 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
@@ -209,7 +209,7 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Intervention details</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['invalid_test_detail_other'] || scenarioResponse(pscd.scenario_code)['invalid_test_detail'] }}</td>
                             </tr>                                                                                                  
@@ -538,7 +538,8 @@ export default {
     this.auxiliaryDataReady = false
 
     new Tooltip(document.body, {
-      selector: '[data-bs-toggle="tooltip"]'
+      selector: '[data-bs-toggle="tooltip"]',
+      trigger: 'hover'
     })
 
     // Massage the category list for better use in Vueform components      

@@ -501,7 +501,8 @@ export default {
   async mounted() {
     console.group('Scenario mounted()')
     new Tooltip(document.body, {
-      selector: '[data-bs-toggle="tooltip"]'
+      selector: '[data-bs-toggle="tooltip"]',
+      trigger: 'hover'
     })
     // Get mitigation and category base data
     let wasError = false

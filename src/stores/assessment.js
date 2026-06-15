@@ -182,18 +182,19 @@ export const assessmentStore = defineStore('assessment', {
           // Look at system interventions
           if (ssr.intervention_type == 'MT1') {   // NOTE: don't change these codes in Strapi!!!
             // Record prompt
-            summary.systemInterventionAnalysis.total++            
-            if (ssr.other_category) {
-              const hasAlert = ssr.other_category.indexOf('alert') != -1
-              const hasAdvisory = ssr.other_category.indexOf('advisory') != -1
-              if (hasAlert && hasAdvisory) {
-                summary.systemInterventionAnalysis.both++
-              } else if (hasAlert) {
-                summary.systemInterventionAnalysis.alertOnly++
-              } else if (hasAdvisory) {
-                summary.systemInterventionAnalysis.advisoryOnly++
-              }
-            }
+            summary.systemInterventionAnalysis.total++
+            // Alerts and advisories removed for 2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401         
+            // if (ssr.other_category) {
+            //   const hasAlert = ssr.other_category.indexOf('alert') != -1
+            //   const hasAdvisory = ssr.other_category.indexOf('advisory') != -1
+            //   if (hasAlert && hasAdvisory) {
+            //     summary.systemInterventionAnalysis.both++
+            //   } else if (hasAlert) {
+            //     summary.systemInterventionAnalysis.alertOnly++
+            //   } else if (hasAdvisory) {
+            //     summary.systemInterventionAnalysis.advisoryOnly++
+            //   }
+            // }
           }
           
           // Look at required scenarios
@@ -882,13 +883,10 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(false)
       } 
 
-      // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
-      // Massage it into db form:
-      // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
       // Form data will be of form 
       // { 
       //  interventionType: MT<code>, 
-      //  otherCategory: [<catcode1>,<catcode2>...], 
+      //  dsCategory: [<catcode1>,<catcode2>...], 
       //  invalidTestDetail: <text>, 
       //  invalidTestDetailOther: <text>, 
       //  qualitativeData: <text>, 

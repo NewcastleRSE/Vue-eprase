@@ -125,15 +125,20 @@
               { value: 'Paediatric', label: 'Paediatrics', disabled: !paediatricAssessmentAllowed }]"
             :messages="{required: 'Select an option'}"
             :rules="['required']"
-          />          
-          <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
+          />
+          <!-- Consent questions removed - fields in db retained -->
+          <HiddenElement name="shareTrustsOptOut" default="1" />
+          <HiddenElement name="shareSuppliersOptOut" default="1" />
+          <!-- Removed 15/06/2026 David - no longer required -->         
+          <!-- <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
             <CheckboxElement name="shareTrustsOptOut">
               <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>          
             <CheckboxElement name="shareSuppliersOptOut">
               <span v-html="embolden('Good mitigation results may be shared with <i>ePrescribing system suppliers</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>   
-          </GroupElement> 
+          </GroupElement>  -->
+          <!-- End of removed block -->
         </ObjectElement>              
       </GroupElement>
          
