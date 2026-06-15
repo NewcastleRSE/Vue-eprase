@@ -327,7 +327,9 @@ export default {
       return description
     },
     initCategoryTooltips(tagsEl, firstTime = true) {
+
       const containerDiv = document.getElementById(tagsEl.fieldId)
+      
       this.$nextTick(() => { 
         // Rejig tooltips on remaining entries in multiselect list
         containerDiv.querySelectorAll('li').forEach(optEl => {
@@ -348,8 +350,9 @@ export default {
           const catLabel = selTag.innerText
           const catArr = this.displayCategories.filter(c => c.label == catLabel)
           if (catArr.length > 0) {
+            const tipValue = this.categoryTooltips[catArr[0].value]
             selTag.setAttribute('data-bs-toggle', 'tooltip')
-            selTag.setAttribute('data-bs-title', this.categoryTooltips[catArr[0].value])      
+            selTag.setAttribute('data-bs-title', tipValue)                             
           }
         })
       })       
@@ -358,6 +361,11 @@ export default {
 
       console.group()
       console.debug('Category selector updated', newVal, oldVal, tagsEl)
+
+      // Prevent tooltips sticking around erroneously
+      for (const item of document.querySelectorAll('.bs-tooltip-auto')) {
+        item.remove()
+      }
 
       // Update the tooltips on list entries and selected tags
       this.initCategoryTooltips(tagsEl, false)
@@ -499,11 +507,13 @@ export default {
     }
   },
   async mounted() {
-    console.group('Scenario mounted()')
+    console.group('Scenario mounted()')    
+
     new Tooltip(document.body, {
       selector: '[data-bs-toggle="tooltip"]',
       trigger: 'hover'
     })
+
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()

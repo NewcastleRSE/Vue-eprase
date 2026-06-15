@@ -798,7 +798,7 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-      if (Object.keys(this.assessmentData.patientScenarios).length == 0) {
+      if (!this.scenarioDataPresent()) {
 
         // Load scenarios for each patient
         let nScenarios = 0
@@ -1135,7 +1135,7 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && Object.keys(this.assessmentData.patientScenarios).length == 0) {
+      if (ret === true && !this.scenarioDataPresent()) {
         ret = await this.getPatientScenarioData()
         if (ret === true) {
           // Save to assessment patient / scenario lists
@@ -1167,6 +1167,19 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    }    
-  }
+    },
+    scenarioDataPresent() {
+      const pcodes = Object.keys(this.assessmentData.patientScenarios)
+      if (pcodes.length == 0) {
+        return false
+      }
+      for (let idx = 0; idx < pcodes.length; idx++) {
+        const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
+        if (!Array.isArray(scenarios) || scenarios.length == 0) {
+          return false
+        }
+      }    
+      return true
+    }
+  }  
 })

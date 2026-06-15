@@ -365,10 +365,10 @@ export default {
       const storedResultsResponse = await this.getPatientScenarioResponses(true)
       wasError = await this.errorResponder(storedResultsResponse)  
     }
-    if (!wasError) {
-      const storedConfigResponse = await this.getConfigQuestionData(true)
-      wasError = await this.errorResponder(storedConfigResponse)  
-    } 
+    // if (!wasError) {
+    //   const storedConfigResponse = await this.getConfigQuestionData(true)
+    //   wasError = await this.errorResponder(storedConfigResponse)  
+    // } 
     if (!wasError) {
       await this.getInstitutionName()
 
