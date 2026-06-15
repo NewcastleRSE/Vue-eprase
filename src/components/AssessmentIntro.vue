@@ -106,7 +106,7 @@ export default {
     },
     setConfirmation() {
       this.requirementsConfirmed = true
-      Cookies.set('showCompetencyChecklist', 'yes', { expires: 90 })
+      Cookies.set('hideCompetencyChecklist', 'yes', { expires: 90 })
     }
   },
   async mounted() {
@@ -115,7 +115,7 @@ export default {
     this.resetPracticeData()
 
     // See if user has already checked all the competency requirements
-    this.requirementsConfirmed = Cookies.get('showCompetencyChecklist') == 'yes'
+    this.requirementsConfirmed = Cookies.get('hideCompetencyChecklist') == 'yes'
    
     // Get mitigation and category base data
     let wasError = false
