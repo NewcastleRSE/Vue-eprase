@@ -181,7 +181,7 @@
                               <th style="width:200px">Response</th>
                               <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Category/intervention type</th>
                               <td>
                                 <ul class="list-group">
@@ -191,7 +191,7 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Intervention details</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
                             </tr>                                                                       
