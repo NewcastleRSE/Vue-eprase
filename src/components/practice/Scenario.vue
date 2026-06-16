@@ -1,31 +1,13 @@
 <template>
-  <GroupElement name="scenarioGroup" :class="'mb-4'">
-    <HiddenElement ref="completedScenariosHidden" name="completedScenarios" :rules="[scenarioCompletionValidator]" />    
+  <GroupElement name="scenarioGroup" class="my-4">
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
-        <div class="alert alert-info mt-2" role="alert">
-          <p>There are 45 test scenarios to complete. This should be carried out in <span
-              class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
-          <p>
-            Please select the first patient's name from those set up in the patient build phase and prescribe the
-            medication exactly as detailed in the scenario 1 tab presented.
-            Record any relevant advice or information received while completing the test as prompted. Check all
-            responses and then click <span class="fw-bold">Save</span>.
-          </p>
-          <p>
-            Please note once you have clicked <span class="fw-bold">Save</span> you will <span
-              class="fw-bold">not</span> be able to return to this page again to change your response.
-          </p>
-          <p>
-            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should
-            complete the same process.
-            On completion of the three scenario tests you will be prompted to move onto the next patient.
-          </p>
-          <p>Please work through all of the patients until all test scenarios are complete</p>
+        <div class="alert alert-info mt-4" role="alert">
+          <p>There are {{ scenarioCount }} test scenarios to complete. TODO - need wording here...</p>
         </div>
       </StaticElement>       
-      <StaticElement name="scenariosProgress" class="mb-4">
+      <StaticElement name="scenariosProgress">
         <div class="alert alert-info fw-bold" role="alert">
           {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
         </div>
@@ -47,11 +29,11 @@
                   @click="openPatientScenarios(patient.patient_code)"
                 >
                   <span class="fw-bold">
-                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-male.png" alt="Adult male patient" />
-                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-female.png" alt="Adult female patient" />
-                    <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/baby.png" alt="Baby patient" />
-                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
-                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
+                    <img v-show="patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-male.png" alt="Adult male patient" />
+                    <img v-show="patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-female.png" alt="Adult female patient" />
+                    <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/baby.png" alt="Baby patient" />
+                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
+                    <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
                     Patient: {{ patient.full_name }}, {{ formatAgeCaption(patient) }}: {{ formatAge(patient) }}
                   </span>
                 </button>
@@ -142,7 +124,7 @@
                             </div>
                           </StaticElement>
                           <!-- New implementation 29/05/2026 in response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
-                          <TagsElement name="otherCategory" placeholder="Select at most two categories"
+                          <TagsElement name="dsCategory" ref="dsCategory" placeholder="Select at most two categories"
                             v-if="dataLoaded && prescribingHasIntervention"
                             :label="embolden('If the system were to respond to the challenge, please select below which category(s) of intervention (e.g. dose, frequency dialogue) occurred, up to a maximum of two:', true)"                              
                             :items="matrixCategories"
@@ -154,7 +136,7 @@
                           />
                           <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
                           <!-- Extra dropdown for identifying different cases where prescribing was not possible - https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->
-                          <SelectElement name="invalidTestDetail"
+                          <SelectElement name="reasonImpossible"
                             v-if="dataLoaded && prescribingImpossible"
                             :label="embolden('Please enter the reason prescribing was not possible', true)"
                             :native="false"
@@ -168,19 +150,19 @@
                             :messages="{required: 'Reason is required if prescribing was not possible'}" 
                             :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.interventionType,MT99`]" 
                           />
-                           <TextElement name="invalidTestDetailOther" placeholder="Please give details"
+                           <TextElement name="otherReasonImpossible" placeholder="Please give details"
                             v-if="dataLoaded && prescribingImpossible && reasonImpossible == 'other'"
                             :label="embolden('Describe why prescribing was not possible', true)" 
-                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.invalidTestDetail,other`]"
+                            :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.reasonImpossible,other`]"
                             :messages="{required: 'Additional description is required'}" 
                             :debounce="200" 
                           />
-                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->                           
+                          <!-- End of response to https://github.com/NewcastleRSE/Vue-eprase/issues/418 -->                     
                           <TextareaElement name="qualitativeData" :rows="5" class="mb-2"
                             :attrs="{ maxlength: 500 }" 
                             :label="embolden('Additional comments', false)" 
                           />
-                          <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
+                          <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-4" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
@@ -211,8 +193,8 @@
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Intervention details</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['invalid_test_detail_other'] || scenarioResponse(pscd.scenario_code)['invalid_test_detail'] }}</td>
-                            </tr>                                                                                                  
+                              <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
+                            </tr>                                                                       
                             <tr>
                               <th>Your notes</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['qualitative_data'] || 'None entered' }}</td>
@@ -246,10 +228,7 @@
             </ObjectElement>
           </div>
         </div>
-      </ObjectElement>
-      <StaticElement v-show="numCompletedScenarios == scenarioCount" name="completedLastScenarioAlert" class="mt-4">
-        <div class="alert alert-info">You have now completed all the scenarios.  Please click 'Continue to Reports' below to see your final report.</div>
-      </StaticElement>
+      </ObjectElement>      
     </GroupElement>
   </GroupElement>
 </template>
@@ -258,37 +237,27 @@
 
 import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../helpers/common'
-import { assessmentStore } from '../stores/assessment'
-import { appSettingsStore } from '../stores/appSettings'
-import { Validator } from '@vueform/vueform'
-
-const scenarioCompletionValidator = class extends Validator {
-  get msg() {
-    return 'Please complete all scenario questions'
-  }
-  check(value) {
-    console.debug('scenarioCompletionValidator() validator entered with', value)
-    return value && value.split(',').length == assessmentStore().assessmentData.numScenarios
-  }
-}
+import { appSettingsStore } from '../../stores/appSettings';
+import { practiceStore } from '../../stores/practice'
+import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
 
 export default {
-  name: 'AssessmentScenario',
+  name: 'Scenario',  
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
     ...mapState(appSettingsStore, ['maxSelectableDsCategories']),
+    ...mapState(practiceStore, [
+      'dataReady', 'patients', 'patientScenarios', 'scenarioPatientLink', 
+      'scenarioUserResponses', 'savePatientScenarioResponse', 'numScenarios', 
+      'getCategoryDetails', 'getMitigationDetails', 'categories', 'mitigations'
+    ]),
     dataLoaded() {
-      return this.auxiliaryDataReady && this.dataReady
+      return this.dataReady
     },        
     patientData() {
-      return this.assessmentData.patients
-    },
-    patientScenarios() {
-      return this.assessmentData.patientScenarios
-    },
+      return this.patients
+    },    
     scenarioCount() {
-      return this.assessmentData.numScenarios
+      return this.numScenarios
     },    
     scenarioResponses() {
       return this.storedResponsesByCode
@@ -301,9 +270,9 @@ export default {
     },
     matrixCategories() {
       return this.displayCategories
-    },     
+    },
     reasonImpossible() {
-      return this.scenarioForm.data[this.currentScenario].invalidTestDetail
+      return this.scenarioForm.data[this.currentScenario].reasonImpossible
     },
     scenarioForm() {
       return this.$refs[`${this.currentScenario}Snippet`][0]
@@ -313,10 +282,6 @@ export default {
     },
     prescribingImpossible() {
       return this.interventionSelections[`${this.currentPatient}.${this.currentScenario}.interventionType`] === 'MT99'
-    },   
-    completedScenariosHidden() {
-      console.log('Hidden element is', this.$refs.completedScenariosHidden)
-      return this.$refs.completedScenariosHidden
     },
     tooManyCategories() {
       return this.prescribingHasIntervention && this.dsCategoriesSelected.length > this.maxSelectableDsCategories
@@ -327,7 +292,6 @@ export default {
   },
   data() {
     return {
-      auxiliaryDataReady: false,
       displayCategories: [],
       categoryTooltips: {},
       interventionSelections: {},
@@ -336,12 +300,11 @@ export default {
       allowCurrentScenarioSave: false,
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
-      scenarioPatientLink: {},
       savedResponseData: true,
-      dsCategoriesSelected: [], // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
-      scenarioCompletionValidator
+      dsCategoriesSelected: [] // Limiter for the category selection in the case of system/user intervention (https://github.com/NewcastleRSE/Vue-eprase/issues/169)
     }
   },
+  emits: ['allScenariosCompleted'],
   methods: {
     isBaby(patient) {
       return patientIsBaby(patient)
@@ -365,8 +328,8 @@ export default {
     },
     initCategoryTooltips(tagsEl, firstTime = true) {
 
-      const containerDiv = document.getElementById(tagsEl.fieldId)      
-
+      const containerDiv = document.getElementById(tagsEl.fieldId)
+      
       this.$nextTick(() => { 
         // Rejig tooltips on remaining entries in multiselect list
         containerDiv.querySelectorAll('li').forEach(optEl => {
@@ -389,7 +352,7 @@ export default {
           if (catArr.length > 0) {
             const tipValue = this.categoryTooltips[catArr[0].value]
             selTag.setAttribute('data-bs-toggle', 'tooltip')
-            selTag.setAttribute('data-bs-title', tipValue)      
+            selTag.setAttribute('data-bs-title', tipValue)                             
           }
         })
       })       
@@ -410,37 +373,40 @@ export default {
       this.dsCategoriesSelected = tagsEl.value
 
       console.groupEnd()
-    },   
+    },
+    storeResponse(patient, scenario) {
+      if (!( scenario.scenario_code in this.storedResponsesByCode )) {
+        // All good to go
+        this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
+        this.storedResponsesByCode[scenario.scenario_code] = this.scenarioUserResponses[scenario.scenario_code]        
+        this.numCompletedScenarios++          
+        setTimeout(() => {
+          this.savedResponseData = true
+          if (this.numCompletedScenarios == this.scenarioCount) {
+            this.$emit('allScenariosCompleted')
+          }
+        }, 200)
+      }   
+    },
     async saveScenarioResponse(patient, scenario) {
       
       console.group('saveScenarioResponse()')
-      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)
-
+      console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)      
+     
       // Validate the patient/scenario form snippet
       this.scenarioForm.validateChildren().then(async () => {
         if (!this.scenarioForm.invalid) {
           this.savedResponseData = false
-          if (!( scenario.scenario_code in this.storedResponsesByCode )) {
-            // All good to go
-            await this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
-            this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
-            this.numCompletedScenarios++     
-            this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
-            this.completedScenariosHidden.validate()     
-            setTimeout(() => {
-              this.savedResponseData = true
-              if (this.numCompletedScenarios == this.scenarioCount) {
-                this.$emit('allScenariosCompleted')
-              }
-            }, 200)
-          }
+          this.storeResponse(patient, scenario)
         }
-      })     
+      })
+                     
       console.groupEnd()
-    },      
+    },     
     showUniqueScenario() {
       // Insane hack to fix https://github.com/NewcastleRSE/Vue-eprase/issues/275 - reactivity should be sufficient but sometimes isn't...
       // So when a patient record is clicked out of order, make sure only the current scenario is activated (remove 'active' and 'active show' from elements)
+      // Probably not needed in this context, but left in just in case - David 01/06/2026
       console.group('showUniqueScenario() - HACK')
       const scenarioTabs = document.getElementById('scenario-patient-' + this.currentPatient + '-scenario-tabs')
       if (scenarioTabs) {
@@ -466,10 +432,10 @@ export default {
 
       this.dsCategoriesSelected = []
       const doneScenarios = Object.keys(this.scenarioResponses)
-      this.completedScenariosHidden.update(doneScenarios.join(','))
-
+      console.debug('Done', doneScenarios.length, 'of', this.scenarioCount, 'scenarios')
       if (doneScenarios.length < this.scenarioCount) {
         // Still some to do, so find the next uncompleted one (won't necessarily be sequential...)
+        console.debug('Still scenarios to complete')
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         await this.$nextTick(() => { 
@@ -480,7 +446,7 @@ export default {
           const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
           if (patientElement != null) {
             this.$nextTick(() => { 
-              patientElement.scrollIntoView({
+                patientElement.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
                 inline: 'nearest'
@@ -496,6 +462,7 @@ export default {
       console.groupEnd()
     },
     // Allow user to simply click on any patient within the list e.g. to review responses
+    // Not needed if practice session limited to one patient, but left here in case...
     async openPatientScenarios(patientCode) {
 
       console.group('openPatientScenarios()')
@@ -509,7 +476,7 @@ export default {
       })  
       
       console.groupEnd()
-    },  
+    },    
     scenarioResponse(scenarioCode) {
       return this.scenarioResponses[scenarioCode] || {}
     },
@@ -540,52 +507,27 @@ export default {
     }
   },
   async mounted() {
-
-    console.group('AssessmentScenario mounted()')
-
-    this.auxiliaryDataReady = false
+    console.group('Scenario mounted()')    
 
     new Tooltip(document.body, {
       selector: '[data-bs-toggle="tooltip"]',
       trigger: 'hover'
     })
 
-    // Massage the category list for better use in Vueform components      
-    this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })  
-    this.categoryTooltips = {}
-    this.categories.forEach(c => this.categoryTooltips[c.category_code] = c.description)       
-
-    for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
-      scenarios.forEach(s => {
-        this.scenarioPatientLink[s.scenario_code] = patientCode
-      })      
-    }
-    const storedResultsResponse = await this.getPatientScenarioResponses(true)
-    const wasError = await this.errorResponder(storedResultsResponse)
+    // Get mitigation and category base data
+    let wasError = false
+    const mitResponse = await this.getMitigationDetails()
+    wasError = await this.errorResponder(mitResponse)
     if (!wasError) {
-      // Package the responses by scenario code for convenience - data is of form:
-      // { intervention_type: MT<code>, result: <calculated_mitigation>, other_category: <category_code1>,<category_code2>..., qualitative_data: <text> }
-      this.assessmentData.storedScenarioResponses.forEach(asr => {
-        this.storedResponsesByCode[asr.scenario.scenario_code] = asr
-      })
-      this.numCompletedScenarios = Object.keys(this.scenarioResponses).length
-      
-      // Absolutely critical line which disables the 'continue to configuration questions' button when no scenarios have been completed...
-      this.completedScenariosHidden.validate()
-
-      this.auxiliaryDataReady = true
-      this.$nextTick(() => { this.openNextUnenteredScenario() })   
-    }    
-    console.groupEnd()
-  },
-  async beforeUnmount() {
-    console.group('AssessmentScenario beforeUnmount()')
-    console.assert(this.dataLoaded, 'AssessmentScenario beforeUnmount() hook - dataReady flag is false')
-    if (this.numCompletedScenarios == this.scenarioCount) {
-      // We have done all the data entry now          
-      const updateResponse = await this.updateAssessmentStatus('Scenarios complete', true)
-      await this.errorResponder(updateResponse)
-    }    
+      const catResponse = await this.getCategoryDetails()
+      wasError = await this.errorResponder(catResponse)
+    } if (!wasError) {
+      // Massage the category list for better use in Vueform components      
+      this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })
+      this.categoryTooltips = {}
+      this.categories.forEach(c => this.categoryTooltips[c.category_code] = c.description)      
+      this.$nextTick(() => { this.openNextUnenteredScenario() })
+    }       
     console.groupEnd()
   }
 }

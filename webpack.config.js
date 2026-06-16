@@ -51,7 +51,7 @@ module.exports = {
               importLoaders: 2,
               url: false,
               modules: {
-                mode: "icss", // Enable ICSS (Interoperable CSS)
+                mode: "icss", // Enable ICSS (Interoperable CSS)                
               }
             }
           },
@@ -144,7 +144,7 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"production"',
         BASE_URL: baseURL,
-        MAINTENANCE_MODE: false
+        MAINTENANCE_MODE: true
       },
     }),
     new webpack.LoaderOptionsPlugin({

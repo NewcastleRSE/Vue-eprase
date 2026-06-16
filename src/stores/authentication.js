@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { assessmentStore } from './assessment'
 import Cookies from 'js-cookie'
+import { practiceStore } from './practice'
 
 const API = process.env.BASE_URL
 
@@ -104,6 +105,7 @@ export const authenticationStore = defineStore('authentication', {
       }
       this.$reset()
       assessmentStore().reset()
+      practiceStore().resetPracticeData()
       localStorage.clear()
       Cookies.remove('authentication')         
     },

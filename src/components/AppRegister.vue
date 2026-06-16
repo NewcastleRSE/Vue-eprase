@@ -47,7 +47,8 @@
               :messages="{required: 'Hospital is required'}" 
               :rules="[{ 'required': ['institution', '!=', ''] }]" /> -->
             <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/232 - have to send a placeholder to avoid late stage strapi change -->
-            <HiddenElement name="hospital" value="hospital_placeholder" />
+            <HiddenElement name="hospital" value="hospital_placeholder" />            
+            
             <TextElement name="password" autocomplete="on"
               :label="embolden('Password', true)"
               :input-type="showPassword ? 'text' : 'password'"            

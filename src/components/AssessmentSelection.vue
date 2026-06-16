@@ -20,7 +20,7 @@
         <p>
           It is now possible to test more than one type of ePrescribing System deployed 
           in your trust. Users can also do both an adult and a separate paediatric assessment 
-          for an individual EP system. If both adult and paediatric prescribing are undertaken, 
+          for an individual ePrescribing system. If both adult and paediatric prescribing are undertaken, 
           <strong>both assessments should be completed</strong>. Please work through each 
           assessment one at a time i.e., complete one assessment fully before starting the next.
         </p>
@@ -113,10 +113,10 @@
             :messages="{required: 'Name of ePrescribing system is required'}"           
             :rules="['required', $vueform.rules.nonEmptyObject]"
           />
-          <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your eP system"
+          <TextElement v-if="isOtherEpSystem" name="otherEpService" placeholder="Name of your ePrescribing system"
             :label="embolden('Name of ePrescribing system', true)"
             :debounce="200" 
-            :messages="{required: 'Other eP system name is required'}" 
+            :messages="{required: 'Other ePrescribing system name is required'}" 
             :rules="['required', 'fieldIsOther:selection.epService']" />
           <RadiogroupElement name="patientType"
             :label="embolden('For patient type', true)"      
@@ -125,15 +125,30 @@
               { value: 'Paediatric', label: 'Paediatrics', disabled: !paediatricAssessmentAllowed }]"
             :messages="{required: 'Select an option'}"
             :rules="['required']"
-          />          
-          <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
+          />
+          <!-- Consent questions removed - fields in db retained -->
+          <HiddenElement name="shareTrustsOptOut" default="1" />
+          <HiddenElement name="shareSuppliersOptOut" default="1" />
+          <!-- Removed 15/06/2026 David - no longer required -->         
+          <!-- <GroupElement name="sharingConsentQuestions" class="alert alert-warning mt-4" role="alert">
             <CheckboxElement name="shareTrustsOptOut">
-              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on EP system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
+              <span v-html="embolden('Good mitigation results from this ePRaSE assessment will be shared with <i>other NHS trusts</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>          
             <CheckboxElement name="shareSuppliersOptOut">
-              <span v-html="embolden('Good mitigation results may be shared with <i>EP system suppliers</i> to support learning on EP system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
+              <span v-html="embolden('Good mitigation results may be shared with <i>ePrescribing system suppliers</i> to support learning on ePrescribing system optimisation.<br>If you <i>do not</i> consent to sharing your data, please opt out by checking this box')"></span>
             </CheckboxElement>   
-          </GroupElement> 
+          </GroupElement>  -->
+          <!-- End of removed block -->
+          <!-- Added 15/06/2026 David as per https://github.com/NewcastleRSE/Vue-eprase/issues/381 -->
+          <StaticElement name="dataNoticeText" class="alert alert-info">
+            <h3>Data Use Notice (ePRaSE)</h3>
+            <p>Your data helps improve prescribing safety across the NHS. When you complete the ePRaSE assessment, your responses are combined with others to support national reporting and system improvement.</p>
+            <p>All data shared outside your organisation is anonymous. Your organisation will not be named or identified in any public reports or dashboards.</p>
+            <p>You will be able to see your own results and compare them with others, but you will not be able to identify any other organisation.</p>
+            <p>Your data is used by NHS England and the ePRaSE team to understand system performance, support learning, and work with suppliers to improve safety.</p>
+            <p>System suppliers only receive summary information that does not identify organisations.</p>
+            <p>If you have questions about data use or governance, please <a href="mailto:nuth.eprase@nhs.net" title="Email the ePRaSE team">contact the ePRaSE team</a></p>
+          </StaticElement>
         </ObjectElement>              
       </GroupElement>
          
@@ -217,7 +232,7 @@ export default {
           accumulator[value] = ++accumulator[value] || 1
           return accumulator
         }, {})
-        // Don't offer EP system codes which already have 2 assessments         
+        // Don't offer ePrescribing system codes which already have 2 assessments         
         const validEpSystems = response.data.data.filter(ep => !Object.keys(frequencyCounts).includes(ep.documentId) || frequencyCounts[ep.documentId] < 2)       
         epSystems = validEpSystems.map(ep => { return { value: ep.documentId, label: ep.name } })
         // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)

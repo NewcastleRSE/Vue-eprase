@@ -1,63 +1,68 @@
-import { createRouter, createWebHistory } from "vue-router"
-import { authenticationStore } from "../stores/authentication"
+import { createRouter, createWebHistory } from 'vue-router'
+import { authenticationStore } from '../stores/authentication'
 
-import AppWelcome from "../components/AppWelcome"
-import AppLogin from "../components/AppLogin"
-import AppLogout from "../components/AppLogout"
-import AppRegister from "../components/AppRegister"
-import Assessment from "../components/Assessment"
-import AppDashboard from "../components/AppDashboard"
-import AppChangePassword from "../components/AppChangePassword"
-import AppMaintenanceMode from "../components/AppMaintenanceMode"
-import PrintablePdf from "../components/PrintablePdf"
-import AppDashboardReport from "../components/AppDashboardReport"
+import AppWelcome from '../components/AppWelcome'
+import AppLogin from '../components/AppLogin'
+import AppLogout from '../components/AppLogout'
+import AppRegister from '../components/AppRegister'
+import Assessment from '../components/Assessment'
+import AssessmentPractice from '../components/AssessmentPractice.vue'
+import AppDashboard from '../components/AppDashboard'
+import AppChangePassword from '../components/AppChangePassword'
+import AppMaintenanceMode from '../components/AppMaintenanceMode'
+import PrintablePdf from '../components/PrintablePdf'
+import AppDashboardReport from '../components/AppDashboardReport'
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [  
     {
-      path: "/login/:action?",
-      name: "login",
+      path: '/login/:action?',
+      name: 'login',
       component: AppLogin,
     },
     {
-      path: "/logout/:action?",
+      path: '/logout/:action?',
       component: AppLogout
     },
     {
-      path: "/register",
+      path: '/register',
       component: AppRegister,
     },
     {
-      path: "/",
+      path: '/',
       component: AppWelcome,
     },
     {
-      path: "/assessment",
+      path: '/assessment',
       component: Assessment,
     },  
     {
-      path: "/change-password",
+      path: '/practice',
+      component: AssessmentPractice,
+    },  
+    {
+      path: '/change-password',
       component: AppChangePassword,
     },  
     {
-      path: "/assessment-dashboard",
+      path: '/assessment-dashboard',
       component: AppDashboard,
     }, 
     {
-      path: "/printablepdf",
+      path: '/printablepdf',
       component: PrintablePdf,
     },
     {
-      path: "/maintenance",
+      path: '/maintenance',
       component: AppMaintenanceMode,
     },
     {
-      path: "/assessment-report",
+      path: '/assessment-report',
       component: AppDashboardReport
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
-    { path: "/:pathMatch(.*)*", redirect: "/" },
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ]
 })
 

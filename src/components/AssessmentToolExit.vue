@@ -4,7 +4,7 @@
       <h2>Assessment Complete</h2>
       <div class="alert alert-info mt-2" role="alert">
         Thank you for completing this assessment, you can now exit the tool where you can leave feedback via the user survey, or you can start a new 
-        assessment for any additional adult EP systems or start a paediatric assessment from the Assessment Selection page. Please select using the buttons below.
+        assessment for any additional adult ePrescribing systems or start a paediatric assessment from the Assessment Selection page. Please select using the buttons below.
       </div>
       <GroupElement name="exitButtonBar">
         <ButtonElement name="surveyAndExit" title="Exit Tool" full

@@ -51,18 +51,24 @@ const fieldIsOther = class extends Validator {
     return this.attributes[0]
   }
 
+  get otherFieldValue() {
+    return this.attributes[1] || 'other'
+  }
+
   check(value) {
-    console.debug(this.otherField, this.form$.data)
+    console.debug('fieldIsOther:check()', this.otherField, this.otherFieldValue, this.form$.data)
     this.watch(this.otherField)
     let otherVal = deepGet(this.form$.data, this.otherField.split('.'))    
+    console.debug('Found value of', this.otherField, ' = ', otherVal, 'in form data', this.form$.data)
     if (otherVal != null) {
-      console.debug(otherVal)
       if (Object.keys(otherVal).includes('label')) {
-        // Select option is an object with keys 'label' and 'value'
+        // Select option is an object with keys 'label' and 'value'        
         otherVal = otherVal.label
+        console.debug('Using label', otherVal, 'for validation as found an object')
       }
       const otherArr = Array.isArray(otherVal) ? otherVal : [otherVal]
-      return otherArr.includes('Other') || otherVal.includes('other')
+      const testValue = this.otherFieldValue
+      return otherArr.includes(testValue.substring(0, 1).toUpperCase() + testValue.substring(1)) || otherVal.includes(testValue)
     }
     return true
   }
@@ -90,6 +96,7 @@ const dateIsSameOrAfter = class extends Validator {
   }
 
   check(value) {
+    console.debug('dateIsSameOrAfter:check()', this.otherDate, this.otherDateDescription, this.form$.data)
     dayjs.extend(customParseFormat)
     dayjs.extend(isSameOrAfter)
     this.watch(this.otherDate)

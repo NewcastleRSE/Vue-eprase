@@ -31,7 +31,7 @@
                 @click="onRegisterClick">
                 <i class="bi bi-person-fill-add me-2"></i>Register
               </ButtonElement>
-              <!--
+              <!-- Will never work in a locked down NHS environment as requires email server
               <ButtonElement name="forgotpassword" full 
                 :columns="4" 
                 :add-class="'ms-2'" 

@@ -176,9 +176,9 @@ input[type="checkbox"], input[type="radio"] {
   pointer-events: none !important;
 }
 
-button.scenario {
-  pointer-events: none !important;
-}
+// button.scenario {
+//   pointer-events: none !important;
+// }
 
 td.assessment-not-started {
   background-color: $danger;
@@ -201,4 +201,8 @@ td.assessment-padding-cell {
   opacity: 1 !important;
   max-width: none;
   width: fit-content;
+}
+
+#practice-stage-tabs button {
+  pointer-events: none !important;
 }

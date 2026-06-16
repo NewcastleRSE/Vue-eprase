@@ -11,14 +11,14 @@
 
         <h2>ePRaSE Tool Assessment Report {{ epSystemYear }}</h2>
         <h3>Trust: {{ institutionName }}</h3>
-        <h3>EP System: {{ epSystemName }}</h3>
+        <h3>ePrescribing system: {{ epSystemName }}</h3>
         <h3>Type of assessment: {{ assessmentData.selection.patientType }} inpatient</h3>
 
         <div class="report-page">
           <p>Summary of risk mitigation performance for your system across all the prescribing tests executed.</p>
           <div ref="pieChartContainer"></div>
           <p>
-            Good mitigation of the prescribing assessments in the ePRaSE tool is defined as where an EP system correctly identifies a risk of error, 
+            Good mitigation of the prescribing assessments in the ePRaSE tool is defined as where an ePrescribing system correctly identifies a risk of error, 
             providing an appropriate predefined response (e.g., prescribing prevented or presents some onscreen alert or advisory intervention) when 
             a medicine is prescribed.
           </p>
@@ -30,7 +30,7 @@
             Over mitigation indicates tests where scores are accrued when an intervention is recorded when none is expected from the control items. 
           </p>
           <p>
-            Invalid results are where a test presented a medicine which was not in the user's EP system and the question was passed over. 
+            Invalid results are where a test presented a medicine which was not in the user's ePrescribing system and the question was passed over. 
           </p>
         </div>
         
@@ -42,7 +42,7 @@
           </p>
           <p>
             The total number of prescribing tests excluded (described as invalid test in the pie chart) due to medication not being available in the 
-            users EP system or the user skipped the question for another reason = {{ excludedTests() }}
+            users ePrescribing system or the user skipped the question for another reason = {{ excludedTests() }}
           </p>
           <p>
             Table (1) below details the total number of prescribing tests completed, broken down by risk category. In addition, information is provided 
@@ -57,16 +57,17 @@
               <tr><td>High risk</td><td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} were correctly mitigated.</td></tr>
               <tr><td>No risk (controls)</td><td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} were correctly mitigated.</td></tr>
               <tr>
-                <td>Alert / advisory intervention types</td>
+                <td>System interventions</td>
                 <td>
                   <p>
                     Out of {{ scenarioTotal - excludedTests() }} valid prescribing tests completed, {{ systemInterventionAnalysis.total }} were recorded as completed with system/user intervention. 
-                    {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
-                    {{ systemInterventionAnalysis.both }} reported as both.
+                    <!-- Removed 15/06/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
+                    <!-- {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
+                    {{ systemInterventionAnalysis.both }} reported as both. -->
                   </p>                
-                  <p>
+                  <!-- <p>
                     This would be considered as a {{ alertRelianceLevel() }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
-                  </p>
+                  </p> -->
                 </td>
               </tr>
             </tbody>
@@ -104,7 +105,7 @@
         <!-- <div class="report-page">
           <h3>Configuration test results</h3>
           <p>
-            In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine EP system set up in areas which do not easily lend themselves to prescribing tests. 
+            In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine ePrescribing system set up in areas which do not easily lend themselves to prescribing tests. 
             Your configuration tests results are presented on Table 3 below.
           </p>
           <div v-if="!Array.isArray(configQuestionAnalysis) || configQuestionAnalysis.length == 0">
@@ -142,7 +143,7 @@
           <p>
             On completion of each annual campaign the ePRaSE team will pool all data to provide an anonymised set of reports for benchmarking purposes. 
             These will be published on the <a href="https://eprase.info" target="_blank">eprase.info</a> website. Where you have provided consent, your 
-            data may be shared at later date with other users and or EP system suppliers to  support learning on EP system optimisation.
+            data may be shared at later date with other users and or ePrescribing system suppliers to  support learning on ePrescribing system optimisation.
           </p>
         </div>
         
@@ -242,7 +243,7 @@ export default {
       return `
         <h2>Assessment Report ${this.epSystemYear}</h2>
         <h3>Trust: ${this.institutionName}</h3>
-        <h4>EP System: ${this.epSystemName}</h4>
+        <h4>ePrescribing system: ${this.epSystemName}</h4>
         <h4>Type of assessment: ${this.assessmentData.selection.patientType} inpatient</h4>
       `
     },
@@ -364,10 +365,10 @@ export default {
       const storedResultsResponse = await this.getPatientScenarioResponses(true)
       wasError = await this.errorResponder(storedResultsResponse)  
     }
-    if (!wasError) {
-      const storedConfigResponse = await this.getConfigQuestionData(true)
-      wasError = await this.errorResponder(storedConfigResponse)  
-    } 
+    // if (!wasError) {
+    //   const storedConfigResponse = await this.getConfigQuestionData(true)
+    //   wasError = await this.errorResponder(storedConfigResponse)  
+    // } 
     if (!wasError) {
       await this.getInstitutionName()
 

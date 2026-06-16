@@ -5,6 +5,7 @@ import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
+import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -18,42 +19,6 @@ const ASSESSMENT_STATES = {
   'Assessment complete': 6
 }
 
-// Done as <recorded_response> : { <expected_response1>: <mitigation_result1>, ... }
-// Transcription of document posted on Slack eprase2 channel by Becky 18/08/2025
-const GOOD_MITIGATION = 'Good mitigation'
-const SOME_MITIGATION = 'Some mitigation'
-const OVER_MITIGATION = 'Over mitigation'
-const NO_MITIGATION = 'No mitigation'
-const INVALID_TEST = 'Invalid test'
-const MITIGATION_DESCRIPTIONS = [NO_MITIGATION, GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, INVALID_TEST]
-const MITIGATION_MATRIX = {
-  'MT2': { // Recorded response : You were able to complete the prescription without any additional user or system input
-    'MT2': GOOD_MITIGATION,     // Expected response : No intervention
-    'MT1': NO_MITIGATION,       // Expected response : User/system intervention
-    'MT3': NO_MITIGATION        // Expected response : Prescribing prevented
-  },
-  'MT4': { // Recorded response : You were able to complete the prescription, but had to override components of the order sentence
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': SOME_MITIGATION,     // Expected response : User/system intervention
-    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT1': { // Recorded response : You were able to complete the prescription, with system/user intervention
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': GOOD_MITIGATION,     // Expected response : User/system intervention
-    'MT3': SOME_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT3': { // Recorded response : Prevented from prescribing
-    'MT2': OVER_MITIGATION,     // Expected response : No intervention
-    'MT1': OVER_MITIGATION,     // Expected response : User/system intervention
-    'MT3': GOOD_MITIGATION      // Expected response : Prescribing prevented
-  },
-  'MT99': { // Recorded response : Medicine or formulary alternative not available in the system
-    'MT2': INVALID_TEST,        // Expected response : No intervention
-    'MT1': INVALID_TEST,        // Expected response : User/system intervention
-    'MT3': INVALID_TEST         // Expected response : Prescribing prevented
-  }
-}
-
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
 
 const EMPTY_SYSTEM = {
@@ -61,15 +26,26 @@ const EMPTY_SYSTEM = {
   // Removed 28/07/2025 David, following meeting with Steph & Ellie at which it was agreed these were confusing and redundant
   // addEpSystem: '',
   // localEpSystemName: '',
+  orgCareSetting: null,
+  orgCareSettingDetail: '',
+  epSystemEnvironment: null,
+  hasTestEnv: true,
   epServiceImplemented: null,
   epServiceUpdated: null,
+  epServiceUpdateType: null,
+  epServiceUpdateTypeDetail: '',
   numMaintainers: 1.0,
+  drugCatalogSupplier: null,
+  drugCatalogSupplierDetail: '',
   epUsage: '',
   otherEpSystem: '',
   labResults: false,
   manResults: false,
   medHistory: false,
   diagnosisResults: false,
+  medHistoryRoutinelyRecorded: false,
+  primaryCareIncorporated: false,
+  primaryCareRoutinelyUsed: false,
   penicillinDescription: [],
   penicillinDescriptionOther: '',
   // Set to true always - field removed from system page 08/05/2026 - avoid database table field modification
@@ -164,7 +140,7 @@ export const assessmentStore = defineStore('assessment', {
           mitigations: MITIGATION_DESCRIPTIONS,
           frequencies: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
           percentages: Array(MITIGATION_DESCRIPTIONS.length).fill(0),
-          colors: [bsColors.danger, bsColors.success, bsColors.warning, bsColors.info, bsColors.invalid],
+          colors: [bsColors.danger, bsColors.success, bsColors.warning, bsColors.info, bsColors.invalid]
         },        
         goodMitigationByRiskAnalysis: { 
           'Extreme': { total: 0, good: 0 }, 
@@ -206,18 +182,19 @@ export const assessmentStore = defineStore('assessment', {
           // Look at system interventions
           if (ssr.intervention_type == 'MT1') {   // NOTE: don't change these codes in Strapi!!!
             // Record prompt
-            summary.systemInterventionAnalysis.total++            
-            if (ssr.other_category) {
-              const hasAlert = ssr.other_category.indexOf('alert') != -1
-              const hasAdvisory = ssr.other_category.indexOf('advisory') != -1
-              if (hasAlert && hasAdvisory) {
-                summary.systemInterventionAnalysis.both++
-              } else if (hasAlert) {
-                summary.systemInterventionAnalysis.alertOnly++
-              } else if (hasAdvisory) {
-                summary.systemInterventionAnalysis.advisoryOnly++
-              }
-            }
+            summary.systemInterventionAnalysis.total++
+            // Alerts and advisories removed for 2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401         
+            // if (ssr.other_category) {
+            //   const hasAlert = ssr.other_category.indexOf('alert') != -1
+            //   const hasAdvisory = ssr.other_category.indexOf('advisory') != -1
+            //   if (hasAlert && hasAdvisory) {
+            //     summary.systemInterventionAnalysis.both++
+            //   } else if (hasAlert) {
+            //     summary.systemInterventionAnalysis.alertOnly++
+            //   } else if (hasAdvisory) {
+            //     summary.systemInterventionAnalysis.advisoryOnly++
+            //   }
+            // }
           }
           
           // Look at required scenarios
@@ -404,7 +381,7 @@ export const assessmentStore = defineStore('assessment', {
         if (exAssessmentResponse !== true) {
           ret = exAssessmentResponse
         } else if (this.exactAssessmentPresent(orgCode, epSystem, patientType)) {
-          // An assessment already in progress for current trust / eP system / patient type - may have been saved while current user logged in
+          // An assessment already in progress for current trust / ePrescribing system / patient type - may have been saved while current user logged in
           ret = {status: 403, message: 'An existing assessment for this ePrescribing system and patient type is already in progress in your trust'}
           this.setDuplicateAssessment(true)
         } else {
@@ -821,7 +798,7 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-      if (Object.keys(this.assessmentData.patientScenarios).length == 0) {
+      if (!this.scenarioDataPresent()) {
 
         // Load scenarios for each patient
         let nScenarios = 0
@@ -906,42 +883,32 @@ export const assessmentStore = defineStore('assessment', {
         this.setDataReady(false)
       } 
 
-      // Form data will be of form { interventionType: MT<code>, alert<category>: <true|false>, advisory<category: <true|false>, qualitativeData: <text>, haveDiscontinuedPrescription: <true|false> }
+      // Form data will be of form 
+      // { 
+      //  interventionType: MT<code>, 
+      //  dsCategory: [<catcode1>,<catcode2>...], 
+      //  invalidTestDetail: <text>, 
+      //  invalidTestDetailOther: <text>, 
+      //  qualitativeData: <text>, 
+      //  haveDiscontinuedPrescription: <true|false> 
+      // }
       // Massage it into db form:
-      // { intervention_type: MT<code>, result: <calculated>, other_category: <category_code1>:alert[,advisory]|<category_code2>:alert[,advisory], qualitative_data: <text> }
+      // { 
+      //  intervention_type: MT<code>, 
+      //  result: <calculated>, 
+      //  other_category: '<category_code1>,<category_code2>...',
+      //  invalid_test_detail: <text>,
+      //  invalid_test_detail_other: <text>,
+      //  qualitative_data: <text> 
+      // }
       const dataOut = {
         intervention_type: formData.interventionType,
         result: '',
         result_score: 0,  // Not sure whether this is required any more?
-        other_category: '',
+        other_category: Array.isArray(formData.otherCategory) ? formData.otherCategory.join(',') : '',
+        invalid_test_detail: formData.invalidTestDetail,
+        invalid_test_detail_other: formData.invalidTestDetailOther,
         qualitative_data: formData.qualitativeData
-      }
-
-      if (formData.interventionType == 'MT1') {
-        // System intervention, so look at alerts and advisories
-        console.debug('System or user intervention - process alerts and advisories')
-        const interventionsByCategoryCode = {}
-        for (const [formKey, formValue] of Object.entries(formData)) {
-          if (formValue === true && formKey != 'haveDiscontinuedPrescription') {            
-            let isAlert = formKey.startsWith('alert')
-            let catCode = formKey.replace(isAlert ? 'alert' : 'advisory', '')
-            if (!( catCode in interventionsByCategoryCode )) {
-              interventionsByCategoryCode[catCode] = []
-            }
-            interventionsByCategoryCode[catCode].push(isAlert ? 'alert' : 'advisory')
-          }          
-        }
-        // Only two categories are allowed - any further ticked ones are ignored completely...
-        const recordedCategories = Object.keys(interventionsByCategoryCode)
-        console.assert(recordedCategories.length > 0, 'Should have at least 1 category alert / advisory boxes ticked')
-        let prompts = []
-        for (let i = 0; i < Math.min(recordedCategories.length, 2); i++) {
-          prompts.push(recordedCategories[i] + ':' + interventionsByCategoryCode[recordedCategories[i]].toString())
-        }          
-        dataOut['other_category'] = prompts.join('|') 
-        // Scream about this before Postgres does... 
-        console.assert(dataOut['other_category'].length < 255, '>' + dataOut['other_category'] + '< will not fit in a short text field!!') 
-        console.debug('Alert / advisory record by category', interventionsByCategoryCode)       
       }
 
       // Next, calculate mitigation (field 'result')
@@ -1168,7 +1135,7 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && Object.keys(this.assessmentData.patientScenarios).length == 0) {
+      if (ret === true && !this.scenarioDataPresent()) {
         ret = await this.getPatientScenarioData()
         if (ret === true) {
           // Save to assessment patient / scenario lists
@@ -1200,6 +1167,19 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    }    
-  }
+    },
+    scenarioDataPresent() {
+      const pcodes = Object.keys(this.assessmentData.patientScenarios)
+      if (pcodes.length == 0) {
+        return false
+      }
+      for (let idx = 0; idx < pcodes.length; idx++) {
+        const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
+        if (!Array.isArray(scenarios) || scenarios.length == 0) {
+          return false
+        }
+      }    
+      return true
+    }
+  }  
 })
