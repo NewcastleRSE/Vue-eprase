@@ -355,8 +355,10 @@ export default {
     this.auxiliaryDataReady = false
 
     let wasError = false
-    const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
-    wasError = await this.errorResponder(updateResponse)
+    if (!this.isReporter()) {
+      const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
+      wasError = await this.errorResponder(updateResponse)
+    }
     if (!wasError) {
       const patientBuildResponse = await this.patientListBuild(true)
       wasError = await this.errorResponder(patientBuildResponse)
