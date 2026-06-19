@@ -19,7 +19,7 @@
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
       </div>
-      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Patient entry progress indicator" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" :style="'width: ' + ((completedPatientsArray().length / patientData.length) * 100) + '%'"></div>
       </div>
     </StaticElement>

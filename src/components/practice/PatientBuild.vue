@@ -1,18 +1,41 @@
 <template>
   <GroupElement ref="patientBuildGroup" name="patientBuildGroup" class="my-4">  
     <StaticElement name="patientBuildHeading">
-      <h2>Patient Entry</h2>
+      <h2>Step 1: Prepare Your Test Patient</h2>
     </StaticElement>
     <StaticElement name="patientListInfo">
       <div class="alert alert-info" role="alert">
-        TODO - need some wording here...
+        <p>Please create the practice test patient in your ePrescribing system (live or test environment).</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item">
+            If your ePrescribing system is connected to a <span class="fw-bold">Patient Administration System (PAS)</span>, 
+            please use this route to create the patient (even if it takes longer).
+          </li>
+          <li class="list-group-item">
+            Use <span class="fw-bold">generic or dummy data</span> for any additional mandatory fields (e.g. GP details), in line with your usual test approach.
+          </li>
+        </ul>
+        <p>Admit the patient and enter the clinical information provided across all available data fields. Prescribe medications following your standard local workflows.</p>
+        <p class="fw-bold">Key Information to Enter</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item"><span class="fw-bold">Demographics</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Current medications</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Allergy status</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Labs and other clinical fields</span> (if possible, in your system)</li>
+        </ul>
+        <p class="fw-bold">Important Notes</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item">Accurate data entry is essential to ensure the scenarios function correctly.</li>
+          <li class="list-group-item">All <span class="fw-bold">demographics, medications, and allergy fields must be completed.</span></li>
+          <li class="list-group-item">Not all EP systems support additional fields (e.g. co-morbidities, presenting complaint, biochemistry). Please enter as much information as your system allows.</li>
+        </ul>
       </div>
     </StaticElement>
     <StaticElement name="patientBuildProgress">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${numCompletedPatients} of ${patientData.length} patients` }}
       </div>
-      <div v-show="numCompletedPatients != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div v-show="numCompletedPatients != 0" class="progress" role="progressbar" aria-label="Patient entry progress indicator" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" :style="'width: ' + ((numCompletedPatients / patientData.length) * 100) + '%'"></div>
       </div>
     </StaticElement>
@@ -75,7 +98,10 @@
           </div>
         </div>
       </div>
-    </StaticElement>        
+    </StaticElement> 
+    <StaticElement class="alert alert-warning" name="zzzIdWarning">
+      <span class="fw-bold">Note:</span> The &quot;zzz&quot; identifier confirms this is a test patient and ensures safe use of the system.
+    </StaticElement>   
   </GroupElement>  
 </template>
 
