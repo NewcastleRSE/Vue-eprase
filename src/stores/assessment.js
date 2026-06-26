@@ -463,10 +463,13 @@ export const assessmentStore = defineStore('assessment', {
     }, 
     // For reporters only
     async loadCompletedAssessment(assessmentId) {
+
       let ret = false
+      this.setDataReady(false)
+
       if (authenticationStore().isLoggedIn() && authenticationStore().isReporter()) {
         // Permissions ok, so get the assessment data
-        console.debug('Extracting data for assessment id', assessmentId)
+        console.debug('Extracting data for assessment id', assessmentId)        
         const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
         if (assessmentResponse.status < 400) {
           // Check assessment is complete
@@ -498,12 +501,23 @@ export const assessmentStore = defineStore('assessment', {
                 numScenarios: 0
               })
             })
-            const scenarioResponse = await this.getPatientScenarioData()
-            if (scenarioResponse !== true) {
-              ret = scenarioResponse
+            // Added 26/06/2026 - this gets the patient list and the scenario data
+            const patientBuildResponse = await this.patientListBuild()
+            if (patientBuildResponse !== true) {
+              ret = patientBuildResponse
             } else {
-              ret = true
-            }            
+              const storedResultsResponse = await this.getPatientScenarioResponses()
+              if (storedResultsResponse !== true) {
+                ret = storedResultsResponse
+              }
+            }             
+            // Commented out 26/06/2026 - removing need for AssessmentFinalReport to be loading data
+            // const scenarioResponse = await this.getPatientScenarioData()
+            // if (scenarioResponse !== true) {
+            //   ret = scenarioResponse
+            // } else {
+            //   ret = true
+            // }            
           } else {
             ret = {status: 400, message: 'Assessment is not complete'}
           }
@@ -511,6 +525,7 @@ export const assessmentStore = defineStore('assessment', {
       } else {
         ret = {status: 401, message: 'You are not authorised access to this data'}
       }
+      this.setDataReady(true)
       return ret
     },
     // Get the system data (may be used standalone - setting dataReady, or as part of another method)
@@ -1137,9 +1152,10 @@ export const assessmentStore = defineStore('assessment', {
       // Ensure scenario details present for each patient
       if (ret === true && !this.scenarioDataPresent()) {
         ret = await this.getPatientScenarioData()
-        if (ret === true) {
+        if (ret === true && !authenticationStore().isReporter()) {
           // Save to assessment patient / scenario lists
           // First get scenario document ids
+          // NOTE: a reporter user loading a completed assessment does not need to do this and is NOT granted write permission on anything anyway!
           const scenarioDocIds = []
           for (const [patientCode, scenarios] of Object.entries(this.assessmentData.patientScenarios)) {
             scenarioDocIds.push(...scenarios.map(s => s.documentId))
@@ -1169,17 +1185,24 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     scenarioDataPresent() {
+      let ret = true
+      console.group('scenarioDataPresent()')
       const pcodes = Object.keys(this.assessmentData.patientScenarios)
+      console.debug('Patient codes', pcodes)
       if (pcodes.length == 0) {
-        return false
-      }
-      for (let idx = 0; idx < pcodes.length; idx++) {
-        const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
-        if (!Array.isArray(scenarios) || scenarios.length == 0) {
-          return false
-        }
-      }    
-      return true
+        ret = false
+      } else {
+        for (let idx = 0; ret && idx < pcodes.length; idx++) {
+          const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
+          console.debug('Scenarios for patient', pcodes[idx], scenarios)
+          if (!Array.isArray(scenarios) || scenarios.length == 0) {
+            ret = false
+          }
+        } 
+      }        
+      console.debug('Returning', ret)
+      console.groupEnd() 
+      return ret
     }
   }  
 })

@@ -358,19 +358,7 @@ export default {
     if (!this.isReporter()) {
       const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
       wasError = await this.errorResponder(updateResponse)
-    }    
-    if (!wasError) {
-      const patientBuildResponse = await this.patientListBuild(true)
-      wasError = await this.errorResponder(patientBuildResponse)
-    }
-    if (!wasError) {
-      const storedResultsResponse = await this.getPatientScenarioResponses(true)
-      wasError = await this.errorResponder(storedResultsResponse)  
-    }
-    // if (!wasError) {
-    //   const storedConfigResponse = await this.getConfigQuestionData(true)
-    //   wasError = await this.errorResponder(storedConfigResponse)  
-    // } 
+    }        
     if (!wasError) {
       await this.getInstitutionName()
 

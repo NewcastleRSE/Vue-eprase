@@ -46,7 +46,7 @@
                 <table v-if="dashboardData.adultAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
                     <tr>
-                      <th class="align-content-center" colspan="9">Completed stage</th>
+                      <th class="align-content-center" colspan="8">Completed stage</th>
                     </tr>
                     <tr>
                       <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
@@ -56,7 +56,6 @@
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Patient build</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Scenarios</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>Config questions</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Finished</span></th>
                     </tr>
                   </thead>
@@ -65,9 +64,9 @@
                       <td :title="aa.institution.institution_code"><span class="nowrap">{{ aa.institution.name }}</span></td>
                       <td><span class="nowrap">{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
+                        <button v-show="n == 5" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
                       </td>
-                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
+                      <td v-for="n in range(aa.stateIndex + 1, 5)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -77,7 +76,7 @@
                 <table v-if="dashboardData.paediatricAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
                     <tr>
-                      <th class="align-content-center" colspan="9">Completed stage</th>
+                      <th class="align-content-center" colspan="8">Completed stage</th>
                     </tr>
                     <tr>
                       <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
@@ -87,7 +86,6 @@
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Patient build</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Scenarios</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>Config questions</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Finished</span></th>
                     </tr>
                   </thead>
@@ -96,9 +94,9 @@
                       <td :title="pa.institution.institution_code"><span class="nowrap">{{ pa.institution.name }}</span></td>
                       <td><span class="nowrap">{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</span></td>
                       <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
+                        <button v-show="n == 5" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
                       </td>
-                      <td v-for="n in range(pa.stateIndex + 1, 6)" class="padding-cell"></td>
+                      <td v-for="n in range(pa.stateIndex + 1, 5)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -176,7 +174,7 @@ export default {
       return new Date().toISOString().slice(0, 10)
     },
     progressBarClass(idx) {
-      return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 6 ? 'in-progress' : 'complete'))
+      return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 5 ? 'in-progress' : 'complete'))
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
@@ -221,8 +219,10 @@ export default {
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
       const selectResponse = await this.loadCompletedAssessment(assessmentId)        
-      await this.errorResponder(selectResponse)
-      window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
+      const wasError = await this.errorResponder(selectResponse)
+      if (!wasError) {
+        window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
+      }      
       console.groupEnd()
     }
   },  
@@ -238,11 +238,7 @@ export default {
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
       wasError = await this.errorResponder(catResponse)
-    }
-    if (!wasError) {
-      const configResponse = await this.getConfigQuestionDetails()
-      wasError = await this.errorResponder(configResponse)
-    }
+    }    
     if (!wasError) {
       // Dashboard data
       const response = await this.progressReport()
