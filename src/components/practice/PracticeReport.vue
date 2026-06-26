@@ -1,11 +1,11 @@
 <template>
   <GroupElement ref="practiceReportGroup" name="practiceReportGroup" :class="'my-4'">  
     <StaticElement name="practiceReportHeading">
-      <h2>ePRaSE Practice Mode - Report</h2>
+      <h2>End of Practice Session</h2>
     </StaticElement>
     <StaticElement name="practiceReportInfo">
       <div class="alert alert-info" role="alert">
-        TODO - need some wording here...
+        Once you are comfortable with the process, please complete the pre-start checklist and then proceed to the full assessment.
       </div>
     </StaticElement>    
   </GroupElement>  

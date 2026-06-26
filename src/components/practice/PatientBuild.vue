@@ -31,14 +31,18 @@
         </ul>
       </div>
     </StaticElement>
-    <StaticElement name="patientBuildProgress">
+    <StaticElement class="alert alert-warning" name="zzzIdWarning">
+      <span class="fw-bold">Note:</span> The &quot;zzz&quot; identifier confirms this is a test patient and ensures safe use of the system.
+    </StaticElement>
+    <!-- Commented out 26/06/2026 David - not relevant with only one patient... -->
+    <!-- <StaticElement name="patientBuildProgress">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${numCompletedPatients} of ${patientData.length} patients` }}
       </div>
       <div v-show="numCompletedPatients != 0" class="progress" role="progressbar" aria-label="Patient entry progress indicator" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" :style="'width: ' + ((numCompletedPatients / patientData.length) * 100) + '%'"></div>
       </div>
-    </StaticElement>
+    </StaticElement> -->
     <StaticElement name="patientBuildBody">
       <div class="accordion" id="patientAccordion">
         <div class="accordion-item" v-for="(patient, idx) in patientData" :key="patient.id">
@@ -98,10 +102,7 @@
           </div>
         </div>
       </div>
-    </StaticElement> 
-    <StaticElement class="alert alert-warning" name="zzzIdWarning">
-      <span class="fw-bold">Note:</span> The &quot;zzz&quot; identifier confirms this is a test patient and ensures safe use of the system.
-    </StaticElement>   
+    </StaticElement>        
   </GroupElement>  
 </template>
 
@@ -205,17 +206,13 @@ export default {
         const nextCode = notDoneCodes.shift()
         const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
         this.patientRelations(docId)  
-        const patientElement = document.getElementById('patient-' + nextCode)
-        if (patientElement != null) {
-          this.$nextTick(() => { 
-            console.debug('Scroll patient', nextCode, 'into view')
-            document.getElementById('patient-' + nextCode).scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'nearest'
-            })
-          })            
-        }            
+        this.$nextTick(() => {             
+          window.scroll({
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+          })
+        })            
       } else {
         console.debug('No unentered patients left')
         this.$emit('allPatientsEntered')
@@ -237,7 +234,7 @@ export default {
   async mounted() {
     console.group('PatientBuild mounted()')      
     // NOTE: choice of patient type and number of patients could be chosen by the user via a preliminary form
-    const loadPatientsResponse = await this.patientListBuild(this.noPatients, [], 'Adult', true)
+    const loadPatientsResponse = await this.patientListBuild(this.noPatients, ['P034'], ['SC102'], 'Adult', true)
     const wasError = await this.errorResponder(loadPatientsResponse)
     if (!wasError) {
       // Get the details for the first (unentered) patient
