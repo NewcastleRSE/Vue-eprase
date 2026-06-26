@@ -71,7 +71,8 @@ const EMPTY_SELECTION = {
   assessmentId: null,
   epService: {},
   otherEpService: '',
-  patientType: '',  
+  patientType: '', 
+  associatedInstitutions: [], //TODO - save assessment  
   shareTrustsOptOut: false,
   shareSuppliersOptOut: false   
 }
