@@ -820,7 +820,9 @@ export const assessmentStore = defineStore('assessment', {
         const patientScenariosByCode = {}
         for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
           const patientCode = this.assessmentData.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          // This randomly stopped returning the prescriptions after a Strapi update... David 26/06/2026
+          //const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
           if (sppResponse.status < 400) {
             patientScenariosByCode[patientCode] = sppResponse.data.data
             nScenarios += patientScenariosByCode[patientCode].length
