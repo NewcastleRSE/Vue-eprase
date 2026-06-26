@@ -144,7 +144,7 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"production"',
         BASE_URL: baseURL,
-        MAINTENANCE_MODE: true
+        MAINTENANCE_MODE: false
       },
     }),
     new webpack.LoaderOptionsPlugin({
