@@ -2,7 +2,7 @@
   <GroupElement name="scenarioGroup" class="my-4">
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
-        <h2>Scenarios</h2>
+        <h2>Step 2: Complete the Scenario</h2>
         <div class="alert alert-info mt-4" role="alert">
           <p>There are {{ scenarioCount }} test scenarios to complete. TODO - need wording here...</p>
         </div>

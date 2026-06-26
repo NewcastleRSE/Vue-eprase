@@ -10,9 +10,9 @@ export const patientDataTabValues = {
   'clinical_data': 'Clinical Data'
 }
 
-// Tab name/title values for practice mode
+// Tab name/title values for practice mode (intro seems redundant as of 19/06/2026)
 export const practiceTabValues = {
-  'intro': 'Introduction',
+  //'intro': 'Introduction',
   'patients': 'Patient entry',
   'scenarios': 'Scenarios',
   'report': 'Reporting'

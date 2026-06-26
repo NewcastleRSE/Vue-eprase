@@ -22,20 +22,20 @@
             </li>                  
           </ul>
           <div class="tab-content">
-            <div class="tab-pane fade active show mt-2" :id="'practice-tab-intro'" role="tabpanel" tabindex="0">
+            <!-- <div class="tab-pane fade active show mt-2" :id="'practice-tab-intro'" role="tabpanel" tabindex="0">
               <PracticeIntro />
               <StaticElement name="practicePreamble">
                 <ButtonElement name="continueToPatientBuild" :columns="4" @click="selectTab('patients')">Continue to Patient Entry</ButtonElement> 
               </StaticElement>
-            </div>
-            <div class="tab-pane fade mt-2" :id="'practice-tab-patients'" role="tabpanel" tabindex="0">
+            </div> -->
+            <div class="tab-pane fade active show mt-2" :id="'practice-tab-patients'" role="tabpanel" tabindex="0">
               <PatientBuild v-if="currentTab == 'patients' ":noPatients="1" @all-patients-entered="completedPatientEntry = true" />
               <StaticElement name="patientListEntryComplete">
                 <div v-show="completedPatientEntry" class="alert alert-info" role="alert">
                   You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios.
                 </div>
                 <GroupElement name="patientbuttonBar" :columns="6" :add-class="'mt-4'">
-                  <ButtonElement name="backToIntro" :class="'me-2'" :columns="3" full @click="selectTab('intro')">Back to Introduction</ButtonElement>
+                  <!-- <ButtonElement name="backToIntro" :class="'me-2'" :columns="3" full @click="selectTab('intro')">Back to Introduction</ButtonElement> -->
                   <ButtonElement :disabled="!completedPatientEntry" name="continueToScenarios" :class="'ms-2'" :columns="3" full @click="selectTab('scenarios')">Continue to Scenarios</ButtonElement> 
                 </GroupElement>                             
               </StaticElement>
@@ -108,7 +108,7 @@ export default {
   },
   data() {
     return {
-      currentTab: 'intro',
+      currentTab: 'patients',
       completedPatientEntry: false,
       completedScenarios: false
     } 
