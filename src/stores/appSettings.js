@@ -7,7 +7,7 @@ import { defineStore } from 'pinia'
 export const appSettingsStore = defineStore('appSettings', {
   state: () => {
     return {
-      version: '3.1.7',
+      version: '3.2.2',
       debugMode: false,
       year: new Date().getFullYear(),
       jwtLifespan: 14400,                           // JWT lifespan in seconds (4 hours)    
