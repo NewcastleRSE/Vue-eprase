@@ -4,17 +4,18 @@
       <StaticElement name="scenarioHeading">
         <h2>Step 2: Complete the Scenario</h2>
         <div class="alert alert-info mt-4" role="alert">
-          <p>There are {{ scenarioCount }} test scenarios to complete. TODO - need wording here...</p>
+          Once the patient is registered, open their profile in your system and complete the following {{ scenarioCount == 1 ? '' : scenarioCount + ' ' }}prescribing test scenario{{ scenarioCount == 1 ? '' : 's' }}.
         </div>
-      </StaticElement>       
-      <StaticElement name="scenariosProgress">
+      </StaticElement> 
+      <!-- Commented out 26/06/2026 David - not relevant for a single scenario... -->      
+      <!-- <StaticElement name="scenariosProgress">
         <div class="alert alert-info fw-bold" role="alert">
           {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
         </div>
         <div v-show="numCompletedScenarios != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
           <div class="progress-bar" :style="'width: ' + ((numCompletedScenarios / scenarioCount) * 100) + '%'"></div>
         </div>
-      </StaticElement>
+      </StaticElement> -->
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
@@ -62,7 +63,7 @@
                       :class="currentScenario == pscd.scenario_code ? 'active show' : ''" role="tabpanel" tabindex="0">
                       <!-- New response form -->
                       <p v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
-                        prescribing practice, then answer the questions below.</p>
+                        prescribing practice, then answer the questions below.</p>                      
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
                           <tr>
@@ -90,11 +91,105 @@
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table>                      
                       <div v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
                         <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
-                          <h4 class="vf-col-12 mb-2">Questions</h4>
+                          <h2 class="vf-col-12 mb-2">Step 3: Record What Happens</h2>
+                          <div class="vf-col-12 alert alert-info" role="alert">
+                            <h4>Possible Outcomes</h4>
+                            <p>
+                              If you placed the order for Paracetamol following your usual prescribing processes, which may have included the selection of a provided order sentence, 
+                              and did not receive any advice or information from the electronic prescribing system then please select:
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with no system/user intervention&quot;.</li>
+                            </ul>
+                            <p>If you had to ignore, modify, or override a provided order sentence to complete the paracetamol prescription then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed but had to override components of the order sentence&quot;.</li>
+                            </ul>
+                            <p>
+                              If you received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, 
+                              monitoring, contraindication or something other; Which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, 
+                              to mitigate risk without outright prevention, then select:
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
+                            </ul>
+                            <p>If you are clearly blocked from being able to prescribe the Paracetamol and it is clear cut with no additional decision point then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing prevented&quot;.</li>
+                            </ul>
+                            <p>If you weren’t able to prescribe the test medicine because the drug or particular administration route isn’t available in your EP system then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">
+                                <p>&quot;Unable to perform test&quot;.</p>
+                                <p>This will then present you will the following options, please select as appropriate:</p>
+                                <ul class="list-group mb-2">
+                                  <li class="list-group-item">Medicine or formulary alternative not available in the system.</li>
+                                  <li class="list-group-item">Medicine administration route not available in the system.</li>
+                                  <li class="list-group-item">Other (mandatory free text).</li>
+                                </ul>                                
+                                <p>In the full assessment, if you select &quot;unable to perform test&quot; this will be classed as an invalid test. It will be included in the overall mitigation calculation of results.</p>
+                              </li>
+                            </ul>                            
+                          </div>
+                          <h2 class="vf-col-12 mb-2">Step 4: Review Feedback</h2>
+                          <div class="vf-col-12 alert alert-info" role="alert">                            
+                            <p>
+                              In this practice session once you submit your response, you will be shown the <span class="fw-bold">expected outcome</span> of this scenario and the explanation of how 
+                              your chosen answer produced your mitigation score for the test. 
+                            </p>
+                            <p>This step helps you:</p>                            
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">Understand how your system is performing</li>
+                              <li class="list-group-item">Recognise where safety features should trigger for this individual test</li>
+                              <li class="list-group-item">Prepare for completing full assessment scenarios accurately</li>
+                            </ul>
+                            <p>
+                              In the live tool the scores within the four categories are good mitigation, some mitigation, no mitigation and over mitigation are added 
+                              together to produce the users overall mitigation performance report.
+                            </p>                            
+                            <p>
+                              For this scenario, the expected outcome is <span class="fw-bold">prescribing prevented</span> where Paracetamol is prescribed at an extreme overdose. 
+                            </p>
+                            <p>
+                              The explanations for each outcome are recorded below. If you did not select <span class="fw-bold">prescribing prevented</span> then please look at the outcome you selected 
+                              and what mitigation score this would give you and the reason why.
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
+                            </ul>
+                            <p>If you are clearly blocked from being able to prescribe the Paracetamol and it is clear cut with no additional decision point then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">
+                                <div class="fw-bold">Prescribing completed with no system/user intervention</div>
+                                This would score as No Mitigation as the ePrescribing system would permit unsafe prescribing of a paracetamol overdose.
+                              </li>
+                              <li class="list-group-item">
+                                <div class="fw-bold">Prescribing completed but had to override components of the order sentence</div>
+                                This would score as Some Mitigation as the ePrescribing system had some safety measure in place for Paracetamol. However it does not meet Good Mitigation requirements because it 
+                                can be bypassed and permit the prescribing of a Paracetamol overdose.
+                              </li> 
+                              <li class="list-group-item">
+                                <div class="fw-bold">Prescribing completed with system/user intervention</div>
+                                This would score as Some Mitigation where the ePrescribing system provided some form of guidance alerting the prescriber to the Paracetamol overdose.
+                              </li>
+                              <li class="list-group-item">
+                                <div class="fw-bold">Prescribing prevented</div>
+                                This would score as Good Mitigation as the Paracetamol overdose is prevented.
+                              </li>
+                              <li class="list-group-item">
+                                <div class="fw-bold">Unable to perform test</div>
+                                This would score as an invalid test and excluded from the final score calculations.
+                              </li>
+                            </ul>                                   
+                          </div>
+                          <div class="vf-col-12 alert alert-warning" role="warning">
+                            Please enter the prescription <span class="fw-bold">exactly as written</span>, even if you believe it is clinically incorrect.
+                            This is intentional and allows the system’s safety features to be tested.
+                          </div>
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
                           <table class="table table-striped vf-col-12">
@@ -442,17 +537,12 @@ export default {
           this.allowCurrentScenarioSave = false
           this.currentScenario = incompleteScenarioCodes[0]
           this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
-          this.showUniqueScenario()       
-          const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
-          if (patientElement != null) {
-            this.$nextTick(() => { 
-                patientElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-              })
-            })            
-          }
+          this.showUniqueScenario()
+          window.scroll({
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+          })          
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
       } else {

@@ -53,7 +53,7 @@
             <div class="tab-pane fade mt-2" :id="'practice-tab-report'" role="tabpanel" tabindex="0">
               <PracticeReport v-if="currentTab == 'report'" />
               <StaticElement name="practiceReport">
-                <ButtonElement :disabled="!completedScenarios" name="continueToAssessment" :columns="4" @click="doAssessment">Do Assessment for real</ButtonElement>
+                <ButtonElement :disabled="!completedScenarios" name="continueToAssessment" :columns="4" @click="doAssessment">Continue to Assessment</ButtonElement>
               </StaticElement>    
             </div>
           </div>

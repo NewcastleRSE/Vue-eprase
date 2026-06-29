@@ -71,7 +71,8 @@ const EMPTY_SELECTION = {
   assessmentId: null,
   epService: {},
   otherEpService: '',
-  patientType: '',  
+  patientType: '', 
+  associatedInstitutions: [], //TODO - save assessment  
   shareTrustsOptOut: false,
   shareSuppliersOptOut: false   
 }
@@ -1188,6 +1189,9 @@ export const assessmentStore = defineStore('assessment', {
     },
     scenarioDataPresent() {
       let ret = true
+      if (authenticationStore().isReporter()) {
+        return false  // Always force refetch for dashboard reports
+      }
       console.group('scenarioDataPresent()')
       const pcodes = Object.keys(this.assessmentData.patientScenarios)
       console.debug('Patient codes', pcodes)

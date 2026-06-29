@@ -73,6 +73,9 @@ export const rootStore = defineStore('root', {
     },   
     // Check tool open by doing a bare-bones API call and seeing if we get a 403 response
     async toolOpen() {
+      if (process.env.MAINTENANCE_MODE) {
+        return false
+      }
       const response = await this.publicApiGet('institutions?pagination[limit]=1')
       return response.status != 403
     },

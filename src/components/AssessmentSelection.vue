@@ -126,6 +126,14 @@
             :messages="{required: 'Select an option'}"
             :rules="['required']"
           />
+          <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/437 -->
+          <TagsElement name="associatedInstitutions"
+            :label="embolden('If completing and submitting the assessment for your own and another trust, select the other organisation(s) here:', false)"                              
+            :items="allInstitutionsBarMine"
+            :break-tags="true"
+            :rules="['max:4']"                              
+            :messages="{'max': 'You can submit for a maximum of 4 other trusts'}"
+          />
           <!-- Consent questions removed - fields in db retained -->
           <HiddenElement name="shareTrustsOptOut" default="1" />
           <HiddenElement name="shareSuppliersOptOut" default="1" />
@@ -169,7 +177,7 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
-    ...mapState(rootStore, ['getEpSystems', 'audit']),
+    ...mapState(rootStore, ['getEpSystems', 'getInstitutions', 'audit']),
     selectionData() {
       return this.assessmentData.selection
     },      
@@ -220,6 +228,14 @@ export default {
         } 
       }          
       console.groupEnd()      
+    },
+    async allInstitutionsBarMine() {
+      const response = await this.getInstitutions()
+      if (response.status < 400) {
+        return response.data.data.map(inst => { return { value: inst.id, label: inst.name } }).filter(inst => inst.label != this.orgName)       
+      } else {
+        return []
+      }
     },
     async getEpSystemNames() {
       let epSystems = []

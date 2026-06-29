@@ -1,5 +1,5 @@
 <template>
-  <GenericModal :modalName="'PracticeModal'" :class="'modal-lg'" :modalId="'practiceModal'" :title="'Practise answering scenario questions?'"
+  <GenericModal :modalName="'PracticeModal'" :class="'modal-xl'" :modalId="'practiceModal'" :title="'Practise answering scenario questions?'"
     :showActionBtn="true" :actionBtnText="'Yes please'" :closeBtnText="'No thanks'" @modalClosed="showInFuture" @modalActioned="doPractice">
     <div>
       <p>Before beginning the assessment, you will have the opportunity to complete a short practice session.</p>

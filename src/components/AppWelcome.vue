@@ -4,7 +4,7 @@
     <div class="pb-3">
       <h1>Welcome to ePRaSE {{ year }}</h1>
       <div class="alert alert-danger" v-if="!toolIsOpen">
-        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed to users.  Access possible for admins only.
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is unavailable to users.  Access possible for administrators only.
       </div>
       <div v-if="toolIsOpen">
         <p class="service-description mx-auto">

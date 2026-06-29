@@ -72,9 +72,9 @@ router.beforeEach(async (to, from, next) => {
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
 
-  if (to.path != '/maintenance' && process.env.MAINTENANCE_MODE) {
-    return next('/maintenance')
-  }
+  //if (to.path != '/maintenance' && process.env.MAINTENANCE_MODE) {
+  //  return next('/maintenance')
+  //}
 
   const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword', '/maintenance']
   const authRequired = !publicPages.includes(to.path)

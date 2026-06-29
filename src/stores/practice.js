@@ -39,7 +39,7 @@ export const practiceStore = defineStore('practice', {
       console.groupEnd()
     },
     // Retrieve or build the patient / scenario list for the practice
-    async patientListBuild(noPatients = 1, patientCodes = [], patientType = 'Adult', recordLoading = false) {
+    async patientListBuild(noPatients = 1, patientCodes = [], scenarioCodes = [], patientType = 'Adult', recordLoading = false) {
 
       let ret = true
 
@@ -74,8 +74,8 @@ export const practiceStore = defineStore('practice', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && Object.keys(this.patientScenarios).length == 0) {
-        ret = await this.getPatientScenarioData(recordLoading)       
+      if (ret === true && !this.scenarioDataPresent()) {
+        ret = await this.getPatientScenarioData(recordLoading, scenarioCodes)       
         if (ret === true) {
           // Do linkage of scenarios with patients
           const linkTable = {}
@@ -95,7 +95,7 @@ export const practiceStore = defineStore('practice', {
       return ret
     },
     // Retrieve all scenarios for an assessment's patients
-    async getPatientScenarioData(recordLoading = false) {
+    async getPatientScenarioData(recordLoading = false, scenarioCodeFilter = []) {
 
       let ret = true
 
@@ -105,16 +105,22 @@ export const practiceStore = defineStore('practice', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-      if (Object.keys(this.patientScenarios).length == 0) {
+      if (!this.scenarioDataPresent()) {
 
         // Load scenarios for each patient
         let nScenarios = 0
         const patientScenariosByCode = {}
         for (let idx = 0; idx < this.patients.length && ret === true; idx++) {
           const patientCode = this.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+          const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
           if (sppResponse.status < 400) {
-            patientScenariosByCode[patientCode] = sppResponse.data.data
+            const allPatientScenarios = sppResponse.data.data
+            if (scenarioCodeFilter.length > 0) {
+              // Apply extra selection criteria
+              patientScenariosByCode[patientCode] = allPatientScenarios.filter(ps => scenarioCodeFilter.includes(ps.scenario_code))
+            } else {
+              patientScenariosByCode[patientCode] = allPatientScenarios
+            }            
             nScenarios += patientScenariosByCode[patientCode].length
           } else {
             ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
@@ -243,6 +249,26 @@ export const practiceStore = defineStore('practice', {
       this.$patch((state) => { state.scenarioUserResponses[scenario.scenario_code] = dataOut })
 
       console.groupEnd()
+    },
+    scenarioDataPresent() {
+      let ret = true
+      console.group('scenarioDataPresent()')
+      const pcodes = Object.keys(this.patientScenarios)
+      console.debug('Patient codes', pcodes)
+      if (pcodes.length == 0) {
+        ret = false
+      } else {
+        for (let idx = 0; ret && idx < pcodes.length; idx++) {
+          const scenarios = this.patientScenarios[pcodes[idx]]
+          console.debug('Scenarios for patient', pcodes[idx], scenarios)
+          if (!Array.isArray(scenarios) || scenarios.length == 0) {
+            ret = false
+          }
+        } 
+      }        
+      console.debug('Returning', ret)
+      console.groupEnd() 
+      return ret
     }
   }
 })
