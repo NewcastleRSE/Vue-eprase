@@ -411,27 +411,55 @@ export const assessmentStore = defineStore('assessment', {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
+        const isReporter = authenticationStore().isReporter()
         uri = `${uri}/${assessmentId}`
-        const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
-        if (chosenAssessments.length > 0) {
+        let chosenAssessments = []
+        let loadedAssessmentData = {}
+        if (isReporter) {
+          // Load up the assessment directly
+          const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
+          if (assessmentResponse.status < 400) {
+            // Check assessment is complete
+            const completedAssessmentData = assessmentResponse.data.data
+            if (completedAssessmentData.state == 'Assessment complete') {
+              loadedAssessmentData = completedAssessmentData 
+            } else {
+              ret = {status: 400, message: 'Assessment is not complete'}
+            }
+          }
+        } else {
+          // Use the ones allowed for the institution
+          chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
+          if (chosenAssessments.length > 0) {
+            loadedAssessmentData = chosenAssessments[0]
+          } else {
+            ret = {status: 400, message: `Assessment with id ${assessmentId} not available to this institution`}
+          }
+        }        
+        if (ret === true) {
           this.$patch((state) => {
             state.assessmentData = Object.assign(state.assessmentData, {
-              assessmentState: chosenAssessments[0].state,
+              assessmentState: loadedAssessmentData.state,
               selection: Object.assign(this.assessmentData.selection, {
                 assessmentId: assessmentId,
                 epService: {
-                  value: chosenAssessments[0].ep_service.documentId,
-                  label: chosenAssessments[0].ep_service.name
+                  value: loadedAssessmentData.ep_service.documentId,
+                  label: loadedAssessmentData.ep_service.name
                 },
-                otherEpService: chosenAssessments[0].other_ep_service,
-                patientType: chosenAssessments[0].patient_type,
-                shareTrustsOptOut: chosenAssessments[0].share_trusts_opt_out,
-                shareSuppliersOptOut: chosenAssessments[0].share_suppliers_opt_out
+                otherEpService: loadedAssessmentData.other_ep_service,
+                patientType: loadedAssessmentData.patient_type,
+                shareTrustsOptOut: loadedAssessmentData.share_trusts_opt_out,
+                shareSuppliersOptOut: loadedAssessmentData.share_suppliers_opt_out,
+                associatedInstitutions: loadedAssessmentData.associated_institutions
               }),                            
               hospital: authenticationStore().hospital,
               institution: authenticationStore().orgDocId,
-              completedPatients: chosenAssessments[0].completed_patients,
-              numCompletedPatients: !chosenAssessments[0].completed_patients ? 0 : chosenAssessments[0].completed_patients.split(',').length
+              completedPatients: loadedAssessmentData.completed_patients,
+              numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
+              system: EMPTY_SYSTEM,
+              patients: [],
+              patientScenarios: {}, // Reload these for each assessment
+              numScenarios: 0
             })
           })
           // Retrieve system data
@@ -439,9 +467,12 @@ export const assessmentStore = defineStore('assessment', {
           if (ret === true) {
             // Retrieve patient and scenario data
             ret = await this.patientListBuild(false, true)
-          }          
+          } 
+          if (ret === true && this.onOrPassedAssessmentStage('Scenarios complete')) {
+            ret = await this.getPatientScenarioResponses()
+          }
         } else {
-          ret = {status: 400, message: `Assessment with id ${assessmentId} not found in list of assessments for this institution`}
+          ret = {status: 400, message: `Assessment with id ${assessmentId} not found`}
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
@@ -775,31 +806,27 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-      if (!this.scenarioDataPresent()) {
 
-        // Load scenarios for each patient
-        let nScenarios = 0
-        const patientScenariosByCode = {}
-        for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
-          const patientCode = this.assessmentData.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-          // This randomly stopped returning the prescriptions after a Strapi update... David 26/06/2026
-          //const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-          if (sppResponse.status < 400) {
-            patientScenariosByCode[patientCode] = sppResponse.data.data
-            nScenarios += patientScenariosByCode[patientCode].length
-          } else {
-            ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
-          }
+      // Load scenarios for each patient
+      let nScenarios = 0
+      const patientScenariosByCode = {}
+      for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
+        const patientCode = this.assessmentData.patients[idx].patient_code
+        const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+        // This randomly stopped returning the prescriptions after a Strapi update... David 26/06/2026
+        //const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+        if (sppResponse.status < 400) {
+          patientScenariosByCode[patientCode] = sppResponse.data.data
+          nScenarios += patientScenariosByCode[patientCode].length
+        } else {
+          ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
         }
-        if (ret === true) {
-          this.$patch((state) => {
-            state.assessmentData.patientScenarios = patientScenariosByCode,
-            state.assessmentData.numScenarios = nScenarios
-          })
-        }
-      } else {
-        console.debug('Patient scenarios already present')
+      }
+      if (ret === true) {
+        this.$patch((state) => {
+          state.assessmentData.patientScenarios = patientScenariosByCode,
+          state.assessmentData.numScenarios = nScenarios
+        })
       }
       
       if (recordLoading) {
@@ -963,7 +990,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Retrieve or build the patient / scenario list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
-    async patientListBuild(recordLoading = false, forceRebuild = false) {
+    async patientListBuild(recordLoading = false) {
 
       let ret = true
 
@@ -976,7 +1003,7 @@ export const assessmentStore = defineStore('assessment', {
       const isReporter = authenticationStore().isReporter()    
 
       // Get patient list
-      if ((forceRebuild || this.assessmentData.patients.length == 0) && this.assessmentData.selection.assessmentId != null) {
+      if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')
         if (patientResponse.status < 400) {
@@ -1030,7 +1057,7 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && (forceRebuild || !this.scenarioDataPresent())) {
+      if (ret === true) {
         ret = await this.getPatientScenarioData()
         if (ret === true && !isReporter) {
           // Save to assessment patient / scenario lists
@@ -1062,28 +1089,6 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
 
-      return ret
-    },
-    scenarioDataPresent() {
-
-      let ret = true    
-
-      console.group('scenarioDataPresent()')
-      const pcodes = Object.keys(this.assessmentData.patientScenarios)
-      console.debug('Patient codes', pcodes)
-      if (pcodes.length == 0) {
-        ret = false
-      } else {
-        for (let idx = 0; ret && idx < pcodes.length; idx++) {
-          const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
-          console.debug('Scenarios for patient', pcodes[idx], scenarios)
-          if (!Array.isArray(scenarios) || scenarios.length == 0) {
-            ret = false
-          }
-        } 
-      }        
-      console.debug('Returning data present', ret)
-      console.groupEnd() 
       return ret
     }
   }  

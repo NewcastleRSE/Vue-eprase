@@ -146,7 +146,10 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['year']),
     ...mapState(rootStore, ['progressReport', 'apiCall']), 
-    ...mapState(assessmentStore, ['loadCompletedAssessment', 'getCategoryDetails', 'getMitigationDetails']),
+    ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
+    dataLoaded() {
+      return this.dataReady
+    },
     epSystemYear() {
       return this.year
     },
@@ -212,7 +215,7 @@ export default {
     },
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
-      const selectResponse = await this.loadCompletedAssessment(assessmentId)        
+      const selectResponse = await this.selectAssessment(assessmentId)        
       const wasError = await this.errorResponder(selectResponse)
       if (!wasError) {
         window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
@@ -222,9 +225,6 @@ export default {
   },  
   async mounted() {
     console.group('AssessmentDashboard mounted()')
-
-    this.auxiliaryDataReady = false
-
     // Basic data for viewing assessments
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
@@ -241,8 +241,6 @@ export default {
         this.dashboardData = response.data
       }      
     }    
-    this.auxiliaryDataReady = true
-
     console.groupEnd()
   },
   beforeUnmount() {
