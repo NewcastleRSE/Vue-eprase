@@ -342,6 +342,7 @@ export default {
       scenarioCompletionValidator
     }
   },
+  emits: ['allScenariosCompleted'],
   methods: {
     isBaby(patient) {
       return patientIsBaby(patient)

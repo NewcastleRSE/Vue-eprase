@@ -15,8 +15,7 @@ const ASSESSMENT_STATES = {
   'System complete': 2,
   'Patient build complete': 3,
   'Scenarios complete': 4,
-  'Config errors complete': 5,
-  'Assessment complete': 6
+  'Assessment complete': 5
 }
 
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
@@ -452,11 +451,11 @@ export const assessmentStore = defineStore('assessment', {
                 shareSuppliersOptOut: loadedAssessmentData.share_suppliers_opt_out,
                 associatedInstitutions: loadedAssessmentData.associated_institutions
               }),                            
-              hospital: authenticationStore().hospital,
-              institution: authenticationStore().orgDocId,
+              hospital: isReporter ? '' : authenticationStore().hospital,
+              institution: isReporter ? loadedAssessmentData.institution.documentId : authenticationStore().orgDocId,
               completedPatients: loadedAssessmentData.completed_patients,
               numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
-              system: EMPTY_SYSTEM,
+              system: structuredClone(EMPTY_SYSTEM),
               patients: [],
               patientScenarios: {}, // Reload these for each assessment
               numScenarios: 0
@@ -466,7 +465,7 @@ export const assessmentStore = defineStore('assessment', {
           ret = await this.getSystemData()
           if (ret === true) {
             // Retrieve patient and scenario data
-            ret = await this.patientListBuild(false, true)
+            ret = await this.patientListBuild()
           } 
           if (ret === true && this.onOrPassedAssessmentStage('Scenarios complete')) {
             ret = await this.getPatientScenarioResponses()
@@ -928,14 +927,13 @@ export const assessmentStore = defineStore('assessment', {
       const saveScenarioDataResponse = await rootStore().apiCall('scenario-data', 'POST', { data: dataOut })
       if (saveScenarioDataResponse.status < 400) {
         const scenarioDataRecord = saveScenarioDataResponse.data.data
+        scenarioDataRecord.scenario = scenario
         // Write new scenario data record into the assessment
         const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
           scenario_data: { connect: [scenarioDataRecord.documentId] }
         }})
         if (updateAssessmentResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
-          }) 
+          this.assessmentData.storedScenarioResponses.push(scenarioDataRecord)          
         } else {
           ret = {status: updateAssessmentResponse.status, message: `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`}
         }

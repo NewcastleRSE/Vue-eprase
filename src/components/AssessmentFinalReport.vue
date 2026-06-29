@@ -321,28 +321,26 @@ export default {
     console.group('AssessmentFinalReport mounted()')
 
     this.auxiliaryDataReady = false
+         
+    await this.getInstitutionName()
 
+    // Create hash object to count mitigation types
+    this.mitigationSummaries = this.mitigationSummary()
+
+    this.auxiliaryDataReady = true
+    this.$nextTick(() => {
+      this.renderPieChart() // Here - plotly throws "Error: DOM element provided is null or undefined"
+      this.renderCdsBarChart()
+    })
+    console.groupEnd()
+  },
+  async beforeUnmount() {
+    console.group('AssessmentFinalReport beforeUnmount()')
     let wasError = false
     if (!this.isReporter()) {
       const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
       wasError = await this.errorResponder(updateResponse)
-    }        
-    if (!wasError) {
-      await this.getInstitutionName()
-
-      // Create hash object to count mitigation types
-      this.mitigationSummaries = this.mitigationSummary()
-
-      this.auxiliaryDataReady = true
-      this.$nextTick(() => {
-        this.renderPieChart()
-        this.renderCdsBarChart()
-      })
-    }     
-    console.groupEnd()
-  },
-  beforeUnmount() {
-    console.group('AssessmentFinalReport beforeUnmount()')
+    }   
     console.groupEnd()
   }
 }

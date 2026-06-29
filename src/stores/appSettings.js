@@ -15,10 +15,8 @@ export const appSettingsStore = defineStore('appSettings', {
       sessionInactivityWarningAt: 119 * 60 * 1000,  // Warn the user of session expiry after this number of milliseconds 
       passwordMinLength: 6,
       passwordMaxLength: 50,
-      assessmentNumPatients: 15,
-      practiceModeNumPatients: 1,                   // Number of patients presented in the practice mode 
-      // Desperate stuff - have to hard code ePRaSE colours here as well as in _variables.module.css - the :export fails after Dart sass update
-      // Any updates here need to be mirrored exactly in assets/_variables.module.css, and vice-versa - David 12/06/2026
+      assessmentNumPatients: 6,
+      practiceModeNumPatients: 1,                   // Number of patients presented in the practice mode      
       maxSelectableDsCategories: 2,                 // How many selectable categories for scenario with user intervention
       // Desperate stuff - have to hard code ePRaSE colours here as well as in _variables.css - the :export fails after Dart sass update
       // Any updates here need to be mirrored exactly in assets/_variables.css, and vice-versa - David 12/06/2026
