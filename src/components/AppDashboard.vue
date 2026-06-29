@@ -106,13 +106,11 @@
                   <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
                   <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
                   <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>                  
-                  <!-- <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a> -->
                 </div>
                 <div class="row col-12 mt-4">
                   <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
                   <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
                   <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
-                  <!-- <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a> -->
                 </div>                               
                 <div class="row col-12 mt-4"><h3>Experimental reports</h3></div>
                 <div class="row col-12 mt-4">
@@ -148,7 +146,7 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['year']),
     ...mapState(rootStore, ['progressReport', 'apiCall']), 
-    ...mapState(assessmentStore, ['loadCompletedAssessment', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
+    ...mapState(assessmentStore, ['loadCompletedAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     epSystemYear() {
       return this.year
     },
@@ -199,11 +197,7 @@ export default {
     async scenarioRiskReport() {
       const response = await this.apiCall('assessment-scenario-risk-report', 'GET', null, 'blob')
       saveAs(response.data, `scenario_risk_report_${this.formatDate()}.csv`)
-    },
-    async configQuestionData() {
-      const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
-      saveAs(response.data, `config_error_data_${this.formatDate()}.csv`)
-    },
+    },   
     async assessmentSummary() {
       const response = await this.apiCall('assessment-summary-data', 'GET', null, 'blob')
       saveAs(response.data, `assessments_summary_${this.formatDate()}.csv`)

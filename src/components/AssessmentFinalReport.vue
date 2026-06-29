@@ -102,35 +102,6 @@
           </table>
         </div>
         
-        <!-- <div class="report-page">
-          <h3>Configuration test results</h3>
-          <p>
-            In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine ePrescribing system set up in areas which do not easily lend themselves to prescribing tests. 
-            Your configuration tests results are presented on Table 3 below.
-          </p>
-          <div v-if="!Array.isArray(configQuestionAnalysis) || configQuestionAnalysis.length == 0">
-            <div class="d-flex align-items-center">
-              <strong role="status">Loading configuration analysis...</strong>
-              <div class="spinner-border ms-auto" aria-hidden="true"></div>
-            </div>
-          </div>
-          <table v-if="Array.isArray(configQuestionAnalysis) && configQuestionAnalysis.length != 0" class="table table-bordered">
-            <thead>
-              <tr><th>Question</th><th>Result</th><th>Advice</th></tr>
-            </thead>
-            <tbody>        
-              <tr v-for="cqa in configQuestionAnalysis">
-                <td>{{ cqa.config_error.description }}</td>
-                <td>{{ cqa.result == 1 ? 'Yes' : 'No' }}</td>
-                <td>{{ (cqa.result == 1 ? 'yes' : 'no') == cqa.config_error.good_answer ? cqa.config_error.good_answer_response : cqa.config_error.undesirable_answer_response }}</td>
-              </tr>                
-            </tbody>
-            <tfoot>
-              <tr class="border-white text-center"><td colspan="3">Table 3. Configuration tests results</td></tr>
-            </tfoot>
-          </table>
-        </div> -->
-        
         <div class="report-page">
           <h3>Clinical Decision Support Category Results</h3>
           <p>
@@ -178,7 +149,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -204,10 +175,7 @@ export default {
     },
     requiredScenarioAnalysis() {
       return this.mitigationSummaries.requiredScenarioAnalysis
-    },
-    configQuestionAnalysis() {
-      return this.assessmentData.config.configQuestionResults
-    },
+    },   
     mitigationByCategoryAnalysis() {
       return this.mitigationSummaries.mitigationByCategoryAnalysis
     }

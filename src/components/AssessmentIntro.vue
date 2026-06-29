@@ -345,7 +345,7 @@ import { practiceStore } from '../stores/practice';
 export default {
   name: 'AssessmentIntro',   
   computed: {
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']), 
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails']), 
     ...mapState(practiceStore, ['resetPracticeData']),
     checklistBoxes() {
       return this.$refs['checklist']
@@ -381,11 +381,7 @@ export default {
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
       wasError = await this.errorResponder(catResponse)
-    }
-    if (!wasError) {
-      const configResponse = await this.getConfigQuestionDetails()
-      wasError = await this.errorResponder(configResponse) 
-    }
+    }   
     if (!wasError) {
       const instResponse = await this.getAssessmentsForInstitution()
       wasError = await this.errorResponder(instResponse)

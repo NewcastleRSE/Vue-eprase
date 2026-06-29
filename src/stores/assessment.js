@@ -62,11 +62,6 @@ const EMPTY_SYSTEM = {
   //timeTaken: null
 }
 
-const EMPTY_CONFIG_DATA = {
-  configQuestions: [],
-  configQuestionResults: []
-}
-
 const EMPTY_SELECTION = {
   assessmentId: null,
   epService: {},
@@ -86,7 +81,6 @@ const EMPTY_DATA = {
   hospital: '',  
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
-  config: EMPTY_CONFIG_DATA,
   patients: [],    
   completedPatients: '',
   numCompletedPatients: 0,
@@ -444,12 +438,8 @@ export const assessmentStore = defineStore('assessment', {
           ret = await this.getSystemData()
           if (ret === true) {
             // Retrieve patient and scenario data
-            ret = await this.patientListBuild()
-          } 
-          if (ret === true) {
-            // Retrieve config question data
-            ret = await this.getConfigQuestionData()
-          }
+            ret = await this.patientListBuild(false, true)
+          }          
         } else {
           ret = {status: 400, message: `Assessment with id ${assessmentId} not found in list of assessments for this institution`}
         }
@@ -709,37 +699,7 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
-    },
-    // Get all configuration questions
-    async getConfigQuestionDetails(recordLoading = false) {
-
-      let ret = true
-      
-      console.group('getConfigQuestionDetails()')
-
-      if (!Array.isArray(this.assessmentData.config.configQuestions) || this.assessmentData.config.configQuestions.length == 0) {
-
-        if (recordLoading) {
-          this.setDataReady(false)
-        }
-      
-        const cfgResponse = await rootStore().getConfigQuestions()
-        if (cfgResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.config.configQuestions = cfgResponse.data.data
-          })
-        } else {
-          ret = cfgResponse
-        }
-
-        if (recordLoading) {
-          this.setDataReady(true)
-        }  
-      }              
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
+    },    
     // Get all patients of the required type
     async getPatientPool(patientType) {
 
@@ -967,92 +927,7 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    },    
-    // Get user responses to configuration questions
-    async getConfigQuestionData(recordLoading = false)  {
-
-      let ret = true
-
-      if (recordLoading) {
-        this.setDataReady(false)
-      }
-
-      console.group('getConfigQuestionData()')
-      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
-
-      if (!Array.isArray(this.assessmentData.config.configQuestionResults) || (this.assessmentData.config.configQuestionResults.length != this.assessmentData.config.configQuestions.length)) {
-        const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
-        if (confQuestionResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
-          })
-        } else {
-          ret = confQuestionResponse
-        }
-      }
-      
-      if (recordLoading) {
-        this.setDataReady(true)
-      }
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
-    // Save new config error responses
-    async saveConfigQuestionData(cqData, recordLoading = false, configComplete = true) {
-
-      let ret = true
-
-      if (recordLoading) {
-        this.setDataReady(false)
-      }
-
-      console.group('saveConfigQuestionData()')
-      console.debug('Responses to config questions are', cqData.config)
-      console.debug('Config questions', this.assessmentData.config.configQuestions)
-      console.debug('Config question data complete (i.e. not logging out before submitting data)', configComplete)
-
-      // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }   
-      let newConfResponseDocIds = []   
-      for (const [cfgCode, cfgResponse] of Object.entries(cqData.config)) {
-        console.debug('About to save', cfgCode, 'response', cfgResponse)
-        console.debug('Filter', this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode))
-        let dataOut = {
-          config_error_code: cfgCode,
-          result: cfgResponse === true ? 1 : 0,
-          config_error: {
-            connect: [this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode)[0].documentId]
-          }
-        }        
-        const savedCfgResponse = await rootStore().apiCall('config-error-data', 'POST', { data: dataOut })
-        if (savedCfgResponse.status >= 400)  {
-          ret = savedCfgResponse
-        } else {
-          newConfResponseDocIds.push(savedCfgResponse.data.data.documentId)
-        }
-      }
-      // Write each new config question response into assessment
-      const updatedAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
-        config_error_data: { connect: newConfResponseDocIds }
-      }})
-      if (updatedAssessmentResponse.status >= 400) {
-        ret = updatedAssessmentResponse
-      }
-
-      // Update store with new complete records
-      this.getConfigQuestionData()
-
-      if (ret === true && configComplete) {
-        ret = await this.updateAssessmentStatus('Config errors complete', true)
-      }
-
-      if (recordLoading) {
-        this.setDataReady(true)
-      }
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
+    },        
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
       let ret = true

@@ -28,13 +28,7 @@
             <FormStep name="scenarioStep" label="Scenarios" :elements="['scenarioEl']" :labels="{
               next: 'Continue to Reports',
               previous: 'Back to Patient Build'
-            }" />
-            <!-- <FormStep name="configQuestionStep" label="Configuration Questions" 
-              :elements="['configQuestionEl']" 
-              :labels="{ 
-                next: 'Continue to Reports',
-                previous: 'Back to Scenarios'
-              }" /> -->
+            }" />           
             <FormStep name="finalReportStep" label="Final Report" :elements="['finalReportEl']"
               :buttons="{ previous: false }" :labels="{
                 next: 'Assessment complete'
@@ -48,7 +42,6 @@
             <AssessmentSystem name="systemInfoEl" v-if="activeStep == 2" />
             <AssessmentPatientBuild name="patientBuildEl" v-if="activeStep == 3" />
             <AssessmentScenario name="scenarioEl" v-if="activeStep == 4" />
-            <!-- <AssessmentConfigQuestion name="configQuestionEl" v-if="activeStep == 5" /> -->
             <AssessmentFinalReport name="finalReportEl" v-if="activeStep == 5" />
             <AssessmentToolExit name="toolExitEl" v-if="activeStep == 6" @jump-to-step="goToStep" />
           </FormElements>
@@ -77,7 +70,6 @@ import AssessmentSelection from './AssessmentSelection'
 import AssessmentSystem from './AssessmentSystem'
 import AssessmentPatientBuild from './AssessmentPatientBuild'
 import AssessmentScenario from './AssessmentScenario'
-import AssessmentConfigQuestion from './AssessmentConfigQuestion'
 import AssessmentFinalReport from './AssessmentFinalReport'
 import AssessmentToolExit from './AssessmentToolExit'
 import LoginInfo from './LoginInfo'
@@ -128,7 +120,6 @@ export default {
     AssessmentSystem,
     AssessmentPatientBuild,
     AssessmentScenario,
-    AssessmentConfigQuestion,
     AssessmentFinalReport,
     AssessmentToolExit,
     LoginInfo,
@@ -168,11 +159,8 @@ export default {
             toStep = 'scenarioStep'
             break
           case 'Scenarios complete':
-            toStep = 'configQuestionStep'
-            break
-          case 'Config errors complete':
             toStep = 'finalReportStep'
-            break
+            break          
           case 'Assessment complete':
             toStep = 'finalReportStep'
             break
