@@ -72,7 +72,7 @@ const EMPTY_SELECTION = {
   epService: {},
   otherEpService: '',
   patientType: '', 
-  associatedInstitutions: [], //TODO - save assessment  
+  associatedInstitutions: [],  
   shareTrustsOptOut: false,
   shareSuppliersOptOut: false   
 }
@@ -396,7 +396,8 @@ export const assessmentStore = defineStore('assessment', {
               ep_service: { connect: [this.assessmentData.selection.epService.value] },
               other_ep_service: this.assessmentData.selection.otherEpService,
               share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
-              share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut
+              share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut,
+              associated_institutions: { connect: this.assessmentData.selection.associatedInstitutions }
             }
           })
           if (response.status < 400) {
@@ -503,7 +504,7 @@ export const assessmentStore = defineStore('assessment', {
               })
             })
             // Added 26/06/2026 - this gets the patient list and the scenario data
-            const patientBuildResponse = await this.patientListBuild()
+            const patientBuildResponse = await this.patientListBuild(false, true)
             if (patientBuildResponse !== true) {
               ret = patientBuildResponse
             } else {
@@ -1087,7 +1088,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Retrieve or build the patient / scenario list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
-    async patientListBuild(recordLoading = false) {
+    async patientListBuild(recordLoading = false, forceRebuild = false) {
 
       let ret = true
 
@@ -1096,10 +1097,11 @@ export const assessmentStore = defineStore('assessment', {
       }      
 
       console.group('patientListBuild()') 
-      console.debug('Assessment ID', this.assessmentData.selection.assessmentId)     
+      console.debug('Assessment ID', this.assessmentData.selection.assessmentId)
+      const isReporter = authenticationStore().isReporter()    
 
       // Get patient list
-      if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {
+      if ((forceRebuild || this.assessmentData.patients.length == 0) && this.assessmentData.selection.assessmentId != null) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')
         if (patientResponse.status < 400) {
@@ -1153,9 +1155,9 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && !this.scenarioDataPresent()) {
+      if (ret === true && (forceRebuild || !this.scenarioDataPresent())) {
         ret = await this.getPatientScenarioData()
-        if (ret === true && !authenticationStore().isReporter()) {
+        if (ret === true && !isReporter) {
           // Save to assessment patient / scenario lists
           // First get scenario document ids
           // NOTE: a reporter user loading a completed assessment does not need to do this and is NOT granted write permission on anything anyway!
@@ -1188,10 +1190,9 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     scenarioDataPresent() {
-      let ret = true
-      if (authenticationStore().isReporter()) {
-        return false  // Always force refetch for dashboard reports
-      }
+
+      let ret = true    
+
       console.group('scenarioDataPresent()')
       const pcodes = Object.keys(this.assessmentData.patientScenarios)
       console.debug('Patient codes', pcodes)
@@ -1206,7 +1207,7 @@ export const assessmentStore = defineStore('assessment', {
           }
         } 
       }        
-      console.debug('Returning', ret)
+      console.debug('Returning data present', ret)
       console.groupEnd() 
       return ret
     }

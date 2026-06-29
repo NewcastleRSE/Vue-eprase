@@ -3,10 +3,13 @@
     <AppLogo cls="banner" />
     <div class="pb-3">
       <h1>Welcome to ePRaSE {{ year }}</h1>
-      <div class="alert alert-danger" v-if="!toolIsOpen">
-        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is unavailable to users.  Access possible for administrators only.
+      <div class="alert alert-danger" v-if="toolTestMode">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is in test mode and currently unavailable to users.
       </div>
-      <div v-if="toolIsOpen">
+      <div class="alert alert-danger" v-if="!toolIsOpen">
+        The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is currently closed.  Access available to admins only.
+      </div>
+      <div v-if="!toolTestMode && toolIsOpen">
         <p class="service-description mx-auto">
         The ePrescribing Risk and Safety Evaluation tool (ePRaSE) is designed to evaluate ePrescribing systems,
         in order to determine their effectiveness and to encourage the correct use of these systems
@@ -83,7 +86,8 @@ export default {
   },
   data() {
     return {
-      toolIsOpen: false
+      toolIsOpen: false,
+      toolTestMode: false
     }
   },
   methods: {
@@ -99,6 +103,7 @@ export default {
   },
   async mounted() {
     this.toolIsOpen = await this.toolOpen()
+    this.toolTestMode = process.env.MAINTENANCE_MODE
   }
 }
 </script>
