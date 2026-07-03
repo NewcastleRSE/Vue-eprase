@@ -355,13 +355,19 @@ export default {
     },
     mitigationDescription(scenarioCode) {
       let description = ''
+      console.group('mitigationDescription()')
+      console.debug('Responses', this.scenarioResponses, 'get description for scenario', scenarioCode)
       if (this.scenarioResponse(scenarioCode)) {
         const mitigationCode = this.scenarioResponse(scenarioCode)['intervention_type']
+        console.debug('Mitigation code', mitigationCode, 'mitigations list', this.mitigations)
         const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
+        console.debug('Mitigation is', mitigation)
         if (mitigation.length > 0) {
           description = mitigation[0].mitigation
         }
-      }                  
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
       return description
     },
     initCategoryTooltips(tagsEl, firstTime = true) {
@@ -416,15 +422,17 @@ export default {
       
       console.group('saveScenarioResponse()')
       console.debug('Patient', patient, 'scenario', scenario, 'form part-object', this.scenarioForm)
-
+      
       // Validate the patient/scenario form snippet
       this.scenarioForm.validateChildren().then(async () => {
-        if (!this.scenarioForm.invalid) {
-          this.savedResponseData = false
+        if (!this.scenarioForm.invalid) {          
           if (!( scenario.scenario_code in this.storedResponsesByCode )) {
-            // All good to go
+            // Not a duplicate - all good to go
+            this.savedResponseData = false
             await this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
-            this.storedResponsesByCode[scenario.scenario_code] = this.assessmentData.storedScenarioResponses[scenario.scenario_code]        
+            const newResponse = this.assessmentData.storedScenarioResponses.filter(ssr => ssr.scenario.scenario_code == scenario.scenario_code)
+            console.assert(newResponse.length > 0, 'Failed to retrieve mitigation data for saved scenario response')
+            this.storedResponsesByCode[scenario.scenario_code] = newResponse[0]       
             this.numCompletedScenarios++     
             this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
             this.completedScenariosHidden.validate()     
