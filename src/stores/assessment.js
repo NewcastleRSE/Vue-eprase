@@ -15,8 +15,7 @@ const ASSESSMENT_STATES = {
   'System complete': 2,
   'Patient build complete': 3,
   'Scenarios complete': 4,
-  'Config errors complete': 5,
-  'Assessment complete': 6
+  'Assessment complete': 5
 }
 
 const OMIT_SYSTEM_FIELDS = ['id', 'documentId', 'createdAt', 'updatedAt', 'publishedAt']
@@ -62,11 +61,6 @@ const EMPTY_SYSTEM = {
   //timeTaken: null
 }
 
-const EMPTY_CONFIG_DATA = {
-  configQuestions: [],
-  configQuestionResults: []
-}
-
 const EMPTY_SELECTION = {
   assessmentId: null,
   epService: {},
@@ -86,7 +80,6 @@ const EMPTY_DATA = {
   hospital: '',  
   selection: EMPTY_SELECTION,
   system: EMPTY_SYSTEM,
-  config: EMPTY_CONFIG_DATA,
   patients: [],    
   completedPatients: '',
   numCompletedPatients: 0,
@@ -417,27 +410,55 @@ export const assessmentStore = defineStore('assessment', {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
+        const isReporter = authenticationStore().isReporter()
         uri = `${uri}/${assessmentId}`
-        const chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
-        if (chosenAssessments.length > 0) {
+        let chosenAssessments = []
+        let loadedAssessmentData = {}
+        if (isReporter) {
+          // Load up the assessment directly
+          const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
+          if (assessmentResponse.status < 400) {
+            // Check assessment is complete
+            const completedAssessmentData = assessmentResponse.data.data
+            if (completedAssessmentData.state == 'Assessment complete') {
+              loadedAssessmentData = completedAssessmentData 
+            } else {
+              ret = {status: 400, message: 'Assessment is not complete'}
+            }
+          }
+        } else {
+          // Use the ones allowed for the institution
+          chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
+          if (chosenAssessments.length > 0) {
+            loadedAssessmentData = chosenAssessments[0]
+          } else {
+            ret = {status: 400, message: `Assessment with id ${assessmentId} not available to this institution`}
+          }
+        }        
+        if (ret === true) {
           this.$patch((state) => {
             state.assessmentData = Object.assign(state.assessmentData, {
-              assessmentState: chosenAssessments[0].state,
+              assessmentState: loadedAssessmentData.state,
               selection: Object.assign(this.assessmentData.selection, {
                 assessmentId: assessmentId,
                 epService: {
-                  value: chosenAssessments[0].ep_service.documentId,
-                  label: chosenAssessments[0].ep_service.name
+                  value: loadedAssessmentData.ep_service.documentId,
+                  label: loadedAssessmentData.ep_service.name
                 },
-                otherEpService: chosenAssessments[0].other_ep_service,
-                patientType: chosenAssessments[0].patient_type,
-                shareTrustsOptOut: chosenAssessments[0].share_trusts_opt_out,
-                shareSuppliersOptOut: chosenAssessments[0].share_suppliers_opt_out
+                otherEpService: loadedAssessmentData.other_ep_service,
+                patientType: loadedAssessmentData.patient_type,
+                shareTrustsOptOut: loadedAssessmentData.share_trusts_opt_out,
+                shareSuppliersOptOut: loadedAssessmentData.share_suppliers_opt_out,
+                associatedInstitutions: loadedAssessmentData.associated_institutions
               }),                            
-              hospital: authenticationStore().hospital,
-              institution: authenticationStore().orgDocId,
-              completedPatients: chosenAssessments[0].completed_patients,
-              numCompletedPatients: !chosenAssessments[0].completed_patients ? 0 : chosenAssessments[0].completed_patients.split(',').length
+              hospital: isReporter ? '' : authenticationStore().hospital,
+              institution: isReporter ? loadedAssessmentData.institution.documentId : authenticationStore().orgDocId,
+              completedPatients: loadedAssessmentData.completed_patients,
+              numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
+              system: structuredClone(EMPTY_SYSTEM),
+              patients: [],
+              patientScenarios: {}, // Reload these for each assessment
+              numScenarios: 0
             })
           })
           // Retrieve system data
@@ -446,12 +467,11 @@ export const assessmentStore = defineStore('assessment', {
             // Retrieve patient and scenario data
             ret = await this.patientListBuild()
           } 
-          if (ret === true) {
-            // Retrieve config question data
-            ret = await this.getConfigQuestionData()
+          if (ret === true && this.onOrPassedAssessmentStage('Scenarios complete')) {
+            ret = await this.getPatientScenarioResponses()
           }
         } else {
-          ret = {status: 400, message: `Assessment with id ${assessmentId} not found in list of assessments for this institution`}
+          ret = {status: 400, message: `Assessment with id ${assessmentId} not found`}
         }
       } 
       await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
@@ -709,37 +729,7 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
       return ret
-    },
-    // Get all configuration questions
-    async getConfigQuestionDetails(recordLoading = false) {
-
-      let ret = true
-      
-      console.group('getConfigQuestionDetails()')
-
-      if (!Array.isArray(this.assessmentData.config.configQuestions) || this.assessmentData.config.configQuestions.length == 0) {
-
-        if (recordLoading) {
-          this.setDataReady(false)
-        }
-      
-        const cfgResponse = await rootStore().getConfigQuestions()
-        if (cfgResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.config.configQuestions = cfgResponse.data.data
-          })
-        } else {
-          ret = cfgResponse
-        }
-
-        if (recordLoading) {
-          this.setDataReady(true)
-        }  
-      }              
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
+    },    
     // Get all patients of the required type
     async getPatientPool(patientType) {
 
@@ -815,31 +805,27 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(false)
       } 
-      if (!this.scenarioDataPresent()) {
 
-        // Load scenarios for each patient
-        let nScenarios = 0
-        const patientScenariosByCode = {}
-        for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
-          const patientCode = this.assessmentData.patients[idx].patient_code
-          const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-          // This randomly stopped returning the prescriptions after a Strapi update... David 26/06/2026
-          //const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
-          if (sppResponse.status < 400) {
-            patientScenariosByCode[patientCode] = sppResponse.data.data
-            nScenarios += patientScenariosByCode[patientCode].length
-          } else {
-            ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
-          }
+      // Load scenarios for each patient
+      let nScenarios = 0
+      const patientScenariosByCode = {}
+      for (let idx = 0; idx < this.assessmentData.patients.length && ret === true; idx++) {
+        const patientCode = this.assessmentData.patients[idx].patient_code
+        const sppResponse = await rootStore().apiCall(`scenarios?populate=*&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+        // This randomly stopped returning the prescriptions after a Strapi update... David 26/06/2026
+        //const sppResponse = await rootStore().apiCall(`scenarios?populate=prescriptions&populate=mitigations&populate=categories&[filters][patients][patient_code][$eq]=${patientCode}`, 'GET')
+        if (sppResponse.status < 400) {
+          patientScenariosByCode[patientCode] = sppResponse.data.data
+          nScenarios += patientScenariosByCode[patientCode].length
+        } else {
+          ret = {status: sppResponse.status, message: `Failed to retrieve scenario data for patient code ${patientCode}`}
         }
-        if (ret === true) {
-          this.$patch((state) => {
-            state.assessmentData.patientScenarios = patientScenariosByCode,
-            state.assessmentData.numScenarios = nScenarios
-          })
-        }
-      } else {
-        console.debug('Patient scenarios already present')
+      }
+      if (ret === true) {
+        this.$patch((state) => {
+          state.assessmentData.patientScenarios = patientScenariosByCode,
+          state.assessmentData.numScenarios = nScenarios
+        })
       }
       
       if (recordLoading) {
@@ -941,14 +927,13 @@ export const assessmentStore = defineStore('assessment', {
       const saveScenarioDataResponse = await rootStore().apiCall('scenario-data', 'POST', { data: dataOut })
       if (saveScenarioDataResponse.status < 400) {
         const scenarioDataRecord = saveScenarioDataResponse.data.data
+        scenarioDataRecord.scenario = scenario
         // Write new scenario data record into the assessment
         const updateAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
           scenario_data: { connect: [scenarioDataRecord.documentId] }
         }})
         if (updateAssessmentResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.storedScenarioResponses[scenario.scenario_code] = scenarioDataRecord
-          }) 
+          this.assessmentData.storedScenarioResponses.push(scenarioDataRecord)          
         } else {
           ret = {status: updateAssessmentResponse.status, message: `Failed to update assessment with new scenario response data, error ${updateAssessmentResponse.message}`}
         }
@@ -967,92 +952,7 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    },    
-    // Get user responses to configuration questions
-    async getConfigQuestionData(recordLoading = false)  {
-
-      let ret = true
-
-      if (recordLoading) {
-        this.setDataReady(false)
-      }
-
-      console.group('getConfigQuestionData()')
-      console.assert(this.assessmentData.selection.assessmentId != null, 'No assessment ID present!')
-
-      if (!Array.isArray(this.assessmentData.config.configQuestionResults) || (this.assessmentData.config.configQuestionResults.length != this.assessmentData.config.configQuestions.length)) {
-        const confQuestionResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate[config_error_data][populate][0]=config_error`, 'GET')
-        if (confQuestionResponse.status < 400) {
-          this.$patch((state) => {
-            state.assessmentData.config.configQuestionResults = confQuestionResponse.data.data.config_error_data
-          })
-        } else {
-          ret = confQuestionResponse
-        }
-      }
-      
-      if (recordLoading) {
-        this.setDataReady(true)
-      }
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
-    // Save new config error responses
-    async saveConfigQuestionData(cqData, recordLoading = false, configComplete = true) {
-
-      let ret = true
-
-      if (recordLoading) {
-        this.setDataReady(false)
-      }
-
-      console.group('saveConfigQuestionData()')
-      console.debug('Responses to config questions are', cqData.config)
-      console.debug('Config questions', this.assessmentData.config.configQuestions)
-      console.debug('Config question data complete (i.e. not logging out before submitting data)', configComplete)
-
-      // cqData looks like { config: { "C001": true, "C002": false, "C003": true } }   
-      let newConfResponseDocIds = []   
-      for (const [cfgCode, cfgResponse] of Object.entries(cqData.config)) {
-        console.debug('About to save', cfgCode, 'response', cfgResponse)
-        console.debug('Filter', this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode))
-        let dataOut = {
-          config_error_code: cfgCode,
-          result: cfgResponse === true ? 1 : 0,
-          config_error: {
-            connect: [this.assessmentData.config.configQuestions.filter(cfgq => cfgq.config_error_code == cfgCode)[0].documentId]
-          }
-        }        
-        const savedCfgResponse = await rootStore().apiCall('config-error-data', 'POST', { data: dataOut })
-        if (savedCfgResponse.status >= 400)  {
-          ret = savedCfgResponse
-        } else {
-          newConfResponseDocIds.push(savedCfgResponse.data.data.documentId)
-        }
-      }
-      // Write each new config question response into assessment
-      const updatedAssessmentResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: {
-        config_error_data: { connect: newConfResponseDocIds }
-      }})
-      if (updatedAssessmentResponse.status >= 400) {
-        ret = updatedAssessmentResponse
-      }
-
-      // Update store with new complete records
-      this.getConfigQuestionData()
-
-      if (ret === true && configComplete) {
-        ret = await this.updateAssessmentStatus('Config errors complete', true)
-      }
-
-      if (recordLoading) {
-        this.setDataReady(true)
-      }
-      console.debug('Returning', ret)
-      console.groupEnd()
-      return ret
-    },
+    },        
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
       let ret = true
@@ -1088,7 +988,7 @@ export const assessmentStore = defineStore('assessment', {
       return ret
     },
     // Retrieve or build the patient / scenario list for an assessment (can be standalone - setting dataReady flag, or used as part of another method)
-    async patientListBuild(recordLoading = false, forceRebuild = false) {
+    async patientListBuild(recordLoading = false) {
 
       let ret = true
 
@@ -1101,7 +1001,7 @@ export const assessmentStore = defineStore('assessment', {
       const isReporter = authenticationStore().isReporter()    
 
       // Get patient list
-      if ((forceRebuild || this.assessmentData.patients.length == 0) && this.assessmentData.selection.assessmentId != null) {
+      if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {
         // Load patient list, if any
         const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')
         if (patientResponse.status < 400) {
@@ -1155,7 +1055,7 @@ export const assessmentStore = defineStore('assessment', {
       }
 
       // Ensure scenario details present for each patient
-      if (ret === true && (forceRebuild || !this.scenarioDataPresent())) {
+      if (ret === true) {
         ret = await this.getPatientScenarioData()
         if (ret === true && !isReporter) {
           // Save to assessment patient / scenario lists
@@ -1187,28 +1087,6 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('Returning', ret)
       console.groupEnd()
 
-      return ret
-    },
-    scenarioDataPresent() {
-
-      let ret = true    
-
-      console.group('scenarioDataPresent()')
-      const pcodes = Object.keys(this.assessmentData.patientScenarios)
-      console.debug('Patient codes', pcodes)
-      if (pcodes.length == 0) {
-        ret = false
-      } else {
-        for (let idx = 0; ret && idx < pcodes.length; idx++) {
-          const scenarios = this.assessmentData.patientScenarios[pcodes[idx]]
-          console.debug('Scenarios for patient', pcodes[idx], scenarios)
-          if (!Array.isArray(scenarios) || scenarios.length == 0) {
-            ret = false
-          }
-        } 
-      }        
-      console.debug('Returning data present', ret)
-      console.groupEnd() 
       return ret
     }
   }  

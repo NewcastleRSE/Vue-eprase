@@ -28,7 +28,7 @@ export const rootStore = defineStore('root', {
       } catch(err) {
         ret = authenticationStore().triageError(err)
       }
-      console.debug('API call response is', ret)
+      console.debug('API GET', url, 'response is', ret)
       console.groupEnd()
 
       return ret
@@ -66,7 +66,7 @@ export const rootStore = defineStore('root', {
         ret = auth.triageError(err)
       }
 
-      console.debug('API call response is', ret)
+      console.debug('API call', url, 'method', method, 'body', body, 'response is', ret)
       console.groupEnd()
 
       return ret
@@ -100,12 +100,7 @@ export const rootStore = defineStore('root', {
     async getClinicalAreas() {
       const response = await this.apiCall('clinical-areas?fields[0]=label&fields[1]=value&pagination[pageSize]=100', 'GET')
       return response
-    },
-    // Get list of configuration questions
-    async getConfigQuestions() {
-      const response = await this.apiCall('config-errors?sort[0]=config_error_code', 'GET')
-      return response
-    },
+    },    
     // Get mitigation code mapping
     async getMitigations() {
       const response = await this.apiCall('mitigations', 'GET')

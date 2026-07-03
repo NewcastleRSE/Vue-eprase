@@ -1,22 +1,19 @@
 <template>
-  <GroupElement name="finalReportGroup" :class="'mb-4'">
-    <StaticElement name="finalReportDataLoading" v-if="!dataLoaded">
-      <div class="d-flex align-items-center">
-        <strong role="status">Loading final report data for assessment...</strong>
-        <div class="spinner-border ms-auto" aria-hidden="true"></div>
-      </div>
-    </StaticElement>
-    <GroupElement name="finalReportDataLoaded" v-if="dataLoaded">
+  <GroupElement name="finalReportGroup" :class="'mb-4'">   
+    <GroupElement name="finalReport">
       <StaticElement name="finalReportHeading">
-
         <h2>ePRaSE Tool Assessment Report {{ epSystemYear }}</h2>
         <h3>Trust: {{ institutionName }}</h3>
         <h3>ePrescribing system: {{ epSystemName }}</h3>
         <h3>Type of assessment: {{ assessmentData.selection.patientType }} inpatient</h3>
-
         <div class="report-page">
           <p>Summary of risk mitigation performance for your system across all the prescribing tests executed.</p>
-          <div ref="pieChartContainer"></div>
+          <div ref="pieChartContainer">
+            <div v-if="!dataLoaded" class="d-flex align-items-center">
+              <strong role="status">Loading final report data for assessment...</strong>
+              <div class="spinner-border ms-auto" aria-hidden="true"></div>
+            </div>
+          </div>
           <p>
             Good mitigation of the prescribing assessments in the ePRaSE tool is defined as where an ePrescribing system correctly identifies a risk of error, 
             providing an appropriate predefined response (e.g., prescribing prevented or presents some onscreen alert or advisory intervention) when 
@@ -48,7 +45,11 @@
             Table (1) below details the total number of prescribing tests completed, broken down by risk category. In addition, information is provided 
             on the number and type of alerts record by your trust where an intervention was recorded.
           </p>
-          <table class="table table-bordered">
+          <div v-if="!dataLoaded" class="d-flex align-items-center">
+            <strong role="status">Loading final report data for assessment...</strong>
+            <div class="spinner-border ms-auto" aria-hidden="true"></div>
+          </div>
+          <table v-if="dataLoaded" class="table table-bordered">
             <thead>
               <tr><th>Prescribing risk category</th><th>Outcome</th></tr>
             </thead>
@@ -83,7 +84,11 @@
             In the ePRaSE tool all users complete the same mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
             results, and explanatory outcomes is detailed below in Table 2. 
           </p>
-          <table class="table table-bordered">
+          <div v-if="!dataLoaded" class="d-flex align-items-center">
+              <strong role="status">Loading final report data for assessment...</strong>
+              <div class="spinner-border ms-auto" aria-hidden="true"></div>
+            </div>
+          <table v-if="dataLoaded" class="table table-bordered">
             <thead>
               <tr><th>Drug name</th><th>Test</th><th>Result</th><th>Advice</th></tr>
             </thead>
@@ -102,35 +107,6 @@
           </table>
         </div>
         
-        <!-- <div class="report-page">
-          <h3>Configuration test results</h3>
-          <p>
-            In the ePRaSE tool users are presented with a block of configuration questions, which are designed to examine ePrescribing system set up in areas which do not easily lend themselves to prescribing tests. 
-            Your configuration tests results are presented on Table 3 below.
-          </p>
-          <div v-if="!Array.isArray(configQuestionAnalysis) || configQuestionAnalysis.length == 0">
-            <div class="d-flex align-items-center">
-              <strong role="status">Loading configuration analysis...</strong>
-              <div class="spinner-border ms-auto" aria-hidden="true"></div>
-            </div>
-          </div>
-          <table v-if="Array.isArray(configQuestionAnalysis) && configQuestionAnalysis.length != 0" class="table table-bordered">
-            <thead>
-              <tr><th>Question</th><th>Result</th><th>Advice</th></tr>
-            </thead>
-            <tbody>        
-              <tr v-for="cqa in configQuestionAnalysis">
-                <td>{{ cqa.config_error.description }}</td>
-                <td>{{ cqa.result == 1 ? 'Yes' : 'No' }}</td>
-                <td>{{ (cqa.result == 1 ? 'yes' : 'no') == cqa.config_error.good_answer ? cqa.config_error.good_answer_response : cqa.config_error.undesirable_answer_response }}</td>
-              </tr>                
-            </tbody>
-            <tfoot>
-              <tr class="border-white text-center"><td colspan="3">Table 3. Configuration tests results</td></tr>
-            </tfoot>
-          </table>
-        </div> -->
-        
         <div class="report-page">
           <h3>Clinical Decision Support Category Results</h3>
           <p>
@@ -138,7 +114,12 @@
             Please review your results, bearing in mind what you know about how your system is built and in the context of the number of questions you have executed in each category 
             which can be seen by hovering over the bars on the online tool chart. 
           </p>
-          <div ref="barChartContainer"></div>
+          <div ref="barChartContainer">
+            <div v-if="!dataLoaded" class="d-flex align-items-center">
+              <strong role="status">Loading final report data for assessment...</strong>
+              <div class="spinner-border ms-auto" aria-hidden="true"></div>
+            </div>
+          </div>
           <p>Chart 1. Overview of mitigation scores within CDS categories</p>
           <p>
             On completion of each annual campaign the ePRaSE team will pool all data to provide an anonymised set of reports for benchmarking purposes. 
@@ -178,7 +159,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'getConfigQuestionData', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -204,10 +185,7 @@ export default {
     },
     requiredScenarioAnalysis() {
       return this.mitigationSummaries.requiredScenarioAnalysis
-    },
-    configQuestionAnalysis() {
-      return this.assessmentData.config.configQuestionResults
-    },
+    },   
     mitigationByCategoryAnalysis() {
       return this.mitigationSummaries.mitigationByCategoryAnalysis
     }
@@ -351,30 +329,24 @@ export default {
   },
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
-
     this.auxiliaryDataReady = false
-
+    await this.getInstitutionName()
+    // Create hash object to count mitigation types
+    this.mitigationSummaries = this.mitigationSummary()
+    this.auxiliaryDataReady = true
+    this.$nextTick(() => {
+      this.renderPieChart() // Here - plotly throws "Error: DOM element provided is null or undefined"
+      this.renderCdsBarChart()
+    })
+    console.groupEnd()
+  },
+  async beforeUnmount() {
+    console.group('AssessmentFinalReport beforeUnmount()')
     let wasError = false
     if (!this.isReporter()) {
       const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
       wasError = await this.errorResponder(updateResponse)
-    }        
-    if (!wasError) {
-      await this.getInstitutionName()
-
-      // Create hash object to count mitigation types
-      this.mitigationSummaries = this.mitigationSummary()
-
-      this.auxiliaryDataReady = true
-      this.$nextTick(() => {
-        this.renderPieChart()
-        this.renderCdsBarChart()
-      })
-    }     
-    console.groupEnd()
-  },
-  beforeUnmount() {
-    console.group('AssessmentFinalReport beforeUnmount()')
+    }   
     console.groupEnd()
   }
 }

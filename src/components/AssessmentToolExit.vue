@@ -1,6 +1,6 @@
 <template>
   <GroupElement name="toolExitGroup" :class="'mb-4'">
-    <StaticElement name="configQuestionDataLoading">
+    <StaticElement name="toolExitContent">
       <h2>Assessment Complete</h2>
       <div class="alert alert-info mt-2" role="alert">
         Thank you for completing this assessment, you can now exit the tool where you can leave feedback via the user survey, or you can start a new 
@@ -27,35 +27,13 @@
 
 <script>
 
-import { mapState } from 'pinia'
-import { assessmentStore } from '../stores/assessment'
-import { rootStore } from '../stores/root'
 import SurveyLinkModal from './modals/SurveyLinkModal'
 
 export default {
-  name: 'AssessmentConfigQuestion',  
-  computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'onOrPassedAssessmentStage', 'updateAssessmentStatus', 'getConfigQuestionData', 'saveConfigQuestionData', 'setLoggingOut']),
-    ...mapState(rootStore, ['getConfigQuestions']),
-    dataLoaded() {
-      return this.dataReady
-    },
-    configQuestionData() {
-      return this.assessmentData.config.configQuestions
-    },
-    matrixQuestionRows() {
-      return this.questionRows
-    }
-  },
+  name: 'AssessmentToolExit', 
   components: {
     SurveyLinkModal
-  },
-  data() {
-    return {
-      questionRows: [],
-      savedResponseData: true
-    }
-  },
+  },  
   emits: ['jumpToStep'],
   methods: { 
     startNewAssessment() {
