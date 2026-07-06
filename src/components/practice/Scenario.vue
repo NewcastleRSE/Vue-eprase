@@ -286,8 +286,8 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
-                              <th>Intervention details</th>
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                              <th>Invalid test reason</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
                             </tr>                                                                       
                             <tr>
