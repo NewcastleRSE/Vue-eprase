@@ -67,14 +67,10 @@ export const router = createRouter({
 })
 
 // Hook to ensure user logged in for all non-public pages
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
 
   console.group('router.beforeEach()')
   console.debug('Navigating to', to, 'from', from)
-
-  //if (to.path != '/maintenance' && process.env.MAINTENANCE_MODE) {
-  //  return next('/maintenance')
-  //}
 
   const publicPages = ['/', '/test', '/login', '/register', '/requestpassword', '/resetpassword', '/maintenance']
   const authRequired = !publicPages.includes(to.path)
@@ -95,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
     console.debug('Routing to login page...')
     console.groupEnd()
 
-    return next('/login')
+    return '/login'
 
   } else if (to.path == '/' && loggedInRes === true) {
 
@@ -103,15 +99,15 @@ router.beforeEach(async (to, from, next) => {
     console.groupEnd()
 
     if (authenticationStore().isReporter()) {
-      return next('/assessment-dashboard')
+      return '/assessment-dashboard'
     }
-    return next('/assessment')
+    return '/assessment'
 
   } else {
 
     console.debug('Routing to', to)
     console.groupEnd()
 
-    next()
+    return
   }
 })
