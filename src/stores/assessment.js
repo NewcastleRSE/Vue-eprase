@@ -1003,11 +1003,11 @@ export const assessmentStore = defineStore('assessment', {
       // Get patient list
       if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {
         // Load patient list, if any
-        const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')
+        const patientResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}?populate=patients`, 'GET')        
         if (patientResponse.status < 400) {
           // API call ok 
-          const patients = patientResponse.data.data.patients
-          if (patients.length == 0) {
+          const patients = patientResponse.data.data.patients          
+          if (patients.length == 0) {            
             // Generate patient list
             const poolRet = await this.getPatientPool(this.assessmentData.selection.patientType)
             if (poolRet !== false) {
@@ -1015,6 +1015,19 @@ export const assessmentStore = defineStore('assessment', {
               if (patientPool.length < appSettingsStore().assessmentNumPatients) {
                 console.warn(`Not enough patients of patient type : ${this.assessmentData.selection.patientType} in database`)
                 ret = {status: 400, message: `There are not enough suitable patients in the database to do a viable assessment for patient type : ${this.assessmentData.selection.patientType}`}
+              }  else if (this.assessmentData.assessmentState == 'Assessment complete' && this.assessmentData.completedPatients.length > 0) {
+                // Reassemble patient list from the completed codes
+                // NOTE: 06/07/2026 David - workaround to the data integrity in migration of 2025 data - query in 1006 returns no patients for completed asssessments indicating a problem
+                // with the legacy data in the link table mapping the one->many relation assessment->patients
+                console.warn('Data anomaly - complete assessment with no patients - reassembling list from completed codes...')
+                const completedCodes = this.assessmentData.completedPatients.split(',')
+                if (completedCodes.length == appSettingsStore().assessmentNumPatients) {
+                  this.$patch((state) => {
+                    state.assessmentData.patients = patientPool.filter(p => completedCodes.includes(p.patient_code))
+                  })
+                } else {
+                  ret = {status: 400, message: 'Data anomaly - no patients returned for complete assessment - failed to recreate as completed code list had only ' + completedCodes.length + ' entries' }
+                }
               } else {
                 // Get those whose scenarios include a required one
                 const requiredPatientCodes = await this.getRequiredScenarioPatientCodes()
