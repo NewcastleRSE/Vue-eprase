@@ -33,7 +33,7 @@ const EMPTY_SYSTEM = {
   epServiceUpdated: null,
   epServiceUpdateType: null,
   epServiceUpdateTypeDetail: '',
-  numMaintainers: 1.0,
+  numMaintainers: null,
   drugCatalogSupplier: null,
   drugCatalogSupplierDetail: '',
   epUsage: '',

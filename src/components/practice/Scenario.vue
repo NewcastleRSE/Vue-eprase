@@ -75,7 +75,7 @@
                             <td>{{ pscd.prescriptions.dose }}</td>
                           </tr>
                           <tr>
-                            <th>Route</th>
+                            <th>Form/Route</th>
                             <td>{{ pscd.prescriptions.route }}</td>
                           </tr>
                           <tr>
@@ -87,7 +87,7 @@
                             <td>{{ pscd.prescriptions.duration }}</td>
                           </tr>
                           <tr>
-                            <th>Justification</th>
+                            <th>Indication</th>
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>

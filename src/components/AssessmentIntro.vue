@@ -279,13 +279,7 @@
       />      
       <StaticElement name="checklistPostamble">
         <p class="fw-bolder">If all boxes are checked, you are ready to begin the ePRaSE assessment.</p>
-      </StaticElement>
-      <ButtonElement name="confirmPrepared" class="mt-2" 
-        :columns="4" 
-        :disabled="!itemsTicked || itemsTicked.length != 7"
-        @click="setConfirmation"
-      >Ready to Start
-      </ButtonElement>
+      </StaticElement>      
     </GroupElement>
     <StaticElement v-if="requirementsConfirmed" name="introBody">
       <h2 class="mb-4">Introduction</h2>
@@ -319,13 +313,7 @@
             <div class="fw-bold">Scenarios</div>
             Prescribe a series of medication to each test patient and provide details about ePrescribing system responses.
           </div>
-        </li>
-        <!-- <li class="list-group-item d-flex justify-content-between align-items-start">
-          <div class="ms-2 me-auto">
-            <div class="fw-bold">Configuration Questions</div>
-            Answer additional questions about your ePrescribing system.
-          </div>
-        </li> -->
+        </li>        
       </ol>    
       <div class="alert alert-warning mt-4" role="alert">
         <span class="fw-medium">Disclaimer:</span> These patients have been designed to support the test
@@ -359,12 +347,17 @@ export default {
   },
   methods: {
     updateTicklist(newValue) {
-      this.itemsTicked = newValue
-    },
-    setConfirmation() {
-      this.requirementsConfirmed = true
-      Cookies.set('hideCompetencyChecklist', 'yes', { expires: 90 })
-    }
+      console.group('updateTicklist()')
+      console.debug('New value', newValue, newValue.length)
+      this.itemsTicked = newValue      
+      if (newValue.length == 7) {
+        console.debug('All boxes ticked, setting cookie...')
+        Cookies.set('hideCompetencyChecklist', 'yes', { expires: 90 })
+        console.debug('Done')
+        this.requirementsConfirmed = true
+      }
+      console.groupEnd()
+    }    
   },
   async mounted() {
     console.group('AssessmentIntro mounted hook')

@@ -9,16 +9,16 @@
               class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
           <p>
             Please select the first patient's name from those set up in the patient build phase and prescribe the
-            medication exactly as detailed in the scenario 1 tab presented.
+            medication exactly as detailed in the Scenario 1 Tab presented.
             Record any relevant advice or information received while completing the test as prompted. Check all
             responses and then click <span class="fw-bold">Save</span>.
           </p>
           <p>
-            Please note once you have clicked <span class="fw-bold">Save</span> you will <span
-              class="fw-bold">not</span> be able to return to this page again to change your response.
+            Please note once you have clicked <span class="fw-bold">save response</span> you will <span
+              class="fw-bold">not</span> be able to return to the scenario to change your response.
           </p>
           <p>
-            You will automatically move onto scenario 2 tab then scenario 3 tab for the patient selected and you should
+            You will automatically move onto Scenario 2 Tab then Scenario 3 Tab for the patient selected and you should
             complete the same process.
             On completion of the three scenario tests you will be prompted to move onto the next patient.
           </p>
@@ -92,7 +92,7 @@
                             <td>{{ pscd.prescriptions.dose }}</td>
                           </tr>
                           <tr>
-                            <th>Route</th>
+                            <th>Form/Route</th>
                             <td>{{ pscd.prescriptions.route }}</td>
                           </tr>
                           <tr>
@@ -104,7 +104,7 @@
                             <td>{{ pscd.prescriptions.duration }}</td>
                           </tr>
                           <tr>
-                            <th>Justification</th>
+                            <th>Indication</th>
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
@@ -183,7 +183,7 @@
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
-                              @change="(newValue) => { allowCurrentScenarioSave = newValue }"
+                              @change="(newValue) => { allowCurrentScenarioSave[pscd.scenario_code] = newValue }"
                             >
                               I have done this
                             </CheckboxElement>                           
@@ -222,7 +222,7 @@
                       </div>
                       <GroupElement name="scenario-response-button-bar" :columns="{ container: 8, label: 0, wrapper: 8 }">                        
                         <ButtonElement v-show="dataLoaded && !scenarioCompleted(pscd.scenario_code)" name="saveScenarioResponse" :ref="pscd.scenario_code + 'Save'"
-                          :disabled="!allowCurrentScenarioSave || tooManyCategories || tooFewCategories"
+                          :disabled="!allowCurrentScenarioSave[pscd.scenario_code] || tooManyCategories || tooFewCategories"
                           :columns="4"
                           :add-class="'me-2'" 
                           @click="saveScenarioResponse(patient, pscd)"
@@ -333,7 +333,8 @@ export default {
       interventionSelections: {},
       currentPatient: null,
       currentScenario: null,
-      allowCurrentScenarioSave: false,
+      // https://github.com/NewcastleRSE/Vue-eprase/issues/462 - needs to be a hash by scenario code
+      allowCurrentScenarioSave: {},
       storedResponsesByCode: {},
       numCompletedScenarios: 0,
       scenarioPatientLink: {},
@@ -482,7 +483,6 @@ export default {
         const incompleteScenarioCodes = Object.keys(this.scenarioPatientLink).filter(sc => !doneScenarios.includes(sc))
         console.assert(incompleteScenarioCodes.length > 0, 'No non-complete scenarios found')
         await this.$nextTick(() => { 
-          this.allowCurrentScenarioSave = false
           this.currentScenario = incompleteScenarioCodes[0]
           this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
           this.showUniqueScenario()       
@@ -510,7 +510,6 @@ export default {
       console.group('openPatientScenarios()')
 
       await this.$nextTick(() => {
-        this.allowCurrentScenarioSave = false
         this.currentPatient = patientCode
         this.currentScenario = this.patientScenarios[patientCode][0].scenario_code
         this.showUniqueScenario()
@@ -567,6 +566,8 @@ export default {
     for (const [patientCode, scenarios] of Object.entries(this.patientScenarios)) {
       scenarios.forEach(s => {
         this.scenarioPatientLink[s.scenario_code] = patientCode
+        // https://github.com/NewcastleRSE/Vue-eprase/issues/462
+        this.allowCurrentScenarioSave[s.scenario_code] = false
       })      
     }
     const storedResultsResponse = await this.getPatientScenarioResponses(true)

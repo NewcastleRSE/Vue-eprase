@@ -5,13 +5,13 @@
     </StaticElement>
     <StaticElement name="patientListInfo">
       <div class="alert alert-info mt-2" role="alert">
-        Please admit the following test patients into your hospital's patient admissions system (or a test environment). 
-        When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
-        You will need to enter additional clinical information for each test patient, these are presented in the other named tabs. 
-        Please work carefully through these in order for the subsequent scenarios to work correctly. When you have finished entering all 
+        <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
+        <p>When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
+        You will need to enter additional clinical information for each test patient, these are presented in the other named tabs.</p>
+        <p>Please work carefully through these in order for the subsequent scenarios to work correctly. When you have finished entering all 
         the information for a patient, click the <span class="fw-bold">Data entry in progress</span> button which will change to 
         <span class="fw-bold">Data entry complete</span> and move you to the next patient. If you need to go back to a previous patient 
-        you can navigate back and forth between all patients within the patient build section.
+        you can navigate back and forth between all patients within the patient build section.</p>
       </div>
     </StaticElement>
     <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    

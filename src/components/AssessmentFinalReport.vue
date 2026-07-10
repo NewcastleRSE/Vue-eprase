@@ -35,15 +35,13 @@
           <h3>EPRaSE Assessment breakdown of results for {{ epSystemYear }}</h3>
           <h4>Overview of prescribing test results</h4>
           <p>
-            The total number of valid prescribing tests completed (excluding configuration questions) = {{ scenarioTotal - excludedTests() }}
+            The total number of valid prescribing tests completed = {{ scenarioTotal - excludedTests() }}
           </p>
           <p>
-            The total number of prescribing tests excluded (described as invalid test in the pie chart) due to medication not being available in the 
-            users ePrescribing system or the user skipped the question for another reason = {{ excludedTests() }}
+            The total number of prescribing tests excluded due to medication being recorded as invalid test = {{ excludedTests() }}
           </p>
           <p>
-            Table (1) below details the total number of prescribing tests completed, broken down by risk category. In addition, information is provided 
-            on the number and type of alerts record by your trust where an intervention was recorded.
+            Table (1) below details the total number of prescribing tests completed, broken down by risk category.
           </p>
           <div v-if="!dataLoaded" class="d-flex align-items-center">
             <strong role="status">Loading final report data for assessment...</strong>
