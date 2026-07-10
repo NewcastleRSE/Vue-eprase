@@ -52,7 +52,7 @@
                     <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/baby.png" alt="Baby patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
-                    Patient: {{ patient.full_name }}, {{ formatAgeCaption(patient) }}: {{ formatAge(patient) }}
+                    Patient: {{ patient.full_name }}, age: {{ formatAge(patient) }}{{ patient.gestational_age == 0 ? '' : ', gestational age: ' + patient.gestational_age + ' weeks' }}
                   </span>
                 </button>
               </h2>
@@ -258,7 +258,7 @@
 
 import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../helpers/common'
+import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString } from '../helpers/common'
 import { assessmentStore } from '../stores/assessment'
 import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
@@ -350,10 +350,7 @@ export default {
     },    
     formatAge(patient) {
       return patientAgeString(patient)
-    },
-    formatAgeCaption(patient) {
-      return patientAgeCaption(patient, false)
-    },
+    },    
     mitigationDescription(scenarioCode) {
       let description = ''
       console.group('mitigationDescription()')
