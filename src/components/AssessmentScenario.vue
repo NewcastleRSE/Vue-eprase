@@ -427,19 +427,24 @@ export default {
           if (!( scenario.scenario_code in this.storedResponsesByCode )) {
             // Not a duplicate - all good to go
             this.savedResponseData = false
-            await this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
-            const newResponse = this.assessmentData.storedScenarioResponses.filter(ssr => ssr.scenario.scenario_code == scenario.scenario_code)
-            console.assert(newResponse.length > 0, 'Failed to retrieve mitigation data for saved scenario response')
-            this.storedResponsesByCode[scenario.scenario_code] = newResponse[0]       
-            this.numCompletedScenarios++     
-            this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
-            this.completedScenariosHidden.validate()     
-            setTimeout(() => {
-              this.savedResponseData = true
-              if (this.numCompletedScenarios == this.scenarioCount) {
-                this.$emit('allScenariosCompleted')
-              }
-            }, 200)
+            this.auxiliaryDataReady = false
+            const saveScenarioResponse = await this.savePatientScenarioResponse(patient, scenario, this.scenarioForm.data[scenario.scenario_code])
+            const wasError = await this.errorResponder(saveScenarioResponse)
+            if (!wasError) {
+              const newResponse = this.assessmentData.storedScenarioResponses.filter(ssr => ssr.scenario.scenario_code == scenario.scenario_code)
+              console.assert(newResponse.length > 0, 'Failed to retrieve mitigation data for saved scenario response')
+              this.storedResponsesByCode[scenario.scenario_code] = newResponse[0]       
+              this.numCompletedScenarios++   
+              this.auxiliaryDataReady = true  
+              this.completedScenariosHidden.update(Object.keys(this.storedResponsesByCode).join(','))
+              this.completedScenariosHidden.validate()     
+              setTimeout(() => {
+                this.savedResponseData = true
+                if (this.numCompletedScenarios == this.scenarioCount) {
+                  this.$emit('allScenariosCompleted')
+                }
+              }, 200)
+            }            
           }
         }
       })     
