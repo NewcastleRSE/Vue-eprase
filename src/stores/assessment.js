@@ -33,7 +33,7 @@ const EMPTY_SYSTEM = {
   epServiceUpdated: null,
   epServiceUpdateType: null,
   epServiceUpdateTypeDetail: '',
-  numMaintainers: 1.0,
+  numMaintainers: null,
   drugCatalogSupplier: null,
   drugCatalogSupplierDetail: '',
   epUsage: '',
@@ -390,7 +390,7 @@ export const assessmentStore = defineStore('assessment', {
               other_ep_service: this.assessmentData.selection.otherEpService,
               share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
               share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut,
-              associated_institutions: { connect: this.assessmentData.selection.associatedInstitutions }
+              associated_institutions: this.assessmentData.selection.associatedInstitutions.length > 0 ? { connect: this.assessmentData.selection.associatedInstitutions } : null
             }
           })
           if (response.status < 400) {
@@ -455,14 +455,16 @@ export const assessmentStore = defineStore('assessment', {
               institution: isReporter ? loadedAssessmentData.institution.documentId : authenticationStore().orgDocId,
               completedPatients: loadedAssessmentData.completed_patients,
               numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
-              system: structuredClone(EMPTY_SYSTEM),
-              patients: [],
+              system: isReporter ? loadedAssessmentData.system : structuredClone(EMPTY_SYSTEM),
+              patients: isReporter ? loadedAssessmentData.patients : [],
               patientScenarios: {}, // Reload these for each assessment
               numScenarios: 0
             })
           })
-          // Retrieve system data
-          ret = await this.getSystemData()
+          if (ret === true && !isReporter) {
+            // Retrieve system data          
+            ret = await this.getSystemData()
+          }          
           if (ret === true) {
             // Retrieve patient and scenario data
             ret = await this.patientListBuild()
@@ -482,74 +484,7 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
       return ret
 
-    }, 
-    // For reporters only
-    async loadCompletedAssessment(assessmentId) {
-
-      let ret = false
-      this.setDataReady(false)
-
-      if (authenticationStore().isLoggedIn() && authenticationStore().isReporter()) {
-        // Permissions ok, so get the assessment data
-        console.debug('Extracting data for assessment id', assessmentId)        
-        const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
-        if (assessmentResponse.status < 400) {
-          // Check assessment is complete
-          const completedAssessmentData = assessmentResponse.data.data
-          if (completedAssessmentData.state == 'Assessment complete') {
-            // Patch in data
-            console.debug('Assessment is complete - patching in data')
-            this.$patch((state) => {
-              state.assessmentData = Object.assign(state.assessmentData, {
-                assessmentState: completedAssessmentData.state,
-                selection: Object.assign(this.assessmentData.selection, {
-                  assessmentId: assessmentId,
-                  epService: {
-                    value: completedAssessmentData.ep_service.documentId,
-                    label: completedAssessmentData.ep_service.name
-                  },
-                  otherEpService: completedAssessmentData.other_ep_service,
-                  patientType: completedAssessmentData.patient_type,
-                  shareTrustsOptOut: completedAssessmentData.share_trusts_opt_out,
-                  shareSuppliersOptOut: completedAssessmentData.share_suppliers_opt_out
-                }),                            
-                hospital: '',
-                institution: completedAssessmentData.institution.documentId,
-                completedPatients: completedAssessmentData.completed_patients,
-                numCompletedPatients: !completedAssessmentData.completed_patients ? 0 : completedAssessmentData.completed_patients.split(',').length,
-                system: completedAssessmentData.system,
-                patients: completedAssessmentData.patients,
-                patientScenarios: {}, // Reload these for each assessment
-                numScenarios: 0
-              })
-            })
-            // Added 26/06/2026 - this gets the patient list and the scenario data
-            const patientBuildResponse = await this.patientListBuild(false, true)
-            if (patientBuildResponse !== true) {
-              ret = patientBuildResponse
-            } else {
-              const storedResultsResponse = await this.getPatientScenarioResponses()
-              if (storedResultsResponse !== true) {
-                ret = storedResultsResponse
-              }
-            }             
-            // Commented out 26/06/2026 - removing need for AssessmentFinalReport to be loading data
-            // const scenarioResponse = await this.getPatientScenarioData()
-            // if (scenarioResponse !== true) {
-            //   ret = scenarioResponse
-            // } else {
-            //   ret = true
-            // }            
-          } else {
-            ret = {status: 400, message: 'Assessment is not complete'}
-          }
-        }
-      } else {
-        ret = {status: 401, message: 'You are not authorised access to this data'}
-      }
-      this.setDataReady(true)
-      return ret
-    },
+    },     
     // Get the system data (may be used standalone - setting dataReady, or as part of another method)
     async getSystemData(recordLoading = false) {
 

@@ -35,7 +35,7 @@
                     <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/baby.png" alt="Baby patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
-                    Patient: {{ patient.full_name }}, {{ formatAgeCaption(patient) }}: {{ formatAge(patient) }}
+                    Patient: {{ patient.full_name }}, age: {{ formatAge(patient) }}{{ patient.gestational_age == 0 ? '' : ', gestational age: ' + patient.gestational_age + ' weeks' }}
                   </span>
                 </button>
               </h2>
@@ -75,7 +75,7 @@
                             <td>{{ pscd.prescriptions.dose }}</td>
                           </tr>
                           <tr>
-                            <th>Route</th>
+                            <th>Form/Route</th>
                             <td>{{ pscd.prescriptions.route }}</td>
                           </tr>
                           <tr>
@@ -87,7 +87,7 @@
                             <td>{{ pscd.prescriptions.duration }}</td>
                           </tr>
                           <tr>
-                            <th>Justification</th>
+                            <th>Indication</th>
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
@@ -286,8 +286,8 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
-                              <th>Intervention details</th>
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                              <th>Invalid test reason</th>
                               <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
                             </tr>                                                                       
                             <tr>
@@ -334,7 +334,7 @@ import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
 import { appSettingsStore } from '../../stores/appSettings';
 import { practiceStore } from '../../stores/practice'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
+import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString } from '../../helpers/common'
 
 export default {
   name: 'Scenario',  
@@ -406,10 +406,7 @@ export default {
     },    
     formatAge(patient) {
       return patientAgeString(patient)
-    },
-    formatAgeCaption(patient) {
-      return patientAgeCaption(patient, false)
-    },
+    },    
     mitigationDescription(scenarioCode) {
       let description = ''
       if (this.scenarioResponse(scenarioCode)) {

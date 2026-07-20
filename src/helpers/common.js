@@ -79,21 +79,13 @@ export function patientIsBaby(patient) {
   return patient.is_adult === false && (patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)
 }
 
-// Output string formatter for age based on age_years / age_days / gestational_age
+// Output string formatter for age based on age_years / age_days
 export function patientAgeString(patient) {
   let ageString = 'Unspecified'
   if (patient.age_years != null && patient.age_years != 0) {
     ageString = patient.age_years + ' years'
   } else if (patient.age_days != null && patient.age_days != 0) {
     ageString = patient.age_days + ' days'
-  } else if (patient.gestational_age != null && patient.gestational_age != 0) {
-    ageString = patient.gestational_age + ' weeks'
   }
   return ageString
-}
-
-// Caption for age based on the active field
-export function patientAgeCaption(patient, uppercaseFirst = false) {
-  const caption = (patient.gestational_age != null && patient.gestational_age != 0) ? 'gestational age' : 'age'
-  return uppercaseFirst ? (caption.substring(0, 1).toUpperCase() + caption.substring(1)) : caption
 }
