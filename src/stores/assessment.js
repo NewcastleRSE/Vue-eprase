@@ -390,7 +390,7 @@ export const assessmentStore = defineStore('assessment', {
               other_ep_service: this.assessmentData.selection.otherEpService,
               share_trusts_opt_out: this.assessmentData.selection.shareTrustsOptOut,
               share_suppliers_opt_out: this.assessmentData.selection.shareSuppliersOptOut,
-              associated_institutions: { connect: this.assessmentData.selection.associatedInstitutions }
+              associated_institutions: this.assessmentData.selection.associatedInstitutions.length > 0 ? { connect: this.assessmentData.selection.associatedInstitutions } : null
             }
           })
           if (response.status < 400) {
