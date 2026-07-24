@@ -123,7 +123,7 @@
 
         <!-- Values changed 29/05/2026 according to https://github.com/NewcastleRSE/Vue-eprase/issues/385 --> 
         <SelectElement name="epUsage"
-          :label="embolden('Across what proportion of settings and services in your organisation are medications electronically prescribed?', true)"
+          :label="embolden('What proportion of inpatient prescriptions in your organisation are written electronically?', true)"
           :native="false"
           :track-by="['label', 'value']"
           :items="[
@@ -180,7 +180,7 @@
             :labels="{ on: 'Yes', off: 'No' }"
           /> -->
           <ToggleElement name="primaryCareIncorporated"
-            :label="embolden('Is there an electronic interface between your primary care systems and your hospital ePrescribing system?')"
+            :label="embolden('Do you have an electronic interface between primary care and your hospital ePrescribing system that allows digital import/reuse of primary care medicines information?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <ToggleElement name="primaryCareRoutinelyUsed"
@@ -242,7 +242,19 @@
           <TextElement name="antiMicInterpretComments"
             :label="embolden('Additional comments')"
             :debounce="200" />
-        </GroupElement>      
+        </GroupElement>
+        <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/487 - need to wait for backend change -->
+        <!-- <SelectElement name="pharmacogenomics"
+          :label="embolden('Are you currently using, or planning to use, pharmacogenomic information to support clinical decision-making within your ePrescribing system?', true)"
+          :items="[
+            { value: '', label: 'Select one...', disabled: true },
+            { value: 'currently', label: 'Currently using pharmacogenomic information' },
+            { value: 'planning', label: 'Planning to use pharmacogenomic information' },
+            { value: 'neither', label: 'Neither' }            
+          ]"
+          :messages="{required: 'pharmacogenomics status is required'}" 
+          :rules="['required']"
+        />                -->
         <CheckboxgroupElement name="highRiskMeds"
           :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
           :items="cbgHighRiskMeds"

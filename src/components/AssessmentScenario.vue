@@ -192,7 +192,7 @@
                           <tbody>
                             <tr>
                               <th style="width:200px">Response</th>
-                              <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
+                              <td v-html="mitigationDescription(pscd.scenario_code)"></td>
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Category/intervention type</th>
@@ -206,7 +206,7 @@
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
                               <th>Invalid test reason</th>
-                              <td>{{ invalidTestDescription(pscd.scenario_code) }}</td>
+                              <td v-html="invalidTestDescription(pscd.scenario_code)"></td>
                             </tr>                                                                                                  
                             <tr>
                               <th>Your notes</th>

@@ -38,7 +38,7 @@
             The total number of valid prescribing tests completed = {{ scenarioTotal - excludedTests() }}
           </p>
           <p>
-            The total number of prescribing tests excluded due to medication being recorded as invalid test = {{ excludedTests() }}
+            The total number of prescribing tests excluded due to medication being recorded as unable to perform test = {{ excludedTests() }}
           </p>
           <p>
             Table (1) below details the total number of prescribing tests completed, broken down by risk category.
