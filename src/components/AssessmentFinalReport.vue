@@ -52,23 +52,32 @@
               <tr><th>Prescribing risk category</th><th>Outcome</th></tr>
             </thead>
             <tbody>
-              <tr><td>Extreme risk</td><td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these {{ goodMitigationAnalysis['Extreme'].good }} were correctly mitigated.</td></tr>
-              <tr><td>High risk</td><td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} were correctly mitigated.</td></tr>
-              <tr><td>No risk (controls)</td><td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} were correctly mitigated.</td></tr>
               <tr>
+                <td>Extreme risk</td>
+                <td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these {{ goodMitigationAnalysis['Extreme'].good }} scenarios the system responded appropriately.</td>
+              </tr>
+              <tr>
+                <td>High risk</td>
+                <td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} scenarios the system responded appropriately.</td>
+              </tr>
+              <tr>
+                <td>No risk / Control</td>
+                <td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} scenarios the system responded appropriately with no system intervention.</td>
+              </tr>
+              <!-- Removed 24/07/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/480 -->
+              <!-- <tr>
                 <td>System interventions</td>
                 <td>
                   <p>
                     Out of {{ scenarioTotal - excludedTests() }} valid prescribing tests completed, {{ systemInterventionAnalysis.total }} were recorded as completed with system/user intervention. 
-                    <!-- Removed 15/06/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
-                    <!-- {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
-                    {{ systemInterventionAnalysis.both }} reported as both. -->
+                    {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
+                    {{ systemInterventionAnalysis.both }} reported as both.
                   </p>                
-                  <!-- <p>
+                  <p>
                     This would be considered as a {{ alertRelianceLevel() }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
-                  </p> -->
+                  </p>
                 </td>
-              </tr>
+              </tr> -->
             </tbody>
             <tfoot>
               <tr class="border-white text-center"><td colspan="3">Table 1. Breakdown of prescribing tests taken</td></tr>

@@ -329,10 +329,12 @@ import Cookies from 'js-cookie'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { practiceStore } from '../stores/practice';
+import { authenticationStore } from '../stores/authentication';
 
 export default {
   name: 'AssessmentIntro',   
   computed: {
+    ...mapState(authenticationStore, ['user']),
     ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails']), 
     ...mapState(practiceStore, ['resetPracticeData']),
     checklistBoxes() {
@@ -352,7 +354,7 @@ export default {
       this.itemsTicked = newValue      
       if (newValue.length == 7) {
         console.debug('All boxes ticked, setting cookie...')
-        Cookies.set('hideCompetencyChecklist', 'yes', { expires: 90 })
+        Cookies.set(`hideCompetencyChecklist-${this.user}`, 'yes', { expires: 90 })
         console.debug('Done')
         this.requirementsConfirmed = true
       }
@@ -365,7 +367,7 @@ export default {
     this.resetPracticeData()
 
     // See if user has already checked all the competency requirements
-    this.requirementsConfirmed = Cookies.get('hideCompetencyChecklist') == 'yes'
+    this.requirementsConfirmed = Cookies.get(`hideCompetencyChecklist-${this.user}`) == 'yes'
    
     // Get mitigation and category base data
     let wasError = false
