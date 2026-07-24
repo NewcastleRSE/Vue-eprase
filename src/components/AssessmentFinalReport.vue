@@ -54,15 +54,15 @@
             <tbody>
               <tr>
                 <td>Extreme risk</td>
-                <td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these {{ goodMitigationAnalysis['Extreme'].good }} scenarios the system responded appropriately.</td>
+                <td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these, {{ goodMitigationAnalysis['Extreme'].good }} scenarios the system responded appropriately.</td>
               </tr>
               <tr>
                 <td>High risk</td>
-                <td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} scenarios the system responded appropriately.</td>
+                <td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these, {{ goodMitigationAnalysis['High'].good }} scenarios the system responded appropriately.</td>
               </tr>
               <tr>
                 <td>No risk / Control</td>
-                <td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} scenarios the system responded appropriately with no system intervention.</td>
+                <td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these, {{ goodMitigationAnalysis['N/A'].good }} scenarios the system responded appropriately with no system intervention.</td>
               </tr>
               <!-- Removed 24/07/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/480 -->
               <!-- <tr>
