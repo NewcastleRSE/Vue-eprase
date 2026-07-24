@@ -159,12 +159,7 @@
                             :label="embolden('Please enter the reason prescribing was not possible', true)"
                             :native="false"
                             :track-by="['label', 'value']"
-                            :items="[
-                              { value: '', label: 'Please select...', disabled: true },
-                              { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
-                              { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
-                              { value: 'other', label: 'Other - please specify' }
-                            ]"
+                            :items="invalidResponses"
                             :messages="{required: 'Reason is required if prescribing was not possible'}" 
                             :rules="['required', `fieldIsOther:scenarioData.${patient.patient_code}.${pscd.scenario_code}.interventionType,MT99`]" 
                           />
@@ -211,7 +206,7 @@
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
                               <th>Invalid test reason</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['invalid_test_detail_other'] || scenarioResponse(pscd.scenario_code)['invalid_test_detail'] }}</td>
+                              <td>{{ invalidTestDescription(pscd.scenario_code) }}</td>
                             </tr>                                                                                                  
                             <tr>
                               <th>Your notes</th>
@@ -258,7 +253,7 @@
 
 import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString } from '../helpers/common'
+import { systemMitigationResponses, systemResponseTooltips, invalidTestResponses, patientIsBaby, patientAgeString } from '../helpers/common'
 import { assessmentStore } from '../stores/assessment'
 import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
@@ -298,6 +293,9 @@ export default {
     },
     systemResponseTips() {
       return systemResponseTooltips
+    },
+    invalidResponses() {
+      return invalidTestResponses
     },
     matrixCategories() {
       return this.displayCategories
@@ -351,6 +349,26 @@ export default {
     formatAge(patient) {
       return patientAgeString(patient)
     },    
+    invalidTestDescription(scenarioCode) {
+      let description = ''
+      console.group('invalidTestDescription()')
+      console.debug('Responses', this.invalidResponses, 'get description for scenario', scenarioCode)
+      if (this.scenarioResponse(scenarioCode)) {
+        const otherResponseNotes = this.scenarioResponse(scenarioCode)['invalid_test_detail_other']
+        if (otherResponseNotes) {
+          description = otherResponseNotes
+        } else {
+          const invalidDetail = this.scenarioResponse(scenarioCode)['invalid_test_detail']
+          const irs = this.invalidResponses.filter(ir => ir.value == invalidDetail)
+          if (irs.length > 0) {
+            description = irs[0].label
+          }
+        }        
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
+      return description
+    },
     mitigationDescription(scenarioCode) {
       let description = ''
       console.group('mitigationDescription()')
@@ -358,10 +376,9 @@ export default {
       if (this.scenarioResponse(scenarioCode)) {
         const mitigationCode = this.scenarioResponse(scenarioCode)['intervention_type']
         console.debug('Mitigation code', mitigationCode, 'mitigations list', this.mitigations)
-        const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
-        console.debug('Mitigation is', mitigation)
-        if (mitigation.length > 0) {
-          description = mitigation[0].mitigation
+        const sysResponsesForCode = this.systemResponses.filter(sr => sr.value == mitigationCode)
+        if (sysResponsesForCode.length > 0) {
+          description = sysResponsesForCode[0].label
         }
       }
       console.debug('Returning description', description)

@@ -16,7 +16,7 @@
     <GroupElement name="systemGroupLoaded" v-if="dataLoaded && !duplication">
       <StaticElement name="epSystemHeading">
         <h2><span class="fst-italic">{{ epSystemName }}</span> ePrescribing System information</h2>
-        <h3>Provide details of the ePrescribing system in use in your hospital:</h3>
+        <h3>Provide details of the ePrescribing system being assessed in your hospital:</h3>
       </StaticElement>
       <ObjectElement ref="systemObject" name="system">
 

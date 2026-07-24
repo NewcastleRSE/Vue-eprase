@@ -28,6 +28,14 @@ export const systemMitigationResponses = [
   { value: 'MT99', label: 'Unable to perform test' },
 ]
 
+// Long labels for the different 'why test was impossible' responses
+export const invalidTestResponses = [
+  { value: '', label: 'Please select...', disabled: true },
+  { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
+  { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
+  { value: 'other', label: 'Other - please specify' }
+]
+
 // Tooltips explaining the possible system responses
 export const systemResponseTooltips = [
   'You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system',

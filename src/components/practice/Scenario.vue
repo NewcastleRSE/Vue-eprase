@@ -288,7 +288,7 @@
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
                               <th>Invalid test reason</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
+                              <td>{{ invalidTestDescription(pscd.scenario_code) }}</td>
                             </tr>                                                                       
                             <tr>
                               <th>Your notes</th>
@@ -334,7 +334,7 @@ import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
 import { appSettingsStore } from '../../stores/appSettings';
 import { practiceStore } from '../../stores/practice'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString } from '../../helpers/common'
+import { systemMitigationResponses, systemResponseTooltips, invalidTestResponses, patientIsBaby, patientAgeString } from '../../helpers/common'
 
 export default {
   name: 'Scenario',  
@@ -362,6 +362,9 @@ export default {
     },
     systemResponseTips() {
       return systemResponseTooltips
+    },
+    invalidResponses() {
+      return invalidTestResponses
     },
     matrixCategories() {
       return this.displayCategories
@@ -407,15 +410,40 @@ export default {
     formatAge(patient) {
       return patientAgeString(patient)
     },    
+    invalidTestDescription(scenarioCode) {
+      let description = ''
+      console.group('invalidTestDescription()')
+      console.debug('Responses', this.invalidResponses, 'get description for scenario', scenarioCode)
+      if (this.scenarioResponse(scenarioCode)) {
+        const otherResponseNotes = this.scenarioResponse(scenarioCode)['other_reason_impossible']
+        if (otherResponseNotes) {
+          description = otherResponseNotes
+        } else {
+          const invalidDetail = this.scenarioResponse(scenarioCode)['reason_impossible']
+          const irs = this.invalidResponses.filter(ir => ir.value == invalidDetail)
+          if (irs.length > 0) {
+            description = irs[0].label
+          }
+        }        
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
+      return description
+    },
     mitigationDescription(scenarioCode) {
       let description = ''
+      console.group('mitigationDescription()')
+      console.debug('Responses', this.scenarioResponses, 'get description for scenario', scenarioCode)
       if (this.scenarioResponse(scenarioCode)) {
         const mitigationCode = this.scenarioResponse(scenarioCode)['intervention_type']
-        const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
-        if (mitigation.length > 0) {
-          description = mitigation[0].mitigation
+        console.debug('Mitigation code', mitigationCode, 'mitigations list', this.mitigations)
+        const sysResponsesForCode = this.systemResponses.filter(sr => sr.value == mitigationCode)
+        if (sysResponsesForCode.length > 0) {
+          description = sysResponsesForCode[0].label
         }
-      }                  
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
       return description
     },
     initCategoryTooltips(tagsEl, firstTime = true) {
