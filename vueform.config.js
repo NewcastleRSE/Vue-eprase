@@ -6,6 +6,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import en from '@vueform/vueform/locales/en'
 import bootstrap from '@vueform/vueform/dist/bootstrap'
 import { defineConfig, Validator } from '@vueform/vueform'
+import { PasswordValidatorManager } from '@password-validator/core'
 
 // https://www.30secondsofcode.org/js/s/get-nested-object-value/ - uses nullish coalescing (??) and optional chaining (?.) operators
 const deepGet = (obj, keys) => keys.reduce((xs, x) => xs?.[x] ?? null, obj)
@@ -19,6 +20,25 @@ const nhsEmail = class extends Validator {
     const isValid = /^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/.test(value)
     console.debug('Return', isValid)
     return isValid
+  }
+}
+
+const nhsPassword = class extends Validator {
+  get msg() {
+    return 'Must be a minimum of 10 characters, and include a mix of uppercase letters, lowercase letters, numbers, and symbols (e.g., !, %, *).'
+  }
+  check(value) {
+    console.debug('Validate NHS password', value)
+    const result = PasswordValidatorManager.fluent()
+      .min(10)  // Minimum length of 10 characters
+      .max(50)  // Maximum length of 50 characters
+      .digit(1) // At least 1 digit
+      .upper(1) // At least 1 upper case
+      .lower(1) // At least 1 lower case
+      .specialCharacter(1)
+      .validate(value)
+    console.debug('Return', result.valid)
+    return result.valid
   }
 }
 
@@ -118,6 +138,6 @@ export default defineConfig({
   displayMessages: false,
   floatPlaceholders: false,
   rules: {
-    nhsEmail, nonEmptyObject, dateIsSameOrAfter, fieldIsOther
+    nhsEmail, nhsPassword, nonEmptyObject, dateIsSameOrAfter, fieldIsOther
   }
 })

@@ -12,9 +12,7 @@ export const appSettingsStore = defineStore('appSettings', {
       year: new Date().getFullYear(),
       jwtLifespan: 14400,                           // JWT lifespan in seconds (4 hours)    
       sessionInactivityTimeout: 120 * 60 * 1000,    // Sessions expire after this number of milliseconds (2 hours)
-      sessionInactivityWarningAt: 119 * 60 * 1000,  // Warn the user of session expiry after this number of milliseconds 
-      passwordMinLength: 6,
-      passwordMaxLength: 50,
+      sessionInactivityWarningAt: 119 * 60 * 1000,  // Warn the user of session expiry after this number of milliseconds       
       assessmentNumPatients: 15,
       practiceModeNumPatients: 1,                   // Number of patients presented in the practice mode      
       maxSelectableDsCategories: 2,                 // How many selectable categories for scenario with user intervention

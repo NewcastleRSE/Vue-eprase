@@ -6,7 +6,7 @@ import AppLogin from '../components/AppLogin'
 import AppLogout from '../components/AppLogout'
 import AppRegister from '../components/AppRegister'
 import Assessment from '../components/Assessment'
-import AssessmentPractice from '../components/AssessmentPractice.vue'
+import AssessmentPractice from '../components/AssessmentPractice'
 import AppDashboard from '../components/AppDashboard'
 import AppChangePassword from '../components/AppChangePassword'
 import AppMaintenanceMode from '../components/AppMaintenanceMode'
@@ -76,15 +76,14 @@ router.beforeEach(async (to, from) => {
   const authRequired = !publicPages.includes(to.path)
   console.debug('Authentication required', authRequired)
 
-  let loggedInRes = false
+  const loggedInRes = await authenticationStore().isLoggedIn()
   if (authRequired) {
-    loggedInRes = await authenticationStore().isLoggedIn()
     if (loggedInRes === false) {
       // Clear all local storage, e.g. wipe sessions with expired JWTs
       authenticationStore().clear()
-    }
-    console.debug('Logged in user', loggedInRes)
+    }    
   }
+  console.debug('Logged in user', loggedInRes)
 
   if (authRequired && loggedInRes === false) {
 
@@ -93,8 +92,10 @@ router.beforeEach(async (to, from) => {
 
     return '/login'
 
-  } else if (to.path == '/' && loggedInRes === true) {
+  } else if ((to.path == '/login' || to.path == '/') && loggedInRes === true) {
 
+    // NOTE: added test for /login here to prevent intentional or accidental use of browser back button taking the user
+    // back to the login screen when they are already authenticated - send them to assessment page in such cases - David 24/07/2026
     console.debug('Routing logged in user to assessment page, skip welcome')
     console.groupEnd()
 

@@ -38,7 +38,7 @@
             The total number of valid prescribing tests completed = {{ scenarioTotal - excludedTests() }}
           </p>
           <p>
-            The total number of prescribing tests excluded due to medication being recorded as invalid test = {{ excludedTests() }}
+            The total number of prescribing tests excluded due to medication being recorded as unable to perform test = {{ excludedTests() }}
           </p>
           <p>
             Table (1) below details the total number of prescribing tests completed, broken down by risk category.
@@ -52,23 +52,32 @@
               <tr><th>Prescribing risk category</th><th>Outcome</th></tr>
             </thead>
             <tbody>
-              <tr><td>Extreme risk</td><td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these {{ goodMitigationAnalysis['Extreme'].good }} were correctly mitigated.</td></tr>
-              <tr><td>High risk</td><td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these {{ goodMitigationAnalysis['High'].good }} were correctly mitigated.</td></tr>
-              <tr><td>No risk (controls)</td><td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these {{ goodMitigationAnalysis['N/A'].total }} were correctly mitigated.</td></tr>
               <tr>
+                <td>Extreme risk</td>
+                <td>You completed {{ goodMitigationAnalysis['Extreme'].total }} extreme risk scenarios. Out of these, {{ formatScenarioQuantity(goodMitigationAnalysis['Extreme'].good) }} the system responded appropriately.</td>
+              </tr>
+              <tr>
+                <td>High risk</td>
+                <td>You completed {{ goodMitigationAnalysis['High'].total }} high risk scenarios. Out of these, {{ formatScenarioQuantity(goodMitigationAnalysis['High'].good) }} the system responded appropriately.</td>
+              </tr>
+              <tr>
+                <td>No risk / Control</td>
+                <td>You completed {{ goodMitigationAnalysis['N/A'].total }} control scenarios. Out of these, {{ formatScenarioQuantity(goodMitigationAnalysis['N/A'].good) }} the system responded appropriately with no system intervention.</td>
+              </tr>
+              <!-- Removed 24/07/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/480 -->
+              <!-- <tr>
                 <td>System interventions</td>
                 <td>
                   <p>
                     Out of {{ scenarioTotal - excludedTests() }} valid prescribing tests completed, {{ systemInterventionAnalysis.total }} were recorded as completed with system/user intervention. 
-                    <!-- Removed 15/06/2026 - https://github.com/NewcastleRSE/Vue-eprase/issues/401 -->
-                    <!-- {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
-                    {{ systemInterventionAnalysis.both }} reported as both. -->
+                    {{ systemInterventionAnalysis.alertOnly }} of these responses were reported as alerts, {{ systemInterventionAnalysis.advisoryOnly }} reported as advisory notifications and 
+                    {{ systemInterventionAnalysis.both }} reported as both.
                   </p>                
-                  <!-- <p>
+                  <p>
                     This would be considered as a {{ alertRelianceLevel() }} reliance on alerts. A high level of alerting can indicate an over-reliance on alerting and may lead to user 'alert fatigue'.
-                  </p> -->
+                  </p>
                 </td>
-              </tr>
+              </tr> -->
             </tbody>
             <tfoot>
               <tr class="border-white text-center"><td colspan="3">Table 1. Breakdown of prescribing tests taken</td></tr>
@@ -103,6 +112,40 @@
               <tr class="border-white text-center"><td colspan="4">Table 2. Mandatory question results</td></tr>
             </tfoot>
           </table>
+        </div>
+
+        <div class="report-page">
+          <div v-if="assessmentData.selection.patientType == 'Adult'" class="alert alert-warning">
+            <p>
+              Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
+              and users may have completed different additional extreme-risk scenarios from those summarised above. To maintain the integrity of the assessment, the information 
+              provided is intended as high-level educational guidance only, highlighting key medication safety themes that may be encountered within the extreme-risk category. 
+              It should not be interpreted as a record of the specific questions completed by any individual user.
+            </p>
+            <ul class="list-group">
+              <li class="list-group-item">
+                <span class="fw-bold">Folate antagonists (e.g. trimethoprim):</span> High-risk medicine interactions that may significantly increase toxicity and serious adverse effects when used with certain treatments.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">High-risk teratogens (e.g. topiramate, valproate):</span> Pregnancy prevention safety concerns requiring additional safeguards for individuals of child-bearing potential due to the risk of harm to an unborn baby.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Fluoroquinolones:</span> Contraindications relating to a patient's medical history where use may lead to serious musculoskeletal or other significant adverse effects.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Methotrexate:</span> Critical prescribing safety risks involving incorrect medicine selection or dosing frequency that could result in severe overdose consequences.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Cephalosporins:</span> Allergy-related safety checks to prevent prescribing in patients with a recorded severe allergy to a related class of medicines.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Nitrofurantoin:</span> Renal function-related contraindications where reduced kidney function may lead to treatment failure and increased risk of toxicity.
+              </li>
+            </ul>
+          </div>
+          <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
+            TODO - Wording to be supplied in #490
+          </div>
         </div>
         
         <div class="report-page">
@@ -196,6 +239,9 @@ export default {
     }
   },
   methods: {
+    formatScenarioQuantity(n) {
+      return n + ' scenario' + (n != 1 ? 's' : '')
+    },
     excludedTests() {
       return this.scenarioResponses.filter(sr => sr.result == 'Invalid test').length
     },

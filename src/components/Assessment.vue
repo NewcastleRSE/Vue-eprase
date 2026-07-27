@@ -269,7 +269,7 @@ export default {
 
     await this.$nextTick(() => {
       // Show practice modal if required
-      const hidePracticeModal = Cookies.get('hidePracticeModal')
+      const hidePracticeModal = Cookies.get(`hidePracticeModal-${this.user}`)
       console.debug('Hide practice modal', hidePracticeModal)
       if (hidePracticeModal != 'yes') {
         console.debug('Showing practice modal')
@@ -282,22 +282,22 @@ export default {
   unmounted() {
     this.timeoutDialogObserver?.disconnect()
   },
-  // errorCaptured(...args) {
+  errorCaptured(...args) {
 
-  //   console.group('errorCaptured()')
-  //   console.debug(args)
+    console.group('errorCaptured()')
+    console.debug(args)
 
-  //   // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
-  //   const activeElement = document.activeElement
-  //   if (activeElement) {
-  //     activeElement.blur()
-  //   }
-  //   this.errorAlertModal.show(args[0].message)
-  //   this.sessionTimeout.destroy()
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+    const activeElement = document.activeElement
+    if (activeElement) {
+      activeElement.blur()
+    }
+    this.errorAlertModal.show(args[0].message)
+    this.sessionTimeout.destroy()
 
-  //   console.groupEnd()
-  //   return false
-  // }
+    console.groupEnd()
+    return false
+  }
 }
 </script>
 

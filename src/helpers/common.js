@@ -1,4 +1,5 @@
 // Container for common constants and methods relating to patient and scenario processing
+import dayjs from "dayjs"
 
 // Tab name/title values for patient build
 export const patientDataTabValues = {
@@ -26,6 +27,14 @@ export const systemMitigationResponses = [
   { value: 'MT1', label: 'Prescribing completed <span class="fw-bold">with</span> system/user intervention' },
   { value: 'MT3', label: 'Prescribing prevented' },
   { value: 'MT99', label: 'Unable to perform test' },
+]
+
+// Long labels for the different 'why test was impossible' responses
+export const invalidTestResponses = [
+  { value: '', label: 'Please select...', disabled: true },
+  { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
+  { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
+  { value: 'other', label: 'Other - please specify' }
 ]
 
 // Tooltips explaining the possible system responses
@@ -83,9 +92,21 @@ export function patientIsBaby(patient) {
 export function patientAgeString(patient) {
   let ageString = 'Unspecified'
   if (patient.age_years != null && patient.age_years != 0) {
-    ageString = patient.age_years + ' years'
+    ageString = patient.age_years + ' year' + (patient.age_years == 1 ? '' : 's')
   } else if (patient.age_days != null && patient.age_days != 0) {
-    ageString = patient.age_days + ' days'
+    ageString = patient.age_days + ' day' + (patient.age_days == 1 ? '' : 's')
   }
   return ageString
+}
+
+// Output patient date of birth, implemented on-the-fly for neonates (#466)
+export function patientDateOfBirth(patient) {
+  let dateOfBirth = 'Not specified'
+  if (patientIsBaby(patient)) {
+    // Create an on-the-fly date of birth to avoid the ageing problem
+    dateOfBirth = dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
+  } else if (patient.dob) {
+    dateOfBirth = new Date(patient.dob).toLocaleDateString('en-GB')
+  }
+  return dateOfBirth
 }
