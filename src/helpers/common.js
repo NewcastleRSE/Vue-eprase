@@ -92,9 +92,9 @@ export function patientIsBaby(patient) {
 export function patientAgeString(patient) {
   let ageString = 'Unspecified'
   if (patient.age_years != null && patient.age_years != 0) {
-    ageString = patient.age_years + ' years'
+    ageString = patient.age_years + ' year' + (patient.age_years == 1 ? '' : 's')
   } else if (patient.age_days != null && patient.age_days != 0) {
-    ageString = patient.age_days + ' days'
+    ageString = patient.age_days + ' day' + (patient.age_days == 1 ? '' : 's')
   }
   return ageString
 }
@@ -104,7 +104,7 @@ export function patientDateOfBirth(patient) {
   let dateOfBirth = 'Not specified'
   if (patientIsBaby(patient)) {
     // Create an on-the-fly date of birth to avoid the ageing problem
-    dateOfBirth = dayjs().subtract(patient.age_days).format('DD/MM/YYYY')
+    dateOfBirth = dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
   } else if (patient.dob) {
     dateOfBirth = new Date(patient.dob).toLocaleDateString('en-GB')
   }
