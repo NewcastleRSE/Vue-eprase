@@ -7,10 +7,9 @@
         :add-class="'me-2'">
         <i class="bi bi-info-circle me-lg-2"></i><span class="d-lg-block d-none">About</span>
       </ButtonElement>
-      <ButtonElement name="practice" title="Practice Session - opens in a new tab" full
+      <ButtonElement name="practice" title="Practice Session" full
         button-type="anchor"
         href="/practice"
-        target="_blank"
         :disabled="$route.path.includes('practice')"
         :columns="3" 
         :add-class="'mx-2'">

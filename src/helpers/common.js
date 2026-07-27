@@ -1,4 +1,5 @@
 // Container for common constants and methods relating to patient and scenario processing
+import dayjs from "dayjs"
 
 // Tab name/title values for patient build
 export const patientDataTabValues = {
@@ -96,4 +97,16 @@ export function patientAgeString(patient) {
     ageString = patient.age_days + ' days'
   }
   return ageString
+}
+
+// Output patient date of birth, implemented on-the-fly for neonates (#466)
+export function patientDateOfBirth(patient) {
+  let dateOfBirth = 'Not specified'
+  if (patientIsBaby(patient)) {
+    // Create an on-the-fly date of birth to avoid the ageing problem
+    dateOfBirth = dayjs().subtract(patient.age_days).format('DD/MM/YYYY')
+  } else if (patient.dob) {
+    dateOfBirth = new Date(patient.dob).toLocaleDateString('en-GB')
+  }
+  return dateOfBirth
 }
