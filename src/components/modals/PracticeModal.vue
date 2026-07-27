@@ -40,13 +40,18 @@
 <script>
 
 import Cookies from 'js-cookie'
+import { mapState } from 'pinia'
 import { setVisible } from '../../helpers/modal'
 import GenericModal from './GenericModal'
+import { authenticationStore } from '../../stores/authentication'
 
 export default {
   name: 'PracticeModal', 
   components: {
     GenericModal
+  },
+  computed: {
+    ...mapState(authenticationStore, ['user'])
   },
   methods: {
     show() {
@@ -55,7 +60,7 @@ export default {
     showInFuture() {
       const cb = this.$refs.cbDontShowAgain
       if (cb.checked) {
-        Cookies.set('hidePracticeModal', 'yes', { expires: 90 })
+        Cookies.set(`hidePracticeModal-${this.user}`, 'yes', { expires: 90 })
       }
     },
     doPractice() {
