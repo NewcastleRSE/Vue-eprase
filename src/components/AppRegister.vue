@@ -49,24 +49,24 @@
             <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/232 - have to send a placeholder to avoid late stage strapi change -->
             <HiddenElement name="hospital" value="hospital_placeholder" />            
             
-            <TextElement name="password" autocomplete="on"
+            <TextElement name="password" autocomplete="on" placeholder="Minimum of 10 characters, at least one uppercase letter, lowercase letter, number, and symbol (e.g., !, %, *)"
               :label="embolden('Password', true)"
-              :input-type="showPassword ? 'text' : 'password'"            
+              :input-type="showPassword ? 'text' : 'password'"                      
               :debounce="200" 
-              :messages="{required: 'Password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
-              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
+              :messages="{required: 'Password is required', confirmed: 'Password and confirmation must be the same'}" 
+              :rules="['required', $vueform.rules.nhsPassword, 'confirmed']">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility(false)"
                   :class="showPassword ? 'bi bi-eye-slash' : 'bi-eye'" 
                   :title="(showPassword ? 'Hide' : 'Show') + ' password'"></i>
               </template>
             </TextElement>
-            <TextElement name="password_confirmation" autocomplete="on"
+            <TextElement name="password_confirmation" autocomplete="on" placeholder="Your password again"
               :label="embolden('Confirm password', true)"
               :input-type="showPasswordConfirm ? 'text' : 'password'"            
               :debounce="200" 
-              :messages="{required: 'Password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
-              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
+              :messages="{required: 'Password confirmation is required'}" 
+              :rules="['required', $vueform.rules.nhsPassword]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility(true)"
                   :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi-eye'" 
@@ -109,8 +109,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['signup']),
-    ...mapState(rootStore, ['getInstitutions', 'audit', 'toolOpen']),
-    ...mapState(appSettingsStore, ['passwordMinLength', 'passwordMaxLength'])
+    ...mapState(rootStore, ['getInstitutions', 'audit', 'toolOpen'])
   },
   data() {
     return {   

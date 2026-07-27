@@ -15,32 +15,32 @@
               :label="embolden('Your current password', true)"
               :input-type="showPassword['current'] ? 'text' : 'password'"            
               :debounce="200" 
-              :messages="{required: 'Current password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
-              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
+              :messages="{required: 'Current password is required'}" 
+              :rules="['required', $vueform.rules.nhsPassword]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility('current')"
                   :class="showPassword['current'] ? 'bi bi-eye-slash' : 'bi-eye'" 
                   :title="(showPassword['current'] ? 'Hide' : 'Show') + ' password'"></i>
               </template>
             </TextElement>
-            <TextElement name="newPassword" autocomplete="on"
+            <TextElement name="newPassword" autocomplete="on" placeholder="Minimum of 10 characters, at least one uppercase letter, lowercase letter, number, and symbol (e.g., !, %, *)"
               :label="embolden('New password', true)"
               :input-type="showPassword['new'] ? 'text' : 'password'"            
               :debounce="200" 
-              :messages="{required: 'New password is required', between: `Password must be between ${passwordMinLength} and ${passwordMaxLength} characters long`, confirmed: 'Password and confirmation must be the same'}" 
-              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`, 'confirmed']">
+              :messages="{required: 'New password is required'}" 
+              :rules="['required', $vueform.rules.nhsPassword, 'confirmed']">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility('new')"
                   :class="showPassword['new'] ? 'bi bi-eye-slash' : 'bi-eye'" 
                   :title="(showPassword['new'] ? 'Hide' : 'Show') + ' password'"></i>
               </template>
             </TextElement>
-            <TextElement name="newPassword_confirmation" autocomplete="on"
+            <TextElement name="newPassword_confirmation" autocomplete="on" placeholder="Your new password again"
               :label="embolden('Confirm new password', true)"
               :input-type="showPassword['newConfirm'] ? 'text' : 'password'"            
               :debounce="200" 
-              :messages="{required: 'New password confirmation is required', between: `Password confirmation must be between ${passwordMinLength} and ${passwordMaxLength} characters long`}" 
-              :rules="['required', `between:${passwordMinLength},${passwordMaxLength}`]">
+              :messages="{required: 'New password confirmation is required'}" 
+              :rules="['required', $vueform.rules.nhsPassword]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility('newConfirm')"
                   :class="showPassword['newConfirm'] ? 'bi bi-eye-slash' : 'bi-eye'" 
@@ -87,8 +87,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['email', 'changePassword']),
-    ...mapState(rootStore, ['audit']),
-    ...mapState(appSettingsStore, ['passwordMinLength', 'passwordMaxLength'])
+    ...mapState(rootStore, ['audit'])
   },
   data() {
     return {         
