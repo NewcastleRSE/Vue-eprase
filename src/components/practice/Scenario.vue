@@ -109,8 +109,16 @@
                             </ul>
                             <p>If you had to ignore, modify, or override a provided order sentence to complete the paracetamol prescription then select:</p>
                             <ul class="list-group mb-2">
-                              <li class="list-group-item">&quot;Prescribing completed but had to override components of the order sentence&quot;.</li>
-                              <li class="list-group-item">
+                              <li class="list-group-item">&quot;Prescribing completed but had to override components of the order sentence&quot;.</li>                             
+                            </ul>
+                            <p>
+                              If you received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, 
+                              monitoring, contraindication or something other; Which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, 
+                              to mitigate risk without outright prevention, then select:
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
+                               <li class="list-group-item">
                                 <p>
                                   If you select this outcome option you will then have to select the relevant clinical decision support category you think the sysem/user 
                                   intervention falls under (up to two CDS categories can be selected).
@@ -169,14 +177,6 @@
                                   </li>
                                 </ul>
                               </li>
-                            </ul>
-                            <p>
-                              If you received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, 
-                              monitoring, contraindication or something other; Which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, 
-                              to mitigate risk without outright prevention, then select:
-                            </p>
-                            <ul class="list-group mb-2">
-                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
                             </ul>
                             <p>If you are clearly blocked from being able to prescribe the Paracetamol and it is clear cut with no additional decision point then select:</p>
                             <ul class="list-group mb-2">

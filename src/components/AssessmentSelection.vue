@@ -97,6 +97,34 @@
         </table>           
       </GroupElement>
 
+      <GroupElement name="archiveAssessmentReports" v-if="archives.length != 0">
+        <table class="table table-striped caption-top vf-col-12">
+          <caption><h3>You can view the archived PDF reports for the following assessments:</h3></caption>
+          <thead>
+            <tr>
+              <th>ePrescribing System</th>
+              <th>Patient Type</th>
+              <th>ePRaSE Version</th>
+              <th>Year</th> 
+              <th>&nbsp;</th>         
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="archRep in archives">
+              <td>{{ archRep.ep_system }}</td>
+              <td>{{ archRep.assessment_type }}</td>
+              <td>{{ archRep.eprase_version }}</td>
+              <td>{{ archRep.year }}</td>
+              <td>
+                <ButtonElement :name="'view-pdf-' + archRep.documentId" title="View this assessment report (opens in a new tab)" @click="showArchiveReport(archRep.pdf_name)">
+                  <i class="bi bi-play-fill me-2"></i>View
+                </ButtonElement>                
+              </td>
+            </tr>
+          </tbody>
+        </table>        
+      </GroupElement>
+
       <GroupElement name="newAssessmentGroup">
         <StaticElement name="newAssessmentCaption">
           <h3>Start a new assessment</h3>
@@ -175,7 +203,7 @@ import { isoToUkDate } from '../helpers/utils'
 export default {
   name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment', 'archivedReports']),
     ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'getInstitutions', 'audit']),
     selectionData() {
@@ -198,6 +226,9 @@ export default {
     },
     duplication() {
       return this.duplicateAssessmentAttempt
+    },
+    archives() {
+      return this.archivedReports
     }
   },
   data() {
@@ -209,7 +240,12 @@ export default {
     }
   },
   emits: ['jumpToStep'],
-  methods: {       
+  methods: {     
+    async showArchiveReport(pdfName) {
+      console.group('showArchiveReport()')
+      console.debug('Viewing', pdfName)
+      console.groupEnd()
+    },
     async continueAssessment(assessmentId) {
 
       console.group('continueAssessment()')
