@@ -182,7 +182,7 @@
                             <ul class="list-group mb-2">
                               <li class="list-group-item">&quot;Prescribing prevented&quot;.</li>
                             </ul>
-                            <p>If you weren't able to prescribe the test medicine because the drug or particular administration route isn't available in your EP system then select:</p>
+                            <p>If you weren't able to prescribe the test medicine because the drug or particular administration route isn't available in your ePrescribing system then select:</p>
                             <ul class="list-group mb-2">
                               <li class="list-group-item">
                                 <p>&quot;Unable to perform test&quot;.</p>
@@ -198,58 +198,7 @@
                           </div>
                           <div class="vf-col-12 alert alert-warning" role="warning">
                             Please select the appropriate option based on the guidance we have provided above. Once you have done this please select &quot;I have done this&quot; and then select &quot;save the response&quot;.
-                          </div>   
-                          <h2 class="vf-col-12 mb-2">Step 4: Review Feedback</h2>
-                          <div class="vf-col-12 alert alert-info" role="alert">                            
-                            <p>
-                              In this practice session once you submit your response, you will be shown the <span class="fw-bold">expected outcome</span> of this scenario and the explanation of how 
-                              your chosen answer produced your mitigation score for the test. 
-                            </p>
-                            <p>This step helps you:</p>                            
-                            <ul class="list-group mb-2">
-                              <li class="list-group-item">Understand how your system is performing</li>
-                              <li class="list-group-item">Recognise where safety features should trigger for this individual test</li>
-                              <li class="list-group-item">Prepare for completing full assessment scenarios accurately</li>
-                            </ul>
-                            <p>
-                              In the live tool the scores within the four categories are good mitigation, some mitigation, no mitigation and over mitigation are added 
-                              together to produce the users overall mitigation performance report.
-                            </p>                            
-                            <p>
-                              For this scenario, the expected outcome is <span class="fw-bold">prescribing prevented</span> where Paracetamol is prescribed at an extreme overdose. 
-                            </p>
-                            <p>
-                              The explanations for each outcome are recorded below. If you did not select <span class="fw-bold">prescribing prevented</span> then please look at the outcome you selected 
-                              and what mitigation score this would give you and the reason why.
-                            </p>
-                            <ul class="list-group mb-2">
-                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
-                            </ul>
-                            <p>If you are clearly blocked from being able to prescribe the Paracetamol and it is clear cut with no additional decision point then select:</p>
-                            <ul class="list-group mb-2">
-                              <li class="list-group-item">
-                                <div class="fw-bold">Prescribing completed with no system/user intervention</div>
-                                This would score as No Mitigation as the ePrescribing system would permit unsafe prescribing of a paracetamol overdose.
-                              </li>
-                              <li class="list-group-item">
-                                <div class="fw-bold">Prescribing completed but had to override components of the order sentence</div>
-                                This would score as Some Mitigation as the ePrescribing system had some safety measure in place for Paracetamol. However it does not meet Good Mitigation requirements because it 
-                                can be bypassed and permit the prescribing of a Paracetamol overdose.
-                              </li> 
-                              <li class="list-group-item">
-                                <div class="fw-bold">Prescribing completed with system/user intervention</div>
-                                This would score as Some Mitigation where the ePrescribing system provided some form of guidance alerting the prescriber to the Paracetamol overdose.
-                              </li>
-                              <li class="list-group-item">
-                                <div class="fw-bold">Prescribing prevented</div>
-                                This would score as Good Mitigation as the Paracetamol overdose is prevented.
-                              </li>
-                              <li class="list-group-item">
-                                <div class="fw-bold">Unable to perform test</div>
-                                This would score as an invalid test and excluded from the final score calculations.
-                              </li>
-                            </ul>                                   
-                          </div>                          
+                          </div>                             
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
                           <table class="table table-striped vf-col-12">
