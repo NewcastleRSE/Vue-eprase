@@ -237,8 +237,8 @@ export const practiceStore = defineStore('practice', {
         intervention_type: formData.interventionType,
         result: '',
         other_category: Array.isArray(formData.dsCategory) ? formData.dsCategory.join(',') : '',
-        invalid_test_detail: formData.invalidTestDetail,
-        invalid_test_detail_other: formData.invalidTestDetailOther,
+        invalid_test_detail: formData.reasonImpossible,
+        invalid_test_detail_other: formData.otherReasonImpossible,
         qualitative_data: formData.qualitativeData
       }
       

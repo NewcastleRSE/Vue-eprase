@@ -118,10 +118,11 @@
           <div v-if="assessmentData.selection.patientType == 'Adult'" class="alert alert-warning">
             <p>
               Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
-              and users may have completed different additional extreme-risk scenarios from those summarised above. To maintain the integrity of the assessment, the information 
-              provided is intended as high-level educational guidance only, highlighting key medication safety themes that may be encountered within the extreme-risk category. 
-              It should not be interpreted as a record of the specific questions completed by any individual user.
+              and users may have completed different additional extreme-risk scenarios from those summarised. To maintain the integrity of the assessment, the information provided 
+              is intended as high-level educational guidance only, highlighting key medication safety themes that may be encountered within the extreme-risk category. It should not 
+              be interpreted as a record of the specific questions completed by any individual user.
             </p>
+            <p>Examples of the sorts of scenario that meet extreme risk are:</p>
             <ul class="list-group">
               <li class="list-group-item">
                 <span class="fw-bold">Folate antagonists (e.g. trimethoprim):</span> High-risk medicine interactions that may significantly increase toxicity and serious adverse effects when used with certain treatments.
@@ -144,7 +145,27 @@
             </ul>
           </div>
           <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
-            TODO - Wording to be supplied in #490
+            <p>
+              Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
+              and users may have completed different additional extreme-risk scenarios from those summarised. To maintain the integrity of the assessment, the information provided 
+              is intended as high-level educational guidance only, highlighting key medication safety themes that may be encountered within the extreme-risk category. It should not 
+              be interpreted as a record of the specific questions completed by any individual user.
+            </p>
+            <p>Examples of the sorts of scenario that meet extreme risk are:</p>
+            <ul class="list-group">
+              <li class="list-group-item">
+                <span class="fw-bold">Long-acting insulin (e.g. Tresiba&reg;):</span> Incorrect prescribing frequency of a long-acting insulin resulting in significant hypoglycaemia risk
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Electrolytes (e.g. Potassium replacement):</span> Dose and infusion rate safety in paediatric potassium replacement, with risk of fatal overdose.
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Antiepileptic (e.g., Phenytoin):</span> Excessive IV administration rate leading to risk of cardiovascular toxicity and death
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Folate antagonists (e.g. trimethoprim):</span> High-risk medicine interactions that may significantly increase toxicity and serious adverse effects when used with certain treatments.
+              </li>
+            </ul>
           </div>
         </div>
         

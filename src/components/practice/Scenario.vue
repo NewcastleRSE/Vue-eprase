@@ -6,16 +6,7 @@
         <div class="alert alert-info mt-4" role="alert">
           Once the patient is registered, open their profile in your system and complete the following {{ scenarioCount == 1 ? '' : scenarioCount + ' ' }}prescribing test scenario{{ scenarioCount == 1 ? '' : 's' }}.
         </div>
-      </StaticElement> 
-      <!-- Commented out 26/06/2026 David - not relevant for a single scenario... -->      
-      <!-- <StaticElement name="scenariosProgress">
-        <div class="alert alert-info fw-bold" role="alert">
-          {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
-        </div>
-        <div v-show="numCompletedScenarios != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-          <div class="progress-bar" :style="'width: ' + ((numCompletedScenarios / scenarioCount) * 100) + '%'"></div>
-        </div>
-      </StaticElement> -->
+      </StaticElement>       
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
@@ -91,13 +82,24 @@
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
-                      </table>                      
+                      </table>          
+                      <div class="vf-col-12 alert alert-warning" role="warning">
+                        Please enter the prescription <span class="fw-bold">exactly as written</span>, even if you believe it is clinically incorrect.
+                        This is intentional and allows the system's safety features to be tested.
+                      </div>            
                       <div v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
                         <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
                           <h2 class="vf-col-12 mb-2">Step 3: Record What Happens</h2>
                           <div class="vf-col-12 alert alert-info" role="alert">
-                            <h4>Possible Outcomes</h4>
+                            <p>
+                              After prescribing Paracetamol (the test medicine), please select the option that best matches your experience of what your system does. 
+                              Please read the information for each option to support with your selection.
+                            </p>
+                            <p>
+                              Please note on the live tool once an outcome option has been selected and you have moved to the next test users can view what was selected but can't go back and change an answer.
+                            </p>
+                            <h4>Outcome Options</h4>
                             <p>
                               If you placed the order for Paracetamol following your usual prescribing processes, which may have included the selection of a provided order sentence, 
                               and did not receive any advice or information from the electronic prescribing system then please select:
@@ -108,6 +110,65 @@
                             <p>If you had to ignore, modify, or override a provided order sentence to complete the paracetamol prescription then select:</p>
                             <ul class="list-group mb-2">
                               <li class="list-group-item">&quot;Prescribing completed but had to override components of the order sentence&quot;.</li>
+                              <li class="list-group-item">
+                                <p>
+                                  If you select this outcome option you will then have to select the relevant clinical decision support category you think the sysem/user 
+                                  intervention falls under (up to two CDS categories can be selected).
+                                </p>
+                                <p>
+                                  Clinical Decision Support (CDS) Categories form the basis of the ePRaSE mitigation analysis and help organisations understand how effectively their 
+                                  EPMA system supports safe prescribing practices across a broad range of clinical risk areas.
+                                </p>
+                                <p>
+                                  The following categories are used:
+                                </p>
+                                <ul class="bulleted-list">
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Anti-Microbial Stewardship - </span>Drug triggers recommendations on antimicrobial prescription support/guidelines and surveillance 
+                                    related to management of antimicrobial resistance.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Age - </span>Drug contraindication (or dose adjustment) based on patient age.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Allergy - </span>Allergy or intolerance to prescribed drug (or another drug in the same category) documented.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Brand - </span>Drug that must be prescribed by BRAND rather than using generic name.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug-Disease (Contraindication) - </span>Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Dose - </span>Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low).
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Duplication - </span>Specified drug prescribed more than once for the same patient.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Frequency - </span>Specified frequency is not appropriate for prescribed drug.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Laboratory - </span>Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, 
+                                    direct notification/display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request).
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Omission - </span>Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication.
+                                  </li>   
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug-Drug Interaction - </span>Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Route - </span>Specified route is contraindicated for drug and/or dose prescribed.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Pregnancy Prevention - </span>Drug prescribed requires safety measures due to reproductive risks.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Therapeutic Duplication - </span>Two different medicines prescribed simultaneously with the same or similar therapeutic aims.
+                                  </li>
+                                </ul>
+                              </li>
                             </ul>
                             <p>
                               If you received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, 
@@ -121,7 +182,7 @@
                             <ul class="list-group mb-2">
                               <li class="list-group-item">&quot;Prescribing prevented&quot;.</li>
                             </ul>
-                            <p>If you weren’t able to prescribe the test medicine because the drug or particular administration route isn’t available in your EP system then select:</p>
+                            <p>If you weren't able to prescribe the test medicine because the drug or particular administration route isn't available in your EP system then select:</p>
                             <ul class="list-group mb-2">
                               <li class="list-group-item">
                                 <p>&quot;Unable to perform test&quot;.</p>
@@ -135,6 +196,9 @@
                               </li>
                             </ul>                            
                           </div>
+                          <div class="vf-col-12 alert alert-warning" role="warning">
+                            Please select the appropriate option based on the guidance we have provided above. Once you have done this please select &quot;I have done this&quot; and then select &quot;save the response&quot;.
+                          </div>   
                           <h2 class="vf-col-12 mb-2">Step 4: Review Feedback</h2>
                           <div class="vf-col-12 alert alert-info" role="alert">                            
                             <p>
@@ -185,11 +249,7 @@
                                 This would score as an invalid test and excluded from the final score calculations.
                               </li>
                             </ul>                                   
-                          </div>
-                          <div class="vf-col-12 alert alert-warning" role="warning">
-                            Please enter the prescription <span class="fw-bold">exactly as written</span>, even if you believe it is clinically incorrect.
-                            This is intentional and allows the system’s safety features to be tested.
-                          </div>
+                          </div>                          
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
                           <table class="table table-striped vf-col-12">
@@ -415,11 +475,12 @@ export default {
       console.group('invalidTestDescription()')
       console.debug('Responses', this.invalidResponses, 'get description for scenario', scenarioCode)
       if (this.scenarioResponse(scenarioCode)) {
-        const otherResponseNotes = this.scenarioResponse(scenarioCode)['other_reason_impossible']
+        console.debug(this.scenarioResponse(scenarioCode))
+        const otherResponseNotes = this.scenarioResponse(scenarioCode)['invalid_test_detail_other']
         if (otherResponseNotes) {
           description = otherResponseNotes
         } else {
-          const invalidDetail = this.scenarioResponse(scenarioCode)['reason_impossible']
+          const invalidDetail = this.scenarioResponse(scenarioCode)['invalid_test_detail']
           const irs = this.invalidResponses.filter(ir => ir.value == invalidDetail)
           if (irs.length > 0) {
             description = irs[0].label
@@ -648,4 +709,15 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+ul.bulleted-list {
+  list-style-type: disc;
+  margin-left: 1em;
+}
+
+li.bulleted {
+  display: list-item;  
+}
+
+</style>
