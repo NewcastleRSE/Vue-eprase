@@ -299,7 +299,7 @@
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
             <div class="fw-bold">System Information</div>
-            Provide details of the ePrescribing system in use in your hospital.
+            Provide details of the ePrescribing system being assessed in your hospital.
           </div>
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-start">

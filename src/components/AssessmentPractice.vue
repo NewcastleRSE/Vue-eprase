@@ -43,10 +43,10 @@
             <div class="tab-pane fade mt-2" :id="'practice-tab-scenarios'" role="tabpanel" tabindex="0">
               <Scenario v-if="currentTab == 'scenarios'" @all-scenarios-completed="completedScenarios = true" />
               <StaticElement name="scenarioEntryDone">
-                <div v-show="completedScenarios" class="alert alert-info" role="alert">You have now completed all the scenarios.</div>
+                <div v-show="completedScenarios" class="alert alert-info" role="alert">You have now completed all the scenarios. Please select &quot;continue to feedback&quot;.</div>
                 <GroupElement name="patientbuttonBar" :columns="6" :add-class="'mt-4'">
                   <ButtonElement name="backToPatientBuild" :class="'me-2'" :columns="3" full @click="selectTab('patients')">Back to Patient Entry</ButtonElement>
-                  <ButtonElement :disabled="!completedScenarios" name="continueToReport" :class="'ms-2'" :columns="3" full @click="selectTab('report')">Continue to Report</ButtonElement>
+                  <ButtonElement :disabled="!completedScenarios" name="continueToReport" :class="'ms-2'" :columns="3" full @click="selectTab('report')">Continue to Feedback</ButtonElement>
                 </GroupElement>                
               </StaticElement>    
             </div>
