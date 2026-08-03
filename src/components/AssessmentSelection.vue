@@ -99,7 +99,7 @@
 
       <GroupElement name="archiveAssessmentReports" v-if="archives.length != 0">
         <table class="table table-striped caption-top vf-col-12">
-          <caption><h3>You can view the archived PDF reports for the following assessments:</h3></caption>
+          <caption><h3 style="color: #025bb6">You can view the archived PDF reports for the following assessments from previous years:</h3></caption>
           <thead>
             <tr>
               <th>ePrescribing System</th>

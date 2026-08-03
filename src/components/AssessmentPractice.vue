@@ -83,12 +83,15 @@ import PracticeIntro from './practice/PracticeIntro'
 import PracticeReport from './practice/PracticeReport'
 import ErrorAlertModal from './modals/ErrorAlertModal'
 import { rootStore } from '../stores/root'
+import { authenticationStore } from '../stores/authentication'
+import Cookies from 'js-cookie'
 
 export default {
   name: 'AssessmentPractice', 
   computed: {
     ...mapState(appSettingsStore, ['year']),
     ...mapState(rootStore, ['audit']),   
+    ...mapState(authenticationStore, ['user']),
     practiceTabs() {
       return practiceTabValues
     },
@@ -121,6 +124,8 @@ export default {
       await this.audit('practice', '/practice', name)
     },
     doAssessment() {
+      // Ensure practice modal doesn't trouble this user again... https://github.com/NewcastleRSE/Vue-eprase/issues/497
+      Cookies.set(`hidePracticeModal-${this.user}`, 'yes', { expires: 90 })
       this.$router.push('/assessment')
     }
   },
