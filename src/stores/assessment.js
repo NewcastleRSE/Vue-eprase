@@ -92,6 +92,7 @@ export const assessmentStore = defineStore('assessment', {
   state: () => ({ 
     assessmentData: structuredClone(EMPTY_DATA),
     allPossibleAssessments: [],
+    archivedReports: [],
     assessmentStates: ASSESSMENT_STATES,  
     mitigations: [],
     categories: [],
@@ -600,6 +601,36 @@ export const assessmentStore = defineStore('assessment', {
       if (recordLoading) {
         this.setDataReady(true)
       }    
+      console.debug('Returning', ret)
+      console.groupEnd()
+      return ret
+    },
+    // Get all archived reports for the logged-in user's institution
+    async getArchivedReports(recordLoading = false) {
+
+      let ret = true
+
+      console.group('getArchivedReports()')
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      }
+
+      // Note this is a veneer of security - anyone with a logged in bearer token could construct a query to view anyone's report
+      // Should possibly be checked at the backend with a custom controller
+      const instCode = authenticationStore().orgCode
+      const archiveResponse = await rootStore().apiCall(`report-archives?filters[institution_code][$eq]=${instCode}&sort[0]=eprase_version:desc&sort[1]=assessment_type`, 'GET')
+      if (archiveResponse.status < 400) {
+        this.$patch((state) => {
+          state.archivedReports = archiveResponse.data.data
+        })
+      } else {
+        ret = archiveResponse
+      }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }  
       console.debug('Returning', ret)
       console.groupEnd()
       return ret

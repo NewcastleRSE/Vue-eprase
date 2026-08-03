@@ -335,7 +335,7 @@ export default {
   name: 'AssessmentIntro',   
   computed: {
     ...mapState(authenticationStore, ['user']),
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails']), 
+    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getArchivedReports']), 
     ...mapState(practiceStore, ['resetPracticeData']),
     checklistBoxes() {
       return this.$refs['checklist']
@@ -380,7 +380,11 @@ export default {
     if (!wasError) {
       const instResponse = await this.getAssessmentsForInstitution()
       wasError = await this.errorResponder(instResponse)
-    }    
+    } 
+    if (!wasError) {
+      const archResponse = await this.getArchivedReports()
+      wasError = await this.errorResponder(archResponse)
+    }     
     console.debug(this.$refs['checklist'])
     console.groupEnd()
   }
