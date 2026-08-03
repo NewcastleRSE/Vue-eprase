@@ -84,35 +84,6 @@
             </tfoot>
           </table>
         </div>
-        
-        <div class="report-page">
-          <h3>Mandatory Questions</h3>
-          <p>
-            In the ePRaSE tool all users complete the same mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
-            results, and explanatory outcomes is detailed below in Table 2. 
-          </p>
-          <div v-if="!dataLoaded" class="d-flex align-items-center">
-              <strong role="status">Loading final report data for assessment...</strong>
-              <div class="spinner-border ms-auto" aria-hidden="true"></div>
-            </div>
-          <table v-if="dataLoaded" class="table table-bordered">
-            <thead>
-              <tr><th>Drug name</th><th>Test</th><th>Result</th><th>Advice</th></tr>
-            </thead>
-            <tbody>
-              <tr v-for="(value, key) in requiredScenarioAnalysis">
-                <td>{{ value.drugName }}</td>
-                <td>{{ value.explanation }}</td>
-                <td>{{ value.userResponse }}</td>
-                <td v-if="value.result === true">Good mitigation</td>
-                <td v-if="value.result !== true">{{ value.badMitigationFeedback }}</td>
-              </tr>            
-            </tbody>
-            <tfoot>
-              <tr class="border-white text-center"><td colspan="4">Table 2. Mandatory question results</td></tr>
-            </tfoot>
-          </table>
-        </div>
 
         <div class="report-page">
           <div v-if="assessmentData.selection.patientType == 'Adult'" class="alert alert-warning">
@@ -168,6 +139,35 @@
             </ul>
           </div>
         </div>
+        
+        <div class="report-page">
+          <h3>Mandatory Questions</h3>
+          <p>
+            In the ePRaSE tool all users complete the same mandatory questions distributed within a set of other randomised questions. A breakdown of your mandatory questions, 
+            results, and explanatory outcomes is detailed below in Table 2. 
+          </p>
+          <div v-if="!dataLoaded" class="d-flex align-items-center">
+              <strong role="status">Loading final report data for assessment...</strong>
+              <div class="spinner-border ms-auto" aria-hidden="true"></div>
+            </div>
+          <table v-if="dataLoaded" class="table table-bordered">
+            <thead>
+              <tr><th>Drug name</th><th>Test</th><th>Result</th><th>Advice</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="(value, key) in requiredScenarioAnalysis">
+                <td>{{ value.drugName }}</td>
+                <td>{{ value.explanation }}</td>
+                <td>{{ value.userResponse }}</td>
+                <td v-if="value.result === true">Good mitigation</td>
+                <td v-if="value.result !== true">{{ value.badMitigationFeedback }}</td>
+              </tr>            
+            </tbody>
+            <tfoot>
+              <tr class="border-white text-center"><td colspan="4">Table 2. Mandatory question results</td></tr>
+            </tfoot>
+          </table>
+        </div>      
         
         <div class="report-page">
           <h3>Clinical Decision Support Category Results</h3>
