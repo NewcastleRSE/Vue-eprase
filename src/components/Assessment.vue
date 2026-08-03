@@ -80,7 +80,7 @@ import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
-//import { authenticationListener } from '../helpers/audit'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'Assessment',
@@ -268,7 +268,7 @@ export default {
     })
     this.setSessionTimer(this.sessionTimeout)
 
-    //authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener, true)
 
     await this.$nextTick(() => {
       // Show practice modal if required
