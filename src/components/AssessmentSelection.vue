@@ -204,7 +204,7 @@ export default {
   name: 'AssessmentSelection',  
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment', 'archivedReports']),
-    ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
+    ...mapState(authenticationStore, ['email', 'orgCode', 'orgName', 'hospital']),
     ...mapState(rootStore, ['getEpSystems', 'getInstitutions', 'audit']),
     selectionData() {
       return this.assessmentData.selection
@@ -244,6 +244,15 @@ export default {
     async showArchiveReport(pdfName) {
       console.group('showArchiveReport()')
       console.debug('Viewing', pdfName)
+
+      // Another little bit of security veneer, won't stop the determined...
+      const instCode = this.orgCode
+      if (!pdfName.startsWith(instCode)) {
+        throw new Error('Report is not tied to your institution - permission denied')
+      } else {
+        window.open(`https://eprasedocs.blob.core.windows.net/web/assessment_reports/${pdfName}`, '_blank')
+      }      
+
       console.groupEnd()
     },
     async continueAssessment(assessmentId) {
