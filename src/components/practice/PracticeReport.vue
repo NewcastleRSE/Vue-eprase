@@ -22,7 +22,7 @@
         </p>
         <ul class="list-group mb-2">            
           <li class="list-group-item">
-            <div class="fw-bold">Prescribing completed with system/user intervention</div>
+            <div class="fw-bold">Prescribing completed with no system/user intervention</div>
             This would score as No Mitigation as the ePrescribing system would permit unsafe prescribing of a paracetamol overdose.
           </li>
           <li class="list-group-item">
