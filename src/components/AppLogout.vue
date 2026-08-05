@@ -17,6 +17,7 @@
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppLogout',
@@ -49,6 +50,7 @@ export default {
     }
   },
   mounted() {
+    authenticationStore().$onAction(authenticationListener, true)
   }
 }
 </script>

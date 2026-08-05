@@ -121,6 +121,7 @@ import { assessmentStore } from '../stores/assessment'
 import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal.vue'
 import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal.vue'
 import { appSettingsStore } from '../stores/appSettings'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppLogin',
@@ -234,6 +235,7 @@ export default {
     // Clear any assessment data that may be around
     this.clear()
     this.toolIsOpen = await this.toolOpen()
+    authenticationStore().$onAction(authenticationListener, true)
   }
 }
 </script>

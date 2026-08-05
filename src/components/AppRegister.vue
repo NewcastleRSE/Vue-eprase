@@ -101,6 +101,7 @@ import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { usernameFromEmail } from '../helpers/utils'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppRegister',
@@ -179,6 +180,7 @@ export default {
   async mounted() {
     this.getInstitutionCodesNames()
     this.toolIsOpen = await this.toolOpen()
+    authenticationStore().$onAction(authenticationListener, true)
   }
 }
 
