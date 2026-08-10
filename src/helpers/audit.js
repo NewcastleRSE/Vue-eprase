@@ -137,7 +137,8 @@ export async function assessmentListener({
   const assessmentTriggers = [
     'competency', 'selectAssessment', 'saveSystemData', 
     'setPatientEntryStart', 'setPatientEntryComplete',
-    'startPatientScenarioEntry', 'savePatientScenarioResponse'
+    'startPatientScenarioEntry', 'savePatientScenarioResponse',
+    'reportGenerated', 'reportPdf'
   ]
 
   if (assessmentTriggers.includes(name)) {
@@ -156,6 +157,8 @@ export async function assessmentListener({
       case 'setPatientEntryComplete': actionType = 'entryComplete'; entityType = 'patient'; entityId = args[0]; break
       case 'startPatientScenarioEntry': actionType = 'entryStart'; entityType = 'scenario'; entityId = `${args[0]}:${args[1]}`; break
       case 'savePatientScenarioResponse': actionType = 'entryComplete'; entityType = 'scenario'; entityId = `${args[0].patient_code}:${args[1].scenario_code}`; break
+      case 'reportGenerated': actionType = 'generated'; entityType = 'report'; entityId = store.assessmentData.selection.assessmentId; break
+      case 'reportPdf': actionType = 'pdf'; entityType = 'report'; entityId = store.assessmentData.selection.assessmentId; break
       default: break
     }
 
@@ -190,3 +193,5 @@ export async function assessmentListener({
   }
   console.groupEnd()
 }
+
+// TODO - add rootStore listener
