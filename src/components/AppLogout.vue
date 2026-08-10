@@ -50,7 +50,7 @@ export default {
     }
   },
   mounted() {
-    authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 </script>

@@ -86,7 +86,83 @@ export async function authenticationListener({
       console.warn('Error:', error)
     })
   }
+  console.groupEnd()  
+}
 
-  console.groupEnd()
+export async function practiceSessionListener({
+  name,     // name of the action
+  store,    // store instance
+  args,     // array of parameters passed to the action
+  after,    // hook after the action returns or resolves
+  onError,  // hook if the action throws or rejects
+  }) {
+
+  console.group('practiceSessionListener()')  
   
+  const practiceTriggers = ['startPractice', 'endPractice']
+
+  if (practiceTriggers.includes(name)) {
+
+    console.debug('Start', name, 'in store', store, 'params', args)
+    const startTime = Date.now()
+
+    // Triggers if the action succeeds and after it has fully run waiting for any returned promise
+    after(async (result) => {       
+      console.group('practiceSessionListener():after()')     
+      console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
+      console.debug('Result:', result)
+      await auditLog(name, 'practice', '', result)      
+      console.groupEnd()
+    })
+
+    // Triggers if the action throws or returns a promise that rejects
+    onError(async (error) => {
+      console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      console.warn('Error:', error)
+    })
+  }
+  console.groupEnd()
+}
+
+export async function assessmentListener({
+  name,     // name of the action
+  store,    // store instance
+  args,     // array of parameters passed to the action
+  after,    // hook after the action returns or resolves
+  onError,  // hook if the action throws or rejects
+  }) {
+
+  console.group('assessmentListener()')  
+  
+  const assessmentTriggers = ['competency']
+
+  if (assessmentTriggers.includes(name)) {
+
+    console.debug('Start', name, 'in store', store, 'params', args)
+    const startTime = Date.now()
+
+    const actionType = name
+    let entityType = 'assessment'
+    let entityId = null
+    switch(name) {
+      case 'competency': entityType = 'checklist'; entityId = ''; break      
+      default: break
+    }
+
+    // Triggers if the action succeeds and after it has fully run waiting for any returned promise
+    after(async (result) => {       
+      console.group('assessmentListener():after()')     
+      console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
+      console.debug('Result:', result)
+      await auditLog(actionType, entityType, entityId, result)      
+      console.groupEnd()
+    })
+
+    // Triggers if the action throws or returns a promise that rejects
+    onError(async (error) => {
+      console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      console.warn('Error:', error)
+    })
+  }
+  console.groupEnd()
 }

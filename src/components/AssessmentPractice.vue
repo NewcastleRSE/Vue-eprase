@@ -85,12 +85,14 @@ import ErrorAlertModal from './modals/ErrorAlertModal'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import Cookies from 'js-cookie'
+import { practiceStore } from '../stores/practice'
+import { practiceSessionListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentPractice', 
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['audit']),   
+    ...mapState(practiceStore, ['startPractice', 'endPractice']),
     ...mapState(authenticationStore, ['user']),
     practiceTabs() {
       return practiceTabValues
@@ -121,7 +123,6 @@ export default {
       const triggerEl = document.querySelector(`#practice-stage-tabs button[data-bs-target="#practice-tab-${name}"]`)      
       Tab.getInstance(triggerEl).show()
       this.currentTab = name
-      await this.audit('practice', '/practice', name)
     },
     doAssessment() {
       // Ensure practice modal doesn't trouble this user again... https://github.com/NewcastleRSE/Vue-eprase/issues/497
@@ -130,13 +131,17 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentPractice mounted hook')    
+    console.group('AssessmentPractice mounted hook')  
+    practiceStore().$onAction(practiceSessionListener)  
     const triggerTabList = document.querySelectorAll('#practice-stage-tabs button')
     triggerTabList.forEach(triggerEl => {
       const tabTrigger = new Tab(triggerEl)      
     })
-    await this.audit('practice', '/practice', 'intro')
+    this.startPractice()
     console.groupEnd()
+  },
+  beforeUnmount() {
+    this.endPractice()
   },
   errorCaptured(...args) {
 

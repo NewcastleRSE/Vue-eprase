@@ -232,7 +232,7 @@ export default {
     // Clear any assessment data that may be around
     this.clear()
     this.toolIsOpen = await this.toolOpen()
-    authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 </script>

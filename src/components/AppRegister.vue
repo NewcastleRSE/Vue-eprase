@@ -180,7 +180,7 @@ export default {
   async mounted() {
     this.getInstitutionCodesNames()
     this.toolIsOpen = await this.toolOpen()
-    authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 

@@ -267,7 +267,7 @@ export default {
     })
     this.setSessionTimer(this.sessionTimeout)
 
-    authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener)
 
     await this.$nextTick(() => {
       // Show practice modal if required

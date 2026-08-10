@@ -1067,6 +1067,10 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
+    },
+    // Dummy function to enable auditing on the completion of competency checklist
+    competency() {
+      console.debug('competency()')
     }
   }  
 })
