@@ -16,7 +16,7 @@
               :input-type="showPassword['current'] ? 'text' : 'password'"            
               :debounce="200" 
               :messages="{required: 'Current password is required'}" 
-              :rules="['required', $vueform.rules.nhsPassword]">
+              :rules="['required']">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility('current')"
                   :class="showPassword['current'] ? 'bi bi-eye-slash' : 'bi-eye'" 
@@ -79,6 +79,7 @@ import { mapState } from 'pinia'
 import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppRegister',
@@ -87,7 +88,6 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['email', 'changePassword']),
-    ...mapState(rootStore, ['audit'])
   },
   data() {
     return {         
@@ -119,11 +119,9 @@ export default {
           const changePassResponse = await this.changePassword(this.passwordPayload.currentPassword, this.passwordPayload.newPassword, this.passwordPayload.newPassword_confirmation)
           if (changePassResponse.status < 400) {
             console.debug('Successfully changed password')
-            await this.audit('changePassword:' + this.email, '/change-password')
             this.$router.push('/login?action=changedPassword')
           } else {
             this.serverError = 'An error occured while changing your password:' + changePassResponse.message
-            await this.audit('changePasswordFail:' + this.email, '/change-password')
           }
         }
       })      
@@ -135,6 +133,9 @@ export default {
     togglePasswordVisibility(passwordTag) {
       this.showPassword[passwordTag] = ! this.showPassword[passwordTag]     
     }
+  },
+  async mounted() {
+    authenticationStore().$onAction(authenticationListener, true)
   }
 }
 

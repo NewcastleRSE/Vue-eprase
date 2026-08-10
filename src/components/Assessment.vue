@@ -254,7 +254,6 @@ export default {
       onLogout: async () => {
         // Ensure user's work is properly saved
         this.setLoggingOut(true)
-        await this.audit('logout:' + this.user, '/logout')
         this.$router.push('/logout')
       },
       onTimeout: async () => {

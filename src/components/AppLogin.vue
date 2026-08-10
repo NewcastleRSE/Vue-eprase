@@ -133,7 +133,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions', 'terminateSession']),
-    ...mapState(rootStore, ['audit', 'toolOpen']),
+    ...mapState(rootStore, ['toolOpen']),
     ...mapState(assessmentStore, ['reset', 'setLoggingOut']),
     ...mapState(appSettingsStore, ['jwtLifespan']),
     onStaging() {
@@ -199,10 +199,8 @@ export default {
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
             if (this.isReporter()) {
-              await this.audit('reporter-login:' + this.user.email, '/login')
               this.$router.push('/assessment-dashboard')
             } else {
-              await this.audit('login:' + this.user.email, '/login')
               this.sessions = await this.getAllSessions()
               console.debug('Number of active sessions in addition to current', this.nonCurrentSessions.length)
               if (this.sessions === false) {
@@ -217,7 +215,6 @@ export default {
           } else {
             console.debug(signinResponse)
             this.serverError = 'Unable to sign you in with these credentials'
-            await this.audit('loginfail:' + this.user.email, '/login')
             this.clear()
           }
         }

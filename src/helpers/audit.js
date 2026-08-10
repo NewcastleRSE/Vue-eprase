@@ -4,22 +4,23 @@ import axios from 'axios'
 const API = process.env.BASE_URL
 
 function isSuccessResult(result) {
-  let success = true
+  let ok = true
   if (result) {
     try {
       // Assume a result payload { status: xxx, message: '<text>' }
-      success = result.status < 400 
+      ok = result.status < 400 
     } catch(e) {
       // Wasn't an object, so success if we get a true result
-      success = result === true
+      ok = result === true
     }
   }
-  return success
+  return ok ? 'success' : 'failure'
 }
 
-function auditLog(actionType, entityType, entityId, result) {
+async function auditLog(actionType, entityType, entityId, result) {
   const auth = authenticationStore()
-  return axios.post(`${API}audits`, { data: {
+  const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
+  await axios.post(`${API}audits`, { data: {
     action_type: actionType,
     entity_type: entityType,
     entity_id: entityId,
@@ -30,10 +31,10 @@ function auditLog(actionType, entityType, entityId, result) {
     eprase_creator_id: auth.userId,
     eprase_updater_id: auth.userId,
     session_id: auth.session
-  }})
+  }}, config)
 }
 
-export function authenticationListener({
+export async function authenticationListener({
   name,     // name of the action
   store,    // store instance
   args,     // array of parameters passed to the action
@@ -41,12 +42,13 @@ export function authenticationListener({
   onError,  // hook if the action throws or rejects
   }) {
 
-  console.group('authenticationListener()')
-  console.debug('Start', name, 'in store', store, 'params', args)
+  console.group('authenticationListener()')  
     
   const authTriggers = ['signup', 'login', 'logout', 'changePassword', 'terminateSession']
 
   if (authTriggers.includes(name)) {
+
+    console.debug('Start', name, 'in store', store, 'params', args)
 
     const startTime = Date.now()
 
@@ -62,16 +64,24 @@ export function authenticationListener({
       default: break
     }
     console.debug('Action type', actionType, 'entity type', entityType, 'entity id', entityId)
+    if (actionType == 'logout') {
+      // So we record the session information before it is destroyed
+      await auditLog(actionType, entityType, entityId, null)
+    }
     
     // Triggers if the action succeeds and after it has fully run waiting for any returned promise
-    after((result) => {      
-      console.debug('Finished', name, `after ${Date.now() - startTime}ms`, 'logging...')
-      console.debug('Result:', result)            
-      return auditLog(actionType, entityType, entityId, result)
+    after(async (result) => {       
+      console.group('authenticationListener():after()')     
+      console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
+      console.debug('Result:', result) 
+      if (actionType != 'logout') {
+        await auditLog(actionType, entityType, entityId, result)  
+      }
+      console.groupEnd()
     })
 
     // Triggers if the action throws or returns a promise that rejects
-    onError((error) => {
+    onError(async (error) => {
       console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
       console.warn('Error:', error)
     })
