@@ -6,10 +6,10 @@ const API = process.env.BASE_URL
 function isSuccessResult(result) {
   let ok = true
   if (result) {
-    try {
+    if (typeof result === 'object' && !Array.isArray(result) &&  Object.keys(result).length > 0) {
       // Assume a result payload { status: xxx, message: '<text>' }
       ok = result.status < 400 
-    } catch(e) {
+    } else {
       // Wasn't an object, so success if we get a true result
       ok = result === true
     }
@@ -52,13 +52,13 @@ export async function authenticationListener({
 
     const startTime = Date.now()
 
-    const actionType = name
+    let actionType = name
     const entityType = 'user'
     let entityId = null
     switch(name) {
       case 'signup': entityId = args[3]; break
       case 'login': entityId = args[0]; break
-      case 'logout': entityId = store.email; break
+      case 'logout': actionType = args[0] == 'timeout' ? 'timeout': name; entityId = store.email; break
       case 'changePassword': entityId = store.email; break
       case 'terminateSession': entityId = args[0]
       default: break
@@ -134,18 +134,28 @@ export async function assessmentListener({
 
   console.group('assessmentListener()')  
   
-  const assessmentTriggers = ['competency']
+  const assessmentTriggers = [
+    'competency', 'selectAssessment', 'saveSystemData', 
+    'setPatientEntryStart', 'setPatientEntryComplete',
+    'startPatientScenarioEntry', 'savePatientScenarioResponse'
+  ]
 
   if (assessmentTriggers.includes(name)) {
 
     console.debug('Start', name, 'in store', store, 'params', args)
     const startTime = Date.now()
 
-    const actionType = name
+    let actionType = name
     let entityType = 'assessment'
     let entityId = null
     switch(name) {
-      case 'competency': entityType = 'checklist'; entityId = ''; break      
+      case 'competency': entityType = 'checklist'; entityId = ''; break  
+      case 'selectAssessment': actionType = Array.isArray(args) && args.length > 0 && args[0] != null ? 'select' : 'create'; break
+      case 'saveSystemData': entityType = 'system'; entityId = store.assessmentData.system.systemId; break
+      case 'setPatientEntryStart': actionType = 'entryStart'; entityType = 'patient'; entityId = args[0]; break
+      case 'setPatientEntryComplete': actionType = 'entryComplete'; entityType = 'patient'; entityId = args[0]; break
+      case 'startPatientScenarioEntry': actionType = 'entryStart'; entityType = 'scenario'; entityId = `${args[0]}:${args[1]}`; break
+      case 'savePatientScenarioResponse': actionType = 'entryComplete'; entityType = 'scenario'; entityId = `${args[0].patient_code}:${args[1].scenario_code}`; break
       default: break
     }
 
@@ -154,6 +164,20 @@ export async function assessmentListener({
       console.group('assessmentListener():after()')     
       console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
       console.debug('Result:', result)
+      if (entityType == 'assessment' && entityId == null) {
+        entityId = store.assessmentData.selection.assessmentId
+      }
+      if (name == 'saveSystemData') {
+        if (entityId == null) {
+          actionType = 'create'
+          entityId = store.assessmentData.system.systemId
+        } else {
+          actionType = 'update'
+        }
+      }
+      if (name == 'savePatientScenarioResponse') {
+        entityId += `:${store.assessmentData.storedScenarioResponses[store.assessmentData.storedScenarioResponses.length-1].documentId}`
+      }
       await auditLog(actionType, entityType, entityId, result)      
       console.groupEnd()
     })

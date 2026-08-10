@@ -199,6 +199,7 @@ import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import { isoToUkDate } from '../helpers/utils'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSelection',  
@@ -313,6 +314,9 @@ export default {
     convertDate(d, useTime) {
       return isoToUkDate(d, useTime)
     }
+  },
+  mounted() {
+    assessmentStore().$onAction(assessmentListener)
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')

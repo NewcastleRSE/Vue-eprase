@@ -109,7 +109,8 @@ export const authenticationStore = defineStore('authentication', {
       localStorage.clear()
       Cookies.remove('authentication')         
     },
-    async logout() {
+    // timeout argument purely for audit purposes
+    async logout(timeout = false) {
       console.group('logout()')
       if (this.token) {
         await axios.post(`${API}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })

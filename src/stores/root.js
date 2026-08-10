@@ -115,15 +115,7 @@ export const rootStore = defineStore('root', {
     async progressReport() {
       const progressResponse = await rootStore().apiCall('assessment-progress-report', 'GET') 
       return progressResponse
-    },
-    // Audit action
-    async audit(action, uri, result) {
-      const response = await this.apiCall('audits', 'POST', { data: { action, uri, result } })
-      if (response.status >= 400) {
-        // Failure to audit should not bomb the operation as user should not be aware of housekeeping behind the scenes...
-        console.error(response.message)
-      }
-    },
+    },    
     // Final report in a print-friendly form
     storePrintableReportData(heading, content, buttonCaption) {
       this.printableReportData = { heading, content, buttonCaption }

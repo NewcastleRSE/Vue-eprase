@@ -259,7 +259,6 @@ export default {
       onTimeout: async () => {
         // Called when session times out (defaults to redirecting to /timed-out)
         this.setLoggingOut(true)
-        await this.audit('timeout:' + this.user, '/logout')
         this.$router.push('/logout?action=timeout')
       },
       timeoutAt: this.sessionInactivityTimeout,

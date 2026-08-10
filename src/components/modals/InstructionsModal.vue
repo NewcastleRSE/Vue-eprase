@@ -20,19 +20,14 @@
 
 import GenericModal from './GenericModal'
 import { mapStores } from 'pinia'
-import { rootStore } from '../../stores/root'
 
 export default {
   name: "InstructionsModal",
   components: {
     GenericModal
-  },
-  computed: {
-    ...mapStores(rootStore)
-  },
+  },  
   methods: {
     close() {
-      rootStore().audit('View instructions', '/assessmentintro')
     }
   }
 }

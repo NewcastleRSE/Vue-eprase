@@ -104,6 +104,7 @@ import PatientComorbidities from './patientTabs/PatientComorbidities'
 import PatientPresentingComplaints from './patientTabs/PatientPresentingComplaints'
 import PatientCurrentMedication from './patientTabs/PatientCurrentMedication'
 import PatientClinicalData from './patientTabs/PatientClinicalData'
+import { assessmentListener } from '../helpers/audit'
 
 const allPatientsCompleted = class extends Validator {
   get msg() {
@@ -126,7 +127,7 @@ export default {
     PatientClinicalData
   },
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
+    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryStart', 'setPatientEntryComplete']),
     dataLoaded() {
       return this.dataReady
     },
@@ -209,7 +210,9 @@ export default {
               inline: 'nearest'
             })
           })            
-        }            
+        } 
+        // Enable auditing of this step
+        this.setPatientEntryStart(nextCode)           
       } else {
         console.debug('No unentered patients left')
       }
@@ -234,6 +237,7 @@ export default {
   async mounted() {
     console.group('AssessmentPatientBuild mounted()')  
     // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
+    assessmentStore().$onAction(assessmentListener)
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
     const wasError = await this.errorResponder(loadPatientsResponse)

@@ -43,7 +43,6 @@
 <script>
 
 import { mapState } from 'pinia'
-import { rootStore } from '../../stores/root'
 import GenericModal from './GenericModal'
 
 export default {
@@ -51,12 +50,8 @@ export default {
   components: {
     GenericModal
   },
-  computed: {
-    ...mapState(rootStore, ['audit'])
-  },
   methods: {
     close() {
-      this.audit('View about', '/assessmentintro')
     }
   }
 }

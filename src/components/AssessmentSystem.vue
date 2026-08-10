@@ -299,6 +299,7 @@ import { assessmentStore } from '../stores/assessment'
 import ConfirmCancelEditModal from "./modals/ConfirmCancelEditModal"
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSystem',      
@@ -392,6 +393,7 @@ export default {
   }, 
   async mounted() {
     console.group('AssessmentSystem mounted()')
+    assessmentStore().$onAction(assessmentListener)
     console.groupEnd()
   },
   async beforeUnmount() {    

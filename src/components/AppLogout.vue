@@ -45,7 +45,7 @@ export default {
     async logOutUser() {
       console.debug('Logging out user...')
       this.setLoggingOut(false)
-      await this.logout()
+      await this.logout(this.$route.query.action == 'timeout')
       this.$router.push('/login?action=' + (this.$route.query.action == 'timeout' ? 'sessionExpired' : 'loggedOut'))
     }
   },

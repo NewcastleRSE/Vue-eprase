@@ -257,6 +257,7 @@ import { systemMitigationResponses, systemResponseTooltips, invalidTestResponses
 import { assessmentStore } from '../stores/assessment'
 import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
+import { assessmentListener } from '../helpers/audit'
 
 const scenarioCompletionValidator = class extends Validator {
   get msg() {
@@ -271,7 +272,10 @@ const scenarioCompletionValidator = class extends Validator {
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
+    ...mapState(assessmentStore, [
+      'dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 
+      'getPatientScenarioResponses', 'startPatientScenarioEntry', 'savePatientScenarioResponse'
+    ]),
     ...mapState(appSettingsStore, ['maxSelectableDsCategories']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
@@ -515,7 +519,8 @@ export default {
               })
             })            
           }
-        console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
+          this.startPatientScenarioEntry(this.currentPatient, this.currentScenario)
+          console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
       } else {
         console.debug('All scenarios completed')
@@ -576,6 +581,8 @@ export default {
       selector: '[data-bs-toggle="tooltip"]',
       trigger: 'hover'
     })
+
+    assessmentStore().$onAction(assessmentListener)
 
     // Massage the category list for better use in Vueform components      
     this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })  
