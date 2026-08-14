@@ -1,5 +1,6 @@
 import { authenticationStore } from '../stores/authentication'
 import axios from 'axios'
+import { validNhsEmail } from './utils'
 
 const API = process.env.BASE_URL
 
@@ -24,9 +25,26 @@ async function auditLog(actionType, entityType, entityId, result) {
     action_type: actionType,
     entity_type: entityType,
     entity_id: entityId,
-    user_id: auth.email,
+    user_id: validNhsEmail(auth.email) ? auth.email : (validNhsEmail(entityId) ? entityId : 'missing_email@nhs.net'),
     organisation: auth.orgCode,
     action_status: isSuccessResult(result),
+    action_source: navigator.userAgent,
+    eprase_creator_id: auth.userId,
+    eprase_updater_id: auth.userId,
+    session_id: auth.session
+  }}, config)
+}
+
+async function errorLog(actionType, errorObject) {
+  const auth = authenticationStore()
+  const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
+  await axios.post(`${API}audits`, { data: {
+    action_type: actionType,
+    entity_type: 'error',
+    entity_id: errorObject instanceof Error ? errorObject.message : ((errorObject != null && errorObject != undefined) ? errorObject.toString() : 'Unspecified error'),
+    user_id: auth.email,
+    organisation: auth.orgCode,
+    action_status: 'failure',
     action_source: navigator.userAgent,
     eprase_creator_id: auth.userId,
     eprase_updater_id: auth.userId,
@@ -53,14 +71,14 @@ export async function authenticationListener({
     const startTime = Date.now()
 
     let actionType = name
-    const entityType = 'user'
+    let entityType = 'user'
     let entityId = null
     switch(name) {
       case 'signup': entityId = args[3]; break
       case 'login': entityId = args[0]; break
       case 'logout': actionType = args[0] == 'timeout' ? 'timeout': name; entityId = store.email; break
       case 'changePassword': entityId = store.email; break
-      case 'terminateSession': entityId = args[0]
+      case 'terminateSession': entityId = args[0]; break
       default: break
     }
     console.debug('Action type', actionType, 'entity type', entityType, 'entity id', entityId)
@@ -75,6 +93,9 @@ export async function authenticationListener({
       console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
       console.debug('Result:', result) 
       if (actionType != 'logout') {
+        if (actionType == 'systemError') {
+          entityId = result.message
+        }
         await auditLog(actionType, entityType, entityId, result)  
       }
       console.groupEnd()
@@ -83,6 +104,7 @@ export async function authenticationListener({
     // Triggers if the action throws or returns a promise that rejects
     onError(async (error) => {
       console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      await errorLog(name, error)
       console.warn('Error:', error)
     })
   }
@@ -118,6 +140,7 @@ export async function practiceSessionListener({
     // Triggers if the action throws or returns a promise that rejects
     onError(async (error) => {
       console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      await errorLog(name, error)
       console.warn('Error:', error)
     })
   }
@@ -188,10 +211,48 @@ export async function assessmentListener({
     // Triggers if the action throws or returns a promise that rejects
     onError(async (error) => {
       console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      await errorLog(name, error)
       console.warn('Error:', error)
     })
   }
   console.groupEnd()
 }
 
-// TODO - add rootStore listener
+export async function rootListener({
+  name,     // name of the action
+  store,    // store instance
+  args,     // array of parameters passed to the action
+  after,    // hook after the action returns or resolves
+  onError,  // hook if the action throws or rejects
+  }) {
+
+  console.group('rootListener()')  
+  
+  const rootTriggers = ['systemError']
+
+  if (rootTriggers.includes(name)) {
+
+    console.debug('Start', name, 'in store', store, 'params', args)
+    const startTime = Date.now()
+    const actionType = name
+    const entityType = 'error'
+    let entityId = null
+
+    // Triggers if the action succeeds and after it has fully run waiting for any returned promise
+    after(async (result) => {       
+      console.group('rootListener():after()')     
+      console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
+      console.debug('Result:', result)
+      await auditLog(name, entityType, result.message, result)      
+      console.groupEnd()
+    })
+
+    // Triggers if the action throws or returns a promise that rejects
+    onError(async (error) => {
+      console.warn('Failed', name, `after ${Date.now() - startTime}ms`)
+      await errorLog(name, error)
+      console.warn('Error:', error)
+    })
+  }
+  console.groupEnd()
+}

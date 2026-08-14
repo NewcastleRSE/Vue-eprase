@@ -73,10 +73,8 @@ app.config.globalProperties.errorResponder = async function(response) {
       if (!sessionValid) {
         status = 403
         message = 'Your session is no longer valid, possibly terminated on another device'
-        rootStore().systemError(status, message)
         authenticationStore().triageError({ status: 403, message: message })
       } else if (!unauthHttp.includes(status)) {
-        rootStore().systemError(status, message)
         throw new Error(message)
       } 
     }

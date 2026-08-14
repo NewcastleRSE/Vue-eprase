@@ -115,7 +115,7 @@
               </li>
             </ul>
           </div>
-          <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
+          <!-- <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
             <p>
               Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
               and users may have completed different additional extreme-risk scenarios from those summarised. To maintain the integrity of the assessment, the information provided 
@@ -137,7 +137,7 @@
                 <span class="fw-bold">Folate antagonists (e.g. trimethoprim):</span> High-risk medicine interactions that may significantly increase toxicity and serious adverse effects when used with certain treatments.
               </li>
             </ul>
-          </div>
+          </div> -->
         </div>
         
         <div class="report-page">

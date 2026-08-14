@@ -117,8 +117,9 @@ export const rootStore = defineStore('root', {
       return progressResponse
     },  
     // Dummy method to enable auditing of system errors
-    systemError(status, message) {
+    systemError(message) {
       console.debug('systemError()', status, message)
+      return { status: 500, message: message }
     },
     // Final report in a print-friendly form
     storePrintableReportData(heading, content, buttonCaption) {

@@ -77,9 +77,10 @@
               :debounce="200" :messages="{ required: 'Email is required' }"
               :rules="['required', $vueform.rules.nhsEmail]" />
             <TextElement name="password" autocomplete="on" :label="embolden('Password', true)"
+              placeholder="Minimum of 10 characters, at least one uppercase letter, lowercase letter, number, and symbol (e.g., !, %, *)"
               :input-type="showPassword ? 'text' : 'password'" :debounce="200"
-              :messages="{ required: 'Password is required', between: 'Password must be between 6 and 50 characters long' }"
-              :rules="['required', 'between:6,50']">
+              :messages="{ required: 'Password is required' }"
+              :rules="['required', $vueform.rules.nhsPassword]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility"
                   :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
@@ -113,13 +114,13 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { usernameFromEmail, isStagingSite, isoToUkDate } from '../helpers/utils'
+import { isStagingSite, isoToUkDate } from '../helpers/utils'
 import ForgotPasswordModal from './modals/ForgotPasswordModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
-import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal.vue'
-import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal.vue'
+import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal'
+import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal'
 import { appSettingsStore } from '../stores/appSettings'
 import { authenticationListener } from '../helpers/audit'
 
@@ -195,7 +196,7 @@ export default {
         if (!form$.hasErrors) {
           // Do the signin
           console.debug('Validation completed successfully')
-          const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
+          const signinResponse = await this.login(this.user.email, this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
             if (this.isReporter()) {

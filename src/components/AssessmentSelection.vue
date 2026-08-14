@@ -206,7 +206,7 @@ export default {
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment', 'archivedReports']),
     ...mapState(authenticationStore, ['email', 'orgCode', 'orgName', 'hospital']),
-    ...mapState(rootStore, ['getEpSystems', 'getInstitutions', 'audit']),
+    ...mapState(rootStore, ['getEpSystems', 'getInstitutions']),
     selectionData() {
       return this.assessmentData.selection
     },      

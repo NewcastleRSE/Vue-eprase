@@ -80,12 +80,12 @@ import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
-import { authenticationListener } from '../helpers/audit'
+import { authenticationListener, rootListener } from '../helpers/audit'
 
 export default {
   name: 'Assessment',
   computed: {
-    ...mapState(rootStore, ['audit']),
+    ...mapState(rootStore, ['systemError']),
     ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
     ...mapState(appSettingsStore, ['version', 'year', 'sessionInactivityTimeout', 'sessionInactivityWarningAt']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
@@ -178,7 +178,7 @@ export default {
         this.formSteps.goTo('epraseIntroStep', false)
       }
       console.groupEnd()
-    },
+    },    
     nextStep(toStep) {
       console.group('nextStep()')
       console.debug('Next step', toStep.index, 'steps by key', this.formSteps.steps$, 'steps by array', this.formSteps.steps$Array)
@@ -206,6 +206,9 @@ export default {
   async mounted() {
 
     console.group('Assessment top-level mounted() hook')
+
+    // Enable auditing of errors
+    rootStore().$onAction(rootListener)
 
     // Set up observer to detect addition of session timeout dialog so Bootstrap classes can be added
     // This avoids making copies of BS styles to manually style 3rd party elements
@@ -294,6 +297,8 @@ export default {
       activeElement.blur()
     }
     this.errorAlertModal.show(args[0].message)
+    this.systemError(args[0].message)
+    
     this.sessionTimeout.destroy()
 
     console.groupEnd()
