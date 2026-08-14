@@ -113,8 +113,8 @@ export default {
     },
     formStepsControl() {
       return this.$refs.assessmentStepsControl
-    }
-  },
+    }    
+  },  
   components: {
     AssessmentIntro,
     AssessmentSelection,
@@ -139,8 +139,7 @@ export default {
       fetchedSessions: false,
       allMySessions: [],
       sessionTimeout: null,
-      timeoutDialogObserver: null,
-      formErrorMessages: []
+      timeoutDialogObserver: null
     }
   },
   methods: {
