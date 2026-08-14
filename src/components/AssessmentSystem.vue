@@ -46,7 +46,7 @@
           :items="[
             { value: 'live', label: 'Live ePrescribing System' },
             { value: 'test', label: 'Development/test environment' }]"
-          :messages="{required: 'Select an option'}"
+          :messages="{required: 'Select an environment option'}"
           :rules="['required']"
         />
         <ToggleElement name="hasTestEnv"

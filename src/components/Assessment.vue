@@ -139,7 +139,8 @@ export default {
       fetchedSessions: false,
       allMySessions: [],
       sessionTimeout: null,
-      timeoutDialogObserver: null
+      timeoutDialogObserver: null,
+      formErrorMessages: []
     }
   },
   methods: {

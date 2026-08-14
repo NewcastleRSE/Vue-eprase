@@ -178,6 +178,7 @@
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
+                              :disabled="!((patient.patient_code + '.' + pscd.scenario_code + '.interventionType') in interventionSelections)"
                               @change="(newValue) => { allowCurrentScenarioSave[pscd.scenario_code] = newValue }"
                             >
                               I have done this
@@ -258,6 +259,7 @@ import { assessmentStore } from '../stores/assessment'
 import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
 import { assessmentListener } from '../helpers/audit'
+import { rootStore } from '../stores/root'
 
 const scenarioCompletionValidator = class extends Validator {
   get msg() {
@@ -272,6 +274,7 @@ const scenarioCompletionValidator = class extends Validator {
 export default {
   name: 'AssessmentScenario',
   computed: {
+    ...mapState(rootStore, ['validationError']),
     ...mapState(assessmentStore, [
       'dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 
       'getPatientScenarioResponses', 'startPatientScenarioEntry', 'savePatientScenarioResponse'
@@ -467,6 +470,10 @@ export default {
               }, 200)
             }            
           }
+        } else {
+          console.debug('#### Invalid scenario response...')
+          this.validationError('scenario', `${patient.patient_code}:${scenario.scenario_code}`, this.scenarioForm.messageBag.errors[this.scenarioForm.messageBag.errors.length - 1])
+          console.debug('#### Done')
         }
       })     
       console.groupEnd()

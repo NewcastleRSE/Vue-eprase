@@ -228,22 +228,29 @@ export async function rootListener({
 
   console.group('rootListener()')  
   
-  const rootTriggers = ['systemError']
+  const rootTriggers = ['systemError', 'validationError']
 
   if (rootTriggers.includes(name)) {
 
     console.debug('Start', name, 'in store', store, 'params', args)
     const startTime = Date.now()
     const actionType = name
-    const entityType = 'error'
+    let entityType = 'error'
     let entityId = null
+    switch(actionType) {
+      case 'validationError': entityType = args[0]; entityId = `${args[1]}:${args[2]}`; break
+      default: break
+    }
 
     // Triggers if the action succeeds and after it has fully run waiting for any returned promise
     after(async (result) => {       
       console.group('rootListener():after()')     
       console.debug('After', name, `after ${Date.now() - startTime}ms`, 'logging...')
       console.debug('Result:', result)
-      await auditLog(name, entityType, result.message, result)      
+      if (actionType == 'systemError') {
+        entityId = result.message
+      }
+      await auditLog(name, entityType, entityId, result)      
       console.groupEnd()
     })
 

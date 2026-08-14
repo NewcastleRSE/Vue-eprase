@@ -116,10 +116,14 @@ export const rootStore = defineStore('root', {
       const progressResponse = await rootStore().apiCall('assessment-progress-report', 'GET') 
       return progressResponse
     },  
-    // Dummy method to enable auditing of system errors
+    // Dummy methods to enable auditing of system and validation errors
     systemError(message) {
       console.debug('systemError()', status, message)
       return { status: 500, message: message }
+    },
+    validationError(stepId, contextId, message) {
+      console.debug('validationError()', stepId, contextId, message)
+      return { status: 500, message: message}
     },
     // Final report in a print-friendly form
     storePrintableReportData(heading, content, buttonCaption) {
