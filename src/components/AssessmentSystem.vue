@@ -308,10 +308,7 @@ export default {
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'setDuplicateAssessment', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
     confirmCancelEditModal() {
       return this.$refs.confirmCancelEditModal
-    },  
-    legalCharacterMatcher() {
-      return /^[A-Za-z0-9-.,_() ]+$/
-    },
+    },     
     monthSelector() {
       return new monthSelectPlugin({
         shorthand: true,
