@@ -35,6 +35,13 @@
               <li class="nav-item" role="presentation">
                 <button 
                   class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                  id="patient-type-audit-export-tab" 
+                  data-bs-target="#patient-type-audit-export">Export audit log data
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button 
+                  class="nav-link" data-bs-toggle="tab" type="button" role="tab"
                   id="patient-type-csv-downloads-tab" 
                   data-bs-target="#patient-type-csv-downloads">Download data as CSV
                 </button>
@@ -101,6 +108,35 @@
                   </tbody>
                 </table>
               </div>
+              <div class="tab-pane fade mt-4" id="patient-type-audit-export" role="tabpanel" tabindex="2">
+                <Vueform>
+                  <StaticElement name="export-audit-heading">
+                    <h3>Export ePRaSE audit logs by date range and institutions</h3>
+                  </StaticElement>
+                  <ObjectElement name="export-audit-date-select">
+                    <SelectElement name="export-audit-date-modifier" label="For date/time" ref="exportAuditModifierRef"
+                      :columns="{ container: 4, label: 3, wrapper: 12 }"
+                      :items="['any', 'before', 'after', 'between']" default="any" 
+                    />
+                    <DateElement name="export-audit-date1" ref="exportAuditDate1Ref" v-show="exportAuditModifier != 'any'"
+                      display-format="DD/MM/YYYY"
+                      placeholder="Select date/time"
+                      :default="new Date()"
+                      :columns="{ container: 4, label: 0, wrapper: 12 }"
+                      :time="true"
+                      :hour24="false"
+                    />
+                    <DateElement name="export-audit-date2" label="and" ref="exportAuditDate2Ref" v-show="exportAuditModifier == 'between'"
+                      display-format="DD/MM/YYYY"
+                      placeholder="Select date/time"
+                      :default="new Date()"
+                      :columns="{ container: 4, label: 1, wrapper: 12 }"
+                      :time="true"
+                      :hour24="false"
+                    />
+                  </ObjectElement>
+                </Vueform>
+              </div>
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
                 <div class="row col-12">
                   <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
@@ -155,6 +191,15 @@ export default {
     },
     errorAlertModal() {
       return this.$refs.errorAlertModal
+    },
+    exportAuditModifier() {
+      return this.$refs.exportAuditModifierRef.value
+    },
+    exportAuditDate1() {
+      return this.$refs.exportAuditDate1Ref.value
+    },
+    exportAuditDate2() {
+      return this.$refs.exportAuditDate2Ref.value
     }
   },
   components: {
