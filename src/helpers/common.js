@@ -103,10 +103,11 @@ export function patientAgeString(patient) {
 export function patientDateOfBirth(patient) {
   let dateOfBirth = 'Not specified'
   if (patientIsBaby(patient)) {
-    // Create an on-the-fly date of birth to avoid the ageing problem
+    // Use age in days
     dateOfBirth = dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
-  } else if (patient.dob) {
-    dateOfBirth = new Date(patient.dob).toLocaleDateString('en-GB')
+  } else {
+    // Use age in years minus a random number of days
+    dateOfBirth = dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age_years, 'year').format('DD/MM/YYYY')
   }
   return dateOfBirth
 }

@@ -5,7 +5,7 @@ import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
-import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
+import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX, patientDateOfBirth } from '../helpers/common'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -83,6 +83,7 @@ const EMPTY_DATA = {
   patients: [],    
   completedPatients: '',
   numCompletedPatients: 0,
+  patientDobs: '',            // Added to record per-assessment DOBs for patients
   patientScenarios: {},       // The details of the scenarios
   numScenarios: 0,
   storedScenarioResponses: [] // Stored responses  
@@ -451,6 +452,7 @@ export const assessmentStore = defineStore('assessment', {
               institution: isReporter ? loadedAssessmentData.institution.documentId : authenticationStore().orgDocId,
               completedPatients: loadedAssessmentData.completed_patients,
               numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
+              patientDobs: loadedAssessmentData.patient_dobs,
               system: isReporter ? loadedAssessmentData.system : structuredClone(EMPTY_SYSTEM),
               patients: isReporter ? loadedAssessmentData.patients : [],
               patientScenarios: {}, // Reload these for each assessment
@@ -1019,6 +1021,18 @@ export const assessmentStore = defineStore('assessment', {
             this.$patch((state) => {
               state.assessmentData.patients = patients
             })
+          }
+          // Postprocess to create build-time DOBs for all patients and store them in 'patientDobs'
+          if (!this.assessmentData.patientDobs) {
+            const dobs = this.assessmentData.patients.map(p => { return patientDateOfBirth(p) }).join(',')            
+            const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: { patient_dobs: dobs } })
+            if (enteredResponse.status < 400) {
+              this.$patch((state) => {
+                state.assessmentData.patientDobs = dobs
+              })
+            } else {
+              ret = {status: enteredResponse.status, message: 'Failed to update assessment with patient DOBs'}
+            }
           }
         } else {
           ret = patientResponse

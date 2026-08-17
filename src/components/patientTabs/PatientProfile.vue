@@ -20,7 +20,7 @@
             <tbody>
               <tr><th>First name</th><td>{{  patient.first_name }}</td></tr>
               <tr><th>Surname</th><td>{{  patient.surname }}</td></tr>
-              <tr><th>DOB</th><td>{{ formatDOB(patient) }}</td></tr>
+              <tr><th>DOB</th><td>{{ dob }}</td></tr>
               <tr><th>Age</th><td>{{ formatAge(patient) }}</td></tr>
               <tr v-if="patient.gestational_age != 0"><th>Gestational age</th><td>{{ patient.gestational_age + ' weeks' }}</td></tr>                            
               <tr><th>Gender</th><td>{{ patient.gender }}</td></tr>
@@ -48,6 +48,10 @@ export default {
     dataLoaded: {
       type: Boolean,
       default: false
+    },
+    dob: {
+      type: String,
+      required: true
     }
   },
   computed: {
@@ -59,9 +63,6 @@ export default {
     },    
     formatAge(patient) {
       return patientAgeString(patient)
-    },
-    formatDOB(patient) {
-      return patientDateOfBirth(patient)
     }
   }
 }

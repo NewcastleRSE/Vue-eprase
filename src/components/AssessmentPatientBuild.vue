@@ -14,7 +14,9 @@
         you can navigate back and forth between all patients within the patient build section.</p>
       </div>
     </StaticElement>
-    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
+    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
+    <!-- Added to minimise patient ageing problem -->
+    <HiddenElement name="patientDobs" />
     <StaticElement name="patientBuildProgress" class="mb-4">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
@@ -62,7 +64,7 @@
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <PatientProfile :patient="patient" :dataLoaded="dataLoaded" />
+                <PatientProfile :patient="patient" :dob="patientDobFromAssessment(idx)" :dataLoaded="dataLoaded" />
                 <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
                 <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
                 <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
@@ -164,7 +166,10 @@ export default {
       allPatientsCompleted
     }    
   },
-  methods: {     
+  methods: {
+    patientDobFromAssessment(idx) {
+      return this.assessmentData.patientDobs.split(',')[idx]
+    },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
