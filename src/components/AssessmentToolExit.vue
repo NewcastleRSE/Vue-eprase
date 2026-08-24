@@ -28,7 +28,6 @@
 <script>
 
 import { mapState } from 'pinia'
-import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
 import SurveyLinkModal from './modals/SurveyLinkModal'
@@ -39,7 +38,6 @@ export default {
     SurveyLinkModal
   },
   computed: {
-    ...mapState(rootStore, ['audit']),
     ...mapState(authenticationStore, ['user']),
     ...mapState(assessmentStore, ['setLoggingOut'])
   },  
@@ -50,7 +48,6 @@ export default {
     },
     async exit() {
       this.setLoggingOut(true)
-      await this.audit('logout:' + this.user, '/logout')
       this.$router.push('/logout')
     }
   },

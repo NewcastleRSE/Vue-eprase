@@ -18,11 +18,14 @@ import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapState } from 'pinia'
 import PrintJS from 'print-js'
+import { assessmentStore } from '../stores/assessment'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: "PrintablePdf",
   computed: {
     ...mapState(authenticationStore, ['user']),
+    ...mapState(assessmentStore, ['reportPdf']),
     ...mapState(rootStore, ['printableReportData'])
   },
   data() {
@@ -34,9 +37,11 @@ export default {
   methods: {
     printablePdfHandler() {      
       PrintJS({ printable: 'printableReportContainer', type: 'html', header: this.heading, targetStyles: ['*'], maxWidth: 4096 })
+      this.reportPdf()
     }
   },
   mounted( ){
+    assessmentStore().$onAction(assessmentListener)
     const printableData = this.printableReportData    
     this.heading = (printableData.heading || 'Please supply a meaningful heading')
     this.buttonCaption = printableData.buttonCaption || 'Preview'

@@ -115,7 +115,7 @@
               </li>
             </ul>
           </div>
-          <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
+          <!-- <div v-if="assessmentData.selection.patientType == 'Paediatric'" class="alert alert-warning">
             <p>
               Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
               and users may have completed different additional extreme-risk scenarios from those summarised. To maintain the integrity of the assessment, the information provided 
@@ -137,7 +137,7 @@
                 <span class="fw-bold">Folate antagonists (e.g. trimethoprim):</span> High-risk medicine interactions that may significantly increase toxicity and serious adverse effects when used with certain treatments.
               </li>
             </ul>
-          </div>
+          </div> -->
         </div>
         
         <div class="report-page">
@@ -216,12 +216,13 @@ import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
 import { nextTick } from 'vue'
 import { appSettingsStore } from '../stores/appSettings'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus']),
+    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -395,13 +396,17 @@ export default {
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
     this.auxiliaryDataReady = false
+    assessmentStore().$onAction(assessmentListener)
     await this.getInstitutionName()
     // Create hash object to count mitigation types
     this.mitigationSummaries = this.mitigationSummary()
     this.auxiliaryDataReady = true
     this.$nextTick(() => {
-      this.renderPieChart() // Here - plotly throws "Error: DOM element provided is null or undefined"
+      this.renderPieChart()
       this.renderCdsBarChart()
+      // Audit the report generation - NOTE this should save the report to the Azure blob store 
+      // https://github.com/NewcastleRSE/Vue-eprase/issues/503
+      this.reportGenerated()
     })
     console.groupEnd()
   },

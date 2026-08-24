@@ -46,7 +46,7 @@
           :items="[
             { value: 'live', label: 'Live ePrescribing System' },
             { value: 'test', label: 'Development/test environment' }]"
-          :messages="{required: 'Select an option'}"
+          :messages="{required: 'Select an environment option'}"
           :rules="['required']"
         />
         <ToggleElement name="hasTestEnv"
@@ -299,6 +299,7 @@ import { assessmentStore } from '../stores/assessment'
 import ConfirmCancelEditModal from "./modals/ConfirmCancelEditModal"
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSystem',      
@@ -307,10 +308,7 @@ export default {
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'setDuplicateAssessment', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
     confirmCancelEditModal() {
       return this.$refs.confirmCancelEditModal
-    },  
-    legalCharacterMatcher() {
-      return /^[A-Za-z0-9-.,_() ]+$/
-    },
+    },     
     monthSelector() {
       return new monthSelectPlugin({
         shorthand: true,
@@ -392,6 +390,7 @@ export default {
   }, 
   async mounted() {
     console.group('AssessmentSystem mounted()')
+    assessmentStore().$onAction(assessmentListener)
     console.groupEnd()
   },
   async beforeUnmount() {    

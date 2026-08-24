@@ -23,6 +23,12 @@ export const practiceStore = defineStore('practice', {
     setDataReady(readyStatus) {
       this.$patch((state) => { state.dataReady = readyStatus })
     },
+    startPractice() {
+      console.debug('practiceSessionStart()')
+    },
+    endPractice() {
+      console.debug('practiceSessionEnd()')
+    },
     resetPracticeData() {
       console.group('resetPracticeData() on practice store')
       this.$patch((state) => {

@@ -7,6 +7,7 @@ import en from '@vueform/vueform/locales/en'
 import bootstrap from '@vueform/vueform/dist/bootstrap'
 import { defineConfig, Validator } from '@vueform/vueform'
 import { PasswordValidatorManager } from '@password-validator/core'
+import { validNhsEmail } from './src/helpers/utils'
 
 // https://www.30secondsofcode.org/js/s/get-nested-object-value/ - uses nullish coalescing (??) and optional chaining (?.) operators
 const deepGet = (obj, keys) => keys.reduce((xs, x) => xs?.[x] ?? null, obj)
@@ -17,7 +18,7 @@ const nhsEmail = class extends Validator {
   }
   check(value) {
     console.debug('Validate NHS email', value)
-    const isValid = /^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/.test(value)
+    const isValid = validNhsEmail(value)
     console.debug('Return', isValid)
     return isValid
   }

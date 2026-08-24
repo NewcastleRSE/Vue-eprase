@@ -329,13 +329,14 @@ import Cookies from 'js-cookie'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
 import { practiceStore } from '../stores/practice';
-import { authenticationStore } from '../stores/authentication';
+import { authenticationStore } from '../stores/authentication'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentIntro',   
   computed: {
     ...mapState(authenticationStore, ['user']),
-    ...mapState(assessmentStore, ['assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getArchivedReports']), 
+    ...mapState(assessmentStore, ['competency', 'assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getArchivedReports']), 
     ...mapState(practiceStore, ['resetPracticeData']),
     checklistBoxes() {
       return this.$refs['checklist']
@@ -357,6 +358,7 @@ export default {
         Cookies.set(`hideCompetencyChecklist-${this.user}`, 'yes', { expires: 90 })
         console.debug('Done')
         this.requirementsConfirmed = true
+        this.competency()
       }
       console.groupEnd()
     }    
@@ -365,6 +367,8 @@ export default {
     console.group('AssessmentIntro mounted hook')
     this.reset()
     this.resetPracticeData()
+
+    assessmentStore().$onAction(assessmentListener)
 
     // See if user has already checked all the competency requirements
     this.requirementsConfirmed = Cookies.get(`hideCompetencyChecklist-${this.user}`) == 'yes'

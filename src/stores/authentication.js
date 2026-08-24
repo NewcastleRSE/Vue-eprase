@@ -3,6 +3,7 @@ import axios from 'axios'
 import { assessmentStore } from './assessment'
 import Cookies from 'js-cookie'
 import { practiceStore } from './practice'
+import { usernameFromEmail } from '../helpers/utils'
 
 const API = process.env.BASE_URL
 
@@ -53,10 +54,11 @@ export const authenticationStore = defineStore('authentication', {
     setSessionTimer(timer) {
       this.$patch({sessionTimeoutTimer: timer})
     },
+    // Identifier is the email address
     async login(identifier, password) {
 
       let ret = {}
-      const payload = { identifier, password }
+      const payload = { identifier: usernameFromEmail(identifier), password: password }
 
       console.group('login()')
       console.debug('Data payload', payload)
@@ -109,7 +111,8 @@ export const authenticationStore = defineStore('authentication', {
       localStorage.clear()
       Cookies.remove('authentication')         
     },
-    async logout() {
+    // timeout argument purely for audit purposes
+    async logout(timeout = false) {
       console.group('logout()')
       if (this.token) {
         await axios.post(`${API}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })
@@ -236,6 +239,7 @@ export const authenticationStore = defineStore('authentication', {
       }
 
       if (payload.status == 401 || payload.status == 440 || payload.status == 403) {
+        payload.message = 'Session expired'
         this.router.push('/login?action=sessionExpired')
       }
 

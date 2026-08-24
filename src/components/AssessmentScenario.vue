@@ -5,8 +5,8 @@
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
-          <p>There are 45 test scenarios to complete. This should be carried out in <span
-              class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
+          <p>There are 45 test scenarios to complete. This should be carried out in an acount with <span
+              class="fw-bold">full prescribing rights</span> to avoid formulary issues.</p>
           <p>
             Please select the first patient's name from those set up in the patient build phase and prescribe the
             medication exactly as detailed in the Scenario 1 Tab presented.
@@ -178,6 +178,7 @@
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-2" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
+                              :disabled="!(`${patient.patient_code}.${pscd.scenario_code}.interventionType` in interventionSelections)"
                               @change="(newValue) => { allowCurrentScenarioSave[pscd.scenario_code] = newValue }"
                             >
                               I have done this
@@ -257,6 +258,8 @@ import { systemMitigationResponses, systemResponseTooltips, invalidTestResponses
 import { assessmentStore } from '../stores/assessment'
 import { appSettingsStore } from '../stores/appSettings'
 import { Validator } from '@vueform/vueform'
+import { assessmentListener } from '../helpers/audit'
+import { rootStore } from '../stores/root'
 
 const scenarioCompletionValidator = class extends Validator {
   get msg() {
@@ -271,7 +274,11 @@ const scenarioCompletionValidator = class extends Validator {
 export default {
   name: 'AssessmentScenario',
   computed: {
-    ...mapState(assessmentStore, ['dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 'getPatientScenarioResponses', 'savePatientScenarioResponse']),
+    ...mapState(rootStore, ['validationError']),
+    ...mapState(assessmentStore, [
+      'dataReady', 'assessmentData', 'mitigations', 'categories', 'updateAssessmentStatus', 'getPatientScenarioData', 
+      'getPatientScenarioResponses', 'startPatientScenarioEntry', 'savePatientScenarioResponse'
+    ]),
     ...mapState(appSettingsStore, ['maxSelectableDsCategories']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
@@ -463,6 +470,10 @@ export default {
               }, 200)
             }            
           }
+        } else {
+          console.debug('#### Invalid scenario response...')
+          this.validationError('scenario', `${patient.patient_code}:${scenario.scenario_code}`, this.scenarioForm.messageBag.errors[this.scenarioForm.messageBag.errors.length - 1])
+          console.debug('#### Done')
         }
       })     
       console.groupEnd()
@@ -515,7 +526,8 @@ export default {
               })
             })            
           }
-        console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
+          this.startPatientScenarioEntry(this.currentPatient, this.currentScenario)
+          console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
       } else {
         console.debug('All scenarios completed')
@@ -555,7 +567,7 @@ export default {
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
       const identifier = el$.dataPath.split('.').slice(1).join('.')
-      // This sets the object key to <patient_code>.<scenario_code>.outcome
+      // This sets the object key to <patient_code>.<scenario_code>.interventionType
       if (this.interventionSelections[identifier] != newVal) {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
@@ -576,6 +588,8 @@ export default {
       selector: '[data-bs-toggle="tooltip"]',
       trigger: 'hover'
     })
+
+    assessmentStore().$onAction(assessmentListener)
 
     // Massage the category list for better use in Vueform components      
     this.displayCategories = this.categories.map(c => { return { value: c.category_code, label: c.name } })  

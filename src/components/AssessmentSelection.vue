@@ -199,13 +199,14 @@ import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import { isoToUkDate } from '../helpers/utils'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSelection',  
   computed: {
     ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment', 'archivedReports']),
     ...mapState(authenticationStore, ['email', 'orgCode', 'orgName', 'hospital']),
-    ...mapState(rootStore, ['getEpSystems', 'getInstitutions', 'audit']),
+    ...mapState(rootStore, ['getEpSystems', 'getInstitutions']),
     selectionData() {
       return this.assessmentData.selection
     },      
@@ -313,6 +314,9 @@ export default {
     convertDate(d, useTime) {
       return isoToUkDate(d, useTime)
     }
+  },
+  mounted() {
+    assessmentStore().$onAction(assessmentListener)
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')

@@ -76,7 +76,7 @@
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <PatientProfile :patient="patient" :dataLoaded="dataLoaded" />
+                <PatientProfile :patient="patient" :dob="generatePatientDob(patient)" :dataLoaded="dataLoaded" />
                 <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
                 <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
                 <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
@@ -103,7 +103,7 @@
 <script>
 
 import { mapState } from 'pinia'
-import { patientDataTabValues } from '../../helpers/common'
+import { patientDataTabValues, patientDateOfBirth } from '../../helpers/common'
 import { practiceStore } from '../../stores/practice'
 import PatientProfile from '../patientTabs/PatientProfile'
 import PatientAllergies from '../patientTabs/PatientAllergies'
@@ -167,7 +167,10 @@ export default {
     }    
   },
   emits: ['allPatientsEntered'],
-  methods: {     
+  methods: {  
+    generatePatientDob(patient) {
+      return patientDateOfBirth(patient)
+    },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     

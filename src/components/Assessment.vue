@@ -80,12 +80,12 @@ import ErrorAlertModal from './modals/ErrorAlertModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import sessionTimeout from '@travishorn/session-timeout'
-//import { authenticationListener } from '../helpers/audit'
+import { authenticationListener, rootListener } from '../helpers/audit'
 
 export default {
   name: 'Assessment',
   computed: {
-    ...mapState(rootStore, ['audit']),
+    ...mapState(rootStore, ['systemError']),
     ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
     ...mapState(appSettingsStore, ['version', 'year', 'sessionInactivityTimeout', 'sessionInactivityWarningAt']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
@@ -113,8 +113,8 @@ export default {
     },
     formStepsControl() {
       return this.$refs.assessmentStepsControl
-    }
-  },
+    }    
+  },  
   components: {
     AssessmentIntro,
     AssessmentSelection,
@@ -178,7 +178,7 @@ export default {
         this.formSteps.goTo('epraseIntroStep', false)
       }
       console.groupEnd()
-    },
+    },    
     nextStep(toStep) {
       console.group('nextStep()')
       console.debug('Next step', toStep.index, 'steps by key', this.formSteps.steps$, 'steps by array', this.formSteps.steps$Array)
@@ -200,12 +200,27 @@ export default {
       this.activeStep = active.index
       this.nextClicked = false
       this.previousClicked = false
+
+      // Apply primary class to all 'previous' buttons which VueForm renders as grey (secondary) - https://github.com/NewcastleRSE/Vue-eprase/issues/505
+      this.$nextTick(() => {
+        const controlsDiv = document.querySelector('div.vf-steps-controls')
+        if (controlsDiv) {
+          const prevBtn = controlsDiv.querySelector('button.vf-btn-secondary')
+          if (prevBtn) {
+            prevBtn.classList.remove('vf-btn-secondary')
+            prevBtn.classList.add('vf-btn-primary')
+          }
+        } 
+      })       
       console.groupEnd()
     }
   },
   async mounted() {
 
     console.group('Assessment top-level mounted() hook')
+
+    // Enable auditing of errors
+    rootStore().$onAction(rootListener)
 
     // Set up observer to detect addition of session timeout dialog so Bootstrap classes can be added
     // This avoids making copies of BS styles to manually style 3rd party elements
@@ -254,13 +269,11 @@ export default {
       onLogout: async () => {
         // Ensure user's work is properly saved
         this.setLoggingOut(true)
-        await this.audit('logout:' + this.user, '/logout')
         this.$router.push('/logout')
       },
       onTimeout: async () => {
         // Called when session times out (defaults to redirecting to /timed-out)
         this.setLoggingOut(true)
-        await this.audit('timeout:' + this.user, '/logout')
         this.$router.push('/logout?action=timeout')
       },
       timeoutAt: this.sessionInactivityTimeout,
@@ -268,7 +281,7 @@ export default {
     })
     this.setSessionTimer(this.sessionTimeout)
 
-    //authenticationStore().$onAction(authenticationListener, true)
+    authenticationStore().$onAction(authenticationListener)
 
     await this.$nextTick(() => {
       // Show practice modal if required
@@ -277,7 +290,7 @@ export default {
       if (hidePracticeModal != 'yes') {
         console.debug('Showing practice modal')
         this.practiceModal.show()
-      }
+      }      
     }) 
 
     console.groupEnd()
@@ -296,6 +309,8 @@ export default {
       activeElement.blur()
     }
     this.errorAlertModal.show(args[0].message)
+    this.systemError(args[0].message)
+    
     this.sessionTimeout.destroy()
 
     console.groupEnd()

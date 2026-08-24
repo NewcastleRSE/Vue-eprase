@@ -77,9 +77,10 @@
               :debounce="200" :messages="{ required: 'Email is required' }"
               :rules="['required', $vueform.rules.nhsEmail]" />
             <TextElement name="password" autocomplete="on" :label="embolden('Password', true)"
+              placeholder="Minimum of 10 characters, at least one uppercase letter, lowercase letter, number, and symbol (e.g., !, %, *)"
               :input-type="showPassword ? 'text' : 'password'" :debounce="200"
-              :messages="{ required: 'Password is required', between: 'Password must be between 6 and 50 characters long' }"
-              :rules="['required', 'between:6,50']">
+              :messages="{ required: 'Password is required' }"
+              :rules="['required', $vueform.rules.nhsPassword]">
               <template #addon-after="scope">
                 <i style="cursor:pointer" @click="togglePasswordVisibility"
                   :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
@@ -113,14 +114,15 @@
 <script>
 import { mapState } from 'pinia'
 import AppLogo from './AppLogo'
-import { usernameFromEmail, isStagingSite, isoToUkDate } from '../helpers/utils'
+import { isStagingSite, isoToUkDate } from '../helpers/utils'
 import ForgotPasswordModal from './modals/ForgotPasswordModal'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
-import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal.vue'
-import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal.vue'
+import LogoutCurrentSessionModal from './modals/LogoutCurrentSessionModal'
+import LogoutOtherSessionsModal from './modals/LogoutOtherSessionsModal'
 import { appSettingsStore } from '../stores/appSettings'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppLogin',
@@ -132,7 +134,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['login', 'clear', 'isReporter', 'getAllSessions', 'terminateSession']),
-    ...mapState(rootStore, ['audit', 'toolOpen']),
+    ...mapState(rootStore, ['toolOpen']),
     ...mapState(assessmentStore, ['reset', 'setLoggingOut']),
     ...mapState(appSettingsStore, ['jwtLifespan']),
     onStaging() {
@@ -194,18 +196,20 @@ export default {
         if (!form$.hasErrors) {
           // Do the signin
           console.debug('Validation completed successfully')
-          const signinResponse = await this.login(usernameFromEmail(this.user.email), this.user.password)
+          const signinResponse = await this.login(this.user.email, this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
             if (this.isReporter()) {
-              await this.audit('reporter-login:' + this.user.email, '/login')
               this.$router.push('/assessment-dashboard')
             } else {
-              await this.audit('login:' + this.user.email, '/login')
               this.sessions = await this.getAllSessions()
               console.debug('Number of active sessions in addition to current', this.nonCurrentSessions.length)
               if (this.sessions === false) {
                 throw new Error('Logged in, but no sessions found - not sure what happened here!')
+              } else if (this.$route.query.action == 'registered') {
+                // Newly-registered user - https://github.com/NewcastleRSE/Vue-eprase/issues/504 - terminate spurious session created on registration by magic-sessionmanager
+                this.nonCurrentSessions.forEach(async sess => this.terminateSession(sess.documentId))
+                this.$router.push('/assessment')
               } else if (this.nonCurrentSessions.length >= 1) {
                 // Disambiguate the case of multiple sessions
                 this.multipleSessions = true
@@ -216,7 +220,6 @@ export default {
           } else {
             console.debug(signinResponse)
             this.serverError = 'Unable to sign you in with these credentials'
-            await this.audit('loginfail:' + this.user.email, '/login')
             this.clear()
           }
         }
@@ -234,6 +237,7 @@ export default {
     // Clear any assessment data that may be around
     this.clear()
     this.toolIsOpen = await this.toolOpen()
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 </script>

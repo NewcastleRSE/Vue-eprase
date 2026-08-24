@@ -101,6 +101,7 @@ import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { usernameFromEmail } from '../helpers/utils'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppRegister',
@@ -109,7 +110,7 @@ export default {
   },
   computed: {
     ...mapState(authenticationStore, ['signup']),
-    ...mapState(rootStore, ['getInstitutions', 'audit', 'toolOpen'])
+    ...mapState(rootStore, ['getInstitutions', 'toolOpen'])
   },
   data() {
     return {   
@@ -145,11 +146,9 @@ export default {
           const signupResponse = await this.signup(username, institution, hospital, email, password)
           if (signupResponse.status < 400) {
             console.debug('Successful registration')
-            await this.audit('register:' + email, '/register')
             this.$router.push('/login?action=registered')
           } else {
             this.serverError = 'An error occured during registration:' + signupResponse.message
-            await this.audit('registerfail:' + email, '/register')
           }
         }
       })      
@@ -179,6 +178,7 @@ export default {
   async mounted() {
     this.getInstitutionCodesNames()
     this.toolIsOpen = await this.toolOpen()
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 

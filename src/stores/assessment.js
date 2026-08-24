@@ -5,7 +5,7 @@ import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
-import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
+import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX, patientDateOfBirth } from '../helpers/common'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -83,6 +83,7 @@ const EMPTY_DATA = {
   patients: [],    
   completedPatients: '',
   numCompletedPatients: 0,
+  patientDobs: '',            // Added to record per-assessment DOBs for patients
   patientScenarios: {},       // The details of the scenarios
   numScenarios: 0,
   storedScenarioResponses: [] // Stored responses  
@@ -359,8 +360,6 @@ export const assessmentStore = defineStore('assessment', {
       console.group('selectAssessment()')
 
       let ret = true
-      let uri = '/assessments'
-      let action = 'select_assessment'
       this.setDataReady(false)
 
       this.setDuplicateAssessment(false)
@@ -400,9 +399,7 @@ export const assessmentStore = defineStore('assessment', {
               state.assessmentData.selection.assessmentId = response.data.data.documentId
               state.assessmentData.hospital = authenticationStore().hospital,
               state.assessmentData.institution = authenticationStore().orgDocId
-            })
-            // David 02/03-2026 - Auditing will now record the assessment documentId on creation as well as update
-            uri = `${uri}/${response.data.data.documentId}`
+            })           
           } else {
             ret = response
           }
@@ -412,7 +409,6 @@ export const assessmentStore = defineStore('assessment', {
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
         const isReporter = authenticationStore().isReporter()
-        uri = `${uri}/${assessmentId}`
         let chosenAssessments = []
         let loadedAssessmentData = {}
         if (isReporter) {
@@ -456,6 +452,7 @@ export const assessmentStore = defineStore('assessment', {
               institution: isReporter ? loadedAssessmentData.institution.documentId : authenticationStore().orgDocId,
               completedPatients: loadedAssessmentData.completed_patients,
               numCompletedPatients: !loadedAssessmentData.completed_patients ? 0 : loadedAssessmentData.completed_patients.split(',').length,
+              patientDobs: loadedAssessmentData.patient_dobs,
               system: isReporter ? loadedAssessmentData.system : structuredClone(EMPTY_SYSTEM),
               patients: isReporter ? loadedAssessmentData.patients : [],
               patientScenarios: {}, // Reload these for each assessment
@@ -477,7 +474,6 @@ export const assessmentStore = defineStore('assessment', {
           ret = {status: 400, message: `Assessment with id ${assessmentId} not found`}
         }
       } 
-      await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
 
       this.setDataReady(true)
 
@@ -523,9 +519,7 @@ export const assessmentStore = defineStore('assessment', {
     // Save the system data (standalone method which sets and unsets dataReady)
     async saveSystemData(systemComplete) {
 
-      let ret = true
-      let uri = '/systems'
-      let action = 'save_system_data'
+      let ret = true      
 
       this.setDataReady(false)
 
@@ -565,8 +559,6 @@ export const assessmentStore = defineStore('assessment', {
         ret = await this.updateAssessmentStatus('System complete')          
       }
 
-      await rootStore().audit(action, uri, ret === true ? 'ok' : ret.message)
-
       this.setDataReady(true)
       console.debug('Returning', ret)
       console.groupEnd()
@@ -595,8 +587,6 @@ export const assessmentStore = defineStore('assessment', {
           ret = {status: updateStatusResponse.status, message: `Failed to update assessment state to ${newStatus}`}
         }        
       }
-
-      await rootStore().audit('update_assessment_status', '/status', ret === true ? 'ok' : ret.message)
 
       if (recordLoading) {
         this.setDataReady(true)
@@ -843,6 +833,10 @@ export const assessmentStore = defineStore('assessment', {
 
       return ret
     },
+    startPatientScenarioEntry(patient, scenario) {
+      // Dummy function to enable auditing of the start of scenario entry
+      console.debug('startPatientScenarioEntry()')
+    },
     async savePatientScenarioResponse(patient, scenario, formData, recordLoading = false) {
 
       let ret = true
@@ -908,8 +902,6 @@ export const assessmentStore = defineStore('assessment', {
         ret = {status: saveScenarioDataResponse.status, message: `Failed to save scenario response, error ${saveScenarioDataResponse.message}`}
       }
             
-      await rootStore().audit('save_scenario_response', '/scenario', ret === true ? `${scenario.scenario_code} response saved ok` : `error ${ret.message} saving response to ${scenario.scenario_code}`)
-
       if (recordLoading) {
         this.setDataReady(true)
       }
@@ -918,7 +910,11 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    },        
+    },   
+    setPatientEntryStart(patientCode) {
+      // Dummy function to trigger auditing of the start of patient entry
+      console.debug('setPatientEntryStart()')
+    },    
     async setPatientEntryComplete(patientCode, recordLoading = false) {
 
       let ret = true
@@ -1026,6 +1022,18 @@ export const assessmentStore = defineStore('assessment', {
               state.assessmentData.patients = patients
             })
           }
+          // Postprocess to create build-time DOBs for all patients and store them in 'patientDobs'
+          if (!this.assessmentData.patientDobs) {
+            const dobs = this.assessmentData.patients.map(p => { return patientDateOfBirth(p) }).join(',')            
+            const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: { patient_dobs: dobs } })
+            if (enteredResponse.status < 400) {
+              this.$patch((state) => {
+                state.assessmentData.patientDobs = dobs
+              })
+            } else {
+              ret = {status: enteredResponse.status, message: 'Failed to update assessment with patient DOBs'}
+            }
+          }
         } else {
           ret = patientResponse
         }
@@ -1067,6 +1075,16 @@ export const assessmentStore = defineStore('assessment', {
       console.groupEnd()
 
       return ret
-    }
+    },
+    // Dummy functions to enable auditing on the completion of competency checklist and reporting steps
+    competency() {
+      console.debug('competency()')
+    },
+    reportGenerated() {
+      console.debug('reportGenerated()')
+    },
+    reportPdf() {
+      console.debug('reportPdf()')
+    } 
   }  
 })

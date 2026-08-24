@@ -269,6 +269,7 @@
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-4" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
+                              :disabled="!(`${patient.patient_code}.${pscd.scenario_code}.interventionType` in interventionSelections)"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
                               I have done this
@@ -620,7 +621,7 @@ export default {
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
       const identifier = el$.dataPath.split('.').slice(1).join('.')
-      // This sets the object key to <patient_code>.<scenario_code>.outcome
+      // This sets the object key to <patient_code>.<scenario_code>.interventionType
       if (this.interventionSelections[identifier] != newVal) {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
