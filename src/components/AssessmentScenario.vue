@@ -5,8 +5,8 @@
       <StaticElement name="scenarioHeading">
         <h2>Scenarios</h2>
         <div class="alert alert-info mt-2" role="alert">
-          <p>There are 45 test scenarios to complete. This should be carried out in <span
-              class="fw-bold">Consultant</span> status to avoid formulary issues.</p>
+          <p>There are 45 test scenarios to complete. This should be carried out in an acount with <span
+              class="fw-bold">full prescribing rights</span> to avoid formulary issues.</p>
           <p>
             Please select the first patient's name from those set up in the patient build phase and prescribe the
             medication exactly as detailed in the Scenario 1 Tab presented.

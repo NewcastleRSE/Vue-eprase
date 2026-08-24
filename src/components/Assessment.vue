@@ -200,6 +200,18 @@ export default {
       this.activeStep = active.index
       this.nextClicked = false
       this.previousClicked = false
+
+      // Apply primary class to all 'previous' buttons which VueForm renders as grey (secondary) - https://github.com/NewcastleRSE/Vue-eprase/issues/505
+      this.$nextTick(() => {
+        const controlsDiv = document.querySelector('div.vf-steps-controls')
+        if (controlsDiv) {
+          const prevBtn = controlsDiv.querySelector('button.vf-btn-secondary')
+          if (prevBtn) {
+            prevBtn.classList.remove('vf-btn-secondary')
+            prevBtn.classList.add('vf-btn-primary')
+          }
+        } 
+      })       
       console.groupEnd()
     }
   },
@@ -278,7 +290,7 @@ export default {
       if (hidePracticeModal != 'yes') {
         console.debug('Showing practice modal')
         this.practiceModal.show()
-      }
+      }      
     }) 
 
     console.groupEnd()
@@ -286,24 +298,24 @@ export default {
   unmounted() {
     this.timeoutDialogObserver?.disconnect()
   },
-  // errorCaptured(...args) {
+  errorCaptured(...args) {
 
-  //   console.group('errorCaptured()')
-  //   console.debug(args)
+    console.group('errorCaptured()')
+    console.debug(args)
 
-  //   // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
-  //   const activeElement = document.activeElement
-  //   if (activeElement) {
-  //     activeElement.blur()
-  //   }
-  //   this.errorAlertModal.show(args[0].message)
-  //   this.systemError(args[0].message)
+    // Eliminate the 'Blocked aria-hidden on an element because its descendant retained focus' error which confuses assistive technologies when a modal is displayed...
+    const activeElement = document.activeElement
+    if (activeElement) {
+      activeElement.blur()
+    }
+    this.errorAlertModal.show(args[0].message)
+    this.systemError(args[0].message)
     
-  //   this.sessionTimeout.destroy()
+    this.sessionTimeout.destroy()
 
-  //   console.groupEnd()
-  //   return false
-  // }
+    console.groupEnd()
+    return false
+  }
 }
 </script>
 
