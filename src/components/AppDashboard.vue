@@ -111,29 +111,39 @@
               <div class="tab-pane fade mt-4" id="patient-type-audit-export" role="tabpanel" tabindex="2">
                 <Vueform ref="exportAuditForm">
                   <StaticElement name="export-audit-heading">
-                    <h3>Export ePRaSE audit logs by date range and institutions</h3>                    
+                    <h3>Export ePRaSE audit logs by date range and institutions</h3>
                     <div class="alert alert-warning">
-                      To avoid performance problems, the number of records returned is limited to 1000. Please use search terms to limit record size to something sensible.
+                      To avoid performance problems, the number of records returned is limited to 1000. Please use
+                      search terms to limit record size to something sensible.
                     </div>
                   </StaticElement>
                   <ObjectElement name="export-audit-formdata">
-                    <SelectElement name="date-modifier" :label="embolden('For date/time')" ref="exportAuditModifierRef"
+                    <SelectElement name="modifier" :label="embolden('For date/time')" ref="exportAuditModifierRef"
                       :columns="{ container: 4, label: 3, wrapper: 12 }" :items="['any', 'before', 'after', 'between']"
                       default="any" />
                     <DateElement name="date1" ref="exportAuditDate1Ref"
-                      v-if="exportAuditDateModifierHasValues(['before', 'after', 'between'])" display-format="DD/MM/YYYY" placeholder="Select date/time"
-                      :default="new Date()" :columns="{ container: 4, label: 0, wrapper: 12 }" :time="true"
-                      :hour24="false" />
-                    <DateElement name="date2" :label="embolden('and')" ref="exportAuditDate2Ref"
-                      v-if="exportAuditDateModifierHasValues(['between'])" display-format="DD/MM/YYYY"
+                      v-if="exportAuditDateModifierHasValues(['before', 'after', 'between'])"
+                      display-format="DD/MM/YYYY HH:mm" 
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
                       placeholder="Select date/time" :default="new Date()"
-                      :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="false" />
+                      :columns="{ container: 4, label: 0, wrapper: 12 }" :time="true" :hour24="true" />
+                    <DateElement name="date2" :label="embolden('and')" ref="exportAuditDate2Ref"
+                      v-if="exportAuditDateModifierHasValues(['between'])" 
+                      display-format="DD/MM/YYYY HH:mm"
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
+                      placeholder="Select date/time" :default="new Date()"
+                      :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="true" />
                     <TagsElement name="institutions" placeholder="Select institution names, or leave blank for all"
-                      :label="embolden('For trust(s)')"
-                      :items="institutions"
-                      :columns="{ container: 11, label: 1, wrapper: 12 }"
-                    />
-                    <ButtonElement name="export-submit" @click="buildDownloadFormData">                      
+                      :label="embolden('For trust(s)')" :items="institutions"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" />
+                    <SelectElement name="ordering" :label="embolden('Sort')" ref="exportOrderingRef"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" 
+                      :items="[
+                        { value: 'ASC', label: 'in ascending date order' },
+                        { value: 'DESC', label: 'in descending date order' }
+                      ]"
+                      default="ASC" />
+                    <ButtonElement name="export-submit" @click="downloadCsv">
                       <i class="bi bi-filetype-csv me-2"></i>Download CSV
                     </ButtonElement>
                   </ObjectElement>
@@ -234,8 +244,9 @@ export default {
     progressBarClass(idx) {
       return 'assessment-' + (idx <= 2 ? 'not-started' : (idx > 2 && idx < 5 ? 'in-progress' : 'complete'))
     },
-    buildDownloadFormData() {
+    async downloadCsv() {
       console.debug(this.$refs.exportAuditForm.requestData)
+      this.apiCall('export-csv', 'POST', this.$refs.exportAuditForm.requestData['export-audit-formdata'])
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
