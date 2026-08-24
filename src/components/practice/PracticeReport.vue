@@ -14,7 +14,7 @@
           some mitigation, no mitigation and over mitigation and these are added together to produce the users overall mitigation performance report.
         </p>                                      
         <ul class="list-group mb-2"> 
-          <li>For this practice scenario, the expected outcome is <span class="fw-bold">prescribing prevented</span> where Paracetamol is prescribed at an extreme overdose.</li>
+          <li>For this practice scenario, the expected outcome is <span class="fw-bold bg-white border rounded p-2">prescribing prevented</span> where Paracetamol is prescribed at an extreme overdose.</li>
         </ul>                                     
         <p>
           The mitigation scoring explanations for each outcome are recorded below. If you did not select <span class="fw-bold">prescribing prevented</span> please review the outcome you selected 
