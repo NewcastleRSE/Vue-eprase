@@ -112,13 +112,14 @@
                 <Vueform ref="exportAuditForm">
                   <StaticElement name="export-audit-heading">
                     <h3>Export ePRaSE audit logs by date range and institutions</h3>
-                    <div class="alert alert-warning">
+                    <!-- May be ok using streaming - TBC -->
+                    <!-- <div class="alert alert-warning">
                       To avoid performance problems, the number of records returned is limited to 1000. Please use
                       search terms to limit record size to something sensible.
-                    </div>
+                    </div> -->
                   </StaticElement>
                   <ObjectElement name="export-audit-formdata">
-                    <SelectElement name="modifier" :label="embolden('For date/time')" ref="exportAuditModifierRef"
+                    <SelectElement name="modifier" :label="embolden('Date/time')" ref="exportAuditModifierRef"
                       :columns="{ container: 4, label: 3, wrapper: 12 }" :items="['any', 'before', 'after', 'between']"
                       default="any" />
                     <DateElement name="date1" ref="exportAuditDate1Ref"
@@ -134,7 +135,7 @@
                       placeholder="Select date/time" :default="new Date()"
                       :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="true" />
                     <TagsElement name="institutions" placeholder="Select institution names, or leave blank for all"
-                      :label="embolden('For trust(s)')" :items="institutions"
+                      :label="embolden('For trust(s)')" :items="institutions" :search="true"
                       :columns="{ container: 11, label: 1, wrapper: 12 }" />
                     <SelectElement name="ordering" :label="embolden('Sort')" ref="exportOrderingRef"
                       :columns="{ container: 11, label: 1, wrapper: 12 }" 
@@ -143,7 +144,7 @@
                         { value: 'DESC', label: 'in descending date order' }
                       ]"
                       default="ASC" />
-                    <ButtonElement name="export-submit" @click="downloadCsv">
+                    <ButtonElement name="export-submit" @click="downloadCsv()">
                       <i class="bi bi-filetype-csv me-2"></i>Download CSV
                     </ButtonElement>
                   </ObjectElement>
@@ -194,6 +195,7 @@ import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
 import { assessmentStore } from '../stores/assessment'
 import { nextTick } from 'vue'
+import dayjs from 'dayjs'
 
 export default {
   name: 'AssessmentDashboard',
@@ -244,9 +246,31 @@ export default {
     progressBarClass(idx) {
       return 'assessment-' + (idx <= 2 ? 'not-started' : (idx > 2 && idx < 5 ? 'in-progress' : 'complete'))
     },
+    buildFileNameFromParams(formData) {
+      const { modifier, institutions, date1, date2 } = formData
+      let fileName = 'audit_log_export_'
+      switch(modifier) {
+        case 'before': 
+        case 'after':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_`; break
+        case 'between':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_and_${dayjs(date2).format('DD_MM_YYYY_HH_MM')}_`; break
+        default:
+          fileName += 'any_time_'; break      
+      }
+      if (!Array.isArray(institutions) || institutions.length == 0) {
+        fileName += 'all_institutions'
+      } else {
+        fileName += `${institutions.join('_')}`
+      }
+      fileName += '.csv'
+      console.debug(fileName)
+      return fileName
+    },
     async downloadCsv() {
-      console.debug(this.$refs.exportAuditForm.requestData)
-      this.apiCall('export-csv', 'POST', this.$refs.exportAuditForm.requestData['export-audit-formdata'])
+      const formData = this.$refs.exportAuditForm.requestData['export-audit-formdata']
+      const response = await this.apiCall('export-csv', 'POST', formData, 'blob')
+      saveAs(response.data, this.buildFileNameFromParams(formData))
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')

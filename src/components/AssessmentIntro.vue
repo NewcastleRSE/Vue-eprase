@@ -279,9 +279,14 @@
       />      
       <StaticElement name="checklistPostamble">
         <p class="fw-bolder">If all boxes are checked, you are ready to begin the ePRaSE assessment.</p>
-      </StaticElement>      
+      </StaticElement>
+      <ButtonElement name="confirmReadinessButton"
+        disabled="!requirementsConfirmed"
+        @click="nextClicked = true; setContinueButtonVisibility(true)"
+      ><i class="bi bi-arrow-right me-2"></i>Next Step
+      </ButtonElement>
     </GroupElement>
-    <StaticElement v-if="requirementsConfirmed" name="introBody">
+    <StaticElement v-if="requirementsConfirmed && nextClicked" name="introBody">
       <h2 class="mb-4">Introduction</h2>
       <p class="fw-bolder">
         The following annual assessment evaluates ePrescribing system performance against a range of indicators.
@@ -345,7 +350,9 @@ export default {
   data() {
     return {
       itemsTicked: [],
-      requirementsConfirmed: false
+      requirementsConfirmed: false,
+      nextClicked: false,
+      ctaButton: null
     }
   },
   methods: {
@@ -361,7 +368,22 @@ export default {
         this.competency()
       }
       console.groupEnd()
-    }    
+    },
+    setContinueButtonVisibility(visible) {
+      if (!this.ctaButton) {
+        const controlsDiv = document.querySelector('div.vf-steps-controls')
+        if (controlsDiv) {
+          this.ctaButton = controlsDiv.querySelector('button.vf-btn-primary')          
+        } 
+      }      
+      if (this.ctaButton) {
+        if (visible) {
+          this.ctaButton.classList.remove('d-none')
+        } else {
+          this.ctaButton.classList.add('d-none')
+        }        
+      }
+    }
   },
   async mounted() {
     console.group('AssessmentIntro mounted hook')
@@ -372,6 +394,9 @@ export default {
 
     // See if user has already checked all the competency requirements
     this.requirementsConfirmed = Cookies.get(`hideCompetencyChecklist-${this.user}`) == 'yes'
+    if (!this.requirementsConfirmed) {
+      this.setContinueButtonVisibility(false)
+    }
    
     // Get mitigation and category base data
     let wasError = false
