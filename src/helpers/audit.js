@@ -228,17 +228,20 @@ export async function rootListener({
 
   console.group('rootListener()')  
   
-  const rootTriggers = ['systemError', 'validationError']
+  const rootTriggers = ['systemError', 'validationError', 'isReportArchived', 'archivePdfReport']
 
   if (rootTriggers.includes(name)) {
 
     console.debug('Start', name, 'in store', store, 'params', args)
     const startTime = Date.now()
-    const actionType = name
+    let actionType = name
     let entityType = 'error'
     let entityId = null
     switch(actionType) {
       case 'validationError': entityType = args[0]; entityId = `${args[1]}:${args[2]}`; break
+      case 'isReportArchived':
+      case 'archivePdfReport':
+        actionType = 'systemError'; break
       default: break
     }
 
@@ -250,7 +253,7 @@ export async function rootListener({
       if (actionType == 'systemError') {
         entityId = result.message
       }
-      await auditLog(name, entityType, entityId, result)      
+      await auditLog(actionType, entityType, entityId, result)      
       console.groupEnd()
     })
 

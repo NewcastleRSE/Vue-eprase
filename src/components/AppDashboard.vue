@@ -194,7 +194,6 @@ import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
 import { assessmentStore } from '../stores/assessment'
-import { nextTick } from 'vue'
 import dayjs from 'dayjs'
 
 export default {
