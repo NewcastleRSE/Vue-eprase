@@ -1,12 +1,13 @@
 <template>
-  <GroupElement ref="intro" name="introGroup" :class="'mb-4'">    
+  <GroupElement ref="intro" name="introGroup" :class="'mb-4'">
     <GroupElement v-if="!requirementsConfirmed" name="introChecklist">
       <StaticElement name="preStartChecklistPreamble">
         <h2 class="mb-4">ePRaSE Assessment - Pre-Start Checklist</h2>
         <div class="accordion" id="checklistAccordion">
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemOne" aria-expanded="true" aria-controls="checklist-itemOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemOne" aria-expanded="true" aria-controls="checklist-itemOne">
                 <span class="fw-medium fs-4">1. Understand the Purpose</span>
               </button>
             </h2>
@@ -16,18 +17,21 @@
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Tests <strong>system behaviour</strong>, not clinical judgement</li>
                   <li class="list-group-item">Requires you to<strong> follow instructions exactly</strong></li>
-                  <li class="list-group-item">Measures <strong>safety features and mitigations</strong> within your EP system</li>
+                  <li class="list-group-item">Measures <strong>safety features and mitigations</strong> within your EP
+                    system</li>
                 </ul>
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You recognise:</p>
                 <ul class="list-group mb-4">
-                  <li class="list-group-item">Some scenarios may appear clinically incorrect — this is <strong>intentional</strong></li>                  
+                  <li class="list-group-item">Some scenarios may appear clinically incorrect — this is
+                    <strong>intentional</strong></li>
                 </ul>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemTwo" aria-expanded="false" aria-controls="checklist-itemTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemTwo" aria-expanded="false" aria-controls="checklist-itemTwo">
                 <span class="fw-medium fs-4">2. Complete (or Plan to Complete) the Practice Session</span>
               </button>
             </h2>
@@ -45,19 +49,21 @@
                   <li class="list-group-item">How to complete a scenario</li>
                   <li class="list-group-item">How to record outcomes correctly</li>
                   <li class="list-group-item">How outcomes map to mitigation scoring</li>
-                </ul>   
+                </ul>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemThree" aria-expanded="false" aria-controls="checklist-itemThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemThree" aria-expanded="false" aria-controls="checklist-itemThree">
                 <span class="fw-medium fs-4">3. System Access &amp; Capability</span>
               </button>
             </h2>
             <div id="checklist-itemThree" class="accordion-collapse collapse" data-bs-parent="#checklistAccordion">
               <div class="accordion-body">
-                <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You have full access to your electronic prescribing system</p>
+                <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You have full access to your electronic
+                  prescribing system</p>
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You (or your team) can:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Register/create a patient</li>
@@ -69,7 +75,7 @@
                   <li class="list-group-item">System permissions</li>
                   <li class="list-group-item">Access to required modules/screens</li>
                 </ul>
-                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>Minimum essential capabilities:</p>                
+                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>Minimum essential capabilities:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Patient registration (or access to a created patient)</li>
                   <li class="list-group-item">Prescribing functionality</li>
@@ -79,8 +85,9 @@
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemFour" aria-expanded="false" aria-controls="checklist-itemFour">
-                <span class="fw-medium fs-4">4. Right People Involved</span> 
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemFour" aria-expanded="false" aria-controls="checklist-itemFour">
+                <span class="fw-medium fs-4">4. Right People Involved</span>
               </button>
             </h2>
             <div id="checklist-itemFour" class="accordion-collapse collapse" data-bs-parent="#checklistAccordion">
@@ -92,15 +99,18 @@
                 </ul>
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>Where needed:</p>
                 <ul class="list-group mb-4">
-                  <li class="list-group-item">Appropriate staff are involved (e.g. prescribers, informatics, pharmacy, admin support)</li>
+                  <li class="list-group-item">Appropriate staff are involved (e.g. prescribers, informatics, pharmacy,
+                    admin support)</li>
                 </ul>
-                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>You may involve multiple users if required</p>                                
+                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>You may involve multiple users if
+                  required</p>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemFive" aria-expanded="false" aria-controls="checklist-itemFive">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemFive" aria-expanded="false" aria-controls="checklist-itemFive">
                 <span class="fw-medium fs-4">5. Decide Where to Run the Assessment</span>
               </button>
             </h2>
@@ -119,13 +129,15 @@
                 <ul class="list-group mb-4">
                   <li class="list-group-item">You understand it may differ from live</li>
                 </ul>
-                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>You understand this choice may affect results and interpretation</p>                                
+                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>You understand this choice may
+                  affect results and interpretation</p>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemSix" aria-expanded="false" aria-controls="checklist-itemSix">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemSix" aria-expanded="false" aria-controls="checklist-itemSix">
                 <span class="fw-medium fs-4">6. Prepare to Build Test Patients</span>
               </button>
             </h2>
@@ -151,7 +163,8 @@
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemSeven" aria-expanded="false" aria-controls="checklist-itemSeven">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemSeven" aria-expanded="false" aria-controls="checklist-itemSeven">
                 <span class="fw-medium fs-4">7. Understand Scenario Approach</span>
               </button>
             </h2>
@@ -166,13 +179,14 @@
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Scenarios are designed to trigger system responses</li>
                   <li class="list-group-item">Accuracy of entry is critical</li>
-                </ul>               
+                </ul>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemEight" aria-expanded="false" aria-controls="checklist-itemEight">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemEight" aria-expanded="false" aria-controls="checklist-itemEight">
                 <span class="fw-medium fs-4">8. Understand Outcome Recording</span>
               </button>
             </h2>
@@ -181,7 +195,8 @@
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You know how to select outcomes:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Prescribing completed with no system/user intervention</li>
-                  <li class="list-group-item">Prescribing completed but had to override components of the order sentence</li>
+                  <li class="list-group-item">Prescribing completed but had to override components of the order sentence
+                  </li>
                   <li class="list-group-item">Prescribing completed with system/user intervention</li>
                   <li class="list-group-item">Prescribing prevented</li>
                   <li class="list-group-item">Unable to perform test</li>
@@ -190,16 +205,17 @@
                 <ul class="list-group mb-4">
                   <li class="list-group-item">You will select a valid reason or provide free text</li>
                 </ul>
-                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You understand:</p>
+                <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You understand:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Your selection directly affects scoring and analysis</li>
-                </ul>               
+                </ul>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemNine" aria-expanded="false" aria-controls="checklist-itemNine">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemNine" aria-expanded="false" aria-controls="checklist-itemNine">
                 <span class="fw-medium fs-4">9. Be Aware of Key Resources</span>
               </button>
             </h2>
@@ -207,20 +223,23 @@
               <div class="accordion-body">
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You know where to access:</p>
                 <ul class="list-group mb-4">
-                  <li class="list-group-item">User guide available on the 'using eprase' page  eprase.info and within the tool tabs</li>
-                  <li class="list-group-item">Explainer videos/support materials available on the 'using eprase' page on <a href="https://eprase.info" title="ePRaSE info site (opens in new tab)">eprase.info</a></li>
+                  <li class="list-group-item">User guide available on the 'using eprase' page eprase.info and within the
+                    tool tabs</li>
+                  <li class="list-group-item">Explainer videos/support materials available on the 'using eprase' page on
+                    <a href="https://eprase.info" title="ePRaSE info site (opens in new tab)">eprase.info</a></li>
                   <li class="list-group-item">Practice session</li>
                 </ul>
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You understand:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">These resources support correct completion and interpretation</li>
-                </ul>                        
+                </ul>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemTen" aria-expanded="false" aria-controls="checklist-itemTen">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemTen" aria-expanded="false" aria-controls="checklist-itemTen">
                 <span class="fw-medium fs-4">10. Allow Sufficient Time</span>
               </button>
             </h2>
@@ -230,13 +249,15 @@
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Patient setup and scenario completion (approx. 4-6 hours)</li>
                 </ul>
-                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>Avoid rushing - accuracy is more important than speed</p>                                       
+                <p class="fw-bolder"><i class="bi bi-exclamation-triangle me-2"></i>Avoid rushing - accuracy is more
+                  important than speed</p>
               </div>
             </div>
           </div>
           <div class="accordion-item">
             <h2 class="accordion-header bg-warning-subtle">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checklist-itemEleven" aria-expanded="false" aria-controls="checklist-itemEleven">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#checklist-itemEleven" aria-expanded="false" aria-controls="checklist-itemEleven">
                 <span class="fw-medium fs-4">11. Data Awareness &amp; Expectations</span>
               </button>
             </h2>
@@ -245,12 +266,14 @@
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You understand:</p>
                 <ul class="list-group mb-4">
                   <li class="list-group-item">Your data is used for learning and improvement</li>
-                  <li class="list-group-item">This assessment is designed to review system functionality and safety responses</li>
+                  <li class="list-group-item">This assessment is designed to review system functionality and safety
+                    responses</li>
                   <li class="list-group-item">Results reflect system performance within the test scenarios</li>
                 </ul>
                 <p class="fw-bolder"><i class="bi bi-check-lg me-2"></i>You are aware:</p>
                 <ul class="list-group mb-4">
-                  <li class="list-group-item">Results should be interpreted in context (e.g. your system, resources, configuration)</li>
+                  <li class="list-group-item">Results should be interpreted in context (e.g. your system, resources,
+                    configuration)</li>
                 </ul>
               </div>
             </div>
@@ -261,44 +284,37 @@
         <h3>Final Readiness Check</h3>
         <p name="finalReadinessPreamble">Before starting, confirm:</p>
       </StaticElement>
-      <CheckboxgroupElement
-        ref="checklist"
-        name="preparedChecklist"
-        @change="updateTicklist"
-        :items="[
-          'I understand the purpose of the assessment',
-          'I know how to complete scenarios correctly',
-          'I can build and use test patients',
-          'I can prescribe within the system',
-          'I know how to record outcomes',
-          'I have access to guidance if needed',
-          'I have enough time to complete the assessment properly'
-        ]"
-        :messages="{required: 'Please tick all 7 boxes to confirm', 'size': 'Please tick all 7 boxes to confirm'}"
-        :rules="['required', 'size:7']"
-      />      
+      <CheckboxgroupElement ref="checklist" name="preparedChecklist" @change="updateTicklist" :items="[
+        'I understand the purpose of the assessment',
+        'I know how to complete scenarios correctly',
+        'I can build and use test patients',
+        'I can prescribe within the system',
+        'I know how to record outcomes',
+        'I have access to guidance if needed',
+        'I have enough time to complete the assessment properly'
+      ]" :messages="{ required: 'Please tick all 7 boxes to confirm', 'size': 'Please tick all 7 boxes to confirm' }"
+        :rules="['required', 'size:7']" />
       <StaticElement name="checklistPostamble">
         <p class="fw-bolder">If all boxes are checked, you are ready to begin the ePRaSE assessment.</p>
       </StaticElement>
-      <ButtonElement name="confirmReadinessButton"
-        disabled="!requirementsConfirmed"
-        @click="nextClicked = true; setContinueButtonVisibility(true)"
-      ><i class="bi bi-arrow-right me-2"></i>Next Step
+      <ButtonElement name="confirmReadinessButton" :disabled="!allBoxesTicked" @click="confirmReadinessClick">
+        Continue to Introduction
       </ButtonElement>
     </GroupElement>
-    <StaticElement v-if="requirementsConfirmed && nextClicked" name="introBody">
+    <StaticElement v-if="requirementsConfirmed" name="introBody">
       <h2 class="mb-4">Introduction</h2>
       <p class="fw-bolder">
         The following annual assessment evaluates ePrescribing system performance against a range of indicators.
-        You will be asked to admit a series of test patients to your hospital's admissions system, and then 
-        prescribe a series of medications to those patients. You will then be asked to record any feedback about 
-        how your ePrescribing system responds to the prescription, for example, you were able to complete the prescription 
-        without any additional user or system input or you were able to complete the prescription with system/user 
+        You will be asked to admit a series of test patients to your hospital's admissions system, and then
+        prescribe a series of medications to those patients. You will then be asked to record any feedback about
+        how your ePrescribing system responds to the prescription, for example, you were able to complete the
+        prescription
+        without any additional user or system input or you were able to complete the prescription with system/user
         intervention.
       </p>
       <h3>User Instructions</h3>
       <p class="fw-bold">
-        The assessment comprises 3 parts: 
+        The assessment comprises 3 parts:
       </p>
       <ol class="list-group list-group-numbered">
         <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -312,20 +328,22 @@
             <div class="fw-bold">Patient Build</div>
             Create test patients with name, date of birth, gender and clinical information.
           </div>
-        </li>    
+        </li>
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="ms-2 me-auto">
             <div class="fw-bold">Scenarios</div>
-            Prescribe a series of medication to each test patient and provide details about ePrescribing system responses.
+            Prescribe a series of medication to each test patient and provide details about ePrescribing system
+            responses.
           </div>
-        </li>        
-      </ol>    
+        </li>
+      </ol>
       <div class="alert alert-warning mt-4" role="alert">
         <span class="fw-medium">Disclaimer:</span> These patients have been designed to support the test
-        tool and may not necessarily resemble real life. <span class="fw-medium fst-italic">Please enter all information exactly as presented.</span>
+        tool and may not necessarily resemble real life. <span class="fw-medium fst-italic">Please enter all information
+          exactly as presented.</span>
       </div>
     </StaticElement>
-  </GroupElement>    
+  </GroupElement>
 </template>
 
 <script>
@@ -333,56 +351,62 @@
 import Cookies from 'js-cookie'
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
-import { practiceStore } from '../stores/practice';
+import { practiceStore } from '../stores/practice'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentListener } from '../helpers/audit'
 
 export default {
-  name: 'AssessmentIntro',   
+  name: 'AssessmentIntro',
   computed: {
     ...mapState(authenticationStore, ['user']),
-    ...mapState(assessmentStore, ['competency', 'assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getArchivedReports']), 
+    ...mapState(assessmentStore, ['competency', 'assessmentData', 'getAssessmentsForInstitution', 'reset', 'getCategoryDetails', 'getMitigationDetails', 'getArchivedReports']),
     ...mapState(practiceStore, ['resetPracticeData']),
     checklistBoxes() {
       return this.$refs['checklist']
     }
-  }, 
+  },
   data() {
     return {
       itemsTicked: [],
       requirementsConfirmed: false,
-      nextClicked: false,
-      ctaButton: null
+      allBoxesTicked: false,
+      stepsControls: null
     }
   },
   methods: {
     updateTicklist(newValue) {
       console.group('updateTicklist()')
       console.debug('New value', newValue, newValue.length)
-      this.itemsTicked = newValue      
+      this.itemsTicked = newValue
       if (newValue.length == 7) {
         console.debug('All boxes ticked, setting cookie...')
         Cookies.set(`hideCompetencyChecklist-${this.user}`, 'yes', { expires: 90 })
         console.debug('Done')
-        this.requirementsConfirmed = true
+        this.allBoxesTicked = true
         this.competency()
       }
       console.groupEnd()
     },
-    setContinueButtonVisibility(visible) {
-      if (!this.ctaButton) {
-        const controlsDiv = document.querySelector('div.vf-steps-controls')
-        if (controlsDiv) {
-          this.ctaButton = controlsDiv.querySelector('button.vf-btn-primary')          
-        } 
-      }      
-      if (this.ctaButton) {
-        if (visible) {
-          this.ctaButton.classList.remove('d-none')
-        } else {
-          this.ctaButton.classList.add('d-none')
-        }        
+    displayStepsControls(visible) {
+      console.debug('Set controls visible', visible)
+      if (!this.stepsControls) {
+        this.stepsControls = document.querySelector('div.vf-steps-controls')
       }
+      if (this.stepsControls) {
+        console.debug('class list currently', this.stepsControls.classList)
+        if (visible) {
+          console.debug('Removing d-none as now visible')
+          this.stepsControls.classList.remove('d-none')
+        } else {
+          console.debug('Adding d-none as now hidden')
+          this.stepsControls.classList.add('d-none')
+        }
+      }
+      console.debug('Class list after update', this.stepsControls.classList)   
+    },
+    confirmReadinessClick() {      
+      this.requirementsConfirmed = true
+      this.displayStepsControls(true)
     }
   },
   async mounted() {
@@ -395,9 +419,9 @@ export default {
     // See if user has already checked all the competency requirements
     this.requirementsConfirmed = Cookies.get(`hideCompetencyChecklist-${this.user}`) == 'yes'
     if (!this.requirementsConfirmed) {
-      this.setContinueButtonVisibility(false)
+      this.displayStepsControls(false)
     }
-   
+
     // Get mitigation and category base data
     let wasError = false
     const mitResponse = await this.getMitigationDetails()
@@ -405,15 +429,15 @@ export default {
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
       wasError = await this.errorResponder(catResponse)
-    }   
+    }
     if (!wasError) {
       const instResponse = await this.getAssessmentsForInstitution()
       wasError = await this.errorResponder(instResponse)
-    } 
+    }
     if (!wasError) {
       const archResponse = await this.getArchivedReports()
       wasError = await this.errorResponder(archResponse)
-    }     
+    }
     console.debug(this.$refs['checklist'])
     console.groupEnd()
   }
