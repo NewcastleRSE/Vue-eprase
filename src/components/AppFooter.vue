@@ -17,7 +17,7 @@
       </ButtonElement>
       <ButtonElement name="userGuide" full 
         button-type="anchor"
-        href="https://eprasedocs.blob.core.windows.net/web/EpraseUserGuide2025.pdf"
+        href="https://eprasedocs.blob.core.windows.net/web/EpraseUserGuide2026.pdf"
         target="_blank"
         title="User Guide as PDF - opens in a new tab"
         :columns="3" 
