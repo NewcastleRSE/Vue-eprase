@@ -85,8 +85,8 @@
           </table>
         </div>
 
-        <div class="report-page">
-          <div v-if="assessmentData.selection.patientType == 'Adult'" class="alert alert-warning">
+        <div class="report-page" v-if="assessmentData.selection.patientType == 'Adult'">
+          <div class="alert alert-warning">
             <p>
               Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
               and users may have completed different additional extreme-risk scenarios from those summarised. To maintain the integrity of the assessment, the information provided 

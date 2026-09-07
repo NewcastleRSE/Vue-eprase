@@ -13,7 +13,6 @@
 
 <script>
 
-import dayjs from 'dayjs'
 import { rootStore } from '../stores/root'
 import { authenticationStore } from '../stores/authentication'
 import { mapState } from 'pinia'

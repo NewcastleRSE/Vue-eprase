@@ -5,7 +5,7 @@ import humps from 'lodash-humps'
 import createHumps from 'lodash-humps/lib/createHumps'
 import { snakeCase } from 'lodash'
 import { shuffle, calcPercentage, removeLeadingComma } from '../helpers/utils'
-import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX, patientDateOfBirth } from '../helpers/common'
+import { GOOD_MITIGATION, SOME_MITIGATION, OVER_MITIGATION, NO_MITIGATION, INVALID_TEST, MITIGATION_DESCRIPTIONS, MITIGATION_MATRIX } from '../helpers/common'
 import { rootStore } from './root'
 import { appSettingsStore } from './appSettings'
 import { authenticationStore } from './authentication'
@@ -928,6 +928,7 @@ export const assessmentStore = defineStore('assessment', {
         if (recordLoading) {
           this.setDataReady(false)
         } 
+
         enteredCodes.push(patientCode)
         const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: { completed_patients: enteredCodes.toString() } })
         if (enteredResponse.status < 400) {
@@ -944,6 +945,35 @@ export const assessmentStore = defineStore('assessment', {
         }
       }
               
+      console.debug('Returning', ret)
+      console.groupEnd()
+
+      return ret
+    },
+    async savePatientDobs(dobStr, recordLoading = false) {
+
+      let ret = true
+
+      console.group('savePatientDobs()')
+      console.debug('Dates of birth', dobStr) 
+
+      if (recordLoading) {
+        this.setDataReady(false)
+      } 
+
+      const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: { patient_dobs: dobStr } })
+      if (enteredResponse.status < 400) {
+        this.$patch((state) => {
+          state.assessmentData.patientDobs = dobStr
+        })
+      } else {
+        ret = {status: enteredResponse.status, message: `Failed to save DOBs list ${dobStr}`}
+      }
+
+      if (recordLoading) {
+        this.setDataReady(true)
+      }
+
       console.debug('Returning', ret)
       console.groupEnd()
 
@@ -1021,19 +1051,7 @@ export const assessmentStore = defineStore('assessment', {
             this.$patch((state) => {
               state.assessmentData.patients = patients
             })
-          }
-          // Postprocess to create build-time DOBs for all patients and store them in 'patientDobs'
-          if (!this.assessmentData.patientDobs) {
-            const dobs = this.assessmentData.patients.map(p => { return patientDateOfBirth(p) }).join(',')            
-            const enteredResponse = await rootStore().apiCall(`assessments/${this.assessmentData.selection.assessmentId}`, 'PUT', { data: { patient_dobs: dobs } })
-            if (enteredResponse.status < 400) {
-              this.$patch((state) => {
-                state.assessmentData.patientDobs = dobs
-              })
-            } else {
-              ret = {status: enteredResponse.status, message: 'Failed to update assessment with patient DOBs'}
-            }
-          }
+          }          
         } else {
           ret = patientResponse
         }

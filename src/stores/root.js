@@ -1,6 +1,7 @@
 import { authenticationStore } from './authentication'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { appSettingsStore } from './appSettings'
 
 const API = process.env.BASE_URL
 const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
@@ -10,7 +11,8 @@ export const rootStore = defineStore('root', {
     printableReportData: {
       heading: '',
       buttonCaption: '',
-      content: ''
+      content: '',
+      archived: false
     }
   }),
   persist: {
@@ -118,7 +120,7 @@ export const rootStore = defineStore('root', {
     },  
     // Dummy methods to enable auditing of system and validation errors
     systemError(message) {
-      console.debug('systemError()', status, message)
+      console.debug('systemError()', message)
       return { status: 500, message: message }
     },
     validationError(stepId, contextId, message) {
@@ -126,8 +128,28 @@ export const rootStore = defineStore('root', {
       return { status: 500, message: message}
     },
     // Final report in a print-friendly form
-    storePrintableReportData(heading, content, buttonCaption) {
-      this.printableReportData = { heading, content, buttonCaption }
+    storePrintableReportData(heading, content, buttonCaption, archived) {
+      this.printableReportData = { heading, content, buttonCaption, archived }
+    },
+    async isReportArchived(institutionCode, epSystemName, patientType) {
+      let ret = null
+      console.debug(`Check report archived for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
+      const archiveVersion = appSettingsStore().archiveVersion
+      const response = await this.apiCall(
+        `report-archives?filters[eprase_version][$eq]=${archiveVersion}&filters[ep_system][$eq]=${epSystemName}&filters[institution_code][$eq]=${institutionCode}&filters[assessment_type][$eq]=${patientType}`,
+        'GET'
+      )
+      if (response.status < 400) {
+        ret = { status: response.data.data.length > 0 ? 'archived' : 'not archived', message: 'ok' }
+      } else {
+        ret = { status: 'error', message: `Failed to save report for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
+      }
+      console.debug('Result', ret)
+      return ret
+    },
+    async archivePdfReport() {
+      const response = this.apiCall('archive-report', 'GET')
+      return response
     }
   }
 })

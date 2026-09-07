@@ -64,7 +64,7 @@
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <PatientProfile :patient="patient" :dob="patientDobFromAssessment(idx)" :dataLoaded="dataLoaded" />
+                <PatientProfile :patient="patient" :dob="patientDobFromAssessment(patient)" :dataLoaded="dataLoaded" />
                 <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
                 <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
                 <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
@@ -97,7 +97,7 @@
 
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
-import { patientDataTabValues } from '../helpers/common'
+import { patientDataTabValues, patientDateOfBirth } from '../helpers/common'
 import { Validator } from '@vueform/vueform'
 import { appSettingsStore } from '../stores/appSettings'
 import PatientProfile from './patientTabs/PatientProfile'
@@ -129,13 +129,13 @@ export default {
     PatientClinicalData
   },
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryStart', 'setPatientEntryComplete']),
+    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryStart', 'setPatientEntryComplete', 'savePatientDobs']),
     dataLoaded() {
       return this.dataReady
     },
     patientData() {
       return this.assessmentData.patients
-    },    
+    },      
     patientAllergies() {
       return this.patientAuxiliaryData('allergies')
     },
@@ -163,12 +163,34 @@ export default {
     return {
       allPatientData: {},
       currentPatient: null,
+      patientDobTable: {},    // Hash of DOBs by patient code
       allPatientsCompleted
     }    
   },
   methods: {
-    patientDobFromAssessment(idx) {
-      return this.assessmentData.patientDobs.split(',')[idx]
+    patientDobFromAssessment(patient) {
+      let dob = ''
+      if (!( patient.patient_code in this.patientDobTable )) {
+        dob = patientDateOfBirth(patient)
+        this.patientDobTable[patient.patient_code] = dob 
+      } else {
+        dob = this.patientDobTable[patient.patient_code]
+      }
+      console.debug('Updated DOB table', this.patientDobTable)
+      return dob
+    },
+    buildDobTable() {
+      const dobsSoFar = this.assessmentData.patientDobs ? this.assessmentData.patientDobs.split(',') : [] // Saved values
+      const completedPcodes = this.completedPatientsArray()
+      dobsSoFar.forEach((dob, idx) => {
+        if (completedPcodes.length > idx) {
+          this.patientDobTable[completedPcodes[idx]] = dob
+        }        
+      }) 
+      console.debug('Initial DOB table', this.patientDobTable)     
+    },
+    dobTableToString() {
+      return this.completedPatientsArray().map(cp => this.patientDobTable[cp]).toString()
     },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
@@ -240,13 +262,15 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')  
-    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
-    assessmentStore().$onAction(assessmentListener)
+    console.group('AssessmentPatientBuild mounted()') 
+    assessmentStore().$onAction(assessmentListener) 
+    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...    
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
     const wasError = await this.errorResponder(loadPatientsResponse)
-    if (!wasError) {
+    if (!wasError) {      
+      // Build the DOB table thus far
+      this.buildDobTable()
       // Get the details for the first (unentered) patient
       this.$nextTick(() => { this.openNextUnenteredPatient() })
     }          
@@ -255,6 +279,8 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentPatientBuild beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
+    // Save the DOB data generated during the build
+    const saveDobResponse = await this.savePatientDobs(this.dobTableToString())
     if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)

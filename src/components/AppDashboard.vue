@@ -109,25 +109,44 @@
                 </table>
               </div>
               <div class="tab-pane fade mt-4" id="patient-type-audit-export" role="tabpanel" tabindex="2">
-                <Vueform>
+                <Vueform ref="exportAuditForm">
                   <StaticElement name="export-audit-heading">
                     <h3>Export ePRaSE audit logs by date range and institutions</h3>
+                    <!-- May be ok using streaming - TBC -->
+                    <!-- <div class="alert alert-warning">
+                      To avoid performance problems, the number of records returned is limited to 1000. Please use
+                      search terms to limit record size to something sensible.
+                    </div> -->
                   </StaticElement>
-                  <ObjectElement name="export-audit-date-select">
-                    <SelectElement name="export-audit-date-modifier" :label="embolden('For date/time')" ref="exportAuditModifierRef"
+                  <ObjectElement name="export-audit-formdata">
+                    <SelectElement name="modifier" :label="embolden('Date/time')" ref="exportAuditModifierRef"
                       :columns="{ container: 4, label: 3, wrapper: 12 }" :items="['any', 'before', 'after', 'between']"
                       default="any" />
-                    <DateElement name="export-audit-date1" ref="exportAuditDate1Ref"
-                      v-if="exportAuditDateModifierHasValues(['before', 'after', 'between'])" display-format="DD/MM/YYYY" placeholder="Select date/time"
-                      :default="new Date()" :columns="{ container: 4, label: 0, wrapper: 12 }" :time="true"
-                      :hour24="false" />
-                    <DateElement name="export-audit-date2" :label="embolden('and')" ref="exportAuditDate2Ref"
-                      v-if="exportAuditDateModifierHasValues(['between'])" display-format="DD/MM/YYYY"
+                    <DateElement name="date1" ref="exportAuditDate1Ref"
+                      v-if="exportAuditDateModifierHasValues(['before', 'after', 'between'])"
+                      display-format="DD/MM/YYYY HH:mm" 
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
                       placeholder="Select date/time" :default="new Date()"
-                      :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="false" />
-                  </ObjectElement>
-                  <ObjectElement name="export-audit-trusts-select">
-                    <!-- TODO -->
+                      :columns="{ container: 4, label: 0, wrapper: 12 }" :time="true" :hour24="true" />
+                    <DateElement name="date2" :label="embolden('and')" ref="exportAuditDate2Ref"
+                      v-if="exportAuditDateModifierHasValues(['between'])" 
+                      display-format="DD/MM/YYYY HH:mm"
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
+                      placeholder="Select date/time" :default="new Date()"
+                      :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="true" />
+                    <TagsElement name="institutions" placeholder="Select institution names, or leave blank for all"
+                      :label="embolden('For trust(s)')" :items="institutions" :search="true"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" />
+                    <SelectElement name="ordering" :label="embolden('Sort')" ref="exportOrderingRef"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" 
+                      :items="[
+                        { value: 'ASC', label: 'in ascending date order' },
+                        { value: 'DESC', label: 'in descending date order' }
+                      ]"
+                      default="ASC" />
+                    <ButtonElement name="export-submit" @click="downloadCsv()">
+                      <i class="bi bi-filetype-csv me-2"></i>Download CSV
+                    </ButtonElement>
                   </ObjectElement>
                 </Vueform>
               </div>
@@ -175,13 +194,13 @@ import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
 import { assessmentStore } from '../stores/assessment'
-import { nextTick } from 'vue'
+import dayjs from 'dayjs'
 
 export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -209,7 +228,8 @@ export default {
   },
   data() {
     return {
-      dashboardData: null
+      dashboardData: null,
+      institutions: []
     }
   },
   methods: {
@@ -224,6 +244,32 @@ export default {
     },
     progressBarClass(idx) {
       return 'assessment-' + (idx <= 2 ? 'not-started' : (idx > 2 && idx < 5 ? 'in-progress' : 'complete'))
+    },
+    buildFileNameFromParams(formData) {
+      const { modifier, institutions, date1, date2 } = formData
+      let fileName = 'audit_log_export_'
+      switch(modifier) {
+        case 'before': 
+        case 'after':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_`; break
+        case 'between':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_and_${dayjs(date2).format('DD_MM_YYYY_HH_MM')}_`; break
+        default:
+          fileName += 'any_time_'; break      
+      }
+      if (!Array.isArray(institutions) || institutions.length == 0) {
+        fileName += 'all_institutions'
+      } else {
+        fileName += `${institutions.join('_')}`
+      }
+      fileName += '.csv'
+      console.debug(fileName)
+      return fileName
+    },
+    async downloadCsv() {
+      const formData = this.$refs.exportAuditForm.requestData['export-audit-formdata']
+      const response = await this.apiCall('export-csv', 'POST', formData, 'blob')
+      saveAs(response.data, this.buildFileNameFromParams(formData))
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
@@ -273,8 +319,14 @@ export default {
   },
   async mounted() {
     console.group('AssessmentDashboard mounted()')
-    // Basic data for viewing assessments
     let wasError = false
+    // Institution list for CSV audit download selector
+    const instResponse = await this.getInstitutions()
+    wasError = await this.errorResponder(instResponse)
+    if (!wasError) {
+      this.institutions = instResponse.data.data.map(inst => { return { value: inst.institution_code, label: inst.name } })
+    }
+    // Basic data for viewing assessments    
     const mitResponse = await this.getMitigationDetails()
     wasError = await this.errorResponder(mitResponse)
     if (!wasError) {
