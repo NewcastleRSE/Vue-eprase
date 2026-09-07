@@ -23,18 +23,23 @@
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" id="patient-type-paediatric-tab"
-                  data-bs-target="#patient-type-paediatric-content">All Paediatric Assessments
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" 
+                  id="patient-type-paediatric-tab" data-bs-target="#patient-type-paediatric-content">All Paediatric Assessments
                 </button>
               </li>
               <li class="nav-item" role="presentation">
                 <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                  id="patient-type-audit-export-tab" data-bs-target="#patient-type-audit-export">Export audit log data
+                  id="archive-reports-tab" data-bs-target="#archive-reports-content">Archive reports
                 </button>
               </li>
               <li class="nav-item" role="presentation">
                 <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                  id="patient-type-csv-downloads-tab" data-bs-target="#patient-type-csv-downloads">Download data as CSV
+                  id="audit-log-export-tab" data-bs-target="#audit-log-export-content">Export audit log data
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                  id="csv-downloads-tab" data-bs-target="#csv-downloads-content">Download data as CSV
                 </button>
               </li>
             </ul>
@@ -108,15 +113,37 @@
                   </tbody>
                 </table>
               </div>
-              <div class="tab-pane fade mt-4" id="patient-type-audit-export" role="tabpanel" tabindex="2">
+              <div class="tab-pane fade mt-4" id="archive-reports-content" role="tabpanel" tabindex="2">
+                <button name="archive-reports-btn" class="col-4 btn btn-primary" 
+                  :disabled="archiveStarted" @click="saveCompletedReportsToArchive()"
+                >Save Current Reports to Archive</button>
+                <div v-show="archiveInProgressAdult">
+                  <h5 class="mt-2">Adult assessments</h5>
+                  <ul ref="archiveFeedbackAdult" class="list-group"> 
+                    <li class="list-group-item">
+                      <div class="d-flex align-items-center">
+                        <strong role="status">Determining what to archive...</strong>
+                        <div class="spinner-border ms-auto" aria-hidden="true"></div>
+                      </div>
+                    </li>                 
+                  </ul>
+                </div>
+                <div v-show="archiveInProgressPaediatric">
+                  <h5 class="mt-2">Paediatric assessments</h5>
+                  <ul ref="archiveFeedbackPaediatric" class="list-group">
+                    <li class="list-group-item">
+                      <div class="d-flex align-items-center">
+                        <strong role="status">Determining what to archive...</strong>
+                        <div class="spinner-border ms-auto" aria-hidden="true"></div>
+                      </div>
+                    </li>                  
+                  </ul>
+                </div>
+              </div>
+              <div class="tab-pane fade mt-4" id="audit-log-export-content" role="tabpanel" tabindex="3">
                 <Vueform ref="exportAuditForm">
                   <StaticElement name="export-audit-heading">
-                    <h3>Export ePRaSE audit logs by date range and institutions</h3>
-                    <!-- May be ok using streaming - TBC -->
-                    <!-- <div class="alert alert-warning">
-                      To avoid performance problems, the number of records returned is limited to 1000. Please use
-                      search terms to limit record size to something sensible.
-                    </div> -->
+                    <h3>Export ePRaSE audit logs by date range and institutions</h3>                   
                   </StaticElement>
                   <ObjectElement name="export-audit-formdata">
                     <SelectElement name="modifier" :label="embolden('Date/time')" ref="exportAuditModifierRef"
@@ -150,7 +177,7 @@
                   </ObjectElement>
                 </Vueform>
               </div>
-              <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
+              <div class="tab-pane fade mt-4" id="csv-downloads-content" role="tabpanel" tabindex="4">
                 <div class="row col-12">
                   <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
                   <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment
@@ -177,7 +204,6 @@
           </div>
         </div>
       </div>
-
     </div>
     <AppLogo cls="bottomright" />
     <ErrorAlertModal ref="errorAlertModal" />
@@ -200,7 +226,7 @@ export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'isReportArchived']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -229,7 +255,11 @@ export default {
   data() {
     return {
       dashboardData: null,
-      institutions: []
+      institutions: [],
+      archiveStarted: false,
+      archiveInProgressAdult: false,
+      archiveInProgressPaediatric: false,
+      archiveComplete: false
     }
   },
   methods: {
@@ -314,6 +344,57 @@ export default {
       if (!wasError) {
         window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
       }
+      console.groupEnd()
+    },
+    addArchivingFeedback(ul, str, addToLast = false) {
+      if (addToLast) {
+        const lastLi = ul.querySelector('li:last-child')
+        lastLi.innerHTML = lastLi.innerText + str
+      } else {
+        const newLi = document.createElement('li')
+        newLi.className = 'list-group-item'
+        newLi.innerHTML = str
+        ul.appendChild(newLi)
+      }      
+    },
+    async saveCompletedReportsToArchive() {
+      console.group('saveCompletedReportsToArchive()')
+      this.archiveStarted = true
+      for (const assessmentType of ['Adult', 'Paediatric']) {
+        this['archiveInProgress' + assessmentType] = true
+        const ul = this.$refs['archiveFeedback' + assessmentType]
+        ul.innerHTML = ''
+        const fieldName = assessmentType.substring(0, 1).toLowerCase() + assessmentType.substring(1) + 'Assessments'
+        const completedAssessments = this.dashboardData[fieldName].filter(assmt => assmt.state == 'Assessment complete')
+        if (completedAssessments.length == 0) {
+          this.addArchivingFeedback(ul, 'No completed reports to be archived')
+        } else {
+          completedAssessments.forEach(async caa => {
+            const epSystemName = caa.other_ep_service || caa.ep_service.name
+            const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
+            let feedbackStr = ''
+            switch(isArchivedResponse.status) {
+              case 'archived': feedbackStr = `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`; break
+              case 'not archived': feedbackStr = `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`; break
+              case 'error': feedbackStr = isArchivedResponse.message; break
+              default: break
+            }
+            this.addArchivingFeedback(ul, feedbackStr)
+            if (isArchivedResponse.status == 'not archived') {
+              // Save the report
+              const selectResponse = await this.selectAssessment(caa.documentId)
+              if (selectResponse === true) {
+                // Save here...
+                const assessmentUrl = this.$router.resolve({ path: '/assessment-report' }).href
+                this.addArchivingFeedback(ul, 'Done', true)   // Or error message if the save failed
+              } else {
+                this.addArchivingFeedback(ul, selectResponse.message, true)
+              }              
+            }            
+          })
+        }
+      } 
+      this.archiveComplete = true     
       console.groupEnd()
     }
   },

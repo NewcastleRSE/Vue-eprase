@@ -142,7 +142,7 @@ export const rootStore = defineStore('root', {
       if (response.status < 400) {
         ret = { status: response.data.data.length > 0 ? 'archived' : 'not archived', message: 'ok' }
       } else {
-        ret = { status: 'error', message: `Failed to save report for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
+        ret = { status: 'error', message: `Failed to get report for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
       }
       console.debug('Result', ret)
       return ret
