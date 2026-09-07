@@ -85,7 +85,7 @@
           </table>
         </div>
 
-        <div v-if="assessmentData.selection.patientType == 'Adult'" class="report-page">
+        <div class="report-page" v-if="assessmentData.selection.patientType == 'Adult'">
           <div class="alert alert-warning">
             <p>
               Please note that the information below is provided to support learning and development. Not all extreme-risk scenarios within the ePRaSE assessment are mandatory, 
@@ -198,7 +198,7 @@
         <ButtonElement name="assemblePrintablePdf"
           :disabled="!dataLoaded"
           :columns="4"
-          @click="openPrintableWindow"
+          @click="assemblePrintableReport"
         >Create printable PDF
         </ButtonElement>
       </StaticElement>
@@ -214,6 +214,7 @@ import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
+import { nextTick } from 'vue'
 import { appSettingsStore } from '../stores/appSettings'
 import { assessmentListener } from '../helpers/audit'
 
@@ -222,8 +223,8 @@ export default {
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
     ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
-    ...mapState(authenticationStore, ['orgCode', 'orgName', 'isReporter']),
-    ...mapState(rootStore, ['storePrintableReportData', 'isReportArchived', 'getInstitutionDetails']),
+    ...mapState(authenticationStore, ['orgName', 'isReporter']),
+    ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
       return this.auxiliaryDataReady && this.dataReady
     },
@@ -256,8 +257,7 @@ export default {
     return {
       institutionName: '',
       auxiliaryDataReady: false,
-      mitigationSummaries: null,
-      reportArchived: false
+      mitigationSummaries: null
     }
   },
   methods: {
@@ -301,9 +301,7 @@ export default {
       })
       const serializer = new XMLSerializer()
       const tplHtml = serializer.serializeToString(tpl)
-      this.storePrintableReportData(this.getHeading(), tplHtml, 'Preview', this.reportArchived)      
-    },
-    openPrintableWindow() {
+      this.storePrintableReportData(this.getHeading(), tplHtml, 'Preview')
       window.open(this.$router.resolve({
         path: '/printablepdf'
       }).href, '_blank')
@@ -400,9 +398,6 @@ export default {
     this.auxiliaryDataReady = false
     assessmentStore().$onAction(assessmentListener)
     await this.getInstitutionName()
-    // Check whether this report is already archived
-    const archivedResponse = await this.isReportArchived(this.orgCode, this.epSystemName, this.assessmentData.selection.patientType)
-    this.reportArchived = archivedResponse.status == 'archived'
     // Create hash object to count mitigation types
     this.mitigationSummaries = this.mitigationSummary()
     this.auxiliaryDataReady = true
@@ -411,12 +406,6 @@ export default {
       this.renderCdsBarChart()
       // Audit the report generation - NOTE this should save the report to the Azure blob store 
       // https://github.com/NewcastleRSE/Vue-eprase/issues/503
-      this.$nextTick(() => {
-        this.assemblePrintableReport()
-        if (!this.reportArchived) {
-          // Archive a PDF here
-        }
-      })
       this.reportGenerated()
     })
     console.groupEnd()
