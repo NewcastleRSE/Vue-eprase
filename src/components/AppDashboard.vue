@@ -346,16 +346,17 @@ export default {
       }
       console.groupEnd()
     },
-    addArchivingFeedback(ul, str, addToLast = false) {
-      if (addToLast) {
-        const lastLi = ul.querySelector('li:last-child')
-        lastLi.innerHTML = lastLi.innerText + str
+    addArchivingFeedback(ul, str, addToLi = null) {
+      let li = addToLi
+      if (addToLi != null) {        
+        addToLi.innerHTML = addToLi.innerHTML + str
       } else {
-        const newLi = document.createElement('li')
-        newLi.className = 'list-group-item'
-        newLi.innerHTML = str
-        ul.appendChild(newLi)
-      }      
+        li = document.createElement('li')
+        li.className = 'list-group-item'
+        li.innerHTML = str
+        ul.appendChild(li)
+      } 
+      return li     
     },
     async saveCompletedReportsToArchive() {
       console.group('saveCompletedReportsToArchive()')
@@ -372,24 +373,29 @@ export default {
           completedAssessments.forEach(async caa => {
             const epSystemName = caa.other_ep_service || caa.ep_service.name
             const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
-            let feedbackStr = ''
             switch(isArchivedResponse.status) {
-              case 'archived': feedbackStr = `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`; break
-              case 'not archived': feedbackStr = `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`; break
-              case 'error': feedbackStr = isArchivedResponse.message; break
-              default: break
-            }
-            this.addArchivingFeedback(ul, feedbackStr)
-            if (isArchivedResponse.status == 'not archived') {
-              // Save the report
-              const selectResponse = await this.selectAssessment(caa.documentId)
-              if (selectResponse === true) {
-                // Save here...
-                const assessmentUrl = this.$router.resolve({ path: '/assessment-report' }).href
-                this.addArchivingFeedback(ul, 'Done', true)   // Or error message if the save failed
-              } else {
-                this.addArchivingFeedback(ul, selectResponse.message, true)
-              }              
+              case 'archived': 
+                this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
+                break
+              case 'not archived': 
+                const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
+                const saveResponse = await this.apiCall('archive-report', 'POST', { 
+                  assessmentId : caa.documentId,
+                  institutionCode: caa.institution.institution_code,
+                  epSystem: epSystemName,
+                  assessmentType: assessmentType
+                })
+                if (saveResponse.status < 400) {                
+                  this.addArchivingFeedback(ul, 'Done', addedLi)   // Or error message if the save failed
+                } else {
+                  this.addArchivingFeedback(ul, saveResponse.message, addedLi)
+                } 
+                break
+              case 'error': 
+                this.addArchivingFeedback(ul, isArchivedResponse.message)
+                break
+              default: 
+                break
             }            
           })
         }
