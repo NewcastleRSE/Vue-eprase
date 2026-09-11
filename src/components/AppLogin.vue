@@ -208,7 +208,8 @@ export default {
                 throw new Error('Logged in, but no sessions found - not sure what happened here!')
               } else if (this.$route.query.action == 'registered') {
                 // Newly-registered user - https://github.com/NewcastleRSE/Vue-eprase/issues/504 - terminate spurious session created on registration by magic-sessionmanager
-                this.nonCurrentSessions.forEach(async sess => this.terminateSession(sess.documentId))
+                // https://github.com/NewcastleRSE/Vue-eprase/issues/523 - added 'await' below to fix the randomness associated with the spurious session not being safely deleted
+                this.nonCurrentSessions.forEach(async sess => await this.terminateSession(sess.documentId))
                 this.$router.push('/assessment')
               } else if (this.nonCurrentSessions.length >= 1) {
                 // Disambiguate the case of multiple sessions
