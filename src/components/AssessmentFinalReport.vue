@@ -214,7 +214,6 @@ import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import Plotly from 'plotly.js-dist-min'
-import { nextTick } from 'vue'
 import { appSettingsStore } from '../stores/appSettings'
 import { assessmentListener } from '../helpers/audit'
 
@@ -395,6 +394,7 @@ export default {
   },
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
+    console.debug('Passed in assessment id', this.$route.query.assessmentId)
     this.auxiliaryDataReady = false
     assessmentStore().$onAction(assessmentListener)
     await this.getInstitutionName()

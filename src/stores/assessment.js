@@ -45,7 +45,7 @@ const EMPTY_SYSTEM = {
   medHistoryRoutinelyRecorded: false,
   primaryCareIncorporated: false,
   primaryCareRoutinelyUsed: false,
-  penicillinDescription: [],
+  penicillinDescription: '',
   penicillinDescriptionOther: '',
   // Set to true always - field removed from system page 08/05/2026 - avoid database table field modification
   penicillinResults: true,
@@ -56,7 +56,8 @@ const EMPTY_SYSTEM = {
   antiMicInterpretComments: '',
   highRiskMeds: [],
   clinicalAreas: [],
-  otherClinicalArea: ''
+  otherClinicalArea: '',
+  usingPharmacogenomics: ''
   // Removed 28/07/2025 David, following meeting with Steph & Ellie at which it was agreed this is redundant
   //timeTaken: null
 }
@@ -71,8 +72,8 @@ const EMPTY_SELECTION = {
   shareSuppliersOptOut: false   
 }
 
-const ARRAY_FIELDS_HUMPS = ['penicillinDescription', 'highRiskMeds', 'clinicalAreas']
-const ARRAY_FIELDS_SNAKES = ['penicillin_description', 'high_risk_meds', 'clinical_areas']
+const ARRAY_FIELDS_HUMPS = ['highRiskMeds', 'clinicalAreas']
+const ARRAY_FIELDS_SNAKES = ['high_risk_meds', 'clinical_areas']
 
 const EMPTY_DATA = {  
   assessmentState: 'Not started',  

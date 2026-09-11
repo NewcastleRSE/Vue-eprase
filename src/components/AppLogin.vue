@@ -205,10 +205,10 @@ export default {
               this.sessions = await this.getAllSessions()
               console.debug('Number of active sessions in addition to current', this.nonCurrentSessions.length)
               if (this.sessions === false) {
-                throw new Error('Logged in, but no sessions found - not sure what happened here!')
+                throw new Error('Logged in, but no sessions found - check backend is running!')
               } else if (this.$route.query.action == 'registered') {
                 // Newly-registered user - https://github.com/NewcastleRSE/Vue-eprase/issues/504 - terminate spurious session created on registration by magic-sessionmanager
-                this.nonCurrentSessions.forEach(async sess => this.terminateSession(sess.documentId))
+                this.nonCurrentSessions.forEach(async sess => await this.terminateSession(sess.documentId))
                 this.$router.push('/assessment')
               } else if (this.nonCurrentSessions.length >= 1) {
                 // Disambiguate the case of multiple sessions

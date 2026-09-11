@@ -58,7 +58,7 @@ export const router = createRouter({
       component: AppMaintenanceMode,
     },
     {
-      path: '/assessment-report',
+      path: '/assessment-report/:assessmentId?',
       component: AppDashboardReport
     },
     // otherwise redirect to welcome (see https://router.vuejs.org/guide/migration/)
