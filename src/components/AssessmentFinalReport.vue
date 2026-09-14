@@ -221,7 +221,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
+    ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -394,13 +394,21 @@ export default {
   },
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
-    console.debug('Passed in assessment id', this.$route.query.assessmentId)
+
     this.auxiliaryDataReady = false
+    if (this.$route.query.assessmentId) {
+      // Load the assessment with the supplied document ID
+      console.debug('Passed in assessment id', this.$route.query.assessmentId)
+      const selectResponse = await this.selectAssessment(assessmentId)
+      await this.errorResponder(selectResponse)
+    }    
+    
     assessmentStore().$onAction(assessmentListener)
     await this.getInstitutionName()
     // Create hash object to count mitigation types
     this.mitigationSummaries = this.mitigationSummary()
     this.auxiliaryDataReady = true
+
     this.$nextTick(() => {
       this.renderPieChart()
       this.renderCdsBarChart()
