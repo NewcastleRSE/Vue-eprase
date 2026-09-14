@@ -360,46 +360,46 @@ export default {
     },
     async saveCompletedReportsToArchive() {
       console.group('saveCompletedReportsToArchive()')
-      this.archiveStarted = true
-      for (const assessmentType of ['Adult', 'Paediatric']) {
-        this['archiveInProgress' + assessmentType] = true
-        const ul = this.$refs['archiveFeedback' + assessmentType]
-        ul.innerHTML = ''
-        const fieldName = assessmentType.substring(0, 1).toLowerCase() + assessmentType.substring(1) + 'Assessments'
-        const completedAssessments = this.dashboardData[fieldName].filter(assmt => assmt.state == 'Assessment complete')
-        if (completedAssessments.length == 0) {
-          this.addArchivingFeedback(ul, 'No completed reports to be archived')
-        } else {
-          completedAssessments.forEach(async caa => {
-            const epSystemName = caa.other_ep_service || caa.ep_service.name
-            const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
-            switch(isArchivedResponse.status) {
-              case 'archived': 
-                this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
-                break
-              case 'not archived': 
-                const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
-                const saveResponse = await this.apiCall('archive-report', 'POST', { 
-                  assessmentId : caa.documentId,
-                  institutionCode: caa.institution.institution_code,
-                  epSystem: epSystemName,
-                  assessmentType: assessmentType
-                })
-                if (saveResponse.status < 400) {                
-                  this.addArchivingFeedback(ul, 'Done', addedLi)   // Or error message if the save failed
-                } else {
-                  this.addArchivingFeedback(ul, saveResponse.message, addedLi)
-                } 
-                break
-              case 'error': 
-                this.addArchivingFeedback(ul, isArchivedResponse.message)
-                break
-              default: 
-                break
-            }            
-          })
-        }
-      } 
+      this.archiveStarted = true      
+      // for (const assessmentType of ['Adult', 'Paediatric']) {
+      //   this['archiveInProgress' + assessmentType] = true
+      //   const ul = this.$refs['archiveFeedback' + assessmentType]
+      //   ul.innerHTML = ''
+      //   const fieldName = assessmentType.substring(0, 1).toLowerCase() + assessmentType.substring(1) + 'Assessments'
+      //   const completedAssessments = this.dashboardData[fieldName].filter(assmt => assmt.state == 'Assessment complete')
+      //   if (completedAssessments.length == 0) {
+      //     this.addArchivingFeedback(ul, 'No completed reports to be archived')
+      //   } else {
+      //     completedAssessments.forEach(async caa => {
+      //       const epSystemName = caa.other_ep_service || caa.ep_service.name
+      //       const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
+      //       switch(isArchivedResponse.status) {
+      //         case 'archived': 
+      //           this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
+      //           break
+      //         case 'not archived': 
+      //           const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
+      //           const saveResponse = await this.apiCall('archive-report', 'POST', { 
+      //             assessmentId : caa.documentId,
+      //             institutionCode: caa.institution.institution_code,
+      //             epSystem: epSystemName,
+      //             assessmentType: assessmentType
+      //           })
+      //           if (saveResponse.status < 400) {                
+      //             this.addArchivingFeedback(ul, 'Done', addedLi)   // Or error message if the save failed
+      //           } else {
+      //             this.addArchivingFeedback(ul, saveResponse.message, addedLi)
+      //           } 
+      //           break
+      //         case 'error': 
+      //           this.addArchivingFeedback(ul, isArchivedResponse.message)
+      //           break
+      //         default: 
+      //           break
+      //       } 
+      //     })
+      //   }
+      // }       
       this.archiveComplete = true     
       console.groupEnd()
     }
