@@ -356,7 +356,7 @@ export const assessmentStore = defineStore('assessment', {
     },    
     // Select a currently in-progress assessment, or initialise a new one
     // Standalone method which always sets/unsets dataReady flag
-    async selectAssessment(assessmentId = null) {
+    async selectAssessment(assessmentId = null, dashboard = false) {
 
       console.group('selectAssessment()')
 
@@ -409,12 +409,12 @@ export const assessmentStore = defineStore('assessment', {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
-        const isReporter = authenticationStore().isReporter()
+        const isReporter = authenticationStore().isReporter()        
         let chosenAssessments = []
         let loadedAssessmentData = {}
-        if (isReporter) {
+        if (dashboard || isReporter) {
           // Load up the assessment directly
-          const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')
+          const assessmentResponse = await rootStore().apiCall(`assessments/${assessmentId}?populate=*`, 'GET')          
           if (assessmentResponse.status < 400) {
             // Check assessment is complete
             const completedAssessmentData = assessmentResponse.data.data
@@ -422,8 +422,8 @@ export const assessmentStore = defineStore('assessment', {
               loadedAssessmentData = completedAssessmentData 
             } else {
               ret = {status: 400, message: 'Assessment is not complete'}
-            }
-          }
+            }            
+          }          
         } else {
           // Use the ones allowed for the institution
           chosenAssessments = this.allPossibleAssessments.filter(a => a.documentId == assessmentId)
@@ -1100,7 +1100,7 @@ export const assessmentStore = defineStore('assessment', {
       console.debug('competency()')
     },
     reportGenerated() {
-      console.debug('reportGenerated()')
+      console.debug('reportGenerated()')      
     },
     reportPdf() {
       console.debug('reportPdf()')

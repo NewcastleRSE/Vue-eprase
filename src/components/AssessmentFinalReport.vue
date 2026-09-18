@@ -221,7 +221,7 @@ export default {
   name: 'AssessmentFinalReport',  
   computed: {
     ...mapState(appSettingsStore, ['year', 'epraseTheme']),
-    ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'mitigationSummary', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
+    ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getMitigationDetails', 'mitigationSummary', 'getCategoryDetails', 'assessmentData', 'patientListBuild', 'getPatientScenarioResponses', 'updateAssessmentStatus', 'reportGenerated', 'reportPdf']),
     ...mapState(authenticationStore, ['orgName', 'isReporter']),
     ...mapState(rootStore, ['storePrintableReportData', 'getInstitutionDetails']),
     dataLoaded() {
@@ -395,27 +395,39 @@ export default {
   async mounted() {
     console.group('AssessmentFinalReport mounted()')
 
+    assessmentStore().$onAction(assessmentListener)
+
+    let wasError = false
     this.auxiliaryDataReady = false
     if (this.$route.query.assessmentId) {
       // Load the assessment with the supplied document ID
       console.debug('Passed in assessment id', this.$route.query.assessmentId)
-      const selectResponse = await this.selectAssessment(assessmentId)
-      await this.errorResponder(selectResponse)
+      // Basic data for viewing assessments    
+      const mitResponse = await this.getMitigationDetails()
+      wasError = await this.errorResponder(mitResponse)
+      if (!wasError) {
+        const catResponse = await this.getCategoryDetails()
+        wasError = await this.errorResponder(catResponse)
+      }
+      if (!wasError) {
+        const selectResponse = await this.selectAssessment(this.$route.query.assessmentId, true)
+        wasError = await this.errorResponder(selectResponse)
+      }      
     }    
-    
-    assessmentStore().$onAction(assessmentListener)
-    await this.getInstitutionName()
-    // Create hash object to count mitigation types
-    this.mitigationSummaries = this.mitigationSummary()
-    this.auxiliaryDataReady = true
+    if (!wasError) {
+      await this.getInstitutionName()
+      // Create hash object to count mitigation types
+      this.mitigationSummaries = this.mitigationSummary()
+      this.auxiliaryDataReady = true
 
-    this.$nextTick(() => {
-      this.renderPieChart()
-      this.renderCdsBarChart()
-      // Audit the report generation - NOTE this should save the report to the Azure blob store 
-      // https://github.com/NewcastleRSE/Vue-eprase/issues/503
-      this.reportGenerated()
-    })
+      this.$nextTick(() => {
+        this.renderPieChart()
+        this.renderCdsBarChart()
+        // Audit the report generation - NOTE this should save the report to the Azure blob store 
+        // https://github.com/NewcastleRSE/Vue-eprase/issues/503
+        this.reportGenerated()
+      })
+    }        
     console.groupEnd()
   },
   async beforeUnmount() {

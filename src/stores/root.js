@@ -72,7 +72,39 @@ export const rootStore = defineStore('root', {
       console.groupEnd()
 
       return ret
-    },   
+    }, 
+    // Added 18/09/2026 David - call to Puppeteer running in separate container to capture PDFs from report HTML
+    // Args supplied in 'body':
+    // assessmentId - documentId of the assessment
+    // institutionCode - Trust's institution code
+    // epSystem - name of the ePrescribing system
+    // assessmentType - Adult | Paediatric
+    async puppeteerCall(body)   {
+
+      console.group('puppeteerCall()')
+      console.debug('Called with body', body)
+
+      let ret = {}
+      const auth = authenticationStore()
+      if (auth.isReporter()) {
+        // Permit reporter users only
+        const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: 'json' } : {}
+        try {
+          const response = await axios.post(process.env.PUPPETEER, body, config)
+          ret = { status: response.status, data: response.data}
+        } catch(err) {
+          ret = auth.triageError(err)
+        }
+      } else {
+        // Disallow all other authenticated users
+        ret = { status: 403, message: 'You do not have the necessary privileges to perform this operation' }
+      }      
+
+      console.debug('Puppeteer response is', ret)
+      console.groupEnd()
+
+      return ret
+    },
     // Check tool open by doing a bare-bones API call and seeing if we get a 403 response
     async toolOpen() {      
       const response = await this.publicApiGet('institutions?pagination[limit]=1')
