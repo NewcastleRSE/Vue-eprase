@@ -88,7 +88,7 @@
               </template>
             </TextElement>
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
-              <ButtonElement name="submit" full :columns="3" :add-class="'me-2'" :submits="true">
+              <ButtonElement id="loginSubmitButton" name="submit" full :columns="3" :add-class="'me-2'" :submits="true">
                 <i class="bi bi-person-circle me-2"></i>Log in
               </ButtonElement>
               <ButtonElement name="reset" full :columns="3" :add-class="'mx-2'" :resets="true">
