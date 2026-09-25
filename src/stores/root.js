@@ -88,6 +88,7 @@ export const rootStore = defineStore('root', {
       const auth = authenticationStore()
       if (auth.isReporter()) {
         // Permit reporter users only
+        body.archiveVersion = appSettingsStore().archiveVersion
         const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` }, responseType: 'json' } : {}
         try {
           const response = await axios.post(process.env.PUPPETEER, body, config)
