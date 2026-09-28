@@ -180,6 +180,27 @@ export const rootStore = defineStore('root', {
       console.debug('Result', ret)
       return ret
     },
+    async archiveReport(institutionCode, epSystemName, patientType, pdfName) {
+      let ret = null
+      console.debug(`Archive ${pdfName} for institution ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
+      const archiveVersion = appSettingsStore().archiveVersion
+      const archiveYear = appSettingsStore().archiveYear
+      const response = await this.apiCall('report-archives', 'POST', { data: {
+        eprase_version: archiveVersion,
+        year: archiveYear,
+        institution_code: institutionCode,
+        ep_system: epSystemName,
+        assessment_type: patientType,
+        pdf_name: pdfName
+      }})
+      if (response.status < 400) {
+        ret = { status: 'ok', message: 'Saved successfully' }
+      } else {
+        ret = { status: 'error', message: `Failed to save archive record for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
+      }
+      console.debug('Result', ret)
+      return ret
+    },
     async archivePdfReport() {
       const response = this.apiCall('archive-report', 'GET')
       return response

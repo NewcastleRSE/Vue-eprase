@@ -206,3 +206,7 @@ td.assessment-padding-cell {
 #practice-stage-tabs button {
   pointer-events: none !important;
 }
+
+div.report-page {
+  break-before: page;
+}

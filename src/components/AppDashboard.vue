@@ -226,7 +226,7 @@ export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'puppeteerCall', 'isReportArchived']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'puppeteerCall', 'isReportArchived', 'archiveReport']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -372,12 +372,14 @@ export default {
         } else {
           completedAssessments.forEach(async caa => {
             const epSystemName = caa.other_ep_service || caa.ep_service.name
+            // Check if the report is already archived in the 'report_archives' table
             const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
             switch(isArchivedResponse.status) {
               case 'archived': 
                 this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
                 break
-              case 'not archived': 
+              case 'not archived':
+                // Create a PDF of the report using Puppeteer
                 const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
                 const saveResponse = await this.puppeteerCall({ 
                   assessmentId : caa.documentId,
@@ -385,8 +387,15 @@ export default {
                   epSystem: epSystemName,
                   assessmentType: assessmentType
                 })
-                if (saveResponse.status < 400) {                
-                  this.addArchivingFeedback(ul, 'Done', addedLi)   // Or error message if the save failed
+                if (saveResponse.status < 400) {
+                  // Successfully created a PDF, add record to report_archives table
+                  const pdf = saveResponse.data.pdfName                  
+                  const archivedResponse = await this.archiveReport(caa.institution.institution_code, epSystemName, assessmentType, pdf)  
+                  if (archivedResponse.status != 'error')                                 {
+                    this.addArchivingFeedback(ul, 'Done', addedLi)
+                  } else {
+                    this.addArchivingFeedback(ul, archivedResponse.message, addedLi)
+                  }
                 } else {
                   this.addArchivingFeedback(ul, saveResponse.message, addedLi)
                 } 
