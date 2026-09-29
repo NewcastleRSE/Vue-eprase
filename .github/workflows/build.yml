@@ -46,6 +46,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
+            az login
             az acr login --name ${{ secrets.USERNAME }}
             sudo docker compose pull client
           host: ${{ secrets.HOST }}
@@ -58,3 +59,4 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.PRIVATE_KEY}}
+
