@@ -46,8 +46,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            az login
-            az acr login --name ${{ secrets.USERNAME }}
+            az acr login --name ${{ secrets.REGISTRY_USERNAME }}
             sudo docker compose pull client
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
