@@ -56,10 +56,13 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME  }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
+
       - name: Compose Pull
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command:
+          command: |
+            docker login -u eprase-token -p ${{ secrets.REGISTRY_TOKEN }} epraseregistry.azurecr.io
+            # az arc login --name  ${{ secrets.REGISTRY_USERNAME  }}
             sudo docker compose pull client
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
