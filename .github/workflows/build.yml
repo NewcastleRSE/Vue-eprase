@@ -62,8 +62,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            docker login -u eprase-token --password-stdin ${{ secrets.REGISTRY_TOKEN }} epraseregistry.azurecr.io
-            # az arc login --name  ${{ secrets.REGISTRY_USERNAME  }}
+            echo ${{ secrets.REGISTRY_TOKEN }} | docker login -u eprase-token --password-stdin  epraseregistry.azurecr.io
             sudo docker compose pull client
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
