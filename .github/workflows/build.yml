@@ -56,7 +56,7 @@ jobs:
         with:
           command: |
             echo ${{ secrets.REGISTRY_TOKEN }} | docker login -u eprase-token --password-stdin  epraseregistry.azurecr.io
-            sudo docker pull epraseregistry.azurecr.io/eprase-client:latest
+            docker pull epraseregistry.azurecr.io/eprase-client:latest
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.PRIVATE_KEY}}
