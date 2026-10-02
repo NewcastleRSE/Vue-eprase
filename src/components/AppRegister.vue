@@ -74,7 +74,7 @@
               </template>
             </TextElement>
             <GroupElement name="buttonBar" :columns="12" :add-class="'mt-2'">
-              <ButtonElement name="submit" full 
+              <ButtonElement name="submit" full id="registerSubmitButton"
                 :columns="3" 
                 :add-class="'me-2'" 
                 :submits="true">
@@ -97,7 +97,6 @@
 
 import AppLogo from './AppLogo'
 import { mapState } from 'pinia'
-import { appSettingsStore } from '../stores/appSettings'
 import { authenticationStore } from '../stores/authentication'
 import { rootStore } from '../stores/root'
 import { usernameFromEmail } from '../helpers/utils'
