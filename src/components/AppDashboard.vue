@@ -370,7 +370,7 @@ export default {
         if (completedAssessments.length == 0) {
           this.addArchivingFeedback(ul, 'No completed reports to be archived')
         } else {
-          completedAssessments.forEach(async caa => {
+          for (const caa of completedAssessments) {
             const epSystemName = caa.other_ep_service || caa.ep_service.name
             // Check if the report is already archived in the 'report_archives' table
             const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
@@ -406,7 +406,7 @@ export default {
               default: 
                 break
             } 
-          })
+          }
         }
       }       
       this.archiveComplete = true     

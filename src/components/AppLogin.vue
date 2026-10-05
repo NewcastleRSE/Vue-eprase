@@ -172,13 +172,13 @@ export default {
       this.$router.push('/logout')
     },
     async logoutOtherSessions() {
-      this.nonCurrentSessions.forEach(async ncs => {
+      for (const ncs of this.nonCurrentSessions) {
         console.debug('Terminate session', ncs)
         let result = await this.terminateSession(ncs.documentId)
         if (!result) {
           console.warn('Failed to delete session with id', ncs.sessionId)
         }
-      })
+      }
       if (this.isReporter()) {
         this.$router.push('/assessment-dashboard')
       } else {
@@ -208,7 +208,9 @@ export default {
                 throw new Error('Logged in, but no sessions found - check backend is running!')
               } else if (this.$route.query.action == 'registered') {
                 // Newly-registered user - https://github.com/NewcastleRSE/Vue-eprase/issues/504 - terminate spurious session created on registration by magic-sessionmanager
-                this.nonCurrentSessions.forEach(async sess => await this.terminateSession(sess.documentId))
+                for (const sess of this.nonCurrentSessions) {
+                  await this.terminateSession(sess.documentId)
+                }
                 this.$router.push('/assessment')
               } else if (this.nonCurrentSessions.length >= 1) {
                 // Disambiguate the case of multiple sessions
