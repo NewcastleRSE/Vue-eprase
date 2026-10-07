@@ -5,21 +5,23 @@
     </StaticElement>
     <StaticElement name="patientListInfo">
       <div class="alert alert-info mt-2" role="alert">
-        Please admit the following test patients into your hospital's patient admissions system (or a test environment). 
-        When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
-        You will need to enter additional clinical information for each test patient, these are presented in the other named tabs. 
-        Please work carefully through these in order for the subsequent scenarios to work correctly. When you have finished entering all 
+        <p>Please admit the following test patients into your hospital's patient admissions system (or a test environment).</p>
+        <p>When registering new test patients you can use any dummy information required to complete the process e.g. fictional GP details. 
+        You will need to enter additional clinical information for each test patient, these are presented in the other named tabs.</p>
+        <p>Please work carefully through these in order for the subsequent scenarios to work correctly. When you have finished entering all 
         the information for a patient, click the <span class="fw-bold">Data entry in progress</span> button which will change to 
         <span class="fw-bold">Data entry complete</span> and move you to the next patient. If you need to go back to a previous patient 
-        you can navigate back and forth between all patients within the patient build section.
+        you can navigate back and forth between all patients within the patient build section.</p>
       </div>
     </StaticElement>
-    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />    
+    <HiddenElement name="completedPatients" :rules="[allPatientsCompleted]" />
+    <!-- Added to minimise patient ageing problem -->
+    <HiddenElement name="patientDobs" />
     <StaticElement name="patientBuildProgress" class="mb-4">
       <div class="alert alert-info fw-bold" role="alert">
         {{ `You have entered ${completedPatientsArray().length} of ${patientData.length} patients` }}
       </div>
-      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div v-show="completedPatientsArray().length != 0" class="progress" role="progressbar" aria-label="Patient entry progress indicator" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" :style="'width: ' + ((completedPatientsArray().length / patientData.length) * 100) + '%'"></div>
       </div>
     </StaticElement>
@@ -62,7 +64,7 @@
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <PatientProfile :patient="patient" :dataLoaded="dataLoaded" />
+                <PatientProfile :patient="patient" :dob="patientDobFromAssessment(patient)" :dataLoaded="dataLoaded" />
                 <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
                 <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
                 <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
@@ -95,7 +97,7 @@
 
 import { mapState } from 'pinia'
 import { assessmentStore } from '../stores/assessment'
-import { patientDataTabValues } from '../helpers/common'
+import { patientDataTabValues, patientDateOfBirth } from '../helpers/common'
 import { Validator } from '@vueform/vueform'
 import { appSettingsStore } from '../stores/appSettings'
 import PatientProfile from './patientTabs/PatientProfile'
@@ -104,6 +106,7 @@ import PatientComorbidities from './patientTabs/PatientComorbidities'
 import PatientPresentingComplaints from './patientTabs/PatientPresentingComplaints'
 import PatientCurrentMedication from './patientTabs/PatientCurrentMedication'
 import PatientClinicalData from './patientTabs/PatientClinicalData'
+import { assessmentListener } from '../helpers/audit'
 
 const allPatientsCompleted = class extends Validator {
   get msg() {
@@ -126,13 +129,13 @@ export default {
     PatientClinicalData
   },
   computed: {
-    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryComplete']),
+    ...mapState(assessmentStore, ['patientListBuild', 'getPatientDetails', 'assessmentData', 'dataReady', 'updateAssessmentStatus', 'setPatientEntryStart', 'setPatientEntryComplete', 'savePatientDobs']),
     dataLoaded() {
       return this.dataReady
     },
     patientData() {
       return this.assessmentData.patients
-    },    
+    },      
     patientAllergies() {
       return this.patientAuxiliaryData('allergies')
     },
@@ -160,10 +163,35 @@ export default {
     return {
       allPatientData: {},
       currentPatient: null,
+      patientDobTable: {},    // Hash of DOBs by patient code
       allPatientsCompleted
     }    
   },
-  methods: {     
+  methods: {
+    patientDobFromAssessment(patient) {
+      let dob = ''
+      if (!( patient.patient_code in this.patientDobTable )) {
+        dob = patientDateOfBirth(patient)
+        this.patientDobTable[patient.patient_code] = dob 
+      } else {
+        dob = this.patientDobTable[patient.patient_code]
+      }
+      console.debug('Updated DOB table', this.patientDobTable)
+      return dob
+    },
+    buildDobTable() {
+      const dobsSoFar = this.assessmentData.patientDobs ? this.assessmentData.patientDobs.split(',') : [] // Saved values
+      const completedPcodes = this.completedPatientsArray()
+      dobsSoFar.forEach((dob, idx) => {
+        if (completedPcodes.length > idx) {
+          this.patientDobTable[completedPcodes[idx]] = dob
+        }        
+      }) 
+      console.debug('Initial DOB table', this.patientDobTable)     
+    },
+    dobTableToString() {
+      return this.completedPatientsArray().map(cp => this.patientDobTable[cp]).toString()
+    },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
@@ -209,7 +237,9 @@ export default {
               inline: 'nearest'
             })
           })            
-        }            
+        } 
+        // Enable auditing of this step
+        this.setPatientEntryStart(nextCode)           
       } else {
         console.debug('No unentered patients left')
       }
@@ -232,12 +262,15 @@ export default {
     }
   },
   async mounted() {
-    console.group('AssessmentPatientBuild mounted()')  
-    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...
+    console.group('AssessmentPatientBuild mounted()') 
+    assessmentStore().$onAction(assessmentListener) 
+    // Absolutely critical line which disables the 'continue to scenarios' button when no patients have been entered...    
     this.completedPatientsHidden.validate()
     const loadPatientsResponse = await this.patientListBuild(true)
     const wasError = await this.errorResponder(loadPatientsResponse)
-    if (!wasError) {
+    if (!wasError) {      
+      // Build the DOB table thus far
+      this.buildDobTable()
       // Get the details for the first (unentered) patient
       this.$nextTick(() => { this.openNextUnenteredPatient() })
     }          
@@ -246,6 +279,8 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentPatientBuild beforeUnmount()')
     console.assert(this.dataLoaded, 'AssessmentPatientBuild beforeUnmount() hook - dataReady flag is false')
+    // Save the DOB data generated during the build
+    const saveDobResponse = await this.savePatientDobs(this.dobTableToString())
     if (this.completedPatientsArray().length == this.patientData.length) {
       // We have done all the data entry now
       const updateResponse = await this.updateAssessmentStatus('Patient build complete', true)

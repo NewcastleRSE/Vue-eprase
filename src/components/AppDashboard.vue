@@ -14,39 +14,37 @@
 
       <div v-if="dashboardData">
         <div>
-          <h1 class="dashboard-head p-4">ePRaSE Tool Assessment State Of Play Dashboard {{ epSystemYear }}</h1>        
+          <h1 class="dashboard-head p-4">ePRaSE Tool Assessment State Of Play Dashboard {{ epSystemYear }}</h1>
           <div class="report-page">
             <ul class="nav nav-tabs" id="patient-type-tabs" role="tablist">
               <li class="nav-item" role="presentation">
-                <button 
-                  class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                  :class="'active'"                      
-                  id="patient-type-adult-tab" 
-                  data-bs-target="#patient-type-adult-content">All Adult Assessments
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" :class="'active'"
+                  id="patient-type-adult-tab" data-bs-target="#patient-type-adult-content">All Adult Assessments
                 </button>
-              </li> 
+              </li>
               <li class="nav-item" role="presentation">
-                <button 
-                  class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                  id="patient-type-paediatric-tab" 
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab" id="patient-type-paediatric-tab"
                   data-bs-target="#patient-type-paediatric-content">All Paediatric Assessments
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button 
-                  class="nav-link" data-bs-toggle="tab" type="button" role="tab"
-                  id="patient-type-csv-downloads-tab" 
-                  data-bs-target="#patient-type-csv-downloads">Download data as CSV
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                  id="patient-type-audit-export-tab" data-bs-target="#patient-type-audit-export">Export audit log data
                 </button>
-              </li>                  
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" type="button" role="tab"
+                  id="patient-type-csv-downloads-tab" data-bs-target="#patient-type-csv-downloads">Download data as CSV
+                </button>
+              </li>
             </ul>
             <div class="tab-content">
               <div class="tab-pane fade active show mt-2" id="patient-type-adult-content" role="tabpanel" tabindex="0">
-                <div v-if="dashboardData.adultAssessments.length == 0" class="mt-2">No assessments created so far</div>                
+                <div v-if="dashboardData.adultAssessments.length == 0" class="mt-2">No assessments created so far</div>
                 <table v-if="dashboardData.adultAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
                     <tr>
-                      <th class="align-content-center" colspan="9">Completed stage</th>
+                      <th class="align-content-center" colspan="8">Completed stage</th>
                     </tr>
                     <tr>
                       <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
@@ -56,28 +54,32 @@
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Patient build</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Scenarios</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>Config questions</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Finished</span></th>
                     </tr>
                   </thead>
-                  <tbody>                    
+                  <tbody>
                     <tr v-for="aa in dashboardData.adultAssessments">
-                      <td :title="aa.institution.institution_code"><span class="nowrap">{{ aa.institution.name }}</span></td>
-                      <td><span class="nowrap">{{ aa.other_ep_service !="" ? aa.other_ep_service : (aa.ep_service != null ? aa.ep_service.name : 'None') }}</span></td>
-                      <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(aa.documentId)">View report</button>
+                      <td :title="aa.institution.institution_code"><span class="nowrap">{{ aa.institution.name }}</span>
                       </td>
-                      <td v-for="n in range(aa.stateIndex + 1, 6)" class="padding-cell"></td>
+                      <td><span class="nowrap">{{ aa.other_ep_service != "" ? aa.other_ep_service : (aa.ep_service !=
+                        null ? aa.ep_service.name : 'None') }}</span></td>
+                      <td v-for="n in range(0, aa.stateIndex)" :class="progressBarClass(aa.stateIndex)">
+                        <button v-show="n == 5" class="btn btn-link btn-nopad"
+                          title="View this user's final report in a new window"
+                          @click="viewAssessmentReport(aa.documentId)">View report</button>
+                      </td>
+                      <td v-for="n in range(aa.stateIndex + 1, 5)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="tab-pane fade mt-2" id="patient-type-paediatric-content" role="tabpanel" tabindex="1">
-                <div v-if="dashboardData.paediatricAssessments.length == 0" class="mt-2">No assessments created so far</div>
+                <div v-if="dashboardData.paediatricAssessments.length == 0" class="mt-2">No assessments created so far
+                </div>
                 <table v-if="dashboardData.paediatricAssessments.length != 0" class="table table-bordered mt-2">
                   <thead>
                     <tr>
-                      <th class="align-content-center" colspan="9">Completed stage</th>
+                      <th class="align-content-center" colspan="8">Completed stage</th>
                     </tr>
                     <tr>
                       <th scope="col" class="vertical-header col-auto"><span>Institution</span></th>
@@ -87,53 +89,102 @@
                       <th scope="col" class="vertical-header col-1"><span>System</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Patient build</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Scenarios</span></th>
-                      <th scope="col" class="vertical-header col-1"><span>Config questions</span></th>
                       <th scope="col" class="vertical-header col-1"><span>Finished</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="pa in dashboardData.paediatricAssessments">
-                      <td :title="pa.institution.institution_code"><span class="nowrap">{{ pa.institution.name }}</span></td>
-                      <td><span class="nowrap">{{ pa.other_ep_service !="" ? pa.other_ep_service : (pa.ep_service != null ? pa.ep_service.name : 'None') }}</span></td>
-                      <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
-                        <button v-show="n == 6" class="btn btn-link btn-nopad" title="View this user's final report in a new window" @click="viewAssessmentReport(pa.documentId)">View report</button>
+                      <td :title="pa.institution.institution_code"><span class="nowrap">{{ pa.institution.name }}</span>
                       </td>
-                      <td v-for="n in range(pa.stateIndex + 1, 6)" class="padding-cell"></td>
+                      <td><span class="nowrap">{{ pa.other_ep_service != "" ? pa.other_ep_service : (pa.ep_service !=
+                        null ? pa.ep_service.name : 'None') }}</span></td>
+                      <td v-for="n in range(0, pa.stateIndex)" :class="progressBarClass(pa.stateIndex)">
+                        <button v-show="n == 5" class="btn btn-link btn-nopad"
+                          title="View this user's final report in a new window"
+                          @click="viewAssessmentReport(pa.documentId)">View report</button>
+                      </td>
+                      <td v-for="n in range(pa.stateIndex + 1, 5)" class="padding-cell"></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
+              <div class="tab-pane fade mt-4" id="patient-type-audit-export" role="tabpanel" tabindex="2">
+                <Vueform ref="exportAuditForm">
+                  <StaticElement name="export-audit-heading">
+                    <h3>Export ePRaSE audit logs by date range and institutions</h3>
+                    <!-- May be ok using streaming - TBC -->
+                    <!-- <div class="alert alert-warning">
+                      To avoid performance problems, the number of records returned is limited to 1000. Please use
+                      search terms to limit record size to something sensible.
+                    </div> -->
+                  </StaticElement>
+                  <ObjectElement name="export-audit-formdata">
+                    <SelectElement name="modifier" :label="embolden('Date/time')" ref="exportAuditModifierRef"
+                      :columns="{ container: 4, label: 3, wrapper: 12 }" :items="['any', 'before', 'after', 'between']"
+                      default="any" />
+                    <DateElement name="date1" ref="exportAuditDate1Ref"
+                      v-if="exportAuditDateModifierHasValues(['before', 'after', 'between'])"
+                      display-format="DD/MM/YYYY HH:mm" 
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
+                      placeholder="Select date/time" :default="new Date()"
+                      :columns="{ container: 4, label: 0, wrapper: 12 }" :time="true" :hour24="true" />
+                    <DateElement name="date2" :label="embolden('and')" ref="exportAuditDate2Ref"
+                      v-if="exportAuditDateModifierHasValues(['between'])" 
+                      display-format="DD/MM/YYYY HH:mm"
+                      value-format="YYYY-MM-DDTHH:mm:ssZ"
+                      placeholder="Select date/time" :default="new Date()"
+                      :columns="{ container: 4, label: 1, wrapper: 12 }" :time="true" :hour24="true" />
+                    <TagsElement name="institutions" placeholder="Select institution names, or leave blank for all"
+                      :label="embolden('For trust(s)')" :items="institutions" :search="true"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" />
+                    <SelectElement name="ordering" :label="embolden('Sort')" ref="exportOrderingRef"
+                      :columns="{ container: 11, label: 1, wrapper: 12 }" 
+                      :items="[
+                        { value: 'ASC', label: 'in ascending date order' },
+                        { value: 'DESC', label: 'in descending date order' }
+                      ]"
+                      default="ASC" />
+                    <ButtonElement name="export-submit" @click="downloadCsv()">
+                      <i class="bi bi-filetype-csv me-2"></i>Download CSV
+                    </ButtonElement>
+                  </ObjectElement>
+                </Vueform>
+              </div>
               <div class="tab-pane fade mt-4" id="patient-type-csv-downloads" role="tabpanel" tabindex="2">
                 <div class="row col-12">
                   <a class="btn btn-primary col-2 me-2" @click="scenarioData()" role="button">Scenario data</a>
-                  <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment summary</a>
-                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>                  
-                  <!-- <a class="btn btn-primary col-2" @click="configQuestionData()" role="button">Config Questions</a> -->
+                  <a class="btn btn-primary col-2 me-2" @click="assessmentSummary()" role="button">Assessment
+                    summary</a>
+                  <a class="btn btn-primary col-2 me-2" @click="systemData()" role="button">System data</a>
                 </div>
                 <div class="row col-12 mt-4">
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by scenario</a>
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation percentages</a>
-                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by category</a>
-                  <!-- <a class="btn btn-primary col-2" @click="optOutData()" role="button">Opt outs summary</a> -->
-                </div>                               
-                <div class="row col-12 mt-4"><h3>Experimental reports</h3></div>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByScenario()" role="button">Mitigation by
+                    scenario</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationPercentages()" role="button">Mitigation
+                    percentages</a>
+                  <a class="btn btn-primary col-2 me-2" @click="mitigationByCategory()" role="button">Mitigation by
+                    category</a>
+                </div>
+                <div class="row col-12 mt-4">
+                  <h3>Experimental reports</h3>
+                </div>
                 <div class="row col-12 mt-4">
                   <a class="btn btn-primary col-2 me-2" @click="categoryRiskReport()" role="button">Category risk</a>
                   <a class="btn btn-primary col-2 me-2" @click="scenarioRiskReport()" role="button">Scenario risk</a>
                 </div>
               </div>
             </div>
-          </div>                  
+          </div>
         </div>
       </div>
 
-    </div>   
+    </div>
     <AppLogo cls="bottomright" />
     <ErrorAlertModal ref="errorAlertModal" />
   </main>
 </template>
 
-<script>      
+<script>
 
 import { mapState } from 'pinia'
 import { rootStore } from '../stores/root'
@@ -143,19 +194,31 @@ import LoginInfo from './LoginInfo'
 import AppLogo from './AppLogo'
 import { saveAs } from 'file-saver-es'
 import { assessmentStore } from '../stores/assessment'
-import { nextTick } from 'vue'
+import dayjs from 'dayjs'
 
 export default {
-  name: 'AssessmentDashboard',  
+  name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall']), 
-    ...mapState(assessmentStore, ['loadCompletedAssessment', 'getCategoryDetails', 'getMitigationDetails', 'getConfigQuestionDetails']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions']),
+    ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
+    dataLoaded() {
+      return this.dataReady
+    },
     epSystemYear() {
       return this.year
     },
     errorAlertModal() {
       return this.$refs.errorAlertModal
+    },
+    exportAuditModifier() {
+      return this.$refs.exportAuditModifierRef ? this.$refs.exportAuditModifierRef.value : 'any'
+    },
+    exportAuditDate1() {
+      return this.$refs.exportAuditDate1Ref.value
+    },
+    exportAuditDate2() {
+      return this.$refs.exportAuditDate2Ref.value
     }
   },
   components: {
@@ -165,18 +228,48 @@ export default {
   },
   data() {
     return {
-      dashboardData: null
+      dashboardData: null,
+      institutions: []
     }
   },
   methods: {
     range(start, end) {
-      return Array(end - start + 1).fill().map((_, i) => start + i);
+      return Array(end - start + 1).fill().map((_, i) => start + i)
     },
     formatDate() {
       return new Date().toISOString().slice(0, 10)
     },
+    exportAuditDateModifierHasValues(values) {
+      return values.includes(this.$refs.exportAuditModifierRef ? this.$refs.exportAuditModifierRef.value : 'any')
+    },
     progressBarClass(idx) {
-      return 'assessment-' + (idx <=2 ? 'not-started' : (idx > 2 && idx < 6 ? 'in-progress' : 'complete'))
+      return 'assessment-' + (idx <= 2 ? 'not-started' : (idx > 2 && idx < 5 ? 'in-progress' : 'complete'))
+    },
+    buildFileNameFromParams(formData) {
+      const { modifier, institutions, date1, date2 } = formData
+      let fileName = 'audit_log_export_'
+      switch(modifier) {
+        case 'before': 
+        case 'after':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_`; break
+        case 'between':
+          fileName += `${modifier}_${dayjs(date1).format('DD_MM_YYYY_HH_MM')}_and_${dayjs(date2).format('DD_MM_YYYY_HH_MM')}_`; break
+        default:
+          fileName += 'any_time_'; break      
+      }
+      if (!Array.isArray(institutions) || institutions.length == 0) {
+        fileName += 'all_institutions'
+      } else {
+        fileName += `${institutions.join('_')}`
+      }
+      fileName += '.csv'
+      console.debug(fileName)
+      return fileName
+    },
+    async downloadCsv() {
+      const formData = this.$refs.exportAuditForm.requestData['export-audit-formdata']
+      const response = await this.apiCall('export-csv', 'POST', formData, 'blob')
+      saveAs(response.data, this.buildFileNameFromParams(formData))
     },
     async scenarioData() {
       const response = await this.apiCall('assessment-scenario-data', 'GET', null, 'blob')
@@ -202,10 +295,6 @@ export default {
       const response = await this.apiCall('assessment-scenario-risk-report', 'GET', null, 'blob')
       saveAs(response.data, `scenario_risk_report_${this.formatDate()}.csv`)
     },
-    async configQuestionData() {
-      const response = await this.apiCall('assessment-config-question-data', 'GET', null, 'blob')
-      saveAs(response.data, `config_error_data_${this.formatDate()}.csv`)
-    },
     async assessmentSummary() {
       const response = await this.apiCall('assessment-summary-data', 'GET', null, 'blob')
       saveAs(response.data, `assessments_summary_${this.formatDate()}.csv`)
@@ -220,28 +309,29 @@ export default {
     },
     async viewAssessmentReport(assessmentId) {
       console.group('viewAssessmentReport()')
-      const selectResponse = await this.loadCompletedAssessment(assessmentId)        
-      await this.errorResponder(selectResponse)
-      window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
+      const selectResponse = await this.selectAssessment(assessmentId)
+      const wasError = await this.errorResponder(selectResponse)
+      if (!wasError) {
+        window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
+      }
       console.groupEnd()
     }
-  },  
+  },
   async mounted() {
     console.group('AssessmentDashboard mounted()')
-
-    this.auxiliaryDataReady = false
-
-    // Basic data for viewing assessments
     let wasError = false
+    // Institution list for CSV audit download selector
+    const instResponse = await this.getInstitutions()
+    wasError = await this.errorResponder(instResponse)
+    if (!wasError) {
+      this.institutions = instResponse.data.data.map(inst => { return { value: inst.institution_code, label: inst.name } })
+    }
+    // Basic data for viewing assessments    
     const mitResponse = await this.getMitigationDetails()
-    wasError = await this.errorResponder(mitResponse)    
+    wasError = await this.errorResponder(mitResponse)
     if (!wasError) {
       const catResponse = await this.getCategoryDetails()
       wasError = await this.errorResponder(catResponse)
-    }
-    if (!wasError) {
-      const configResponse = await this.getConfigQuestionDetails()
-      wasError = await this.errorResponder(configResponse)
     }
     if (!wasError) {
       // Dashboard data
@@ -249,10 +339,8 @@ export default {
       const wasError = await this.errorResponder(response)
       if (!wasError) {
         this.dashboardData = response.data
-      }      
-    }    
-    this.auxiliaryDataReady = true
-
+      }
+    }
     console.groupEnd()
   },
   beforeUnmount() {
@@ -278,9 +366,8 @@ export default {
 </script>
 
 <style scoped>
-
 .dashboard-head {
-   text-align: center;
+  text-align: center;
 }
 
 .vertical-header span {
@@ -297,5 +384,4 @@ span.nowrap {
 .btn-nopad {
   padding: 0px;
 }
-
 </style>

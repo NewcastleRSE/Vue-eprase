@@ -1,4 +1,5 @@
 // Container for common constants and methods relating to patient and scenario processing
+import dayjs from "dayjs"
 
 // Tab name/title values for patient build
 export const patientDataTabValues = {
@@ -10,12 +11,12 @@ export const patientDataTabValues = {
   'clinical_data': 'Clinical Data'
 }
 
-// Tab name/title values for practice mode
+// Tab name/title values for practice mode (intro seems redundant as of 19/06/2026)
 export const practiceTabValues = {
-  'intro': 'Introduction',
+  //'intro': 'Introduction',
   'patients': 'Patient entry',
   'scenarios': 'Scenarios',
-  'report': 'Reporting'
+  'report': 'Feedback'
 }
 
 // Response text for the different mitigation codes
@@ -28,12 +29,20 @@ export const systemMitigationResponses = [
   { value: 'MT99', label: 'Unable to perform test' },
 ]
 
+// Long labels for the different 'why test was impossible' responses
+export const invalidTestResponses = [
+  { value: '', label: 'Please select...', disabled: true },
+  { value: 'medicine unavailable', label: 'Medicine or formulary alternative not available in the system' },
+  { value: 'route unavailable', label: 'Medicine administration route not available in the system' },
+  { value: 'other', label: 'Other - please specify' }
+]
+
 // Tooltips explaining the possible system responses
 export const systemResponseTooltips = [
   'You placed the order for the new medicine using your normal processes, which may have included the selection of a provided order sentence and did not receive any advice or information from the electronic prescribing system',
   'You placed the order for the new medicine but had to ignore, modify or override a provided order sentence to complete it',
-  'You prescribed the medicine and received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, monitoring, contraindication or something else, which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, to mitigate risk without outright prevention.',
-  'These are prescribing actions that should never occur, where it is clear cut with no additional prescriber decision point. The ePrescribing system blocks completion of the prescriptions entirely.',
+  'You prescribed the medicine and received some system generated clinical decision support, alerts, warnings or other information that directed you to make a decision to modify the prescription.',
+  'The ePrescribing system blocks completion of the prescriptions entirely with no prescriber action required. It is clear cut and the prescription cannot be written.',
   'Where the medicine presented in the test is not available in your system, the question will be passed over. This will be classed as an invalid test. It will not affect the overall mitigation results, which are calculated on the valid tests taken.'
 ]
 
@@ -79,21 +88,26 @@ export function patientIsBaby(patient) {
   return patient.is_adult === false && (patient.age_days != null && patient.age_days != 0) || (patient.gestational_age != null && patient.gestational_age != 0)
 }
 
-// Output string formatter for age based on age_years / age_days / gestational_age
+// Output string formatter for age based on age_years / age_days
 export function patientAgeString(patient) {
   let ageString = 'Unspecified'
   if (patient.age_years != null && patient.age_years != 0) {
-    ageString = patient.age_years + ' years'
+    ageString = patient.age_years + ' year' + (patient.age_years == 1 ? '' : 's')
   } else if (patient.age_days != null && patient.age_days != 0) {
-    ageString = patient.age_days + ' days'
-  } else if (patient.gestational_age != null && patient.gestational_age != 0) {
-    ageString = patient.gestational_age + ' weeks'
+    ageString = patient.age_days + ' day' + (patient.age_days == 1 ? '' : 's')
   }
   return ageString
 }
 
-// Caption for age based on the active field
-export function patientAgeCaption(patient, uppercaseFirst = false) {
-  const caption = (patient.gestational_age != null && patient.gestational_age != 0) ? 'gestational age' : 'age'
-  return uppercaseFirst ? (caption.substring(0, 1).toUpperCase() + caption.substring(1)) : caption
+// Output patient date of birth, implemented on-the-fly for neonates (#466)
+export function patientDateOfBirth(patient) {
+  let dateOfBirth = 'Not specified'
+  if (patientIsBaby(patient)) {
+    // Use age in days
+    dateOfBirth = dayjs().subtract(patient.age_days, 'day').format('DD/MM/YYYY')
+  } else {
+    // Use age in years minus a random number of days
+    dateOfBirth = dayjs().subtract(Math.random() * 365, 'day').subtract(patient.age_years, 'year').format('DD/MM/YYYY')
+  }
+  return dateOfBirth
 }

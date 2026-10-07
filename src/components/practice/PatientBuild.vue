@@ -1,21 +1,42 @@
 <template>
   <GroupElement ref="patientBuildGroup" name="patientBuildGroup" class="my-4">  
     <StaticElement name="patientBuildHeading">
-      <h2>Patient Entry</h2>
+      <h2>Step 1: Prepare Your Test Patient</h2>
     </StaticElement>
     <StaticElement name="patientListInfo">
       <div class="alert alert-info" role="alert">
-        TODO - need some wording here...
+        <p>Please create the following practice test patient, zzzMarilyn Dunnett, in your electronic prescribing (EP) system (live or test environment).</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item">
+            If your ePrescribing system is connected to a <span class="fw-bold">Patient Administration System (PAS)</span>, 
+            please use this route to create the patient (even if it takes longer).
+          </li>
+          <li class="list-group-item">
+            Use <span class="fw-bold">generic or dummy data</span> for any additional mandatory fields (e.g. GP details), in line with your usual test approach.
+          </li>
+        </ul>
+        <p>Admit the patient and enter the clinical information provided across all available data fields. Prescribe medications following your standard local workflows.</p>
+        <p class="fw-bold">Key Information to Enter</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item"><span class="fw-bold">Profile</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Allergies</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Comorbidities</span> (if possible, in your system)</li>
+          <li class="list-group-item"><span class="fw-bold">Presenting Complaints</span> (if possible, in your system)</li>
+          <li class="list-group-item"><span class="fw-bold">Current Medicines</span> (mandatory)</li>
+          <li class="list-group-item"><span class="fw-bold">Clinical Data</span> (if possible, in your system)</li>
+        </ul>
+        <p class="fw-bold">Important Notes</p>
+        <ul class="list-group mb-4">
+          <li class="list-group-item">Accurate data entry is essential to ensure the scenarios function correctly.</li>
+          <li class="list-group-item">All <span class="fw-bold">demographics, medications, and allergy fields must be completed.</span></li>
+          <li class="list-group-item">Not all EP systems support additional fields (e.g. co-morbidities, presenting complaint, biochemistry). Please enter as much information as your system allows.</li>
+          <li class="list-group-item">Once you have finished entering the patient data please select data entry in progress.</li>
+        </ul>
       </div>
     </StaticElement>
-    <StaticElement name="patientBuildProgress">
-      <div class="alert alert-info fw-bold" role="alert">
-        {{ `You have entered ${numCompletedPatients} of ${patientData.length} patients` }}
-      </div>
-      <div v-show="numCompletedPatients != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" :style="'width: ' + ((numCompletedPatients / patientData.length) * 100) + '%'"></div>
-      </div>
-    </StaticElement>
+    <StaticElement class="alert alert-warning" name="zzzIdWarning">
+      <span class="fw-bold">Note:</span> The &quot;zzz&quot; identifier confirms this is a test patient and ensures safe use of the system.
+    </StaticElement>   
     <StaticElement name="patientBuildBody">
       <div class="accordion" id="patientAccordion">
         <div class="accordion-item" v-for="(patient, idx) in patientData" :key="patient.id">
@@ -55,7 +76,7 @@
 
               <!-- Tab panes -->
               <div class="tab-content">
-                <PatientProfile :patient="patient" :dataLoaded="dataLoaded" />
+                <PatientProfile :patient="patient" :dob="generatePatientDob(patient)" :dataLoaded="dataLoaded" />
                 <PatientAllergies :patient="patient" :patientAllergies="patientAllergies" :dataLoaded="dataLoaded" />
                 <PatientComorbidities :patient="patient" :patientComorbidities="patientComorbidities" :dataLoaded="dataLoaded" />
                 <PatientPresentingComplaints :patient="patient" :patientPresentingComplaints="patientPresentingComplaints" :dataLoaded="dataLoaded" />                                                
@@ -82,7 +103,7 @@
 <script>
 
 import { mapState } from 'pinia'
-import { patientDataTabValues } from '../../helpers/common'
+import { patientDataTabValues, patientDateOfBirth } from '../../helpers/common'
 import { practiceStore } from '../../stores/practice'
 import PatientProfile from '../patientTabs/PatientProfile'
 import PatientAllergies from '../patientTabs/PatientAllergies'
@@ -146,7 +167,10 @@ export default {
     }    
   },
   emits: ['allPatientsEntered'],
-  methods: {     
+  methods: {  
+    generatePatientDob(patient) {
+      return patientDateOfBirth(patient)
+    },
     patientAuxiliaryData(type) {
       return (this.currentPatient != null && this.currentPatient in this.allPatientData && Array.isArray(this.allPatientData[this.currentPatient][type])) 
         ? this.allPatientData[this.currentPatient][type] : []     
@@ -179,17 +203,13 @@ export default {
         const nextCode = notDoneCodes.shift()
         const docId = this.patientData.filter(p => p.patient_code == nextCode)[0].documentId
         this.patientRelations(docId)  
-        const patientElement = document.getElementById('patient-' + nextCode)
-        if (patientElement != null) {
-          this.$nextTick(() => { 
-            console.debug('Scroll patient', nextCode, 'into view')
-            document.getElementById('patient-' + nextCode).scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'nearest'
-            })
-          })            
-        }            
+        this.$nextTick(() => {             
+          window.scroll({
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+          })
+        })            
       } else {
         console.debug('No unentered patients left')
         this.$emit('allPatientsEntered')
@@ -211,7 +231,7 @@ export default {
   async mounted() {
     console.group('PatientBuild mounted()')      
     // NOTE: choice of patient type and number of patients could be chosen by the user via a preliminary form
-    const loadPatientsResponse = await this.patientListBuild(this.noPatients, [], 'Adult', true)
+    const loadPatientsResponse = await this.patientListBuild(this.noPatients, ['P034'], ['SC102'], 'Adult', true)
     const wasError = await this.errorResponder(loadPatientsResponse)
     if (!wasError) {
       // Get the details for the first (unentered) patient

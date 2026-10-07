@@ -22,20 +22,20 @@
             </li>                  
           </ul>
           <div class="tab-content">
-            <div class="tab-pane fade active show mt-2" :id="'practice-tab-intro'" role="tabpanel" tabindex="0">
+            <!-- <div class="tab-pane fade active show mt-2" :id="'practice-tab-intro'" role="tabpanel" tabindex="0">
               <PracticeIntro />
               <StaticElement name="practicePreamble">
                 <ButtonElement name="continueToPatientBuild" :columns="4" @click="selectTab('patients')">Continue to Patient Entry</ButtonElement> 
               </StaticElement>
-            </div>
-            <div class="tab-pane fade mt-2" :id="'practice-tab-patients'" role="tabpanel" tabindex="0">
+            </div> -->
+            <div class="tab-pane fade active show mt-2" :id="'practice-tab-patients'" role="tabpanel" tabindex="0">
               <PatientBuild v-if="currentTab == 'patients' ":noPatients="1" @all-patients-entered="completedPatientEntry = true" />
               <StaticElement name="patientListEntryComplete">
                 <div v-show="completedPatientEntry" class="alert alert-info" role="alert">
                   You have now completed all the patient entries, please click 'Continue to Scenarios' below to begin entering the prescription scenarios.
                 </div>
                 <GroupElement name="patientbuttonBar" :columns="6" :add-class="'mt-4'">
-                  <ButtonElement name="backToIntro" :class="'me-2'" :columns="3" full @click="selectTab('intro')">Back to Introduction</ButtonElement>
+                  <!-- <ButtonElement name="backToIntro" :class="'me-2'" :columns="3" full @click="selectTab('intro')">Back to Introduction</ButtonElement> -->
                   <ButtonElement :disabled="!completedPatientEntry" name="continueToScenarios" :class="'ms-2'" :columns="3" full @click="selectTab('scenarios')">Continue to Scenarios</ButtonElement> 
                 </GroupElement>                             
               </StaticElement>
@@ -43,17 +43,17 @@
             <div class="tab-pane fade mt-2" :id="'practice-tab-scenarios'" role="tabpanel" tabindex="0">
               <Scenario v-if="currentTab == 'scenarios'" @all-scenarios-completed="completedScenarios = true" />
               <StaticElement name="scenarioEntryDone">
-                <div v-show="completedScenarios" class="alert alert-info" role="alert">You have now completed all the scenarios.</div>
+                <div v-show="completedScenarios" class="alert alert-info" role="alert">You have now completed all the scenarios. Please select &quot;continue to feedback&quot;.</div>
                 <GroupElement name="patientbuttonBar" :columns="6" :add-class="'mt-4'">
                   <ButtonElement name="backToPatientBuild" :class="'me-2'" :columns="3" full @click="selectTab('patients')">Back to Patient Entry</ButtonElement>
-                  <ButtonElement :disabled="!completedScenarios" name="continueToReport" :class="'ms-2'" :columns="3" full @click="selectTab('report')">Continue to Report</ButtonElement>
+                  <ButtonElement :disabled="!completedScenarios" name="continueToReport" :class="'ms-2'" :columns="3" full @click="selectTab('report')">Continue to Feedback</ButtonElement>
                 </GroupElement>                
               </StaticElement>    
             </div>
             <div class="tab-pane fade mt-2" :id="'practice-tab-report'" role="tabpanel" tabindex="0">
               <PracticeReport v-if="currentTab == 'report'" />
               <StaticElement name="practiceReport">
-                <ButtonElement :disabled="!completedScenarios" name="continueToAssessment" :columns="4" @click="doAssessment">Do Assessment for real</ButtonElement>
+                <ButtonElement :disabled="!completedScenarios" name="continueToAssessment" :columns="4" @click="doAssessment">Continue to Assessment</ButtonElement>
               </StaticElement>    
             </div>
           </div>
@@ -83,12 +83,17 @@ import PracticeIntro from './practice/PracticeIntro'
 import PracticeReport from './practice/PracticeReport'
 import ErrorAlertModal from './modals/ErrorAlertModal'
 import { rootStore } from '../stores/root'
+import { authenticationStore } from '../stores/authentication'
+import Cookies from 'js-cookie'
+import { practiceStore } from '../stores/practice'
+import { practiceSessionListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentPractice', 
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['audit']),   
+    ...mapState(practiceStore, ['startPractice', 'endPractice']),
+    ...mapState(authenticationStore, ['user']),
     practiceTabs() {
       return practiceTabValues
     },
@@ -108,7 +113,7 @@ export default {
   },
   data() {
     return {
-      currentTab: 'intro',
+      currentTab: 'patients',
       completedPatientEntry: false,
       completedScenarios: false
     } 
@@ -118,20 +123,25 @@ export default {
       const triggerEl = document.querySelector(`#practice-stage-tabs button[data-bs-target="#practice-tab-${name}"]`)      
       Tab.getInstance(triggerEl).show()
       this.currentTab = name
-      await this.audit('practice', '/practice', name)
     },
     doAssessment() {
+      // Ensure practice modal doesn't trouble this user again... https://github.com/NewcastleRSE/Vue-eprase/issues/497
+      Cookies.set(`hidePracticeModal-${this.user}`, 'yes', { expires: 90 })
       this.$router.push('/assessment')
     }
   },
   async mounted() {
-    console.group('AssessmentPractice mounted hook')    
+    console.group('AssessmentPractice mounted hook')  
+    practiceStore().$onAction(practiceSessionListener)  
     const triggerTabList = document.querySelectorAll('#practice-stage-tabs button')
     triggerTabList.forEach(triggerEl => {
       const tabTrigger = new Tab(triggerEl)      
     })
-    await this.audit('practice', '/practice', 'intro')
+    this.startPractice()
     console.groupEnd()
+  },
+  beforeUnmount() {
+    this.endPractice()
   },
   errorCaptured(...args) {
 

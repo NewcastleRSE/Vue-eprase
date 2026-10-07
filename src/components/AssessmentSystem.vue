@@ -16,7 +16,7 @@
     <GroupElement name="systemGroupLoaded" v-if="dataLoaded && !duplication">
       <StaticElement name="epSystemHeading">
         <h2><span class="fst-italic">{{ epSystemName }}</span> ePrescribing System information</h2>
-        <h3>Please answer the following questions about your ePrescribing System:</h3>
+        <h3>Provide details of the ePrescribing system being assessed in your hospital:</h3>
       </StaticElement>
       <ObjectElement ref="systemObject" name="system">
 
@@ -46,7 +46,7 @@
           :items="[
             { value: 'live', label: 'Live ePrescribing System' },
             { value: 'test', label: 'Development/test environment' }]"
-          :messages="{required: 'Select an option'}"
+          :messages="{required: 'Select an environment option'}"
           :rules="['required']"
         />
         <ToggleElement name="hasTestEnv"
@@ -123,7 +123,7 @@
 
         <!-- Values changed 29/05/2026 according to https://github.com/NewcastleRSE/Vue-eprase/issues/385 --> 
         <SelectElement name="epUsage"
-          :label="embolden('Across what proportion of settings and services in your organisation are medications electronically prescribed?', true)"
+          :label="embolden('What proportion of inpatient prescriptions in your organisation are written electronically?', true)"
           :native="false"
           :track-by="['label', 'value']"
           :items="[
@@ -174,13 +174,12 @@
             :label="embolden('Does your organisation routinely record diagnosis and medical history electronically within the ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
-          <!-- Unclear - document and issue constradict each other - looks like this should be removed -->
-          <!-- <ToggleElement name="manualEnterDiagnosis"
+          <ToggleElement name="medHistory"
             :label="embolden('Are you able to manually enter diagnosis and medical history into your ePrescribing system?')"
             :labels="{ on: 'Yes', off: 'No' }"
-          /> -->
+          />
           <ToggleElement name="primaryCareIncorporated"
-            :label="embolden('Is there an electronic interface between your primary care systems and your hospital ePrescribing system?')"
+            :label="embolden('Do you have an electronic interface between primary care and your hospital ePrescribing system that allows digital import/reuse of primary care medicines information?')"
             :labels="{ on: 'Yes', off: 'No' }"
           />
           <ToggleElement name="primaryCareRoutinelyUsed"
@@ -242,7 +241,20 @@
           <TextElement name="antiMicInterpretComments"
             :label="embolden('Additional comments')"
             :debounce="200" />
-        </GroupElement>      
+            <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/487 - need to wait for backend change -->
+          <SelectElement name="usingPharmacogenomics"
+            :label="embolden('Are you currently using, or planning to use, pharmacogenomic information to support clinical decision-making within your ePrescribing system?', true)"
+            :items="[
+              { value: '', label: 'Select one...', disabled: true },
+              { value: 'currently', label: 'Currently using pharmacogenomic information' },
+              { value: 'planning', label: 'Planning to use pharmacogenomic information' },
+              { value: 'neither', label: 'Neither' }            
+            ]"
+            :messages="{required: 'pharmacogenomics use status is required'}" 
+            :rules="['required']"
+          />              
+        </GroupElement>
+         
         <CheckboxgroupElement name="highRiskMeds"
           :label="embolden('Is the ePrescribing system used to prescribe the following?', true)"       
           :items="cbgHighRiskMeds"
@@ -287,6 +299,7 @@ import { assessmentStore } from '../stores/assessment'
 import ConfirmCancelEditModal from "./modals/ConfirmCancelEditModal"
 import flatPicker from 'vue-flatpickr-component'
 import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSystem',      
@@ -295,10 +308,7 @@ export default {
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'setDuplicateAssessment', 'dataReady', 'loggingOut', 'resetSystemData', 'saveSystemData', 'updateAssessmentStatus']),   
     confirmCancelEditModal() {
       return this.$refs.confirmCancelEditModal
-    },  
-    legalCharacterMatcher() {
-      return /^[A-Za-z0-9-.,_() ]+$/
-    },
+    },     
     monthSelector() {
       return new monthSelectPlugin({
         shorthand: true,
@@ -380,6 +390,7 @@ export default {
   }, 
   async mounted() {
     console.group('AssessmentSystem mounted()')
+    assessmentStore().$onAction(assessmentListener)
     console.groupEnd()
   },
   async beforeUnmount() {    

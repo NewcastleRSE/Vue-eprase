@@ -15,6 +15,7 @@ import vueformConfig from '../vueform.config'
 import { router } from './router'
 import { authenticationStore } from './stores/authentication.js'
 import { isStagingSite } from './helpers/utils.js'
+import { rootStore } from './stores/root.js'
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
 // 30/03/2026 David - leave debugging trace information in for staging site, only strip out on actual production server
@@ -59,8 +60,8 @@ app.config.globalProperties.errorResponder = async function(response) {
   const isObject = Object.prototype.toString.call(response) === '[object Object]'
   if (isObject) {
     console.debug('errorResponder() processing API response', response)
-    const status = response.status || 200
-    const message = response.message || 'An unspecified error occurred'
+    let status = response.status || 200
+    let message = response.message || 'An unspecified error occurred'
     const unauthHttp = [401, 403, 440]
     if (status >= 400) {
       wasError = true
@@ -70,7 +71,9 @@ app.config.globalProperties.errorResponder = async function(response) {
         sessionValid = await authenticationStore().isLoggedIn()
       }
       if (!sessionValid) {
-        authenticationStore().triageError({ status: 403, message: 'Your session is no longer valid, possibly terminated on another device' })
+        status = 403
+        message = 'Your session is no longer valid, possibly terminated on another device'
+        authenticationStore().triageError({ status: 403, message: message })
       } else if (!unauthHttp.includes(status)) {
         throw new Error(message)
       } 

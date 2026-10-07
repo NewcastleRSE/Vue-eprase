@@ -2,6 +2,10 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 
+export function validNhsEmail(value) {
+  return /^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/.test(value)
+}
+
 export function calcPercentage(num, total) {
   return total !== 0 ? ((num / total) * 100).toFixed(1) : 0
 }

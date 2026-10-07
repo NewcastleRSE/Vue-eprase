@@ -15,19 +15,14 @@
 
 import GenericModal from './GenericModal'
 import { mapState } from 'pinia'
-import { rootStore } from '../../stores/root'
 
 export default {
   name: "ContactModal",
   components: {
     GenericModal
   },
-  computed: {
-    ...mapState(rootStore, ['audit'])
-  },
   methods: {
     close() {
-      this.audit('View contact', '/assessmentintro')
     }
   }
 }

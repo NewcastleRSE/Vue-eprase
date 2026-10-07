@@ -97,6 +97,34 @@
         </table>           
       </GroupElement>
 
+      <GroupElement name="archiveAssessmentReports" v-if="archives.length != 0">
+        <table class="table table-striped caption-top vf-col-12">
+          <caption><h3 style="color: #025bb6">You can view the archived PDF reports for the following assessments from previous years:</h3></caption>
+          <thead>
+            <tr>
+              <th>ePrescribing System</th>
+              <th>Patient Type</th>
+              <th>ePRaSE Version</th>
+              <th>Year</th> 
+              <th>&nbsp;</th>         
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="archRep in archives">
+              <td>{{ archRep.ep_system }}</td>
+              <td>{{ archRep.assessment_type }}</td>
+              <td>{{ archRep.eprase_version }}</td>
+              <td>{{ archRep.year }}</td>
+              <td>
+                <ButtonElement :name="'view-pdf-' + archRep.documentId" title="View this assessment report (opens in a new tab)" @click="showArchiveReport(archRep.pdf_name)">
+                  <i class="bi bi-play-fill me-2"></i>View
+                </ButtonElement>                
+              </td>
+            </tr>
+          </tbody>
+        </table>        
+      </GroupElement>
+
       <GroupElement name="newAssessmentGroup">
         <StaticElement name="newAssessmentCaption">
           <h3>Start a new assessment</h3>
@@ -125,6 +153,14 @@
               { value: 'Paediatric', label: 'Paediatrics', disabled: !paediatricAssessmentAllowed }]"
             :messages="{required: 'Select an option'}"
             :rules="['required']"
+          />
+          <!-- https://github.com/NewcastleRSE/Vue-eprase/issues/437 -->
+          <TagsElement name="associatedInstitutions"
+            :label="embolden('If completing and submitting the assessment for your own and another trust, select the other organisation(s) here:', false)"                              
+            :items="allInstitutionsBarMine"
+            :break-tags="true"
+            :rules="['max:4']"                              
+            :messages="{'max': 'You can submit for a maximum of 4 other trusts'}"
           />
           <!-- Consent questions removed - fields in db retained -->
           <HiddenElement name="shareTrustsOptOut" default="1" />
@@ -163,13 +199,14 @@ import { rootStore } from '../stores/root'
 import { assessmentStore } from '../stores/assessment'
 import { authenticationStore } from '../stores/authentication'
 import { isoToUkDate } from '../helpers/utils'
+import { assessmentListener } from '../helpers/audit'
 
 export default {
   name: 'AssessmentSelection',  
   computed: {
-    ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment']),
-    ...mapState(authenticationStore, ['email', 'orgName', 'hospital']),
-    ...mapState(rootStore, ['getEpSystems', 'audit']),
+    ...mapState(assessmentStore, ['allPossibleAssessments', 'duplicateAssessmentAttempt', 'assessmentData', 'loggingOut', 'dataReady', 'selectAssessment', 'archivedReports']),
+    ...mapState(authenticationStore, ['email', 'orgCode', 'orgName', 'hospital']),
+    ...mapState(rootStore, ['getEpSystems', 'getInstitutions']),
     selectionData() {
       return this.assessmentData.selection
     },      
@@ -190,6 +227,9 @@ export default {
     },
     duplication() {
       return this.duplicateAssessmentAttempt
+    },
+    archives() {
+      return this.archivedReports
     }
   },
   data() {
@@ -201,7 +241,21 @@ export default {
     }
   },
   emits: ['jumpToStep'],
-  methods: {       
+  methods: {     
+    async showArchiveReport(pdfName) {
+      console.group('showArchiveReport()')
+      console.debug('Viewing', pdfName)
+
+      // Another little bit of security veneer, won't stop the determined...
+      const instCode = this.orgCode
+      if (!pdfName.startsWith(instCode)) {
+        throw new Error('Report is not tied to your institution - permission denied')
+      } else {
+        window.open(`https://eprasedocs.blob.core.windows.net/web/assessment_reports/${pdfName}`, '_blank')
+      }      
+
+      console.groupEnd()
+    },
     async continueAssessment(assessmentId) {
 
       console.group('continueAssessment()')
@@ -220,6 +274,14 @@ export default {
         } 
       }          
       console.groupEnd()      
+    },
+    async allInstitutionsBarMine() {
+      const response = await this.getInstitutions()
+      if (response.status < 400) {
+        return response.data.data.map(inst => { return { value: inst.id, label: inst.name } }).filter(inst => inst.label != this.orgName)       
+      } else {
+        return []
+      }
     },
     async getEpSystemNames() {
       let epSystems = []
@@ -252,6 +314,9 @@ export default {
     convertDate(d, useTime) {
       return isoToUkDate(d, useTime)
     }
+  },
+  mounted() {
+    assessmentStore().$onAction(assessmentListener)
   },
   async beforeUnmount() {
     console.group('AssessmentSelection beforeUnmount()')

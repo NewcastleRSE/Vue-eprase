@@ -17,6 +17,7 @@
 import { mapState } from 'pinia'
 import { authenticationStore } from '../stores/authentication'
 import { assessmentStore } from '../stores/assessment'
+import { authenticationListener } from '../helpers/audit'
 
 export default {
   name: 'AppLogout',
@@ -44,11 +45,12 @@ export default {
     async logOutUser() {
       console.debug('Logging out user...')
       this.setLoggingOut(false)
-      await this.logout()
+      await this.logout(this.$route.query.action == 'timeout')
       this.$router.push('/login?action=' + (this.$route.query.action == 'timeout' ? 'sessionExpired' : 'loggedOut'))
     }
   },
   mounted() {
+    authenticationStore().$onAction(authenticationListener)
   }
 }
 </script>

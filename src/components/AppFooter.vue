@@ -7,10 +7,9 @@
         :add-class="'me-2'">
         <i class="bi bi-info-circle me-lg-2"></i><span class="d-lg-block d-none">About</span>
       </ButtonElement>
-      <ButtonElement name="practice" title="Practice Session - opens in a new tab" full
+      <ButtonElement name="practice" title="Practice Session" full
         button-type="anchor"
         href="/practice"
-        target="_blank"
         :disabled="$route.path.includes('practice')"
         :columns="3" 
         :add-class="'mx-2'">
@@ -18,7 +17,7 @@
       </ButtonElement>
       <ButtonElement name="userGuide" full 
         button-type="anchor"
-        href="https://eprasedocs.blob.core.windows.net/web/EpraseUserGuide2025.pdf"
+        href="https://eprasedocs.blob.core.windows.net/web/EpraseUserGuide2026.pdf"
         target="_blank"
         title="User Guide as PDF - opens in a new tab"
         :columns="3" 

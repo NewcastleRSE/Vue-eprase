@@ -2,19 +2,11 @@
   <GroupElement name="scenarioGroup" class="my-4">
     <GroupElement name="scenarioDataLoaded" ref="scenarioDataLoadedGroup">
       <StaticElement name="scenarioHeading">
-        <h2>Scenarios</h2>
+        <h2>Step 2: Complete the Scenario</h2>
         <div class="alert alert-info mt-4" role="alert">
-          <p>There are {{ scenarioCount }} test scenarios to complete. TODO - need wording here...</p>
+          Once the patient is registered, open their profile in your system and complete the following {{ scenarioCount == 1 ? '' : scenarioCount + ' ' }}prescribing test scenario{{ scenarioCount == 1 ? '' : 's' }}.
         </div>
       </StaticElement>       
-      <StaticElement name="scenariosProgress">
-        <div class="alert alert-info fw-bold" role="alert">
-          {{ `You have completed ${numCompletedScenarios} of ${scenarioCount} scenarios` }}
-        </div>
-        <div v-show="numCompletedScenarios != 0" class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-          <div class="progress-bar" :style="'width: ' + ((numCompletedScenarios / scenarioCount) * 100) + '%'"></div>
-        </div>
-      </StaticElement>
       <ObjectElement name="scenarioData">                
         <div class="accordion vf-col-12" id="patientAccordion">
           <div class="accordion-item" v-for="patient in patientData" :key="patient.id">
@@ -34,7 +26,7 @@
                     <img v-show="isBaby(patient)" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/baby.png" alt="Baby patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Male'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-boy.png" alt="Male paediatric patient" />
                     <img v-show="!isBaby(patient) && !patient.is_adult && patient.gender == 'Female'" class="img-thumbnail" style="width: 50px; height: 50px" src="../../assets/images/anon-child-girl.png" alt="Female paediatric patient" />                         
-                    Patient: {{ patient.full_name }}, {{ formatAgeCaption(patient) }}: {{ formatAge(patient) }}
+                    Patient: {{ patient.full_name }}, age: {{ formatAge(patient) }}{{ patient.gestational_age == 0 ? '' : ', gestational age: ' + patient.gestational_age + ' weeks' }}
                   </span>
                 </button>
               </h2>
@@ -62,7 +54,7 @@
                       :class="currentScenario == pscd.scenario_code ? 'active show' : ''" role="tabpanel" tabindex="0">
                       <!-- New response form -->
                       <p v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)" class="my-4">Prescribe the following medication to the specified patient using your normal
-                        prescribing practice, then answer the questions below.</p>
+                        prescribing practice, then answer the questions below.</p>                      
                       <table class="table table-striped" style="table-layout: fixed;">
                         <tbody>
                           <tr>
@@ -74,7 +66,7 @@
                             <td>{{ pscd.prescriptions.dose }}</td>
                           </tr>
                           <tr>
-                            <th>Route</th>
+                            <th>Form/Route</th>
                             <td>{{ pscd.prescriptions.route }}</td>
                           </tr>
                           <tr>
@@ -86,15 +78,127 @@
                             <td>{{ pscd.prescriptions.duration }}</td>
                           </tr>
                           <tr>
-                            <th>Justification</th>
+                            <th>Indication</th>
                             <td>{{ pscd.prescriptions.justification }}</td>
                           </tr>
                         </tbody>
-                      </table>
+                      </table>          
+                      <div class="vf-col-12 alert alert-warning" role="warning">
+                        Please enter the prescription <span class="fw-bold">exactly as written</span>, even if you believe it is clinically incorrect.
+                        This is intentional and allows the system's safety features to be tested.
+                      </div>            
                       <div v-if="dataLoaded && !scenarioCompleted(pscd.scenario_code)">
                         <!-- Radio group of potential system responses (maps onto database field 'intervention_type') -->
                         <ObjectElement :name="pscd.scenario_code" :ref="`${pscd.scenario_code}Snippet`">
-                          <h4 class="vf-col-12 mb-2">Questions</h4>
+                          <h2 class="vf-col-12 mb-2">Step 3: Record What Happens</h2>
+                          <div class="vf-col-12 alert alert-info" role="alert">
+                            <p>
+                              After prescribing Paracetamol (the test medicine), please select the option that best matches your experience of what your system does. 
+                              Please read the information for each option to support with your selection.
+                            </p>
+                            <p>
+                              Please note on the live tool once an outcome option has been selected and you have moved to the next test users can view what was selected but can't go back and change an answer.
+                            </p>
+                            <h4>Outcome Options</h4>
+                            <p>
+                              If you placed the order for Paracetamol following your usual prescribing processes, which may have included the selection of a provided order sentence, 
+                              and did not receive any advice or information from the electronic prescribing system then please select:
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with no system/user intervention&quot;.</li>
+                            </ul>
+                            <p>If you had to ignore, modify, or override a provided order sentence to complete the paracetamol prescription then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed but had to override components of the order sentence&quot;.</li>                             
+                            </ul>
+                            <p>
+                              If you received some system advice or information in relation to allergies, abnormal lab results, dosing, route, patient age, therapeutic duplication, 
+                              monitoring, contraindication or something other; Which required you to make a decision to modify the prescription, like adjusting doses or monitoring parameters, 
+                              to mitigate risk without outright prevention, then select:
+                            </p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing completed with system/user intervention&quot;.</li>
+                               <li class="list-group-item">
+                                <p>
+                                  If you select this outcome option you will then have to select the relevant clinical decision support category you think the sysem/user 
+                                  intervention falls under (up to two CDS categories can be selected).
+                                </p>
+                                <p>
+                                  Clinical Decision Support (CDS) Categories form the basis of the ePRaSE mitigation analysis and help organisations understand how effectively their 
+                                  EPMA system supports safe prescribing practices across a broad range of clinical risk areas.
+                                </p>
+                                <p>
+                                  The following categories are used:
+                                </p>
+                                <ul class="bulleted-list">
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Anti-Microbial Stewardship - </span>Drug triggers recommendations on antimicrobial prescription support/guidelines and surveillance 
+                                    related to management of antimicrobial resistance.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Age - </span>Drug contraindication (or dose adjustment) based on patient age.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Allergy - </span>Allergy or intolerance to prescribed drug (or another drug in the same category) documented.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Brand - </span>Drug that must be prescribed by BRAND rather than using generic name.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug-Disease (Contraindication) - </span>Drug contraindication (or dose adjustment) based on patient diagnosis or co-morbidities.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Dose - </span>Specified dose for prescribed drug is outside recommended dose range for any patient (includes doses that are too high or too low).
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Duplication - </span>Specified drug prescribed more than once for the same patient.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Frequency - </span>Specified frequency is not appropriate for prescribed drug.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Laboratory - </span>Drug contraindication (or dose adjustment) based on laboratory test result (includes therapeutic drug monitoring, 
+                                    direct notification/display of abnormal labs; dosing suggestions; monitoring advisory or monitoring order request).
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Omission - </span>Critical medication NOT prescribed based upon patient diagnosis or other prescribed medication.
+                                  </li>   
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug-Drug Interaction - </span>Interaction between prescribed drug and one or more concomitant prescribed drug(s) may result in patient harm.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Drug Route - </span>Specified route is contraindicated for drug and/or dose prescribed.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Pregnancy Prevention - </span>Drug prescribed requires safety measures due to reproductive risks.
+                                  </li>
+                                  <li class="bulleted">
+                                    <span class="fw-bold">Therapeutic Duplication - </span>Two different medicines prescribed simultaneously with the same or similar therapeutic aims.
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                            <p>If you are clearly blocked from being able to prescribe the Paracetamol and it is clear cut with no additional decision point then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">&quot;Prescribing prevented&quot;.</li>
+                            </ul>
+                            <p>If you weren't able to prescribe the test medicine because the drug or particular administration route isn't available in your ePrescribing system then select:</p>
+                            <ul class="list-group mb-2">
+                              <li class="list-group-item">
+                                <p>&quot;Unable to perform test&quot;.</p>
+                                <p>This will then present you will the following options, please select as appropriate:</p>
+                                <ul class="list-group mb-2">
+                                  <li class="list-group-item">Medicine or formulary alternative not available in the system.</li>
+                                  <li class="list-group-item">Medicine administration route not available in the system.</li>
+                                  <li class="list-group-item">Other (mandatory free text).</li>
+                                </ul>                                
+                                <p>In the full assessment, if you select &quot;unable to perform test&quot; this will be classed as an invalid test. It will be included in the overall mitigation calculation of results.</p>
+                              </li>
+                            </ul>                            
+                          </div>
+                          <div class="vf-col-12 alert alert-warning" role="warning">
+                            Please select the appropriate option based on the guidance we have provided above. Once you have done this please select &quot;I have done this&quot; and then select &quot;save the response&quot;.
+                          </div>                             
                           <span class="vf-col-12"
                             v-html="embolden('Which of the following best describes the response from the system when you attempted to prescribe the specified drug?', true)"></span>
                           <table class="table table-striped vf-col-12">
@@ -165,6 +269,7 @@
                           <GroupElement :name="pscd.scenario_code + 'Discontinued'" class="alert alert-warning fw-bold mb-4" role="alert">
                             <StaticElement :name="pscd.scenario_code + 'DiscontinueInstruction'">Please discontinue the prescription order before proceeding to the next scenario</StaticElement>
                             <CheckboxElement name="haveDiscontinuedPrescription"
+                              :disabled="!(`${patient.patient_code}.${pscd.scenario_code}.interventionType` in interventionSelections)"
                               @change="(newValue) => { allowCurrentScenarioSave = newValue }"
                             >
                               I have done this
@@ -179,7 +284,7 @@
                           <tbody>
                             <tr>
                               <th style="width:200px">Response</th>
-                              <td>{{ mitigationDescription(pscd.scenario_code) }}</td>
+                              <td v-html="mitigationDescription(pscd.scenario_code)"></td>
                             </tr>
                             <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
                               <th>Category/intervention type</th>
@@ -191,9 +296,9 @@
                                 </ul>
                               </td>
                             </tr>
-                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT1'">
-                              <th>Intervention details</th>
-                              <td>{{ scenarioResponse(pscd.scenario_code)['other_reason_impossible'] || scenarioResponse(pscd.scenario_code)['reason_impossible'] }}</td>
+                            <tr v-if="scenarioResponse(pscd.scenario_code)['intervention_type'] == 'MT99'">
+                              <th>Unable to perform test reason</th>
+                              <td v-html="invalidTestDescription(pscd.scenario_code)"></td>
                             </tr>                                                                       
                             <tr>
                               <th>Your notes</th>
@@ -239,7 +344,7 @@ import { mapState } from 'pinia'
 import { Tooltip } from 'bootstrap/dist/js/bootstrap.bundle.min'
 import { appSettingsStore } from '../../stores/appSettings';
 import { practiceStore } from '../../stores/practice'
-import { systemMitigationResponses, systemResponseTooltips, patientIsBaby, patientAgeString, patientAgeCaption } from '../../helpers/common'
+import { systemMitigationResponses, systemResponseTooltips, invalidTestResponses, patientIsBaby, patientAgeString } from '../../helpers/common'
 
 export default {
   name: 'Scenario',  
@@ -267,6 +372,9 @@ export default {
     },
     systemResponseTips() {
       return systemResponseTooltips
+    },
+    invalidResponses() {
+      return invalidTestResponses
     },
     matrixCategories() {
       return this.displayCategories
@@ -311,19 +419,42 @@ export default {
     },    
     formatAge(patient) {
       return patientAgeString(patient)
-    },
-    formatAgeCaption(patient) {
-      return patientAgeCaption(patient, false)
+    },    
+    invalidTestDescription(scenarioCode) {
+      let description = ''
+      console.group('invalidTestDescription()')
+      console.debug('Responses', this.invalidResponses, 'get description for scenario', scenarioCode)
+      if (this.scenarioResponse(scenarioCode)) {
+        console.debug(this.scenarioResponse(scenarioCode))
+        const otherResponseNotes = this.scenarioResponse(scenarioCode)['invalid_test_detail_other']
+        if (otherResponseNotes) {
+          description = otherResponseNotes
+        } else {
+          const invalidDetail = this.scenarioResponse(scenarioCode)['invalid_test_detail']
+          const irs = this.invalidResponses.filter(ir => ir.value == invalidDetail)
+          if (irs.length > 0) {
+            description = irs[0].label
+          }
+        }        
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
+      return description
     },
     mitigationDescription(scenarioCode) {
       let description = ''
+      console.group('mitigationDescription()')
+      console.debug('Responses', this.scenarioResponses, 'get description for scenario', scenarioCode)
       if (this.scenarioResponse(scenarioCode)) {
         const mitigationCode = this.scenarioResponse(scenarioCode)['intervention_type']
-        const mitigation = this.mitigations.filter(m => m.mitigation_code == mitigationCode)
-        if (mitigation.length > 0) {
-          description = mitigation[0].mitigation
+        console.debug('Mitigation code', mitigationCode, 'mitigations list', this.mitigations)
+        const sysResponsesForCode = this.systemResponses.filter(sr => sr.value == mitigationCode)
+        if (sysResponsesForCode.length > 0) {
+          description = sysResponsesForCode[0].label
         }
-      }                  
+      }
+      console.debug('Returning description', description)
+      console.groupEnd()                  
       return description
     },
     initCategoryTooltips(tagsEl, firstTime = true) {
@@ -442,17 +573,12 @@ export default {
           this.allowCurrentScenarioSave = false
           this.currentScenario = incompleteScenarioCodes[0]
           this.currentPatient = this.scenarioPatientLink[this.currentScenario] 
-          this.showUniqueScenario()       
-          const patientElement = document.getElementById('scenario-patient-' + this.currentPatient)
-          if (patientElement != null) {
-            this.$nextTick(() => { 
-                patientElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-              })
-            })            
-          }
+          this.showUniqueScenario()
+          window.scroll({
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth' 
+          })          
         console.debug('Set current patient to', this.currentPatient, 'current scenario to', this.currentScenario)
         })       
       } else {
@@ -495,7 +621,7 @@ export default {
     setIntervention(newVal, oldVal, el$) {
       console.group('setIntervention()')
       const identifier = el$.dataPath.split('.').slice(1).join('.')
-      // This sets the object key to <patient_code>.<scenario_code>.outcome
+      // This sets the object key to <patient_code>.<scenario_code>.interventionType
       if (this.interventionSelections[identifier] != newVal) {
         // Only set this reactive quantity if its value has *actually* changed - 'change' event is fired multiple times for radios and Vue slows down dramatically as the DOM is rewritten multiple times!
         console.debug('New value', newVal, 'old value', oldVal, 'selection value', this.interventionSelections)
@@ -533,4 +659,15 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+ul.bulleted-list {
+  list-style-type: disc;
+  margin-left: 1em;
+}
+
+li.bulleted {
+  display: list-item;  
+}
+
+</style>
