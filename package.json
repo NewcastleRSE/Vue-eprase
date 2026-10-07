@@ -31,7 +31,7 @@
     "print-js": "^1.6.0",
     "sass": "^1.98.0",
     "terser-webpack-plugin": "^5.4.0",
-    "vue": "^3.5.31",
+    "vue": "^3.5.43",
     "vue-axios": "^3.5.2",
     "vue-flatpickr-component": "^12.0.0",
     "vue-router": "^5.0.4"
