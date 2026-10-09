@@ -243,7 +243,7 @@
                           <SelectElement name="reasonImpossible"
                             v-if="dataLoaded && prescribingImpossible"
                             :label="embolden('Please enter the reason prescribing was not possible', true)"
-                            :native="false"
+                            :native="true"
                             :track-by="['label', 'value']"
                             :items="[
                               { value: '', label: 'Please select...', disabled: true },
