@@ -226,7 +226,7 @@ export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'puppeteerCall', 'isReportArchived', 'archiveReport']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'pdfToBlobstore', 'isReportArchived', 'archiveReport']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -381,7 +381,7 @@ export default {
               case 'not archived':
                 // Create a PDF of the report using Puppeteer
                 const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
-                const saveResponse = await this.puppeteerCall({ 
+                const saveResponse = await this.pdfToBlobstore({ 
                   assessmentId : caa.documentId,
                   institutionCode: caa.institution.institution_code,
                   epSystem: epSystemName,

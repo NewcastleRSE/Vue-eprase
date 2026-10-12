@@ -86,7 +86,7 @@ export default {
   name: 'Assessment',
   computed: {
     ...mapState(rootStore, ['systemError']),
-    ...mapState(authenticationStore, ['user', 'isReporter', 'isLoggedIn', 'setSessionTimer']),
+    ...mapState(authenticationStore, ['user', 'isLoggedIn', 'setSessionTimer']),
     ...mapState(appSettingsStore, ['version', 'year', 'sessionInactivityTimeout', 'sessionInactivityWarningAt']),
     ...mapState(assessmentStore, ['assessmentData', 'duplicateAssessmentAttempt', 'assessmentStateIndex', 'setLoggingOut']),
     assessmentId() {

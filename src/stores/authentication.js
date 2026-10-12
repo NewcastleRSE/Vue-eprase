@@ -48,8 +48,19 @@ export const authenticationStore = defineStore('authentication', {
     }
   },
   actions: {
-    isReporter() {
-      return this.role == 'Reporter'
+    async isReporter() {
+
+      let ret = false
+
+      // Make this more secure by calling the back-end rather than simply storing the role
+      //return this.role == 'Reporter'
+      try {
+        const roleRes = await axios.get(`${API}users/me?populate[role][fields][0]=name`, { headers: this.authTokenHeader })
+        ret = roleRes?.data?.role?.name == 'Reporter'
+      } catch (err) {        
+        ret = this.triageError(err)      
+      }
+      return ret
     },
     setSessionTimer(timer) {
       this.$patch({sessionTimeoutTimer: timer})
@@ -82,7 +93,7 @@ export const authenticationStore = defineStore('authentication', {
         this.$patch({
           user: userDetails.user.username,
           userId: userDetails.user.id,
-          role: instRes.data.role.name,
+          role: instRes.data.role.name, // Probably not being used now - much more secure to retrieve this from back-end when required
           email: userDetails.user.email,
           institutionId: instRes.data.institution.id,
           hospital: userDetails.user.hospital,

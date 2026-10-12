@@ -157,7 +157,7 @@
                           <SelectElement name="invalidTestDetail"
                             v-if="dataLoaded && prescribingImpossible"
                             :label="embolden('Please enter the reason prescribing was not possible', true)"
-                            :native="false"
+                            :native="true"
                             :track-by="['label', 'value']"
                             :items="invalidResponses"
                             :messages="{required: 'Reason is required if prescribing was not possible'}" 

@@ -272,7 +272,8 @@ export default {
     },
     async getInstitutionName() {
       this.institutionName = this.orgName
-      if (this.isReporter()) {
+      const isReporter = await this.isReporter()
+      if (isReporter) {
         // Get institution name from assessment
         const iresponse = await this.getInstitutionDetails(this.assessmentData.institution)
         if (iresponse.status < 400) {
@@ -433,7 +434,8 @@ export default {
   async beforeUnmount() {
     console.group('AssessmentFinalReport beforeUnmount()')
     let wasError = false
-    if (!this.isReporter()) {
+    const isReporter = await this.isReporter()
+    if (!isReporter) {
       const updateResponse = await this.updateAssessmentStatus('Assessment complete', true)
       wasError = await this.errorResponder(updateResponse)
     }   

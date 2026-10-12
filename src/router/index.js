@@ -99,7 +99,8 @@ router.beforeEach(async (to, from) => {
     console.debug('Routing logged in user to assessment page, skip welcome')
     console.groupEnd()
 
-    if (authenticationStore().isReporter()) {
+    const isReporter = await authenticationStore().isReporter()
+    if (isReporter) {
       return '/assessment-dashboard'
     }
     return '/assessment'

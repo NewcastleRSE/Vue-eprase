@@ -409,7 +409,7 @@ export const assessmentStore = defineStore('assessment', {
         // Continuing existing assessment
         console.assert(assessmentId != null, 'No assessment id supplied!')
         console.debug('Continuing assessment', assessmentId, '=> patch in data')
-        const isReporter = authenticationStore().isReporter()        
+        const isReporter = await authenticationStore().isReporter()        
         let chosenAssessments = []
         let loadedAssessmentData = {}
         if (dashboard || isReporter) {
@@ -991,7 +991,7 @@ export const assessmentStore = defineStore('assessment', {
 
       console.group('patientListBuild()') 
       console.debug('Assessment ID', this.assessmentData.selection.assessmentId)
-      const isReporter = authenticationStore().isReporter()    
+      const isReporter = await authenticationStore().isReporter()    
 
       // Get patient list
       if (this.assessmentData.patients.length == 0 && this.assessmentData.selection.assessmentId != null) {

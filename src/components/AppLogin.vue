@@ -179,7 +179,8 @@ export default {
           console.warn('Failed to delete session with id', ncs.sessionId)
         }
       }
-      if (this.isReporter()) {
+      const isReporter = await this.isReporter()
+      if (isReporter) {
         this.$router.push('/assessment-dashboard')
       } else {
         this.$router.push('/assessment')
@@ -199,7 +200,8 @@ export default {
           const signinResponse = await this.login(this.user.email, this.user.password)
           if (signinResponse.status < 400) {
             console.debug('Successful signin')
-            if (this.isReporter()) {
+            const isReporter = await this.isReporter()
+            if (isReporter) {
               this.$router.push('/assessment-dashboard')
             } else {
               this.sessions = await this.getAllSessions()
