@@ -30,16 +30,19 @@ const nhsPassword = class extends Validator {
   }
   check(value) {
     console.debug('Validate NHS password', value)
-    const result = PasswordValidatorManager.fluent()
-      .min(10)  // Minimum length of 10 characters
-      .max(50)  // Maximum length of 50 characters
-      .digit(1) // At least 1 digit
-      .upper(1) // At least 1 upper case
-      .lower(1) // At least 1 lower case
-      .specialCharacter(1)
-      .validate(value)
-    console.debug('Return', result.valid)
-    return result.valid
+    if (typeof value === 'string') {
+      const result = PasswordValidatorManager.fluent()
+        .min(10)  // Minimum length of 10 characters
+        .max(50)  // Maximum length of 50 characters
+        .digit(1) // At least 1 digit
+        .upper(1) // At least 1 upper case
+        .lower(1) // At least 1 lower case
+        .specialCharacter(1)
+        .validate(value)
+      console.debug('Return', result.valid)
+      return result.valid
+    }
+    return false
   }
 }
 
