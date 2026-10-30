@@ -226,7 +226,7 @@ export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'pdfToBlobstore', 'isReportArchived', 'archiveReport']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'isReportArchived', 'archiveReport']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -379,26 +379,19 @@ export default {
                 this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
                 break
               case 'not archived':
-                // Create a PDF of the report using Puppeteer
+                // Create a PDF of the report using Puppeteer and write to archive table
                 const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
-                const saveResponse = await this.pdfToBlobstore({ 
+                const saveResponse = await this.archiveReport({ 
                   assessmentId : caa.documentId,
                   institutionCode: caa.institution.institution_code,
                   epSystem: epSystemName,
                   assessmentType: assessmentType
                 })
-                if (saveResponse.status < 400) {
-                  // Successfully created a PDF, add record to report_archives table
-                  const pdf = saveResponse.data.pdfName                  
-                  const archivedResponse = await this.archiveReport(caa.institution.institution_code, epSystemName, assessmentType, pdf)  
-                  if (archivedResponse.status != 'error')                                 {
-                    this.addArchivingFeedback(ul, 'Done', addedLi)
-                  } else {
-                    this.addArchivingFeedback(ul, archivedResponse.message, addedLi)
-                  }
+                if (saveResponse.status != 'error')                                 {
+                  this.addArchivingFeedback(ul, 'Done', addedLi)
                 } else {
                   this.addArchivingFeedback(ul, saveResponse.message, addedLi)
-                } 
+                }                
                 break
               case 'error': 
                 this.addArchivingFeedback(ul, isArchivedResponse.message)

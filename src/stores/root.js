@@ -147,12 +147,13 @@ export const rootStore = defineStore('root', {
       console.debug('Result', ret)
       return ret
     },
-    async archiveReport(institutionCode, epSystemName, patientType, pdfName) {
+    async archiveReport(assessmentId, institutionCode, epSystemName, patientType) {
       let ret = null
-      console.debug(`Archive ${pdfName} for institution ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
+      console.debug(`Archive report for institution ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
       const archiveVersion = appSettingsStore().archiveVersion
       const archiveYear = appSettingsStore().archiveYear
       const response = await this.apiCall('archive-report', 'POST', { data: {
+        assessmentId: assessmentId,
         eprase_version: archiveVersion,
         year: archiveYear,
         institution_code: institutionCode,
