@@ -1,6 +1,7 @@
 // vueform.config.(js|ts)
 
 import dayjs from 'dayjs'
+import Fuse from 'fuse.js'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import en from '@vueform/vueform/locales/en'
@@ -55,6 +56,50 @@ const nonEmptyObject = class extends Validator {
       return Object.keys(value).length > 0
     }
     return false
+  }
+}
+
+// Fix for assessment selection loophole which allows selection of 'Other' and typing an option included in the original list
+// Array values to be tested against joined by '|' and supplied as a string - David 30/10/2026
+const valueFuzzyMatchArray = class extends Validator {
+
+  get msg() {
+    return 'Other ePrescribing system name must be distinct from dropdown options'
+  }
+
+  get messageParams() {
+    return {
+      attribute: this.attributeName,
+      epOptions: this.epOptions
+    }
+  }
+
+  get epOptions() {
+    return this.attributes[0]
+  }
+
+  check(value) {
+
+    let ret = true
+
+    console.debug('valueFuzzyMatchArray:check()', value, this.epOptions)
+    this.watch(this.epOptions)
+    const matchThresholdScore = 0.6   // 0 = requires perfect match, 1.0 = matches anything
+    const optsArray = this.epOptions.split('|')
+    const fuse = new Fuse(optsArray, {
+      includeScore: true,
+      ignoreDiacritics: true
+    })
+    // Return like [{ item: '<value>', refIndex: 0, score: 0.25 }]
+    const results = fuse.search(value)
+    const matches = results.filter(r => r.score <= matchThresholdScore)
+    if (matches.length > 0) {
+      console.debug('Found', matches.length, 'potential matches for', value)
+      const matchValues = matches.map(m => optsArray[m.refIndex])
+      console.debug(value, 'deemed to be a match for one of', matchValues)
+      ret = false
+    }
+    return ret
   }
 }
 
@@ -142,6 +187,6 @@ export default defineConfig({
   displayMessages: false,
   floatPlaceholders: false,
   rules: {
-    nhsEmail, nhsPassword, nonEmptyObject, dateIsSameOrAfter, fieldIsOther
+    nhsEmail, nhsPassword, nonEmptyObject, dateIsSameOrAfter, fieldIsOther, valueFuzzyMatchArray
   }
 })

@@ -145,7 +145,7 @@
             :label="embolden('Name of ePrescribing system', true)"
             :debounce="200" 
             :messages="{required: 'Other ePrescribing system name is required'}" 
-            :rules="['required', 'fieldIsOther:selection.epService']" />
+            :rules="['required', 'fieldIsOther:selection.epService', `valueFuzzyMatchArray:${packedEpOptions}`]" />
           <RadiogroupElement name="patientType"
             :label="embolden('For patient type', true)"      
             :items="[
@@ -235,6 +235,7 @@ export default {
   data() {
     return {
       isOtherEpSystem: false,
+      packedEpOptions: '',
       adultAssessmentAllowed: true,
       paediatricAssessmentAllowed: true,
       continuingExistingAssessment: false
@@ -297,10 +298,13 @@ export default {
         // Don't offer ePrescribing system codes which already have 2 assessments         
         const validEpSystems = response.data.data.filter(ep => !Object.keys(frequencyCounts).includes(ep.documentId) || frequencyCounts[ep.documentId] < 2)       
         epSystems = validEpSystems.map(ep => { return { value: ep.documentId, label: ep.name } })
+        // Added 30/10/2026 David - aid to the fuzzy match validator for epSystem names entered when 'Other' selected
+        this.packedEpOptions = validEpSystems.map(ep => ep.name).join('|')
         // Make sure 'Other' appears at the end of the list for user friendliness (system names are sorted alphabetically)
         const otherIdx = epSystems.findIndex(ep => ep.label == 'Other')
         epSystems.push(epSystems.splice(otherIdx, 1)[0]) //https://stackoverflow.com/questions/24909371/move-item-in-array-to-last-position
         epSystems.unshift({value: '', label: 'Please select...', disabled: true})
+        console.debug(epSystems)
       } else {
         await this.errorResponder(response)
       }
