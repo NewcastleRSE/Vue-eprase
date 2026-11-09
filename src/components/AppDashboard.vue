@@ -379,15 +379,10 @@ export default {
                 this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
                 break
               case 'not archived':
-                // Create a PDF of the report using Puppeteer and write to archive table
+                // Create a PDF of the report using Puppeteer and write to archive table 
                 const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
-                const saveResponse = await this.archiveReport({ 
-                  assessmentId : caa.documentId,
-                  institutionCode: caa.institution.institution_code,
-                  epSystem: epSystemName,
-                  assessmentType: assessmentType
-                })
-                if (saveResponse.status != 'error')                                 {
+                const saveResponse = await this.archiveReport(caa.documentId, caa.institution.institution_code, epSystemName, assessmentType)
+                if (saveResponse.status != 'error') {
                   this.addArchivingFeedback(ul, 'Done', addedLi)
                 } else {
                   this.addArchivingFeedback(ul, saveResponse.message, addedLi)
