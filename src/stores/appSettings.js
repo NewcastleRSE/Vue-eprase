@@ -10,8 +10,8 @@ export const appSettingsStore = defineStore('appSettings', {
       version: '3.2.2',
       debugMode: false,
       year: new Date().getFullYear(),
-      archiveVersion: 4,
-      archiveYear: '2025-26',
+      archiveVersion: 4,                            // Two key quantities for the archiving of reports - need to be updated 
+      archiveYear: '2025-26',                       // for every tool run
       jwtLifespan: 14400,                           // JWT lifespan in seconds (4 hours)    
       sessionInactivityTimeout: 120 * 60 * 1000,    // Sessions expire after this number of milliseconds (2 hours)
       sessionInactivityWarningAt: 119 * 60 * 1000,  // Warn the user of session expiry after this number of milliseconds       

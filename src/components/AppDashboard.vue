@@ -117,26 +117,15 @@
                 <button name="archive-reports-btn" class="col-4 btn btn-primary" 
                   :disabled="archiveStarted" @click="saveCompletedReportsToArchive()"
                 >Save Current Reports to Archive</button>
-                <div v-show="archiveInProgressAdult">
-                  <h5 class="mt-2">Adult assessments</h5>
-                  <ul ref="archiveFeedbackAdult" class="list-group"> 
-                    <li class="list-group-item">
-                      <div class="d-flex align-items-center">
-                        <strong role="status">Determining what to archive...</strong>
-                        <div class="spinner-border ms-auto" aria-hidden="true"></div>
-                      </div>
-                    </li>                 
-                  </ul>
+                <div class="alert alert-danger mt-4" v-if="archiveError != null">
+                  <span class="fw-bold">{{ archiveError }}</span>
                 </div>
-                <div v-show="archiveInProgressPaediatric">
-                  <h5 class="mt-2">Paediatric assessments</h5>
-                  <ul ref="archiveFeedbackPaediatric" class="list-group">
-                    <li class="list-group-item">
-                      <div class="d-flex align-items-center">
-                        <strong role="status">Determining what to archive...</strong>
-                        <div class="spinner-border ms-auto" aria-hidden="true"></div>
-                      </div>
-                    </li>                  
+                <div class="mt-4" v-if="archiveError == null && archiveMessage != null">
+                  <span class="fw-bold">{{ archiveMessage }}</span>
+                </div>
+                <div class="mt-4" v-if="archiveError == null && archiveFeedback.length > 0">
+                  <ul class="list-group">
+                    <li v-for="af in archiveFeedback">{{ af }}</li>
                   </ul>
                 </div>
               </div>
@@ -226,7 +215,7 @@ export default {
   name: 'AssessmentDashboard',
   computed: {
     ...mapState(appSettingsStore, ['year']),
-    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions', 'isReportArchived', 'archiveReport']),
+    ...mapState(rootStore, ['progressReport', 'apiCall', 'getInstitutions']),
     ...mapState(assessmentStore, ['dataReady', 'selectAssessment', 'getCategoryDetails', 'getMitigationDetails']),
     dataLoaded() {
       return this.dataReady
@@ -257,9 +246,9 @@ export default {
       dashboardData: null,
       institutions: [],
       archiveStarted: false,
-      archiveInProgressAdult: false,
-      archiveInProgressPaediatric: false,
-      archiveComplete: false
+      archiveMessage: null,
+      archiveFeedback: [],
+      archiveError: null
     }
   },
   methods: {
@@ -345,59 +334,24 @@ export default {
         window.open(this.$router.resolve({ path: '/assessment-report' }).href, '_blank')
       }
       console.groupEnd()
-    },
-    addArchivingFeedback(ul, str, addToLi = null) {
-      let li = addToLi
-      if (addToLi != null) {        
-        addToLi.innerHTML = addToLi.innerHTML + str
-      } else {
-        li = document.createElement('li')
-        li.className = 'list-group-item'
-        li.innerHTML = str
-        ul.appendChild(li)
-      } 
-      return li     
-    },
+    },    
     async saveCompletedReportsToArchive() {
       console.group('saveCompletedReportsToArchive()')
-      this.archiveStarted = true      
-      for (const assessmentType of ['Adult', 'Paediatric']) {
-        this['archiveInProgress' + assessmentType] = true
-        const ul = this.$refs['archiveFeedback' + assessmentType]
-        ul.innerHTML = ''
-        const fieldName = assessmentType.substring(0, 1).toLowerCase() + assessmentType.substring(1) + 'Assessments'
-        const completedAssessments = this.dashboardData[fieldName].filter(assmt => assmt.state == 'Assessment complete')
-        if (completedAssessments.length == 0) {
-          this.addArchivingFeedback(ul, 'No completed reports to be archived')
-        } else {
-          for (const caa of completedAssessments) {
-            const epSystemName = caa.other_ep_service || caa.ep_service.name
-            // Check if the report is already archived in the 'report_archives' table
-            const isArchivedResponse = await this.isReportArchived(caa.institution.institution_code, epSystemName, assessmentType)
-            switch(isArchivedResponse.status) {
-              case 'archived': 
-                this.addArchivingFeedback(ul, `${caa.institution.institution_code} ${epSystemName} ${assessmentType} already archived, skipping...`)
-                break
-              case 'not archived':
-                // Create a PDF of the report using Puppeteer and write to archive table 
-                const addedLi = this.addArchivingFeedback(ul, `Saving ${caa.institution.institution_code} ${epSystemName} ${assessmentType} to archive...`)
-                const saveResponse = await this.archiveReport(caa.documentId, caa.institution.institution_code, epSystemName, assessmentType)
-                if (saveResponse.status != 'error') {
-                  this.addArchivingFeedback(ul, 'Done', addedLi)
-                } else {
-                  this.addArchivingFeedback(ul, saveResponse.message, addedLi)
-                }                
-                break
-              case 'error': 
-                this.addArchivingFeedback(ul, isArchivedResponse.message)
-                break
-              default: 
-                break
-            } 
-          }
-        }
-      }       
-      this.archiveComplete = true     
+      this.archiveStarted = true 
+      const archiveVersion = appSettingsStore().archiveVersion
+      const archiveYear = appSettingsStore().archiveYear
+      const response = await this.apiCall('archive-reports', 'POST', { data: {
+        eprase_version: archiveVersion,
+        year: archiveYear
+      }})
+      if (response.status < 400) {
+        // Expect data payload of form { message: <status message>, content: [<detail1>, <detail2>...] }
+        this.archiveMessage = response.data.message
+        this.archiveFeedback = response.data.content
+      } else {
+        // Errors come with <message> 
+        this.archiveError = response.message
+      }
       console.groupEnd()
     }
   },

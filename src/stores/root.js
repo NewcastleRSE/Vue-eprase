@@ -1,7 +1,6 @@
 import { authenticationStore } from './authentication'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { appSettingsStore } from './appSettings'
 
 const API = process.env.BASE_URL
 const SUPPORTED_METHODS = ['GET', 'POST', 'PUT', 'DELETE']
@@ -130,43 +129,6 @@ export const rootStore = defineStore('root', {
     // Final report in a print-friendly form
     storePrintableReportData(heading, content, buttonCaption, archived) {
       this.printableReportData = { heading, content, buttonCaption, archived }
-    },
-    async isReportArchived(institutionCode, epSystemName, patientType) {
-      let ret = null
-      console.debug(`Check report archived for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
-      const archiveVersion = appSettingsStore().archiveVersion
-      const response = await this.apiCall(
-        `report-archives?filters[eprase_version][$eq]=${archiveVersion}&filters[ep_system][$eq]=${epSystemName}&filters[institution_code][$eq]=${institutionCode}&filters[assessment_type][$eq]=${patientType}`,
-        'GET'
-      )
-      if (response.status < 400) {
-        ret = { status: response.data.data.length > 0 ? 'archived' : 'not archived', message: 'ok' }
-      } else {
-        ret = { status: 'error', message: `Failed to get report for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
-      }
-      console.debug('Result', ret)
-      return ret
-    },
-    async archiveReport(assessmentId, institutionCode, epSystemName, patientType) {
-      let ret = null
-      console.debug(`Archive report for institution ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`)
-      const archiveVersion = appSettingsStore().archiveVersion
-      const archiveYear = appSettingsStore().archiveYear
-      const response = await this.apiCall('archive-report', 'POST', { data: {
-        assessmentId: assessmentId,
-        eprase_version: archiveVersion,
-        year: archiveYear,
-        institution_code: institutionCode,
-        ep_system: epSystemName,
-        assessment_type: patientType
-      }})
-      if (response.status < 400) {
-        ret = { status: 'ok', message: 'Saved successfully' }
-      } else {
-        ret = { status: 'error', message: `Failed to save archive record for ${institutionCode}, patient type ${patientType}, ePrescribing system ${epSystemName}`}
-      }
-      console.debug('Result', ret)
-      return ret
     }
   }
 })
