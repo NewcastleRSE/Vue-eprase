@@ -1,8 +1,7 @@
 import { authenticationStore } from '../stores/authentication'
 import axios from 'axios'
 import { validNhsEmail } from './utils'
-
-const API = process.env.BASE_URL
+import { app } from '../main'
 
 function isSuccessResult(result) {
   let ok = true
@@ -21,7 +20,7 @@ function isSuccessResult(result) {
 async function auditLog(actionType, entityType, entityId, result) {
   const auth = authenticationStore()
   const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
-  await axios.post(`${API}audits`, { data: {
+  await axios.post(`${app.config.globalProperties.API}audits`, { data: {
     action_type: actionType,
     entity_type: entityType,
     entity_id: entityId,
@@ -38,7 +37,7 @@ async function auditLog(actionType, entityType, entityId, result) {
 async function errorLog(actionType, errorObject) {
   const auth = authenticationStore()
   const config = auth.token ? { headers: { Authorization: `Bearer ${auth.token}` } } : {}
-  await axios.post(`${API}audits`, { data: {
+  await axios.post(`${app.config.globalProperties.API}audits`, { data: {
     action_type: actionType,
     entity_type: 'error',
     entity_id: errorObject instanceof Error ? errorObject.message : ((errorObject != null && errorObject != undefined) ? errorObject.toString() : 'Unspecified error'),

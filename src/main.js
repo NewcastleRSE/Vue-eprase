@@ -15,7 +15,6 @@ import vueformConfig from '../vueform.config'
 import { router } from './router'
 import { authenticationStore } from './stores/authentication.js'
 import { isStagingSite } from './helpers/utils.js'
-import { rootStore } from './stores/root.js'
 
 // Strip out most debugging information in production version (leaves console.warn and console.error)
 // 30/03/2026 David - leave debugging trace information in for staging site, only strip out on actual production server
@@ -25,19 +24,24 @@ if (process.env.NODE_ENV === 'production' && !isStagingSite()) {
   console.group = function() {}
   console.groupEnd = function() {}
 }
-console.dir(process.env)
 
 const app = createApp(App)
+
+app.config.globalProperties.API = `${window.location.protocol}//${window.location.hostname == 'localhost' ? 'localhost' : 'server'}:1337/api/`
+
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 pinia.use(({ store }) => {
-  store.router = router // This makes 'router' available as 'this.router' in stores
+  store.router = router,
+  store.API = app.config.globalProperties.API
 })
 
-axios.defaults.baseURL = process.env.BASE_URL
+axios.defaults.baseURL = app.config.globalProperties.API
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 axios.defaults.withCredentials = true
+
+console.debug('Window location hostname', window.location.hostname)
 
 app.use(pinia).use(VueAxios, axios).use(router).use(Vueform, vueformConfig)
 
@@ -82,4 +86,5 @@ app.config.globalProperties.errorResponder = async function(response) {
   return wasError
 }
 
+export { app }
 app.mount('#app')
