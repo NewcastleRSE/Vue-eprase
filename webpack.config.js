@@ -129,15 +129,12 @@ module.exports = {
 if (process.env.NODE_ENV === "production") {
   let baseURL = '"http://localhost:1337/api/"'
   let sentryENV = "development"
-  let pdfToBlobstoreURL = '"http://localhost:3000/pdf-to-blobstore/"'
 
   if (process.env.TARGET === "staging") {
     baseURL = '"https://eprase.ncldata.dev/strapi/api/"'
-    // TODO - set pdfToBlobstoreURL here
     sentryENV = "staging"
   } else if (process.env.TARGET === "production") {
     baseURL = '"https://eprase.nuth.nhs.uk/strapi/api/"'
-    // TODO - set pdfToBlobstoreURL here
     sentryENV = "production"
   }
 
@@ -148,7 +145,6 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"production"',
         BASE_URL: baseURL,
-        PDF_TO_BLOBSTORE: pdfToBlobstoreURL,
         MAINTENANCE_MODE: true
       },
     }),
@@ -165,7 +161,6 @@ if (process.env.NODE_ENV === "production") {
       "process.env": {
         NODE_ENV: '"development"',
         BASE_URL: '"http://localhost:1337/api/"',
-        PDF_TO_BLOBSTORE: '"http://localhost:3000/pdf-to-blobstore/"',
         MAINTENANCE_MODE: false
       },
     }),

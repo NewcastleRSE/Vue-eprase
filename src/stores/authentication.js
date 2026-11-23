@@ -3,7 +3,7 @@ import axios from 'axios'
 import { assessmentStore } from './assessment'
 import Cookies from 'js-cookie'
 import { practiceStore } from './practice'
-import { usernameFromEmail } from '../helpers/utils'
+import { usernameFromEmail, apiUrl } from '../helpers/utils'
 
 export const authenticationStore = defineStore('authentication', {
   state: () => ({
@@ -53,7 +53,7 @@ export const authenticationStore = defineStore('authentication', {
       // Make this more secure by calling the back-end rather than simply storing the role
       //return this.role == 'Reporter'
       try {
-        const roleRes = await axios.get(`${this.API}users/me?populate[role][fields][0]=name`, { headers: this.authTokenHeader })
+        const roleRes = await axios.get(`${apiUrl()}users/me?populate[role][fields][0]=name`, { headers: this.authTokenHeader })
         ret = roleRes?.data?.role?.name == 'Reporter'
       } catch (err) {        
         ret = this.triageError(err)      
@@ -75,18 +75,18 @@ export const authenticationStore = defineStore('authentication', {
       try {
         // NOTE: this uses the standard authentication pathway which doesn't restrict institutions to one logged-in user at a time
         // Will need to develop a plugin to do the signin in order to implement this - David 21/03/2025
-        const signinRes = await axios.post(`${this.API}auth/local`, payload)
+        const signinRes = await axios.post(`${apiUrl()}auth/local`, payload)
         const userDetails = signinRes.data
         console.debug('User details from signin', userDetails)
         this.$patch({token: userDetails.jwt})
 
         // Get current session document ID
-        const sessRes = await axios.get(`${this.API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })
+        const sessRes = await axios.get(`${apiUrl()}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })
         this.$patch({session: sessRes.data.data.documentId})
 
         // Get details of user trust and institution
         console.debug('Determining user institution...')
-        const instRes = await axios.get(`${this.API}users/me?populate[institution][fields][]=*&populate[role][fields][0]=name`, { headers: this.authTokenHeader }) 
+        const instRes = await axios.get(`${apiUrl()}users/me?populate[institution][fields][]=*&populate[role][fields][0]=name`, { headers: this.authTokenHeader }) 
                 
         this.$patch({
           user: userDetails.user.username,
@@ -124,7 +124,7 @@ export const authenticationStore = defineStore('authentication', {
     async logout(timeout = false) {
       console.group('logout()')
       if (this.token) {
-        await axios.post(`${this.API}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })
+        await axios.post(`${apiUrl()}magic-sessionmanager/logout`, {}, { headers: this.authTokenHeader })
       }  
       this.clear()
       console.groupEnd()
@@ -136,7 +136,7 @@ export const authenticationStore = defineStore('authentication', {
       console.group('isLoggedIn()')
 
       try {
-        const res = await axios.get(`${this.API}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })        
+        const res = await axios.get(`${apiUrl()}magic-sessionmanager/current-session`, { headers: this.authTokenHeader })        
         ret = res.data?.data?.isTrulyActive === true 
       } catch (err) {
         console.error(err)
@@ -154,7 +154,7 @@ export const authenticationStore = defineStore('authentication', {
       console.group('getAllSessions()')
 
       try {
-        const res = await axios.get(`${this.API}magic-sessionmanager/my-sessions`, { headers: this.authTokenHeader })
+        const res = await axios.get(`${apiUrl()}magic-sessionmanager/my-sessions`, { headers: this.authTokenHeader })
         ret = res.data.data
       } catch (err) {
         console.error(err)
@@ -173,7 +173,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Terminating active session', sessionDocumentId)
 
       try {
-        const res = await axios.delete(`${this.API}magic-sessionmanager/my-sessions/${sessionDocumentId}`, { headers: this.authTokenHeader })
+        const res = await axios.delete(`${apiUrl()}magic-sessionmanager/my-sessions/${sessionDocumentId}`, { headers: this.authTokenHeader })
         console.debug(res)
         ret = res.data.success
       } catch (err) {
@@ -194,7 +194,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const signupRes = await axios.post(`${this.API}auth/local/register`, payload)        
+        const signupRes = await axios.post(`${apiUrl()}auth/local/register`, payload)        
         ret = { status: signupRes.status, data: signupRes.data }
       } catch (err) {
         ret = this.triageError(err)
@@ -215,7 +215,7 @@ export const authenticationStore = defineStore('authentication', {
       console.debug('Data payload', payload)
 
       try {
-        const changePassRes = await axios.post(`${this.API}auth/change-password`, payload, { headers: this.authTokenHeader })        
+        const changePassRes = await axios.post(`${apiUrl()}auth/change-password`, payload, { headers: this.authTokenHeader })        
         ret = { status: changePassRes.status, data: changePassRes.data }
       } catch (err) {
         ret = this.triageError(err)

@@ -27,16 +27,13 @@ if (process.env.NODE_ENV === 'production' && !isStagingSite()) {
 
 const app = createApp(App)
 
-app.config.globalProperties.API = `${window.location.protocol}//${window.location.hostname == 'localhost' ? 'localhost' : 'server'}:1337/api/`
-
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 pinia.use(({ store }) => {
-  store.router = router,
-  store.API = app.config.globalProperties.API
+  store.router = router
 })
 
-axios.defaults.baseURL = app.config.globalProperties.API
+axios.defaults.baseURL = process.env.BASE_URL
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.mode = 'no-cors'
 axios.defaults.withCredentials = true

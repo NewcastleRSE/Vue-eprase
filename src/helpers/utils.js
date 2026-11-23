@@ -1,7 +1,10 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
-import { app } from '../main'
+
+export function apiUrl() {
+  return `${window.location.protocol}//${window.location.hostname == 'client' ? 'server' : window.location.hostname}:1337/api/`
+}
 
 export function validNhsEmail(value) {
   return /^[a-zA-Z0-9-.]+@([a-z-]+.|)nhs.(uk|net)+$/.test(value)
@@ -45,7 +48,7 @@ export function shuffle(a) {
 }
 
 export function isStagingSite() {
-  // Detects staging server via app.config.globalProperties.API
-  console.debug('Detecting whether we are on staging', app.config.globalProperties.API)
-  return app.config.globalProperties.API.includes('ncldata.dev')
+  // Detects staging server via process.env.BASE_URL
+  console.debug('Detecting whether we are on staging', process.env.BASE_URL)
+  return process.env.BASE_URL.includes('ncldata.dev')
 }
