@@ -4,7 +4,7 @@ import '../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'
 import '../node_modules/bootstrap-icons/font/bootstrap-icons.min.css'
 import '../node_modules/flatpickr/dist/plugins/monthSelect/style.css'
 
-import { createApp } from 'vue'
+import { createApp, markRaw } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
@@ -30,7 +30,7 @@ const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 pinia.use(({ store }) => {
-  store.router = router
+  store.router = markRaw(router)
 })
 
 axios.defaults.baseURL = process.env.BASE_URL
